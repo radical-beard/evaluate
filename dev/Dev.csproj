@@ -1,0 +1,13 @@
+<Project Sdk="Godot.NET.Sdk/4.6.0">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <!-- Dev/test harness: consumes the Evaluate library by project reference, the
+       same way a game consumes the published RadicalBeard.Evaluate package. -->
+  <ItemGroup>
+    <ProjectReference Include="../src/Evaluate/Evaluate.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,8 @@
+---
+returns:
+ - position: get set vec3
+---
+-- Declares a `position` property but never exposes get_position/set_position,
+-- so the returns contract must reject it at require time.
+local M = {}
+return M

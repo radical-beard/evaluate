@@ -1,0 +1,10 @@
+; Evaluate dev/test harness — consumes the Evaluate library by project reference.
+config_version=5
+
+[application]
+config/name="Evaluate Dev"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.6", "C#", "Forward Plus")
+
+[dotnet]
+project/assembly_name="Dev"

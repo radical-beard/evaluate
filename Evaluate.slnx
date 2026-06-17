@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="src/Evaluate/Evaluate.csproj" />
+  <Project Path="src/Evaluate.Generator/Evaluate.Generator.csproj" />
+  <Folder Name="/dev/">
+    <Project Path="dev/Dev.csproj" />
+  </Folder>
+</Solution>

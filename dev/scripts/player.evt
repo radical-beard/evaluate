@@ -1,0 +1,28 @@
+---
+config:
+ - player.toml
+apis:
+ - world
+returns:
+ - position: get set vec3
+ - base_weapon_damage: get double
+---
+-- The player IS a Godot node living in the scene tree (Godot's own model, via
+-- the engine API — there is no separate entity system). The handle we hand back
+-- just reads/writes that node. Built-in data (position) is a node property;
+-- free-form gameplay data (base_weapon_damage) rides on node metadata.
+local M = {}
+
+local node = godot.Node3D.new()
+node.position = std.vec3(config.player.start_pos)
+node:set_meta("base_weapon_damage", config.player.base_weapon_damage)
+world:add_child(node)
+
+-- read-write: declared `get set vec3`
+function M.get_position() return node.position end
+function M.set_position(v) node.position = v end
+
+-- read-only: declared `get double`, so no setter is exposed
+function M.get_base_weapon_damage() return node:get_meta("base_weapon_damage") end
+
+return M

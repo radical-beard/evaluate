@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- net8.0 matches Godot 4.6's .NET runtime, so any Godot 4.6 game (net8 or
+         net10) can consume this package. -->
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Evaluate</RootNamespace>
+    <PackageId>RadicalBeard.Evaluate</PackageId>
+    <Description>A data-driven, hot-reloadable game framework for Godot 4.6 / C#. Gameplay is authored in sandboxed Lua (.evt) scripts + TOML — no engine recompiles.</Description>
+    <!-- Referenced libraries must ship beside a dynamically-loaded Godot game. -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GodotSharp" Version="4.6.0" />
+    <!-- Generates the _Ready/_Process native-dispatch glue for our Node types.
+         A plain Microsoft.NET.Sdk lib doesn't add this automatically. -->
+    <PackageReference Include="Godot.SourceGenerators" Version="4.6.0" PrivateAssets="all" />
+    <PackageReference Include="LuaCSharp" Version="0.5.5" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
+    <PackageReference Include="YamlDotNet" Version="16.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Generators run at compile time only; the binding code is baked into this
+         assembly, so consumers never need the generator. -->
+    <ProjectReference Include="../Evaluate.Generator/Evaluate.Generator.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

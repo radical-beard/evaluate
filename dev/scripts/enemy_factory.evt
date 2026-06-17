@@ -1,0 +1,21 @@
+---
+apis:
+ - world
+returns:
+ - spawn
+---
+-- A reusable factory. Its `returns` declares the plain method `spawn`, so the
+-- loader exposes exactly that and nothing else. Each enemy is a Godot node.
+local M = {}
+
+local count = 0
+
+function M.spawn()
+  count = count + 1
+  local node = godot.Node3D.new()
+  node.position = std.vec3(count, 0, 0)   -- lined up along x
+  world:add_child(node)
+  return node
+end
+
+return M

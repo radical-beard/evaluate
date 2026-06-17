@@ -1,0 +1,5 @@
+# Defaults for the character built by player.luau.
+# Exposed to Lua as the `config.player` table.
+[player]
+start_pos = [0.0, 0.0, 0.0]   # x, y, z
+base_weapon_damage = 25.0

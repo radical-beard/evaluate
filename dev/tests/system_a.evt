@@ -1,0 +1,5 @@
+---
+register:
+ - on_update
+---
+function on_update(dt) end

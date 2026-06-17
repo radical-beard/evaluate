@@ -1,0 +1,5 @@
+---
+apis:
+---
+-- Declares no APIs, so `input` is not in this sandbox. Touching it must fail.
+return input.is_down("right")

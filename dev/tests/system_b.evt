@@ -1,0 +1,6 @@
+---
+register:
+ - on_update
+---
+-- A second script registering on_update — must be rejected project-wide.
+function on_update(dt) end

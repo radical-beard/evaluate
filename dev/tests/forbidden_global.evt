@@ -1,0 +1,5 @@
+---
+apis:
+---
+-- Declares no APIs, so the sandbox contains no `os`. Touching it must fail.
+return os.clock()
