@@ -75,6 +75,21 @@ public static class EvaluateTests
             Check("hot reload refreshes a system in place", v1 && v2, $"v1={v1}, v2={v2}");
         }
 
+        // 7 (positive control): metatable-based OOP works in the sandbox
+        // (setmetatable + __index inheritance + method dispatch + raw*/getmetatable).
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var handle = NewLoader().Require("metatable_oop.evt").Read<LuaTable>();
+                var result = handle["result"].Type == LuaValueType.String ? handle["result"].Read<string>() : "";
+                ok = result == "Rex says woof | Rex has 4 legs | raw=true | gm=true";
+                detail = $"result=\"{result}\"";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("metatable OOP (setmetatable + inheritance + raw*) works in the sandbox", ok, detail);
+        }
+
         log($"[tests] {passed} passed, {failed} failed");
         return failed;
     }

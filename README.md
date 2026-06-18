@@ -17,7 +17,11 @@ hot-reloaded by default.
 - **Per-script sandbox.** Each body runs via `load(body, name, "t", env)` on a
   shared `LuaState`, where `env` holds *only* the declared `config.*`, declared
   `apis`, the always-available `std` and ambient `godot`, plus a few safe
-  primitives. Undeclared globals (`os`, `io`, …) are absent. (`runtime/Loader.cs`)
+  primitives — including the metatable builtins (`setmetatable`/`getmetatable`/
+  `rawget`/`rawset`/`rawequal`/`rawlen`) so scripts can define classes the
+  idiomatic Lua way. Undeclared globals (`os`, `io`, …) are absent, and `pcall`
+  is intentionally withheld (errors surface rather than being swallowed).
+  (`runtime/Loader.cs`)
 - **Custom `require`** narrows the returned module to its `returns` contract
   (get/set property → `get_`/`set_` accessors; plain method; read-only hides the
   setter; missing accessor errors).

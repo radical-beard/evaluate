@@ -51,7 +51,14 @@ public sealed class Loader
 
     private static readonly string[] SafeGlobals =
         { "pairs", "ipairs", "next", "type", "tostring", "tonumber",
-          "error", "assert", "select", "string", "math", "table" };
+          "error", "assert", "select", "string", "math", "table",
+          // Metatable toolkit: lets scripts build classes/objects the idiomatic
+          // Lua way (setmetatable + __index). Pure language features with no
+          // engine/IO reach, so they are capability-free like `std`. The sandbox
+          // scopes *capabilities*, not language expressiveness, and resource/DoS
+          // limits are out of scope by design — so exposing these is safe. `pcall`
+          // remains intentionally withheld (errors should surface, not be swallowed).
+          "setmetatable", "getmetatable", "rawget", "rawset", "rawequal", "rawlen" };
 
     public Loader(Func<string, string> readScript, Action<string> log)
     {
