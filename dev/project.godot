@@ -8,3 +8,6 @@ config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 
 [dotnet]
 project/assembly_name="Dev"
+
+[editor_plugins]
+enabled=PackedStringArray("res://addons/evaluate_scene/plugin.cfg")

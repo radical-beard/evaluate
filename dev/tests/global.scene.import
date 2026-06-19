@@ -1,0 +1,14 @@
+[remap]
+
+importer="evaluate.scene"
+type="PackedScene"
+uid="uid://cg3ela7dpj1fd"
+path="res://.godot/imported/global.scene-2cdd257ea1528d9faf37ba137c980a8d.scn"
+
+[deps]
+
+source_file="res://tests/global.scene"
+dest_files=["res://.godot/imported/global.scene-2cdd257ea1528d9faf37ba137c980a8d.scn"]
+
+[params]
+

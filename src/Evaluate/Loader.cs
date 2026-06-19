@@ -45,7 +45,7 @@ public sealed class Loader
     private readonly Action<string> _log;
     private readonly GodotBinder _godotBinder;
     private Node? _globalRoot;              // persistent layer; never cleared
-    private Node? _sceneContainer;          // current swappable scene; freed on goto
+    private Node? _sceneContainer;          // current swappable scene; freed on scene change
     private string? _activeScene;           // name of the active scene
     private string? _pendingScene;          // requested by scene.goto, applied next frame
     private Persistence? _persistence;      // lazily opened SQLite save store
@@ -62,19 +62,17 @@ public sealed class Loader
     private readonly List<LoadedSystem> _systems = new();
     private readonly List<LoadedNode> _globalNodes = new();              // persistent node scripts
     private readonly List<LoadedNode> _sceneNodes = new();               // active-scene node scripts
-    private readonly Dictionary<string, GodotObject> _globalNamed = new();  // name -> persistent node
-    private readonly Dictionary<string, GodotObject> _sceneNamed = new();   // name -> active-scene node
     private readonly HashSet<string> _loadedScripts = new();             // every .evt Run so far
     private readonly HashSet<string> _configFiles = new();               // every declared toml
     private readonly HashSet<string> _assetFiles = new();                // every declared asset
-    private readonly HashSet<string> _sceneFiles = new();               // every declared *.scene.toml
+    private readonly HashSet<string> _sceneFiles = new();               // every declared *.scene file
 
     private const string GlobalNs = "<global>";
 
     // Systems discovered/registered in this project (scripts with a register: block).
     public IReadOnlyList<LoadedSystem> Systems => _systems;
 
-    // The name of the active scene (null before the first goto).
+    // The name of the active scene (null before the first scene change).
     public string? ActiveScene => _activeScene;
 
     // Input state the host can toggle to simulate the player pressing keys.
@@ -142,8 +140,17 @@ public sealed class Loader
         foreach (var file in scriptFiles)
         {
             if (!file.EndsWith(".evt") || file.EndsWith(".node.evt")) continue;
-            if (Frontmatter.Parse(_readScript(file)).Register.Count == 0) continue;
-            LoadSystem(file);
+            // One malformed script (or its malformed config) must not stop the rest
+            // from loading — log it and move on.
+            try
+            {
+                if (Frontmatter.Parse(_readScript(file)).Register.Count == 0) continue;
+                LoadSystem(file);
+            }
+            catch (Exception e)
+            {
+                _log($"failed to load system {file}: {e.Message}");
+            }
         }
     }
 
@@ -209,7 +216,7 @@ public sealed class Loader
     // ---- global + scene layer lifetime ---------------------------------------
 
     // The reserved manifest naming the persistent layer + the starting scene.
-    public const string ManifestName = "global.scene.toml";
+    public const string ManifestName = "global.scene";
 
     // Read + parse the global manifest, build its persistent layer, and return
     // the scene to start in (or null if the manifest declares none).
@@ -224,7 +231,7 @@ public sealed class Loader
     public string? LoadGlobalLayer(SceneSpec manifest)
     {
         if (_globalRoot is null) throw new EvaluateException("LoadGlobalLayer called before SetGlobalRoot");
-        InstantiateTree(manifest, _globalRoot, _globalNamed, _globalNodes);
+        InstantiateTree(manifest, _globalRoot, _globalNodes);
         foreach (var n in _globalNodes) Fire(n, "on_ready");
         return manifest.StartScene;
     }
@@ -243,22 +250,23 @@ public sealed class Loader
             foreach (var s in SystemsFor(_activeScene)) FireSystem(s, "on_exit");
         }
         _sceneNodes.Clear();
-        _sceneNamed.Clear();
         _sceneContainer?.QueueFree();    // frees the whole subtree next idle frame
 
         // Entering the new scene under a fresh container.
         var spec = SceneFile.Parse(_readScript(SceneFileName(name)));
         _sceneFiles.Add(SceneFileName(name));
+        if (spec.Nodes.Count == 0)
+            _log($"scene '{name}' has no nodes — '{SceneFileName(name)}' is empty or missing");
         var container = new Node { Name = name };
         _globalRoot.AddChild(container);
         _sceneContainer = container;
         _activeScene = name;
-        InstantiateTree(spec, container, _sceneNamed, _sceneNodes);
+        InstantiateTree(spec, container, _sceneNodes);
         foreach (var n in _sceneNodes) Fire(n, "on_ready");
         foreach (var s in SystemsFor(name)) FireSystem(s, "on_enter");
     }
 
-    // A pending scene.goto target (applied by the host at the next frame
+    // A pending scene.change target (applied by the host at the next frame
     // boundary, never mid-hook), consumed once.
     public string? TakePendingScene()
     {
@@ -284,32 +292,20 @@ public sealed class Loader
         if (s.Hooks.TryGetValue(hook, out var fn)) Call(fn);
     }
 
-    private static string SceneFileName(string name) => name + ".scene.toml";
+    private static string SceneFileName(string name) => name + ".scene";
 
-    // Instantiate a scene/manifest node tree under `container`: build each node
-    // by type, set its declared properties, parent it (by name or to the
-    // container), register its name, and attach its node script (with `self`).
-    private void InstantiateTree(SceneSpec spec, Node container,
-        Dictionary<string, GodotObject> named, List<LoadedNode> nodes)
+    // Instantiate a scene/manifest node tree under `container`: SceneBuilder builds
+    // the visual tree (types, properties, hierarchy) and, via the visit callback,
+    // we attach each node's `*.node.evt` behavior script (bound to that node).
+    private void InstantiateTree(SceneSpec spec, Node container, List<LoadedNode> nodes)
     {
-        foreach (var ns in spec.Nodes)
+        void Attach(NodeSpec ns, Node node)
         {
-            var obj = _godotBinder.Instantiate(ns.Type)
-                ?? throw new EvaluateException($"scene node '{ns.Name}' has unknown type '{ns.Type}'");
-            if (obj is not Node node)
-                throw new EvaluateException($"scene node '{ns.Name}' type '{ns.Type}' is not a Node");
-
-            if (!string.IsNullOrEmpty(ns.Name)) node.Name = ns.Name;
-            foreach (var kv in ns.Props) _godotBinder.SetProperty(obj, kv.Key, TomlToLua(kv.Value));
-            if (!string.IsNullOrEmpty(ns.Name)) named[ns.Name] = obj;
-
-            var parent = ns.Parent is not null && named.TryGetValue(ns.Parent, out var p) && p is Node pn
-                ? pn : container;
-            parent.AddChild(node);
-
             if (!string.IsNullOrEmpty(ns.Script))
-                nodes.Add(LoadNodeScript(ns.Script!, obj, container));
+                nodes.Add(LoadNodeScript(ns.Script!, node, container));
         }
+        foreach (var ns in spec.Nodes)
+            container.AddChild(SceneBuilder.BuildNode(ns, _godotBinder, Attach));
     }
 
     // Load a `*.node.evt` bound to one live node: fresh sandbox with `self`, then
@@ -340,7 +336,7 @@ public sealed class Loader
         foreach (var s in _loadedScripts) yield return s;   // .evt + .node.evt
         foreach (var c in _configFiles) yield return c;
         foreach (var a in _assetFiles) yield return a;
-        foreach (var sc in _sceneFiles) yield return sc;    // *.scene.toml + manifest
+        foreach (var sc in _sceneFiles) yield return sc;    // *.scene + manifest
     }
 
     // Apply a live change to `path`. Returns a short description of what happened.
@@ -373,7 +369,7 @@ public sealed class Loader
         // restart applies it cleanly.
         if (path == ManifestName)
             return $"invalidated global manifest {path} (restart to apply persistent-node changes)";
-        if (path.EndsWith(".scene.toml"))
+        if (path.EndsWith(".scene"))
         {
             if (_activeScene is not null && SceneFileName(_activeScene) == path)
             {
@@ -532,7 +528,8 @@ public sealed class Loader
     // `scene` is the routing + active-scene capability:
     //   scene.change(name) - request a switch (applied at the next frame boundary)
     //   scene.current()    - the active scene's name (or nil)
-    //   scene.find(name)   - look up a node by name in the active scene
+    //   scene.find(path)   - look up a node by PATH in the active scene
+    //                        (e.g. "Level/Enemy") — unique by construction
     //   scene.add(node)    - parent a node under the active scene container
     //                        (so it is freed when the scene is left)
     // (`change`, not `goto`: `goto` is a reserved word in Lua 5.2.)
@@ -551,8 +548,10 @@ public sealed class Loader
         });
         api["find"] = new LuaFunction((c, ct) =>
         {
-            var name = c.GetArgument<string>(0);
-            c.Return(_sceneNamed.TryGetValue(name, out var n) ? _godotBinder.WrapInstance(n) : LuaValue.Nil);
+            // Resolve against the live scene tree: a node path is unique by
+            // construction, so there is no name-collision ambiguity.
+            var node = _sceneContainer?.GetNodeOrNull(c.GetArgument<string>(0));
+            c.Return(node is null ? LuaValue.Nil : _godotBinder.WrapInstance(node));
             return new(1);
         });
         api["add"] = new LuaFunction((c, ct) =>
@@ -630,7 +629,7 @@ public sealed class Loader
     // `world` is the persistent global-root node that spawned objects parent to —
     // a real Godot node exposed through the binder (world:add_child(node), …).
     // Nodes added here survive scene switches; for scene-local content use
-    // scene.add(node) or declare nodes in a *.scene.toml. Game objects ARE Godot
+    // scene.add(node) or declare nodes in a *.scene file. Game objects ARE Godot
     // nodes; there is no separate entity system.
     private LuaValue BuildWorldApi(string path, LoadContext ctx)
     {
@@ -652,27 +651,11 @@ public sealed class Loader
         {
             if (section.Key.Length == 0) continue;
             var t = new LuaTable();
-            foreach (var kv in section.Value) t[kv.Key] = TomlToLua(kv.Value);
+            foreach (var kv in section.Value) t[kv.Key] = SceneBuilder.TomlToLua(kv.Value);
             root[section.Key] = t;
         }
         _tomlCache[file] = root;
         return root;
-    }
-
-    private static LuaValue TomlToLua(object v) => v switch
-    {
-        bool b => b,
-        double d => d,
-        string s => s,
-        object[] arr => ArrayToLua(arr),
-        _ => LuaValue.Nil,
-    };
-
-    private static LuaValue ArrayToLua(object[] arr)
-    {
-        var list = new LuaTable();
-        for (int i = 0; i < arr.Length; i++) list[i + 1] = TomlToLua(arr[i]);   // 1-based, recursive
-        return list;
     }
 
     private static T Sync<T>(ValueTask<T> vt) =>

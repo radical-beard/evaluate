@@ -1,9 +1,0 @@
-# The GLOBAL layer (reserved manifest): nodes here persist across every scene
-# switch, and `start_scene` is entered once startup finishes. The player lives
-# here so it survives goto().
-start_scene = "menu"
-
-[[node]]
-name = "Player"
-type = "Node3D"
-script = "player.node.evt"

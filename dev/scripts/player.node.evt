@@ -8,7 +8,7 @@ register:
  - on_update
 ---
 -- A NODE script: behavior for one node. `self` IS the Godot Node3D this script
--- is attached to (declared in global.scene.toml), so there is no spawning here.
+-- is attached to (declared in global.scene), so there is no spawning here.
 function on_ready()
   self.position = std.vec3(config.player.start_pos)
   self:set_meta("base_weapon_damage", config.player.base_weapon_damage)

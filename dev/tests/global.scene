@@ -1,4 +1,3 @@
-[[node]]
-name = "Probe"
+[nodes.Probe]
 type = "Node3D"
 script = "self_node.node.evt"

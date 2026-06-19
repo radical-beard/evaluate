@@ -55,17 +55,25 @@ public partial class EvaluateRuntime : Node
                      (sys.IsGlobal ? "(global)" : $"[{string.Join(",", sys.Scenes)}]"));
 
         // Build the persistent layer (instantiates manifest nodes + their
-        // on_ready), run global on_start, then enter the start scene.
-        var start = _loader.LoadGlobalLayerFromFile();
-        CallHook("on_start");
-        if (start is not null)
+        // on_ready), run global on_start, then enter the start scene. A malformed
+        // manifest/start scene is logged, not fatal — the game still launches.
+        try
         {
-            GD.Print($"[evaluate] entering start scene '{start}'");
-            _loader.GotoScene(start);
+            var start = _loader.LoadGlobalLayerFromFile();
+            CallHook("on_start");
+            if (start is not null)
+            {
+                GD.Print($"[evaluate] entering start scene '{start}'");
+                _loader.GotoScene(start);
+            }
+            else
+            {
+                GD.Print($"[evaluate] no start_scene in {Loader.ManifestName}; running global layer only");
+            }
         }
-        else
+        catch (System.Exception e)
         {
-            GD.Print($"[evaluate] no start_scene in {Loader.ManifestName}; running global layer only");
+            GD.PushError($"[evaluate] startup load error: {e.Message}");
         }
 
         GD.Print($"[evaluate] world now has {GetChildCount()} node(s) in the scene tree");
@@ -77,16 +85,21 @@ public partial class EvaluateRuntime : Node
     {
         if (_loader is null) return;     // test mode already quit
 
-        // Apply any pending hot-reloads on the main thread.
+        // Apply any pending hot-reloads on the main thread. A bad edit (e.g. a
+        // half-saved, malformed .scene/.toml) is logged and skipped, never crashes.
         while (_changes.TryDequeue(out var changed))
-            GD.Print($"[evaluate] hot reload: {_loader.ReloadOnChange(changed)}");
+        {
+            try { GD.Print($"[evaluate] hot reload: {_loader.ReloadOnChange(changed)}"); }
+            catch (System.Exception e) { GD.PushError($"[evaluate] hot reload failed for {changed}: {e.Message}"); }
+        }
 
         // Apply a requested scene switch at a safe point — never mid-hook, so a
-        // scene's nodes are never freed while their on_update is running.
+        // scene's nodes are never freed while their on_update is running. A
+        // malformed/unknown target is logged; the current scene keeps running.
         if (_loader.TakePendingScene() is { } next)
         {
-            GD.Print($"[evaluate] scene change -> '{next}'");
-            _loader.GotoScene(next);
+            try { GD.Print($"[evaluate] scene change -> '{next}'"); _loader.GotoScene(next); }
+            catch (System.Exception e) { GD.PushError($"[evaluate] failed to enter scene '{next}': {e.Message}"); }
         }
 
         CallHook("on_update", delta);

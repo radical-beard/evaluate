@@ -1,0 +1,14 @@
+[remap]
+
+importer="evaluate.scene"
+type="PackedScene"
+uid="uid://b86q4carpbcs4"
+path="res://.godot/imported/level1.scene-7f36dc0a9b444dba8fcdd956d90475cd.scn"
+
+[deps]
+
+source_file="res://scripts/level1.scene"
+dest_files=["res://.godot/imported/level1.scene-7f36dc0a9b444dba8fcdd956d90475cd.scn"]
+
+[params]
+

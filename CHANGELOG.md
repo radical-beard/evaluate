@@ -5,6 +5,58 @@ All notable changes to Evaluate are documented here. The format is based on
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While
 the version is `0.x`, minor bumps may include breaking changes.
 
+## [0.4.0] — 2026-06-18
+
+Nested node trees, a real TOML parser, and editor preview for scene files.
+
+### Added
+- **Nested node trees.** Scene files use a keyed/nested schema — a node's name is
+  the table key and nesting is the tree: `[nodes.Player]` then
+  `[nodes.Player.Camera]` makes `Camera` a child of `Player`, to any depth. A
+  sub-table is a child node; a scalar/array is an engine property; `type`/`script`
+  are reserved keys.
+- **Editor preview addon** (`dev/addons/evaluate_scene`). An `EditorImportPlugin`
+  converts `.scene` → a `PackedScene` so the Godot editor recognizes and renders
+  the node tree. It reuses the same `SceneFile`/`SceneBuilder` as the runtime, is
+  editor-only (`#if TOOLS`), and never touches the runtime path — so runtime
+  hot-reload of `.scene` edits is unaffected.
+- **`SceneBuilder`** — shared, runtime-only node-tree builder used by both the
+  runtime (live instantiation) and the editor importer (`PackedScene` packing).
+
+### Changed
+- **Breaking — scene files use the `.scene` extension** (TOML content), not
+  `.scene.toml`. Godot's importer keys on the last extension, so `.scene` lets the
+  editor plugin hook scene files only and never touch config `.toml`. The manifest
+  is now `global.scene`.
+- **Breaking — keyed/nested scene schema** replaces the flat `[[node]]` list with
+  `name`/`parent` fields. Hierarchy is expressed by table nesting, not `parent`
+  references (which are gone).
+- **Breaking — `scene.find(path)` is path-based**, resolved against the live node
+  tree (`"Level/Enemy"`), so lookups are unique by construction and never stale.
+  The bare-name registry is gone.
+- **TOML is now parsed by [Tomlyn](https://github.com/xoofx/Tomlyn) 0.19.0**, both
+  for config and scene files; the hand-rolled `Toml.cs` parser is gone. Used via
+  Tomlyn's document model (no reflective deserialization), so the AOT-clean posture
+  holds.
+- Enforcement suite grew from 12 to 18 tests (nested parse, `PackedScene` build,
+  unique path-based `find`, malformed-TOML handling, reserved-name rejection,
+  sub-table-as-child, nested-table marshalling).
+
+### Hardened
+- **Malformed TOML degrades, it does not crash.** A bad config or `.scene` (e.g. a
+  half-saved hot-edit, a typo, or a duplicate key) now surfaces as a clean
+  `EvaluateException` and is logged + skipped — the running game keeps going, the
+  startup continues, and one broken script no longer stops the others. (The old
+  hand-rolled parser silently ignored bad lines; Tomlyn throws, so the throw is now
+  caught at every parse boundary.)
+- **Node names are validated** against Godot's reserved path characters
+  (`. : @ / % "`) at parse time, so a name can't be silently sanitized and break
+  path-based `scene.find`.
+- **Nested/inline config tables marshal correctly** to Lua tables instead of being
+  silently dropped to `nil`.
+- `scene.change` to a missing/empty scene logs a warning instead of silently
+  activating an empty scene.
+
 ## [0.3.0] — 2026-06-18
 
 Scenes: a two-tier model so one program can hold many scenes, each with its own
@@ -101,6 +153,7 @@ Initial release — a data-driven, moddable game framework that runs inside Godo
   declared assets on the main thread.
 - Packaged for NuGet as `RadicalBeard.Evaluate`.
 
+[0.4.0]: https://github.com/radical-beard/evaluate/releases/tag/v0.4.0
 [0.3.0]: https://github.com/radical-beard/evaluate/releases/tag/v0.3.0
 [0.2.0]: https://github.com/radical-beard/evaluate/releases/tag/v0.2.0
 [0.1.0]: https://github.com/radical-beard/evaluate/releases/tag/v0.1.0

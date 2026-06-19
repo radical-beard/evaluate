@@ -1,0 +1,8 @@
+# A swappable scene (TOML content). Its nodes live under a per-scene container
+# that is freed wholesale when we leave the scene. The tree is the table path.
+[nodes.MenuRoot]
+type = "Node3D"
+
+[nodes.MenuRoot.Title]
+type = "Node3D"
+position = [0, 1, 0]

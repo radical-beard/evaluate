@@ -138,7 +138,7 @@ public static class EvaluateTests
                 var root = new Node();
                 var loader = NewLoader();
                 loader.SetGlobalRoot(root);
-                loader.LoadGlobalLayerFromFile();     // global.scene.toml -> Probe + self_node.node.evt
+                loader.LoadGlobalLayerFromFile();     // global.scene -> Probe + self_node.node.evt
                 var probe = root.GetChildCount() > 0 ? root.GetChild(0) : null;
                 ok = probe is not null && probe.HasMeta("ready") && probe.GetMeta("ready").AsBool();
                 detail = probe is null ? "no node instantiated" : $"meta ready={probe.HasMeta("ready")}";
@@ -148,18 +148,100 @@ public static class EvaluateTests
             Check("a node script runs with self bound to its node", ok, detail);
         }
 
-        // 12: SceneFile parses [[node]] blocks (name/type/parent/script/props)
+        // 12: SceneFile parses the keyed/nested [nodes.X] schema into a tree
         {
             var spec = SceneFile.Parse(
-                "start_scene = \"x\"\n[[node]]\nname = \"A\"\ntype = \"Node3D\"\n" +
-                "[[node]]\nname = \"B\"\ntype = \"Node2D\"\nparent = \"A\"\n" +
-                "script = \"b.node.evt\"\nposition = [1.0, 2.0]\n");
-            var ok = spec.StartScene == "x" && spec.Nodes.Count == 2
-                && spec.Nodes[0].Name == "A" && spec.Nodes[0].Type == "Node3D"
-                && spec.Nodes[1].Parent == "A" && spec.Nodes[1].Script == "b.node.evt"
-                && spec.Nodes[1].Props.ContainsKey("position");
-            Check("scene file parses [[node]] blocks with parent/script/props", ok,
-                $"start={spec.StartScene}, nodes={spec.Nodes.Count}");
+                "start_scene = \"x\"\n" +
+                "[nodes.Player]\ntype = \"Node3D\"\nscript = \"p.node.evt\"\nposition = [1, 2, 3]\n" +
+                "[nodes.Player.Camera]\ntype = \"Camera3D\"\n");
+            var player = spec.Nodes.Count > 0 ? spec.Nodes[0] : null;
+            var camera = player is { Children.Count: > 0 } ? player.Children[0] : null;
+            var ok = spec.StartScene == "x" && spec.Nodes.Count == 1
+                && player!.Name == "Player" && player.Type == "Node3D"
+                && player.Script == "p.node.evt" && player.Props.ContainsKey("position")
+                && camera is not null && camera.Name == "Camera" && camera.Type == "Camera3D";
+            Check("scene file parses keyed/nested [nodes.X] into a tree", ok,
+                $"roots={spec.Nodes.Count}, children={(player?.Children.Count ?? -1)}");
+        }
+
+        // 13: SceneBuilder builds the real Godot node tree (editor-import core)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var spec = SceneFile.Parse(
+                    "[nodes.Player]\ntype = \"Node3D\"\nposition = [1, 2, 3]\n" +
+                    "[nodes.Player.Camera]\ntype = \"Camera3D\"\n");
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var packed = SceneBuilder.BuildPackedScene(spec, binder);
+                var root = packed.Instantiate();
+                var player = root.GetNodeOrNull("Player");
+                var camera = root.GetNodeOrNull("Player/Camera");
+                ok = player is Node3D && camera is Camera3D
+                    && ((Node3D)player).Position == new Vector3(1, 2, 3);
+                detail = $"player={player?.GetType().Name}, camera={camera?.GetType().Name}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("SceneBuilder builds a PackedScene node tree", ok, detail);
+        }
+
+        // 14: nested nodes resolve uniquely BY PATH (the scene.find guarantee),
+        // even when the same child name appears under two different parents.
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var spec = SceneFile.Parse(
+                    "[nodes.A]\ntype = \"Node3D\"\n[nodes.A.Item]\ntype = \"Node2D\"\n" +
+                    "[nodes.B]\ntype = \"Node3D\"\n[nodes.B.Item]\ntype = \"Node3D\"\n");
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var container = new Node();
+                foreach (var n in spec.Nodes) container.AddChild(SceneBuilder.BuildNode(n, binder));
+                var aItem = container.GetNodeOrNull("A/Item");
+                var bItem = container.GetNodeOrNull("B/Item");
+                ok = aItem is Node2D && bItem is Node3D;   // same name, different paths, correct nodes
+                detail = $"A/Item={aItem?.GetType().Name}, B/Item={bItem?.GetType().Name}";
+                container.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("nested nodes resolve uniquely by path", ok, detail);
+        }
+
+        // 15: malformed TOML surfaces as a clean EvaluateException, NOT a raw
+        // TomlException (so callers can handle it and the game degrades, not crashes)
+        {
+            bool ok = false; string detail = "no throw";
+            try { SceneFile.Parse("this is not = = toml {{{"); }
+            catch (EvaluateException) { ok = true; }
+            catch (Exception e) { detail = $"wrong type: {e.GetType().Name}"; }
+            Check("malformed TOML throws a clean EvaluateException", ok, detail);
+        }
+
+        // 16: a node name with a Godot-reserved char is rejected at parse time
+        // (it would otherwise be silently sanitized and break path-based find)
+        Check("reserved-char node name is rejected", Throws(() =>
+            SceneFile.Parse("[nodes.\"a/b\"]\ntype = \"Node3D\"\n")));
+
+        // 17: a sub-table is always a child (even keyed 'script'); a node with no
+        // type is rejected with a clear error
+        {
+            var spec = SceneFile.Parse("[nodes.Root]\ntype = \"Node3D\"\n[nodes.Root.script]\ntype = \"Node2D\"\n");
+            var child = spec.Nodes.Count == 1 && spec.Nodes[0].Children.Count == 1 ? spec.Nodes[0].Children[0] : null;
+            var subTableIsChild = child is not null && child.Name == "script" && child.Type == "Node2D";
+            var missingTypeRejected = Throws(() => SceneFile.Parse("[nodes.X]\nposition = [1, 2, 3]\n"));
+            Check("sub-table is a child (even keyed 'script'); missing type rejected",
+                subTableIsChild && missingTypeRejected, $"child={child?.Type}, missingRejected={missingTypeRejected}");
+        }
+
+        // 18: nested config tables marshal to a Lua table, not nil (no silent loss)
+        {
+            var nested = new Dictionary<string, object> { ["a"] = (double)1, ["b"] = "x" };
+            var lua = SceneBuilder.TomlToLua(nested);
+            var ok = lua.Type == LuaValueType.Table
+                && lua.Read<LuaTable>()["a"].Read<double>() == 1
+                && lua.Read<LuaTable>()["b"].Read<string>() == "x";
+            Check("nested table marshals to a Lua table (not nil)", ok, $"type={lua.Type}");
         }
 
         log($"[tests] {passed} passed, {failed} failed");

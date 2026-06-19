@@ -1,132 +1,82 @@
 using System.Collections.Generic;
-using System.Globalization;
+using Tomlyn.Model;
 
 namespace Evaluate;
 
-// A parsed TOML document that preserves top-level bare keys, single `[section]`
-// tables, and repeated `[[name]]` array-of-tables blocks in order. Used by scene
-// files, which declare `start_scene = "..."` plus a sequence of `[[node]]` blocks.
-public sealed class TomlDocument
-{
-    // Bare `key = value` pairs before any section header.
-    public Dictionary<string, object> Root = new();
-    // `[section]` -> its key/value map.
-    public Dictionary<string, Dictionary<string, object>> Tables = new();
-    // `[[name]]` -> the blocks in declaration order.
-    public Dictionary<string, List<Dictionary<string, object>>> TableArrays = new();
-}
-
-// TOML reader for the config subset Evaluate needs: [section] headers, and
-// `key = value` where value is a string ("..."), bool (true/false), number, or
-// an array [...] of those (nested arrays allowed). Comments with '#' (ignored
-// inside strings). Returns section -> (key -> value); value is bool, double,
-// string, or object[].
+// TOML reader backed by Tomlyn. Two shapes are exposed:
+//  - Parse: section -> (key -> value), matching the original hand-rolled parser's
+//    contract so the flat config files (game.toml, ...) and their callers are
+//    unchanged.
+//  - FromToml: the shared value mapper (Tomlyn model -> bool / double / string /
+//    object[] / nested Dictionary), used by both Parse and the scene-file parser.
 public static class Toml
 {
+    // Parse to Tomlyn's document model, turning Tomlyn's TomlException into a clean
+    // EvaluateException (the hand-rolled parser this replaced never threw, so every
+    // caller — config + scene files — must treat a malformed/duplicate-key file as a
+    // recoverable error, not an engine crash). Empty/whitespace input is valid TOML
+    // and yields an empty table.
+    internal static TomlTable Model(string text)
+    {
+        try
+        {
+            return Tomlyn.Toml.ToModel(text);
+        }
+        catch (Tomlyn.TomlException e)
+        {
+            throw new EvaluateException($"TOML parse error: {e.Message.Replace("\r", " ").Replace("\n", " ")}");
+        }
+    }
+
     public static Dictionary<string, Dictionary<string, object>> Parse(string text)
     {
+        var model = Model(text);
         var result = new Dictionary<string, Dictionary<string, object>>();
-        var current = new Dictionary<string, object>();
-        result[""] = current;
+        var root = new Dictionary<string, object>();
+        result[""] = root;
 
-        foreach (var raw in text.Replace("\r\n", "\n").Split('\n'))
+        foreach (var kv in model)
         {
-            var line = StripComment(raw).Trim();
-            if (line.Length == 0) continue;
-
-            if (line.StartsWith("[") && line.EndsWith("]"))
+            if (kv.Value is TomlTable section)
             {
-                current = new Dictionary<string, object>();
-                result[line[1..^1].Trim()] = current;
-                continue;
+                var t = new Dictionary<string, object>();
+                foreach (var sk in section) t[sk.Key] = FromToml(sk.Value);
+                result[kv.Key] = t;
             }
-
-            var eq = line.IndexOf('=');
-            if (eq < 0) continue;
-            current[line[..eq].Trim()] = ParseValue(line[(eq + 1)..].Trim());
+            else
+            {
+                root[kv.Key] = FromToml(kv.Value);   // bare top-level key
+            }
         }
         return result;
     }
 
-    // Document-preserving parse: keeps bare top-level keys and, crucially,
-    // repeated `[[name]]` blocks (array-of-tables) that the flat Parse() above
-    // would collapse to a single section. Same value grammar as Parse().
-    public static TomlDocument ParseDocument(string text)
+    // Map a Tomlyn model value to Evaluate's plain object model. Integers are
+    // widened to double (as the old parser did, so config consumers are unchanged);
+    // arrays become object[]; sub-tables become nested dictionaries.
+    public static object FromToml(object? v) => v switch
     {
-        var doc = new TomlDocument();
-        var current = doc.Root;       // bare keys land at the document root
+        null => "",
+        bool b => b,
+        long l => (double)l,
+        double d => d,
+        string s => s,
+        TomlArray arr => ArrayFromToml(arr),
+        TomlTable tbl => TableFromToml(tbl),
+        _ => v.ToString() ?? "",   // dates / other scalars -> string
+    };
 
-        foreach (var raw in text.Replace("\r\n", "\n").Split('\n'))
-        {
-            var line = StripComment(raw).Trim();
-            if (line.Length == 0) continue;
-
-            if (line.StartsWith("[[") && line.EndsWith("]]"))
-            {
-                var name = line[2..^2].Trim();
-                current = new Dictionary<string, object>();
-                if (!doc.TableArrays.TryGetValue(name, out var list))
-                    doc.TableArrays[name] = list = new List<Dictionary<string, object>>();
-                list.Add(current);
-                continue;
-            }
-            if (line.StartsWith("[") && line.EndsWith("]"))
-            {
-                current = new Dictionary<string, object>();
-                doc.Tables[line[1..^1].Trim()] = current;
-                continue;
-            }
-
-            var eq = line.IndexOf('=');
-            if (eq < 0) continue;
-            current[line[..eq].Trim()] = ParseValue(line[(eq + 1)..].Trim());
-        }
-        return doc;
+    private static object[] ArrayFromToml(TomlArray arr)
+    {
+        var list = new object[arr.Count];
+        for (int i = 0; i < arr.Count; i++) list[i] = FromToml(arr[i]);
+        return list;
     }
 
-    private static object ParseValue(string v)
+    private static Dictionary<string, object> TableFromToml(TomlTable tbl)
     {
-        if (v.Length >= 2 && v[0] == '"' && v[^1] == '"')
-            return v[1..^1].Replace("\\\"", "\"").Replace("\\n", "\n").Replace("\\t", "\t");
-        if (v == "true") return true;
-        if (v == "false") return false;
-        if (v.StartsWith("[") && v.EndsWith("]"))
-        {
-            var items = new List<object>();
-            foreach (var part in SplitTopLevel(v[1..^1]))
-            {
-                var t = part.Trim();
-                if (t.Length > 0) items.Add(ParseValue(t));
-            }
-            return items.ToArray();
-        }
-        return double.Parse(v, CultureInfo.InvariantCulture);
-    }
-
-    // Split on top-level commas, ignoring commas inside strings or nested [].
-    private static IEnumerable<string> SplitTopLevel(string s)
-    {
-        int depth = 0, start = 0;
-        bool inStr = false;
-        for (int i = 0; i < s.Length; i++)
-        {
-            var c = s[i];
-            if (c == '"' && (i == 0 || s[i - 1] != '\\')) inStr = !inStr;
-            else if (!inStr && c == '[') depth++;
-            else if (!inStr && c == ']') depth--;
-            else if (!inStr && c == ',' && depth == 0) { yield return s[start..i]; start = i + 1; }
-        }
-        if (start < s.Length) yield return s[start..];
-    }
-
-    private static string StripComment(string line)
-    {
-        bool inStr = false;
-        for (int i = 0; i < line.Length; i++)
-        {
-            if (line[i] == '"' && (i == 0 || line[i - 1] != '\\')) inStr = !inStr;
-            else if (line[i] == '#' && !inStr) return line[..i];
-        }
-        return line;
+        var d = new Dictionary<string, object>();
+        foreach (var kv in tbl) d[kv.Key] = FromToml(kv.Value);
+        return d;
     }
 }

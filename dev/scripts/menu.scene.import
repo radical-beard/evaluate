@@ -1,0 +1,14 @@
+[remap]
+
+importer="evaluate.scene"
+type="PackedScene"
+uid="uid://d2cr2o14hl1h7"
+path="res://.godot/imported/menu.scene-5755c5e510bb9d4fcec175d58027e001.scn"
+
+[deps]
+
+source_file="res://scripts/menu.scene"
+dest_files=["res://.godot/imported/menu.scene-5755c5e510bb9d4fcec175d58027e001.scn"]
+
+[params]
+

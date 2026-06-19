@@ -1,0 +1,12 @@
+# A second swappable scene. Entering it frees the menu's container and builds
+# this tree fresh — while the global Player (and its Camera) carries straight over.
+[nodes.Level]
+type = "Node3D"
+
+[nodes.Level.Enemy]
+type = "Node3D"
+position = [3, 0, 0]
+
+[nodes.Level.Enemy.Weapon]
+type = "Node3D"
+position = [0, 0, 1]

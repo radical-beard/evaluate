@@ -1,61 +1,82 @@
 using System.Collections.Generic;
+using Tomlyn.Model;
 
 namespace Evaluate;
 
-// One node declared in a scene file: its name, Godot type, optional parent (by
-// name), optional `.node.evt` behavior script, and any remaining keys as
-// engine properties to set after construction (position, etc.).
+// One node declared in a scene file: its name (the table key), Godot type,
+// optional `.node.evt` behavior script, any remaining keys as engine properties,
+// and its child nodes. The tree is the table path: `[nodes.Player.Camera]` makes
+// Camera a child of Player.
 public sealed class NodeSpec
 {
     public string Name = "";
     public string Type = "";
-    public string? Parent;
     public string? Script;
     public Dictionary<string, object> Props = new();
+    public List<NodeSpec> Children = new();
 }
 
-// A parsed `*.scene.toml`: an ordered node tree, plus (for the reserved
-// `global.scene.toml` manifest) the scene to start in.
+// A parsed `*.scene` file: a node tree, plus (for the reserved `global.scene`
+// manifest) the scene to start in.
 public sealed class SceneSpec
 {
     public string? StartScene;
-    public List<NodeSpec> Nodes = new();
+    public List<NodeSpec> Nodes = new();   // root-level nodes
 }
 
-// Turns a `*.scene.toml` document into a typed SceneSpec. Structure is a bare
-// `start_scene = "..."` (manifest only) plus a sequence of `[[node]]` blocks;
-// each block's `name`/`type`/`parent`/`script` are reserved and every other key
-// becomes an engine property applied to the instantiated node.
+// Turns a `*.scene` file (TOML content) into a typed SceneSpec. Structure is a
+// bare `start_scene = "..."` (manifest only) plus a `[nodes.*]` tree where each
+// node's `type`/`script` are reserved, a sub-table is a child node, and any other
+// key is an engine property applied to the instantiated node.
 public static class SceneFile
 {
-    private static readonly HashSet<string> Reserved = new() { "name", "type", "parent", "script" };
+    // Characters Godot strips from a Node name (Node.set_name sanitizes these). A
+    // declared name containing one would not round-trip, silently breaking the
+    // path-based scene.find — so we reject it at parse time instead.
+    private static readonly char[] ReservedNameChars = { '.', ':', '@', '/', '%', '"' };
 
     public static SceneSpec Parse(string toml)
     {
-        var doc = Toml.ParseDocument(toml);
+        var model = Toml.Model(toml);
         var spec = new SceneSpec();
 
-        if (doc.Root.TryGetValue("start_scene", out var ss) && ss is string s)
+        if (model.TryGetValue("start_scene", out var ss) && ss is string s)
             spec.StartScene = s;
 
-        if (doc.TableArrays.TryGetValue("node", out var nodes))
-            foreach (var n in nodes)
-            {
-                var node = new NodeSpec
-                {
-                    Name = Str(n, "name"),
-                    Type = Str(n, "type"),
-                    Parent = n.TryGetValue("parent", out var p) ? p as string : null,
-                    Script = n.TryGetValue("script", out var sc) ? sc as string : null,
-                };
-                foreach (var kv in n)
-                    if (!Reserved.Contains(kv.Key)) node.Props[kv.Key] = kv.Value;
-                spec.Nodes.Add(node);
-            }
+        if (model.TryGetValue("nodes", out var n) && n is TomlTable nodes)
+            foreach (var kv in nodes)
+                if (kv.Value is TomlTable table)
+                    spec.Nodes.Add(ParseNode(kv.Key, table));
 
         return spec;
     }
 
-    private static string Str(Dictionary<string, object> d, string key) =>
-        d.TryGetValue(key, out var v) && v is string s ? s : "";
+    // A node's name is its table key; a sub-table is ALWAYS a child node (even one
+    // keyed `type`/`script`); `type`/`script` scalars are reserved; everything else
+    // is an engine property. Every node must declare a `type`.
+    private static NodeSpec ParseNode(string name, TomlTable table)
+    {
+        if (name.IndexOfAny(ReservedNameChars) >= 0)
+            throw new EvaluateException(
+                $"scene node name '{name}' contains a reserved character (any of . : @ / % \"); " +
+                "Godot would rewrite it and break path lookup");
+
+        var node = new NodeSpec { Name = name };
+        foreach (var kv in table)
+        {
+            if (kv.Value is TomlTable child) { node.Children.Add(ParseNode(kv.Key, child)); continue; }
+            switch (kv.Key)
+            {
+                case "type": node.Type = kv.Value?.ToString() ?? ""; break;
+                case "script": node.Script = kv.Value?.ToString(); break;
+                default: node.Props[kv.Key] = Toml.FromToml(kv.Value); break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(node.Type))
+            throw new EvaluateException(
+                $"scene node '{name}' has no 'type'. (A sub-table is always a child node; " +
+                "vector/struct properties must be lists like [x, y, z], not tables.)");
+        return node;
+    }
 }
