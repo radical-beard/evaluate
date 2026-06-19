@@ -116,19 +116,20 @@ custom dialect's `+=`.
 
 ## Layout
 
-    project.godot  main.tscn  Evaluate.csproj
-    src/Evaluate/  EvaluateRuntime.cs  Loader.cs  Std.cs  Frontmatter.cs  Toml.cs
-                SceneFile.cs  SceneBuilder.cs  GodotBinder.cs  Persistence.cs
-                BindGodotAttribute.cs  Prebaked.cs  EvaluateTests.cs
-    generator/  Evaluate.Generator.csproj  BindGodotGenerator.cs   (Roslyn source generator)
-    scripts/    global.scene  menu.scene  level1.scene
-                player.node.evt  showcase.evt  menu.evt  level1.evt
-                game.toml  player.toml
-    addons/     evaluate_scene/  (editor import plugin: .scene -> PackedScene preview)
-    tests/      forbidden_global / undeclared_api / missing_accessor /
-                system_a / system_b / readonly_module / metatable_oop /
-                scene_a / scene_b / scene_a_dup / global_update / self_node (.evt)
-                global.scene
+    README.md  CHANGELOG.md  Directory.Build.props  Evaluate.slnx  global.json  LICENSE.md
+    src/Evaluate/            Evaluate.csproj  EvaluateRuntime.cs  Loader.cs  Std.cs
+                             Frontmatter.cs  Toml.cs  SceneFile.cs  SceneBuilder.cs
+                             GodotBinder.cs  Persistence.cs  BindGodotAttribute.cs  Prebaked.cs  EvaluateTests.cs
+    src/Evaluate.Generator/  Evaluate.Generator.csproj  BindGodotGenerator.cs   (Roslyn source generator)
+    dev/        the demo / enforcement-test harness game (consumes the lib by project reference):
+      project.godot  main.tscn  EvaluateHost.cs  Dev.csproj
+      scripts/  global.scene  menu.scene  level1.scene
+                player.node.evt  showcase.evt  menu.evt  level1.evt  game.toml  player.toml
+      addons/evaluate_scene/  editor import plugin (.scene -> PackedScene preview)
+      tests/    enforcement suite (.evt): forbidden_global / undeclared_api / missing_accessor /
+                system_a / system_b / readonly_module / metatable_oop / scene_a / scene_b /
+                scene_a_dup / global_update / self_node, + global.scene
+    artifacts/  packed .nupkgs (gitignored)
 
 ## Remaining work toward "full featured"
 
