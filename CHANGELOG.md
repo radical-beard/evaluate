@@ -5,6 +5,21 @@ All notable changes to Evaluate are documented here. The format is based on
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While
 the version is `0.x`, minor bumps may include breaking changes.
 
+## [0.4.1] — 2026-06-18
+
+Per-game save location.
+
+### Changed
+- **Breaking — saves live in Godot's `user://` directory**, not a hardcoded
+  `~/.local/share/evaluate/save.db`. `Persistence` now resolves its SQLite store
+  via `ProjectSettings.GlobalizePath("user://")`, so each game gets its **own**
+  store at the **platform-native** per-app path (Windows `%APPDATA%`, macOS
+  `~/Library/Application Support`, Linux `~/.local/share`) — which is also what
+  Steam Cloud syncs from. The old path was Linux-only *and* shared the same
+  `save.db` across every Evaluate game. A game picks a clean folder name with
+  `use_custom_user_dir` / `custom_user_dir_name` in `project.godot`. (Existing
+  data under the old path is not migrated; nothing reads it anymore.)
+
 ## [0.4.0] — 2026-06-18
 
 Nested node trees, a real TOML parser, and editor preview for scene files.
@@ -153,6 +168,7 @@ Initial release — a data-driven, moddable game framework that runs inside Godo
   declared assets on the main thread.
 - Packaged for NuGet as `RadicalBeard.Evaluate`.
 
+[0.4.1]: https://github.com/radical-beard/evaluate/releases/tag/v0.4.1
 [0.4.0]: https://github.com/radical-beard/evaluate/releases/tag/v0.4.0
 [0.3.0]: https://github.com/radical-beard/evaluate/releases/tag/v0.3.0
 [0.2.0]: https://github.com/radical-beard/evaluate/releases/tag/v0.2.0

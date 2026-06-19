@@ -565,8 +565,8 @@ public sealed class Loader
         return api;
     }
 
-    // `save` persists runtime/player data to SQLite (~/.local/share/evaluate/).
-    // save.set(key, v) / save.get(key[, default]) / save.delete(key).
+    // `save` persists runtime/player data to SQLite in Godot's per-project user://
+    // dir. save.set(key, v) / save.get(key[, default]) / save.delete(key).
     private LuaValue BuildSaveApi()
     {
         _persistence ??= new Persistence();

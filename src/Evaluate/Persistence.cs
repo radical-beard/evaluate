@@ -1,21 +1,25 @@
 using System;
 using System.IO;
+using Godot;
 using Microsoft.Data.Sqlite;
 
 namespace Evaluate;
 
 // Runtime save & player-config persistence, backed by SQLite. This is for data
 // chosen/produced at runtime (saves, settings) — distinct from TOML dev config.
-// The database lives under ~/.local/share/evaluate/ (XDG data convention).
+// The database lives in Godot's per-project user data directory (`user://`): the
+// platform-native, per-game location (Windows %APPDATA%, macOS ~/Library/
+// Application Support, Linux ~/.local/share) and what Steam Cloud syncs from. A
+// game chooses its own folder via project.godot's use_custom_user_dir; without
+// one Godot falls back to a per-project app_userdata path. Either way each game
+// gets its own store — saves are no longer shared across every Evaluate game.
 public sealed class Persistence : IDisposable
 {
     private readonly SqliteConnection _conn;
 
     public Persistence()
     {
-        var dir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-            ".local", "share", "evaluate");
+        var dir = ProjectSettings.GlobalizePath("user://");
         Directory.CreateDirectory(dir);
 
         _conn = new SqliteConnection($"Data Source={Path.Combine(dir, "save.db")}");

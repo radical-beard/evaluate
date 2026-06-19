@@ -75,8 +75,9 @@ hot-reloaded by default.
 - **`std.*` standard library.** Real C#-backed types via the `[LuaObject]` source
   generator — `std.vec3`, `std.vec2`, `std.color`, `std.vector`,
   `std.linked_list` (`src/Evaluate/Std.cs`).
-- **Persistence (`save`).** SQLite-backed runtime/player data under
-  `~/.local/share/evaluate/` — `save.set/get/delete` (`src/Evaluate/Persistence.cs`).
+- **Persistence (`save`).** SQLite-backed runtime/player data in Godot's
+  per-project `user://` directory (the platform-native, per-game path Steam Cloud
+  syncs from) — `save.set/get/delete` (`src/Evaluate/Persistence.cs`).
 - **Godot binding (ambient, default).** `godot.<Type>` resolves any Godot type
   on first use (`src/Evaluate/GodotBinder.cs`):
   - **instances** — `godot.Node3D.new()` (Activator); member access routes
