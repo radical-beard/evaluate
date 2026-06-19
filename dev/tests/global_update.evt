@@ -1,0 +1,6 @@
+---
+register:
+ - on_update
+---
+-- A GLOBAL system (no scenes:) — active in every scene.
+function on_update(dt) end

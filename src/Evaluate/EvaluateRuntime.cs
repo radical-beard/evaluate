@@ -37,16 +37,36 @@ public partial class EvaluateRuntime : Node
         _screenshot = ArgValue(args, "--screenshot");
 
         _loader = new Loader(ReadScript, msg => GD.Print($"[evt] {msg}"));
-        _loader.SetWorld(this);     // this Node is the scene-tree parent for spawned game objects
 
-        // Auto-discovery: find every script, load the ones that register systems.
+        // Persistent global root: holds the player and other never-cleared nodes,
+        // and parents the swappable per-scene container.
+        var globalRoot = new Node { Name = "Global" };
+        AddChild(globalRoot);
+        _loader.SetGlobalRoot(globalRoot);
+
+        // Auto-discovery: find every script, load the ones that register systems
+        // (node scripts are loaded per-node via scene files, not here).
         var scripts = DiscoverScriptNames().ToList();
         GD.Print($"[evaluate] discovered {scripts.Count} script(s): {string.Join(", ", scripts)}");
         _loader.LoadAllSystems(scripts);
 
         foreach (var sys in _loader.Systems)
-            GD.Print($"[evaluate] system registered: {sys.Path}");
+            GD.Print($"[evaluate] system registered: {sys.Path} " +
+                     (sys.IsGlobal ? "(global)" : $"[{string.Join(",", sys.Scenes)}]"));
+
+        // Build the persistent layer (instantiates manifest nodes + their
+        // on_ready), run global on_start, then enter the start scene.
+        var start = _loader.LoadGlobalLayerFromFile();
         CallHook("on_start");
+        if (start is not null)
+        {
+            GD.Print($"[evaluate] entering start scene '{start}'");
+            _loader.GotoScene(start);
+        }
+        else
+        {
+            GD.Print($"[evaluate] no start_scene in {Loader.ManifestName}; running global layer only");
+        }
 
         GD.Print($"[evaluate] world now has {GetChildCount()} node(s) in the scene tree");
 
@@ -60,6 +80,14 @@ public partial class EvaluateRuntime : Node
         // Apply any pending hot-reloads on the main thread.
         while (_changes.TryDequeue(out var changed))
             GD.Print($"[evaluate] hot reload: {_loader.ReloadOnChange(changed)}");
+
+        // Apply a requested scene switch at a safe point — never mid-hook, so a
+        // scene's nodes are never freed while their on_update is running.
+        if (_loader.TakePendingScene() is { } next)
+        {
+            GD.Print($"[evaluate] scene change -> '{next}'");
+            _loader.GotoScene(next);
+        }
 
         CallHook("on_update", delta);
         _frame++;
@@ -94,12 +122,15 @@ public partial class EvaluateRuntime : Node
         if (_loader is not null) CallHook("on_input", _loader.Wrap(@event));
     }
 
-    // Drive a registered lifecycle hook across all systems.
+    // Drive a registered lifecycle hook across everything active this frame:
+    // global + active-scene systems, plus global + active-scene node scripts.
     private void CallHook(string name, params LuaValue[] args)
     {
         if (_loader is null) return;
-        foreach (var sys in _loader.Systems)
+        foreach (var sys in _loader.ActiveSystems)
             if (sys.Hooks.TryGetValue(name, out var fn)) _loader.Call(fn, args);
+        foreach (var node in _loader.ActiveNodes)
+            if (node.Hooks.TryGetValue(name, out var fn)) _loader.Call(fn, args);
     }
 
     // ---- hot reload (default) -------------------------------------------------

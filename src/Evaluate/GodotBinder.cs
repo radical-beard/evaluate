@@ -140,6 +140,22 @@ public sealed class GodotBinder
         return new LuaValue(new GodotInstanceProxy(obj) { Metatable = mt });
     }
 
+    // Construct a Godot object by type name (e.g. "Node3D") — the C#-side
+    // equivalent of the `new` exposed on a `godot.<Type>` handle. Used to build
+    // nodes declared in scene files. Null if the name isn't a constructible type.
+    public GodotObject? Instantiate(string typeName)
+    {
+        var type = GodotAssembly.GetType($"Godot.{typeName}");
+        if (type is null || !typeof(GodotObject).IsAssignableFrom(type) || type.IsAbstract) return null;
+        return (GodotObject)Activator.CreateInstance(type)!;
+    }
+
+    // Set an engine property from a Lua value, with the same target-type-aware
+    // marshalling as `node.prop = v` (so scene-file `position = [0,1,2]` becomes
+    // a Vector3). Routes through the engine, not reflection.
+    public void SetProperty(GodotObject obj, string key, LuaValue val) =>
+        obj.Set(key, ToSetValue(obj, key, val));
+
     private LuaValue MakeMethod(GodotObject obj, string name) => new LuaFunction((ctx, ct) =>
     {
         var n = ctx.ArgumentCount - 1;                 // arg 0 is self (colon call)
@@ -255,15 +271,42 @@ public sealed class GodotBinder
     // Target-aware property write: if the destination is a struct and the Lua
     // value is a plain table, build the exact struct from its named fields. This
     // makes the read-modify-write pattern (node.transform = t) work for every
-    // struct, without a dedicated std type per struct.
+    // struct, without a dedicated std type per struct. A positional list
+    // ([x,y,z]) targeting a vector/color is also accepted, so scene files can
+    // write `position = [0, 1, 2]`.
     private Variant ToSetValue(GodotObject obj, string key, LuaValue val)
     {
         if (val.Type == LuaValueType.Table)
         {
             var pt = PropertyType(obj, key);
-            if (pt is { } vt && IsStruct(vt)) return TableToStruct(val.Read<LuaTable>(), vt);
+            if (pt is { } vt && IsStruct(vt))
+            {
+                var t = val.Read<LuaTable>();
+                return t.ArrayLength > 0 && t.HashMapCount == 0
+                    ? PositionalStruct(t, vt)       // [x, y, z, …]
+                    : TableToStruct(t, vt);         // {x=…, y=…, …}
+            }
         }
         return ToVariant(val);
+    }
+
+    // Build a vector/color/quaternion from a 1-based positional list. Non-vector
+    // structs have no obvious positional form, so they fall back to named fields.
+    private static Variant PositionalStruct(LuaTable t, Variant.Type vt)
+    {
+        float E(int i) => t[i].Type == LuaValueType.Number ? (float)t[i].Read<double>() : 0f;
+        int Ei(int i) => t[i].Type == LuaValueType.Number ? (int)t[i].Read<double>() : 0;
+        return vt switch
+        {
+            Variant.Type.Vector2 => new Vector2(E(1), E(2)),
+            Variant.Type.Vector3 => new Vector3(E(1), E(2), E(3)),
+            Variant.Type.Vector4 => new Vector4(E(1), E(2), E(3), E(4)),
+            Variant.Type.Vector2I => new Vector2I(Ei(1), Ei(2)),
+            Variant.Type.Vector3I => new Vector3I(Ei(1), Ei(2), Ei(3)),
+            Variant.Type.Color => new Color(E(1), E(2), E(3), t.ArrayLength >= 4 ? E(4) : 1f),
+            Variant.Type.Quaternion => new Quaternion(E(1), E(2), E(3), E(4)),
+            _ => TableToStruct(t, vt),
+        };
     }
 
     private Variant.Type? PropertyType(GodotObject obj, string key)

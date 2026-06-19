@@ -3,6 +3,19 @@ using System.Globalization;
 
 namespace Evaluate;
 
+// A parsed TOML document that preserves top-level bare keys, single `[section]`
+// tables, and repeated `[[name]]` array-of-tables blocks in order. Used by scene
+// files, which declare `start_scene = "..."` plus a sequence of `[[node]]` blocks.
+public sealed class TomlDocument
+{
+    // Bare `key = value` pairs before any section header.
+    public Dictionary<string, object> Root = new();
+    // `[section]` -> its key/value map.
+    public Dictionary<string, Dictionary<string, object>> Tables = new();
+    // `[[name]]` -> the blocks in declaration order.
+    public Dictionary<string, List<Dictionary<string, object>>> TableArrays = new();
+}
+
 // TOML reader for the config subset Evaluate needs: [section] headers, and
 // `key = value` where value is a string ("..."), bool (true/false), number, or
 // an array [...] of those (nested arrays allowed). Comments with '#' (ignored
@@ -33,6 +46,42 @@ public static class Toml
             current[line[..eq].Trim()] = ParseValue(line[(eq + 1)..].Trim());
         }
         return result;
+    }
+
+    // Document-preserving parse: keeps bare top-level keys and, crucially,
+    // repeated `[[name]]` blocks (array-of-tables) that the flat Parse() above
+    // would collapse to a single section. Same value grammar as Parse().
+    public static TomlDocument ParseDocument(string text)
+    {
+        var doc = new TomlDocument();
+        var current = doc.Root;       // bare keys land at the document root
+
+        foreach (var raw in text.Replace("\r\n", "\n").Split('\n'))
+        {
+            var line = StripComment(raw).Trim();
+            if (line.Length == 0) continue;
+
+            if (line.StartsWith("[[") && line.EndsWith("]]"))
+            {
+                var name = line[2..^2].Trim();
+                current = new Dictionary<string, object>();
+                if (!doc.TableArrays.TryGetValue(name, out var list))
+                    doc.TableArrays[name] = list = new List<Dictionary<string, object>>();
+                list.Add(current);
+                continue;
+            }
+            if (line.StartsWith("[") && line.EndsWith("]"))
+            {
+                current = new Dictionary<string, object>();
+                doc.Tables[line[1..^1].Trim()] = current;
+                continue;
+            }
+
+            var eq = line.IndexOf('=');
+            if (eq < 0) continue;
+            current[line[..eq].Trim()] = ParseValue(line[(eq + 1)..].Trim());
+        }
+        return doc;
     }
 
     private static object ParseValue(string v)

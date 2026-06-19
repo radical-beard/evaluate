@@ -1,0 +1,8 @@
+---
+scenes:
+ - b
+register:
+ - on_update
+---
+-- Same hook as scene_a, but a different scene — must be allowed.
+function on_update(dt) end

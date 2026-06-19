@@ -1,0 +1,8 @@
+---
+scenes:
+ - a
+register:
+ - on_update
+---
+-- Same hook AND same scene as scene_a — must be rejected.
+function on_update(dt) end

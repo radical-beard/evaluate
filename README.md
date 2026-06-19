@@ -11,7 +11,8 @@ hot-reloaded by default.
 
 - **Frontmatter → signature.** The leading `---` block is split off and parsed
   as real YAML (YamlDotNet) into `config:`, `apis:`, `register:`, `returns:`,
-  `assets:`; the Lua body is handed to the VM verbatim (line numbers preserved).
+  `assets:`, `scenes:`; the Lua body is handed to the VM verbatim (line numbers
+  preserved).
   The signature *is* the C#↔Lua boundary contract — `returns` declares typed,
   access-scoped members (no Lua type system). (`runtime/Frontmatter.cs`)
 - **Per-script sandbox.** Each body runs via `load(body, name, "t", env)` on a
@@ -27,17 +28,35 @@ hot-reloaded by default.
   setter; missing accessor errors).
 - **Data lives in the engine.** `entity.spawn{…}` creates a C# entity
   (`runtime/Engine.cs`); the Lua handle proxies reads/writes into C# via metatable.
-- **Auto-discovery.** The runtime recursively scans `res://scripts`; any script
-  with a `register:` block is wired to Godot lifecycle (`on_start` once,
-  `on_update(dt)` per frame). **Each hook may be registered by only one script
-  project-wide.**
-- **Hot reload (default).** A `FileSystemWatcher` watches scripts, configs, and
-  frontmatter-declared `assets:`; changes reload on the main thread. A changed
-  system re-runs its body and refreshes its hook closures while live entities
-  persist. (`runtime/EvaluateRuntime.cs`)
-- **Lifecycle hooks.** `register:` wires `on_start`, `on_update(dt)`,
-  `on_physics_update(dt)`, `on_input(event)` to Godot's Node lifecycle. One
-  registration per hook, project-wide.
+- **Auto-discovery.** The runtime recursively scans `res://scripts`; any system
+  `.evt` with a `register:` block is wired to the Godot lifecycle. A hook may be
+  registered **once per scene** (see *Scenes & layers*) — so the same `on_update`
+  can be registered in `menu`, `level1`, and globally, each by a different script.
+- **Hot reload (default).** A `FileSystemWatcher` watches scripts, scene files,
+  configs, and frontmatter-declared `assets:`; changes reload on the main thread.
+  A changed system or node script re-runs its body and refreshes its hook
+  closures while live nodes persist; a changed `*.scene.toml` rebuilds the active
+  scene. (`runtime/EvaluateRuntime.cs`)
+- **Scenes & layers.** Gameplay is split into a persistent **global layer** and a
+  swappable **scene layer**, so one program holds many scenes, each with its own
+  registered functions:
+  - **`global.scene.toml`** (reserved manifest) declares nodes that *never*
+    clear (e.g. the player) plus `start_scene`. Loaded once into a persistent
+    **Global root**.
+  - **`*.scene.toml`** declares a node tree (`[[node]]` blocks: `name`, `type`,
+    `parent` by name, `script`, plus engine properties like `position = [x,y,z]`).
+    Instantiated under a per-scene container that is **freed wholesale** on switch.
+  - **`*.node.evt`** is one node's behavior, attached via the scene file; its
+    hooks run with **`self`** bound to that node (no spawning in the script).
+  - **`*.evt`** systems are conductors: no `scenes:` ⇒ **global** (always run);
+    `scenes: [a, b]` ⇒ active only while `a`/`b` is current. The `scene` API does
+    routing — `scene.change(name)` (applied at the next frame boundary, never
+    mid-hook), `scene.current()`, `scene.find(name)`, `scene.add(node)`.
+- **Lifecycle hooks.** `register:` wires Godot's Node lifecycle. **System hooks:**
+  `on_start` (global, once), `on_enter`/`on_exit` (scene-scoped, per activation),
+  `on_update(dt)`, `on_physics_update(dt)`, `on_input(event)`. **Node hooks**
+  (`*.node.evt`, with `self`): `on_ready`, `on_update`, `on_physics_update`,
+  `on_input`, `on_exit`.
 - **`std.*` standard library.** Real C#-backed types via the `[LuaObject]` source
   generator — `std.vec3`, `std.vec2`, `std.color`, `std.vector`,
   `std.linked_list` (`runtime/Std.cs`).
@@ -75,19 +94,24 @@ custom dialect's `+=`.
 
 ## Run
 
-    godot --headless --path .            # demo: discovery, engine call, instance+signal, std, movement
-    godot --headless --path . -- --test  # enforcement suite (6 tests)
+    godot --headless --path dev                       # demo: global layer, scene switch (menu -> level1), node script
+    godot --headless --path dev -- --test             # enforcement suite (12 tests)
+    godot --headless --path dev -- --quit-after 8     # demo, then quit after 8 frames
 
 ## Layout
 
     project.godot  main.tscn  Evaluate.csproj
     runtime/    EvaluateRuntime.cs  Loader.cs  Std.cs  Frontmatter.cs  Toml.cs
-                GodotBinder.cs  Persistence.cs  BindGodotAttribute.cs  Prebaked.cs
-                EvaluateTests.cs
+                SceneFile.cs  GodotBinder.cs  Persistence.cs  BindGodotAttribute.cs
+                Prebaked.cs  EvaluateTests.cs
     generator/  Evaluate.Generator.csproj  BindGodotGenerator.cs   (Roslyn source generator)
-    scripts/    game.evt player.evt enemy_factory.evt  game.toml player.toml
+    scripts/    global.scene.toml  menu.scene.toml  level1.scene.toml
+                player.node.evt  showcase.evt  menu.evt  level1.evt
+                game.toml  player.toml
     tests/      forbidden_global / undeclared_api / missing_accessor /
-                system_a / system_b / readonly_module  (.evt)
+                system_a / system_b / readonly_module / metatable_oop /
+                scene_a / scene_b / scene_a_dup / global_update / self_node (.evt)
+                global.scene.toml
 
 ## Remaining work toward "full featured"
 

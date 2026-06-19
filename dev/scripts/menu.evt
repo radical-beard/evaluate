@@ -1,0 +1,30 @@
+---
+scenes:
+ - menu
+apis:
+ - scene
+register:
+ - on_enter
+ - on_exit
+ - on_update
+---
+-- A SCENE-SCOPED system: its hooks fire only while "menu" is the active scene.
+-- Because it is scoped to `menu`, it may register on_update even though the
+-- global `showcase.evt` also registers on_update — different scenes, no clash.
+local frames = 0
+
+function on_enter()
+  print("menu: on_enter (active scene = " .. tostring(scene.current()) .. ")")
+end
+
+function on_exit()
+  print("menu: on_exit (leaving — my nodes get freed)")
+end
+
+function on_update(dt)
+  frames = frames + 1
+  if frames == 3 then
+    print("menu: advancing to level1")
+    scene.change("level1")
+  end
+end

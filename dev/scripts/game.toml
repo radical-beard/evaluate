@@ -1,9 +1,5 @@
-# Defaults for the conductor (game.evt).
+# Defaults for the global showcase system (showcase.evt).
 # Exposed to Lua as the `config.game` table.
 [game]
-spawn = [2.0, 0.0, 0.0]   # x, y, z
-move_speed = 4.5
-enemy_count = 3
 title = "Evaluate Demo"   # string with a # that must not be treated as a comment
 debug = true
-tags = ["alpha", "beta"]

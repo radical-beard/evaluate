@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Godot;
 using Lua;
 
 namespace Evaluate;
@@ -35,8 +37,9 @@ public static class EvaluateTests
         Check("returns contract rejects a missing accessor",
             Throws(() => { NewLoader().Require("missing_accessor.evt"); }));
 
-        // 4: a lifecycle hook may be registered only once project-wide
-        Check("a hook can only be registered once per project", DoubleRegisterRejected());
+        // 4: a lifecycle hook may be registered only once per scene namespace
+        // (system_a/system_b are both global, so they share the global namespace)
+        Check("a hook can only be registered once per scene", DoubleRegisterRejected());
 
         // 5 (positive control): read-only property exposes getter, hides setter
         {
@@ -88,6 +91,75 @@ public static class EvaluateTests
             }
             catch (Exception e) { detail = e.Message; }
             Check("metatable OOP (setmetatable + inheritance + raw*) works in the sandbox", ok, detail);
+        }
+
+        // 8: the SAME hook in DIFFERENT scenes is allowed (the core new feature)
+        Check("the same hook may be registered in different scenes", !Throws(() =>
+        {
+            var loader = NewLoader();
+            loader.LoadSystem("scene_a.evt");   // scenes: [a]
+            loader.LoadSystem("scene_b.evt");   // scenes: [b]
+        }));
+
+        // 9: the same hook in the SAME scene is still rejected
+        Check("the same hook in the same scene is rejected", Throws(() =>
+        {
+            var loader = NewLoader();
+            loader.LoadSystem("scene_a.evt");
+            loader.LoadSystem("scene_a_dup.evt");   // scenes: [a] again
+        }));
+
+        // 10: scene.change switches the active system set; a global system
+        // stays active across scenes, scene-scoped ones only while active.
+        {
+            var root = new Node();
+            var loader = NewLoader();
+            loader.SetGlobalRoot(root);
+            loader.LoadSystem("global_update.evt");   // global
+            loader.LoadSystem("scene_a.evt");         // scenes: [a]
+            loader.LoadSystem("scene_b.evt");         // scenes: [b]
+
+            bool Active(string path) => loader.ActiveSystems.Any(s => s.Path == path);
+
+            loader.GotoScene("a");
+            var inA = Active("global_update.evt") && Active("scene_a.evt") && !Active("scene_b.evt");
+            loader.GotoScene("b");
+            var inB = Active("global_update.evt") && Active("scene_b.evt") && !Active("scene_a.evt");
+
+            Check("scene switch gates hooks; global stays active", inA && inB, $"inA={inA}, inB={inB}");
+            root.QueueFree();
+        }
+
+        // 11: a node script runs with `self` bound to its node
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var root = new Node();
+                var loader = NewLoader();
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayerFromFile();     // global.scene.toml -> Probe + self_node.node.evt
+                var probe = root.GetChildCount() > 0 ? root.GetChild(0) : null;
+                ok = probe is not null && probe.HasMeta("ready") && probe.GetMeta("ready").AsBool();
+                detail = probe is null ? "no node instantiated" : $"meta ready={probe.HasMeta("ready")}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("a node script runs with self bound to its node", ok, detail);
+        }
+
+        // 12: SceneFile parses [[node]] blocks (name/type/parent/script/props)
+        {
+            var spec = SceneFile.Parse(
+                "start_scene = \"x\"\n[[node]]\nname = \"A\"\ntype = \"Node3D\"\n" +
+                "[[node]]\nname = \"B\"\ntype = \"Node2D\"\nparent = \"A\"\n" +
+                "script = \"b.node.evt\"\nposition = [1.0, 2.0]\n");
+            var ok = spec.StartScene == "x" && spec.Nodes.Count == 2
+                && spec.Nodes[0].Name == "A" && spec.Nodes[0].Type == "Node3D"
+                && spec.Nodes[1].Parent == "A" && spec.Nodes[1].Script == "b.node.evt"
+                && spec.Nodes[1].Props.ContainsKey("position");
+            Check("scene file parses [[node]] blocks with parent/script/props", ok,
+                $"start={spec.StartScene}, nodes={spec.Nodes.Count}");
         }
 
         log($"[tests] {passed} passed, {failed} failed");

@@ -1,0 +1,6 @@
+---
+register:
+ - on_ready
+---
+-- Node script: `self` is the node it is attached to.
+function on_ready() self:set_meta("ready", true) end

@@ -1,5 +1,6 @@
-# Defaults for the character built by player.luau.
+# Defaults for the player node script (player.node.evt).
 # Exposed to Lua as the `config.player` table.
 [player]
 start_pos = [0.0, 0.0, 0.0]   # x, y, z
 base_weapon_damage = 25.0
+move_speed = 4.5

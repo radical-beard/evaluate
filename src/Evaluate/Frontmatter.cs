@@ -32,6 +32,10 @@ public sealed class Frontmatter
     public List<string> Register = new();
     public List<ReturnSpec> Returns = new();
     public List<string> Assets = new();
+    // Scenes this system participates in. Empty = global (runs in every scene).
+    // Only meaningful for system `.evt` scripts; node scripts get their scene
+    // membership implicitly from the scene file that references them.
+    public List<string> Scenes = new();
     public string Body = "";
 
     private static readonly IDeserializer Yaml = new DeserializerBuilder().Build();
@@ -63,6 +67,7 @@ public sealed class Frontmatter
         fm.Apis = StringList(root, "apis");
         fm.Register = StringList(root, "register");
         fm.Assets = StringList(root, "assets");
+        fm.Scenes = StringList(root, "scenes");
 
         if (root.TryGetValue("returns", out var r) && r is IEnumerable<object> items)
             foreach (var item in items)
