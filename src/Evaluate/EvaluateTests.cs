@@ -244,6 +244,76 @@ public static class EvaluateTests
             Check("nested table marshals to a Lua table (not nil)", ok, $"type={lua.Type}");
         }
 
+        // 19: a .toml edit hot-reloads LIVE — config is a live view over the TOML
+        // cache, not a frozen snapshot, so a value read in a hook reflects the latest
+        // saved file with no script re-run (the bare-toml hot-reload that was missing).
+        {
+            var sink = new List<string>();
+            var src = new Dictionary<string, string>
+            {
+                ["tuner.evt"] =
+                    "---\nconfig:\n - t.toml\nregister:\n - on_start\n---\n" +
+                    "function on_start() print('label=' .. config.tune.label) end\n",
+                ["t.toml"] = "[tune]\nlabel = \"one\"\n",
+            };
+            var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", sink.Add);
+            var sys = loader.LoadSystem("tuner.evt");
+            loader.Call(sys.OnStart);
+            var v1 = sink.Contains("label=one");
+
+            src["t.toml"] = "[tune]\nlabel = \"two\"\n";
+            loader.ReloadOnChange("t.toml");
+            loader.Call(sys.OnStart);                  // SAME closure, no re-run
+            var v2 = sink.Contains("label=two");
+
+            Check("a .toml edit hot-reloads live (config is a live view)", v1 && v2, $"v1={v1}, v2={v2}");
+        }
+
+        // 20: global.scene hot-reloads the PERSISTENT layer in place — a manifest
+        // edit rebuilds the nodes (same names freed + recreated) and applies the
+        // change. Was previously "restart to apply persistent-node changes".
+        {
+            var root = new Node();
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] = "[nodes.Hero]\ntype = \"Node3D\"\nposition = [1, 0, 0]\n",
+            };
+            var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+            loader.SetGlobalRoot(root);
+            loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+            var p1 = root.GetNodeOrNull("Hero") is Node3D h1 && h1.Position == new Vector3(1, 0, 0);
+
+            src["global.scene"] = "[nodes.Hero]\ntype = \"Node3D\"\nposition = [2, 0, 0]\n";
+            loader.ReloadOnChange("global.scene");
+            var p2 = root.GetNodeOrNull("Hero") is Node3D h2 && h2.Position == new Vector3(2, 0, 0);
+            var single = root.GetChildren().Count(c => c.Name == "Hero") <= 1;   // old freed, no dup name
+
+            Check("global.scene hot-reloads the persistent layer in place",
+                p1 && p2 && single, $"p1={p1}, p2={p2}, single={single}");
+            root.QueueFree();
+        }
+
+        // 21: an ACTIVE scene's .scene file hot-reloads — the active scene is rebuilt
+        // in place and the same-named container keeps its name (detach-before-readd).
+        {
+            var root = new Node();
+            var src = new Dictionary<string, string>
+            {
+                ["lvl.scene"] = "[nodes.Box]\ntype = \"Node3D\"\nposition = [5, 0, 0]\n",
+            };
+            var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+            loader.SetGlobalRoot(root);
+            loader.GotoScene("lvl");
+            var s1 = root.GetNodeOrNull("lvl/Box") is Node3D b1 && b1.Position == new Vector3(5, 0, 0);
+
+            src["lvl.scene"] = "[nodes.Box]\ntype = \"Node3D\"\nposition = [6, 0, 0]\n";
+            loader.ReloadOnChange("lvl.scene");
+            var s2 = root.GetNodeOrNull("lvl/Box") is Node3D b2 && b2.Position == new Vector3(6, 0, 0);
+
+            Check("an active scene's .scene file hot-reloads in place", s1 && s2, $"s1={s1}, s2={s2}");
+            root.QueueFree();
+        }
+
         log($"[tests] {passed} passed, {failed} failed");
         return failed;
     }

@@ -5,6 +5,34 @@ All notable changes to Evaluate are documented here. The format is based on
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While
 the version is `0.x`, minor bumps may include breaking changes.
 
+## [0.4.2] — 2026-06-19
+
+Config and scene hot-reload now actually apply live.
+
+### Changed
+- **`config` is a live view, not a frozen snapshot.** Each `config.<section>.<key>`
+  access reads the current TOML cache, so saving a `.toml` updates running scripts
+  immediately — even values captured once into an object (`self.cfg = config.x`;
+  then `cfg.field` each frame). Previously a script's `config` was copied at load
+  time, so a bare `.toml` edit never took effect without re-running the script.
+  `ReloadOnChange` now re-reads a changed `.toml` into the cache (keeping the
+  last-good values if the file is mid-save / malformed) rather than just
+  invalidating it.
+  - Minor: `config.<section>` is now backed by a metatable, so `pairs()`/`ipairs()`
+    over a config section no longer enumerates its keys (named-key access is
+    unchanged). Read declared keys by name.
+- **`global.scene` hot-reloads the persistent layer in place.** Editing the global
+  manifest now fires `on_exit`, frees the manifest's nodes, and re-instantiates +
+  fires `on_ready` — instead of logging "restart to apply". Note this *recreates*
+  the persistent nodes, so their runtime state resets (it applies a structural
+  manifest change live; it is not state-preserving like a node-script reload).
+
+### Fixed
+- **Scene rebuilds keep their node name.** A reloaded active scene (and the
+  rebuilt global layer) now detaches the old container/nodes before re-adding, so
+  the rebuilt nodes keep their declared names instead of colliding into
+  `Name2`-style suffixes while the old subtree waits to free.
+
 ## [0.4.1] — 2026-06-18
 
 Per-game save location.

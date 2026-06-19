@@ -61,6 +61,8 @@ public sealed class Loader
 
     private readonly List<LoadedSystem> _systems = new();
     private readonly List<LoadedNode> _globalNodes = new();              // persistent node scripts
+    private readonly List<Node> _globalLayerRoots = new();               // manifest's instantiated root nodes (for reload)
+    private SceneSpec? _globalManifest;                                  // last-loaded manifest (for live rebuild)
     private readonly List<LoadedNode> _sceneNodes = new();               // active-scene node scripts
     private readonly HashSet<string> _loadedScripts = new();             // every .evt Run so far
     private readonly HashSet<string> _configFiles = new();               // every declared toml
@@ -231,7 +233,8 @@ public sealed class Loader
     public string? LoadGlobalLayer(SceneSpec manifest)
     {
         if (_globalRoot is null) throw new EvaluateException("LoadGlobalLayer called before SetGlobalRoot");
-        InstantiateTree(manifest, _globalRoot, _globalNodes);
+        _globalManifest = manifest;
+        InstantiateTree(manifest, _globalRoot, _globalNodes, _globalLayerRoots);
         foreach (var n in _globalNodes) Fire(n, "on_ready");
         return manifest.StartScene;
     }
@@ -250,7 +253,11 @@ public sealed class Loader
             foreach (var s in SystemsFor(_activeScene)) FireSystem(s, "on_exit");
         }
         _sceneNodes.Clear();
-        _sceneContainer?.QueueFree();    // frees the whole subtree next idle frame
+        if (_sceneContainer is not null)
+        {
+            _globalRoot.RemoveChild(_sceneContainer);   // free the name slot NOW, so a
+            _sceneContainer.QueueFree();                // same-name rebuild keeps its name
+        }
 
         // Entering the new scene under a fresh container.
         var spec = SceneFile.Parse(_readScript(SceneFileName(name)));
@@ -297,7 +304,7 @@ public sealed class Loader
     // Instantiate a scene/manifest node tree under `container`: SceneBuilder builds
     // the visual tree (types, properties, hierarchy) and, via the visit callback,
     // we attach each node's `*.node.evt` behavior script (bound to that node).
-    private void InstantiateTree(SceneSpec spec, Node container, List<LoadedNode> nodes)
+    private void InstantiateTree(SceneSpec spec, Node container, List<LoadedNode> nodes, List<Node>? roots = null)
     {
         void Attach(NodeSpec ns, Node node)
         {
@@ -305,7 +312,11 @@ public sealed class Loader
                 nodes.Add(LoadNodeScript(ns.Script!, node, container));
         }
         foreach (var ns in spec.Nodes)
-            container.AddChild(SceneBuilder.BuildNode(ns, _godotBinder, Attach));
+        {
+            var node = SceneBuilder.BuildNode(ns, _godotBinder, Attach);
+            container.AddChild(node);
+            roots?.Add(node);
+        }
     }
 
     // Load a `*.node.evt` bound to one live node: fresh sandbox with `self`, then
@@ -344,7 +355,6 @@ public sealed class Loader
     // its hook closures, but on_start is NOT re-invoked (no re-spawn).
     public string ReloadOnChange(string path)
     {
-        _tomlCache.Remove(path);
         _requireCache.Remove(path);
 
         // Node script: refresh its hook closures on every live instance, keeping
@@ -367,8 +377,7 @@ public sealed class Loader
         // Scene file: rebuild the active scene in place; others rebuild on entry.
         // The global manifest is the heavy case — it owns persistent nodes, so a
         // restart applies it cleanly.
-        if (path == ManifestName)
-            return $"invalidated global manifest {path} (restart to apply persistent-node changes)";
+        if (path == ManifestName) return ReloadGlobalLayer();
         if (path.EndsWith(".scene"))
         {
             if (_activeScene is not null && SceneFileName(_activeScene) == path)
@@ -379,7 +388,21 @@ public sealed class Loader
             return $"invalidated scene {path} (rebuilt on next entry)";
         }
 
-        if (path.EndsWith(".toml")) return $"invalidated config {path} (re-read on next use)";
+        if (path.EndsWith(".toml"))
+        {
+            // Re-read into the cache so every live `config` view reflects the new
+            // values immediately. A malformed/half-saved file keeps the last-good
+            // values rather than blanking config mid-frame.
+            try
+            {
+                _tomlCache[path] = BuildTomlTable(path);
+                return $"reloaded config {path} (live)";
+            }
+            catch (EvaluateException e)
+            {
+                return $"kept last-good config {path} ({e.Message})";
+            }
+        }
         if (path.EndsWith(".evt")) return $"invalidated module {path} (re-required on next use)";
         return $"noted change to asset {path} (would re-import)";
     }
@@ -404,6 +427,34 @@ public sealed class Loader
             return count;
         }
         return RefreshIn(_globalNodes, _globalRoot) + RefreshIn(_sceneNodes, _sceneContainer);
+    }
+
+    // Rebuild the persistent global layer in place from the re-read manifest: fire
+    // on_exit for its node scripts, detach + free the manifest's nodes, then
+    // re-instantiate and fire on_ready. The active scene and any world-spawned nodes
+    // are untouched. NOTE: persistent nodes are recreated, so their runtime state
+    // resets — this applies a *structural* manifest change live (it is not
+    // state-preserving the way a node-script reload is). Detach-then-QueueFree frees
+    // the old names immediately so the rebuilt nodes keep their declared names.
+    private string ReloadGlobalLayer()
+    {
+        if (_globalRoot is null || _globalManifest is null)
+            return $"invalidated global manifest {ManifestName} (no global layer loaded yet)";
+
+        foreach (var n in _globalNodes) Fire(n, "on_exit");
+        _globalNodes.Clear();
+        foreach (var root in _globalLayerRoots)
+        {
+            _globalRoot.RemoveChild(root);   // free the name slot now, before re-adding
+            root.QueueFree();
+        }
+        _globalLayerRoots.Clear();
+
+        var manifest = SceneFile.Parse(_readScript(ManifestName));
+        _globalManifest = manifest;
+        InstantiateTree(manifest, _globalRoot, _globalNodes, _globalLayerRoots);
+        foreach (var n in _globalNodes) Fire(n, "on_ready");
+        return $"reloaded global manifest {ManifestName} (persistent layer rebuilt)";
     }
 
     public void Call(LuaValue fn, params LuaValue[] args) => Sync(_lua.CallAsync(fn, args));
@@ -450,11 +501,7 @@ public sealed class Loader
         // Node scripts drive one node, exposed as `self`.
         if (ctx.Self is not null) env["self"] = _godotBinder.WrapInstance(ctx.Self);
 
-        var config = new LuaTable();
-        foreach (var file in fm.Configs)
-            foreach (var kv in LoadToml(file))
-                config[kv.Key] = kv.Value;
-        env["config"] = config;
+        env["config"] = BuildConfigView(fm.Configs);
 
         foreach (var api in fm.Apis)
         {
@@ -644,18 +691,82 @@ public sealed class Loader
     private LuaTable LoadToml(string file)
     {
         if (_tomlCache.TryGetValue(file, out var cached)) return cached;
+        var root = BuildTomlTable(file);
+        _tomlCache[file] = root;
+        return root;
+    }
 
-        var parsed = Toml.Parse(_readScript(file));
+    // Parse a config file into a fresh section->table LuaTable (no caching). Throws
+    // EvaluateException on a malformed file (see Toml.Model).
+    private LuaTable BuildTomlTable(string file)
+    {
         var root = new LuaTable();
-        foreach (var section in parsed)
+        foreach (var section in Toml.Parse(_readScript(file)))
         {
             if (section.Key.Length == 0) continue;
             var t = new LuaTable();
             foreach (var kv in section.Value) t[kv.Key] = SceneBuilder.TomlToLua(kv.Value);
             root[section.Key] = t;
         }
-        _tomlCache[file] = root;
         return root;
+    }
+
+    // Build the `config` table as a LIVE view over the declared TOML files. A
+    // metatable resolves config.<section> to a section-view whose keys read the
+    // CURRENT TOML cache on each access — so a saved .toml edit (re-read into the
+    // cache by ReloadOnChange) is reflected immediately, with no restart and no
+    // script re-run, even for a value captured once (e.g. self.cfg = config.x; then
+    // cfg.field each frame). config tables were a frozen snapshot before, which is
+    // why bare .toml edits did not hot-reload.
+    private LuaTable BuildConfigView(List<string> files)
+    {
+        // section name -> declaring file (first declarer wins). Warm the cache so a
+        // startup parse error surfaces here, not lazily inside a hook.
+        var sectionFile = new Dictionary<string, string>();
+        foreach (var file in files)
+        {
+            LoadToml(file);
+            foreach (var section in Toml.Parse(_readScript(file)).Keys)
+                if (section.Length > 0 && !sectionFile.ContainsKey(section))
+                    sectionFile[section] = file;
+        }
+
+        var config = new LuaTable();
+        var mt = new LuaTable();
+        mt["__index"] = new LuaFunction((c, ct) =>
+        {
+            var key = c.GetArgument(1);
+            if (key.Type == LuaValueType.String
+                && sectionFile.TryGetValue(key.Read<string>(), out var file))
+            {
+                var view = MakeSectionView(file, key.Read<string>());
+                config[key] = view;     // memoize the view object (it reads live internally)
+                c.Return(view);
+            }
+            else c.Return(LuaValue.Nil);
+            return new(1);
+        });
+        config.Metatable = mt;
+        return config;
+    }
+
+    // A view onto one config section: every key access reads the current TOML cache,
+    // so it always reflects the latest saved file.
+    private LuaTable MakeSectionView(string file, string section)
+    {
+        var view = new LuaTable();
+        var mt = new LuaTable();
+        mt["__index"] = new LuaFunction((c, ct) =>
+        {
+            var root = LoadToml(file);    // cache hit in steady state (kept warm by ReloadOnChange)
+            if (root[section].Type == LuaValueType.Table)
+                c.Return(root[section].Read<LuaTable>()[c.GetArgument(1)]);
+            else
+                c.Return(LuaValue.Nil);
+            return new(1);
+        });
+        view.Metatable = mt;
+        return view;
     }
 
     private static T Sync<T>(ValueTask<T> vt) =>
