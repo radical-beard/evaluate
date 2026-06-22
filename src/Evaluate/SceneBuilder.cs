@@ -14,7 +14,7 @@ public static class SceneBuilder
     // (spec, node) pair after the node and its children exist — the runtime uses
     // it to attach node scripts; the editor passes null.
     public static Node BuildNode(NodeSpec spec, GodotBinder binder, Action<NodeSpec, Node>? visit = null,
-        Func<string, IReadOnlyList<NodeSpec>>? resolveScene = null)
+        Func<string, IReadOnlyList<NodeSpec>>? resolveScene = null, HashSet<string>? instanceChain = null)
     {
         var obj = binder.Instantiate(spec.Type)
             ?? throw new EvaluateException($"scene node '{spec.Name}' has unknown type '{spec.Type}'");
@@ -28,12 +28,20 @@ public static class SceneBuilder
         if (spec.Unique) node.UniqueNameInOwner = true;
 
         foreach (var child in spec.Children)
-            node.AddChild(BuildNode(child, binder, visit, resolveScene));
+            node.AddChild(BuildNode(child, binder, visit, resolveScene, instanceChain));
 
-        // `instance = "scene"`: that scene's root nodes are built as children of this node.
+        // `instance = "scene"`: that scene's root nodes are built as children of this node. A
+        // visited-set across the instance chain rejects a self/mutual reference with a clean
+        // error instead of recursing into an uncatchable StackOverflow.
         if (spec.Instance is { } inst && resolveScene is not null)
+        {
+            instanceChain ??= new HashSet<string>();
+            if (!instanceChain.Add(inst))
+                throw new EvaluateException($"scene instance cycle: '{inst}' is instanced within itself");
             foreach (var rootSpec in resolveScene(inst))
-                node.AddChild(BuildNode(rootSpec, binder, visit, resolveScene));
+                node.AddChild(BuildNode(rootSpec, binder, visit, resolveScene, instanceChain));
+            instanceChain.Remove(inst);     // a sibling branch may reuse the same scene (not a cycle)
+        }
 
         visit?.Invoke(spec, node);
         return node;

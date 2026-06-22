@@ -484,6 +484,15 @@ public static class EvaluateTests
             Check("scene unique-name + declarative connection wire up (A3)", ok, detail);
         }
 
+        // 32: an instance= cycle is rejected with a clean error (NOT an uncatchable SOF) (A3)
+        Check("instance cycle is rejected, not recursed", Throws(() =>
+        {
+            var spec = SceneFile.Parse("[nodes.Loop]\ntype = \"Node3D\"\ninstance = \"self\"\n");
+            var binder = new GodotBinder(Lua.LuaState.Create());
+            IReadOnlyList<NodeSpec> Resolve(string n) => spec.Nodes;   // any name -> the self-instancing node
+            SceneBuilder.BuildNode(spec.Nodes[0], binder, null, Resolve);
+        }));
+
         log($"[tests] {passed} passed, {failed} failed");
         return failed;
     }

@@ -5,6 +5,16 @@ All notable changes to Evaluate are documented here. The format is based on
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While
 the version is `0.x`, minor bumps may include breaking changes.
 
+## [0.5.1] — 2026-06-22
+
+### Fixed
+- **`instance =` cycles are rejected instead of crashing.** A scene that instances itself
+  (directly or via a mutual A→B→A chain) recursed forever into an uncatchable
+  StackOverflow at scene build. `SceneBuilder.BuildNode` now threads a visited-set across
+  the instance chain and throws a clean `EvaluateException` (caught + logged by the runtime)
+  on a revisit. Child nesting and reusing the same instanced scene in sibling branches are
+  unaffected.
+
 ## [0.5.0] — 2026-06-22
 
 Full Godot-scene parity for `.scene` files, an app-quit hook, and raw SQL for scripts.
