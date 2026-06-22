@@ -314,6 +314,176 @@ public static class EvaluateTests
             root.QueueFree();
         }
 
+        // 22: scene node `meta` + `groups` are parsed and applied (A1)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var spec = SceneFile.Parse(
+                    "[nodes.Hero]\ntype = \"Node3D\"\ngroups = [\"player\", \"alive\"]\n" +
+                    "meta = { mode = \"game\", level = 3 }\n");
+                var n = spec.Nodes[0];
+                var parsed = n.Groups.Count == 2 && n.Meta.Count == 2 && (string)n.Meta["mode"] == "game";
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var container = new Node();
+                container.AddChild(SceneBuilder.BuildNode(n, binder));
+                var hero = container.GetNodeOrNull("Hero");
+                ok = parsed && hero is not null
+                    && hero.IsInGroup("player") && hero.IsInGroup("alive")
+                    && hero.HasMeta("mode") && hero.GetMeta("mode").AsString() == "game"
+                    && hero.HasMeta("level") && hero.GetMeta("level").AsInt32() == 3;
+                detail = $"parsed={parsed}, player={hero?.IsInGroup("player")}, mode={(hero?.HasMeta("mode") == true ? hero.GetMeta("mode").AsString() : "-")}";
+                container.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("scene node meta + groups are applied", ok, detail);
+        }
+
+        // 23: a sub-table keyed `meta` is metadata, NOT a child; `groups` must be an array
+        Check("malformed groups (non-array) is rejected", Throws(() =>
+            SceneFile.Parse("[nodes.X]\ntype = \"Node3D\"\ngroups = \"player\"\n")));
+
+        // 24: a global system may register + fire on_quit (A4 — persist-on-exit hook)
+        {
+            var sink = new List<string>();
+            var src = new Dictionary<string, string>
+            {
+                ["saver.evt"] = "---\nregister:\n - on_quit\n---\nfunction on_quit() print('flushed') end\n",
+            };
+            var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", sink.Add);
+            var sys = loader.LoadSystem("saver.evt");
+            loader.Call(sys.Hooks["on_quit"]);
+            Check("a global system can register + fire on_quit", sink.Contains("flushed"));
+        }
+
+        // 25: on_quit is global-only — a scene-scoped on_quit is rejected
+        Check("scene-scoped on_quit is rejected", Throws(() =>
+        {
+            var src = new Dictionary<string, string>
+            {
+                ["bad_quit.evt"] = "---\nscenes:\n - a\nregister:\n - on_quit\n---\nfunction on_quit() end\n",
+            };
+            new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { }).LoadSystem("bad_quit.evt");
+        }));
+
+        // 26: the sql capability core — exec/query/params/async+flush (A5)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var sql = new Sql(_ => { });
+                var no = System.Array.Empty<object?>();
+                sql.ExecStmt("DROP TABLE IF EXISTS _t", no, true);
+                sql.ExecStmt("CREATE TABLE _t(id INTEGER PRIMARY KEY, name TEXT, n REAL)", no, true);
+                var ins = sql.ExecStmt("INSERT INTO _t(name, n) VALUES(@p1, @p2)", new object?[] { "alice", 3.5 }, true);
+                sql.ExecStmt("INSERT INTO _t(name, n) VALUES(@p1, @p2)", new object?[] { "bob", 7.0 }, false);  // async
+                sql.Flush();
+                var rows = sql.QueryStmt("SELECT name, n FROM _t ORDER BY id", no);
+                var cnt = sql.QueryStmt("SELECT COUNT(*) AS c FROM _t WHERE n > @p1", new object?[] { 5.0 });
+                ok = ins.changes == 1 && ins.lastId == 1
+                    && rows.Count == 2 && (string)rows[0]["name"]! == "alice" && (string)rows[1]["name"]! == "bob"
+                    && Convert.ToInt64(cnt[0]["c"]) == 1;
+                detail = $"ins=({ins.changes},{ins.lastId}), rows={rows.Count}, cnt={(cnt.Count > 0 ? cnt[0]["c"] : "-")}";
+                sql.ExecStmt("DROP TABLE _t", no, true);
+                sql.Dispose();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("sql exec/query/params/async+flush round-trip", ok, detail);
+        }
+
+        // 27: the sql capability round-trips through Lua (apis: sql)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var handle = NewLoader().Require("sql_probe.evt").Read<LuaTable>();
+                var result = handle["result"].Type == LuaValueType.String ? handle["result"].Read<string>() : "";
+                ok = result == "zed:2";
+                detail = $"result=\"{result}\"";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("sql capability round-trips through Lua", ok, detail);
+        }
+
+        // 28: inline sub-resource property — `mesh = { _type = "BoxMesh", size = [..] }` (A2)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var spec = SceneFile.Parse(
+                    "[nodes.M]\ntype = \"MeshInstance3D\"\nmesh = { _type = \"BoxMesh\", size = [2, 3, 4] }\n");
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var container = new Node();
+                container.AddChild(SceneBuilder.BuildNode(spec.Nodes[0], binder));
+                var box = container.GetNodeOrNull<MeshInstance3D>("M")?.Mesh as BoxMesh;
+                ok = box is not null && box.Size == new Vector3(2, 3, 4);
+                detail = $"size={box?.Size}";
+                container.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("inline sub-resource property builds (A2)", ok, detail);
+        }
+
+        // 29: resource-by-path — a res:// string on a Resource property loads it (A2)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var spec = SceneFile.Parse("[nodes.M]\ntype = \"MeshInstance3D\"\nmesh = \"res://box.tres\"\n");
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var container = new Node();
+                container.AddChild(SceneBuilder.BuildNode(spec.Nodes[0], binder));
+                var box = container.GetNodeOrNull<MeshInstance3D>("M")?.Mesh as BoxMesh;
+                ok = box is not null && box.Size == new Vector3(4, 5, 6);
+                detail = $"size={box?.Size}";
+                container.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("resource-by-path property loads (A2)", ok, detail);
+        }
+
+        // 30: `instance = "scene"` builds the sub-scene's roots as children (A3)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var subSpec = SceneFile.Parse("[nodes.Inner]\ntype = \"Node3D\"\n[nodes.Inner2]\ntype = \"Node2D\"\n");
+                var spec = SceneFile.Parse("[nodes.Wrap]\ntype = \"Node3D\"\ninstance = \"sub\"\n");
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                IReadOnlyList<NodeSpec> Resolve(string n) => n == "sub" ? subSpec.Nodes : new List<NodeSpec>();
+                var container = new Node();
+                container.AddChild(SceneBuilder.BuildNode(spec.Nodes[0], binder, null, Resolve));
+                ok = container.GetNodeOrNull("Wrap/Inner") is Node3D && container.GetNodeOrNull("Wrap/Inner2") is Node2D;
+                detail = $"inner={container.GetNodeOrNull("Wrap/Inner")?.GetType().Name}";
+                container.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("instance builds sub-scene roots as children (A3)", ok, detail);
+        }
+
+        // 31: `unique = true` (owner + %Name) and declarative `connections` wire up (A3)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var root = new Node();
+                var loader = NewLoader();
+                loader.SetGlobalRoot(root);
+                loader.GotoScene("a3");                       // res://tests/a3.scene
+                var container = root.GetNodeOrNull("a3");
+                var emitter = container?.GetNodeOrNull("Emitter");
+                var target = container?.GetNodeOrNull("Target");
+                var uniqueOk = emitter is not null && emitter.UniqueNameInOwner && emitter.Owner == container
+                    && target?.GetNodeOrNull("%Emitter") == emitter;
+                var connOk = emitter is not null && emitter.GetSignalConnectionList("renamed").Count == 1;
+                ok = uniqueOk && connOk;
+                detail = $"unique={uniqueOk}, conn={connOk}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("scene unique-name + declarative connection wire up (A3)", ok, detail);
+        }
+
         log($"[tests] {passed} passed, {failed} failed");
         return failed;
     }

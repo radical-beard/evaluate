@@ -5,6 +5,31 @@ All notable changes to Evaluate are documented here. The format is based on
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While
 the version is `0.x`, minor bumps may include breaking changes.
 
+## [0.5.0] — 2026-06-22
+
+Full Godot-scene parity for `.scene` files, an app-quit hook, and raw SQL for scripts.
+
+### Added
+- **Scene-file node `meta` and `groups`.** A `[nodes.X]` may declare
+  `meta = { key = value, ... }` (→ `set_meta`) and `groups = ["a", "b"]`
+  (→ `add_to_group`) — reserved keys, so a node can't be named `meta`/`groups`.
+- **Scene-file resources.** A string property holding a `res://…` path that targets a
+  `Resource`-typed property is loaded (e.g. `texture = "res://art/x.png"`); an inline
+  sub-resource is built from `{ _type = "BoxMesh", size = [1, 1, 1] }` (the `_type`
+  marker distinguishes it from a child node).
+- **Scene instancing, unique names, connections.** `instance = "other_scene"` builds that
+  scene's root nodes as children; `unique = true` sets `unique_name_in_owner` (the loader
+  now sets node owners, so `%Name` resolves at runtime); `connections = [{ signal, to,
+  method }]` wires a node's signal to a built-in method on the node at `to`.
+- **`on_quit` global hook.** Fires once on any teardown (window-close, a script's
+  `get_tree():quit()`, `--quit-after`) so global systems/nodes can flush persistence.
+  Window-close is no longer auto-accepted; the runtime quits explicitly.
+- **`sql` capability — full SQL for scripts.** `apis: - sql` exposes
+  `sql.exec` / `sql.query` / `sql.query_row` / `sql.transaction` (synchronous,
+  parameterized via `@p1, @p2, …`), `sql.exec_async` + `sql.flush` (a background writer
+  thread that never touches the Lua state), and `sql.snapshot(path)`. WAL mode makes
+  commits atomic and durable; the game owns its schema. The flat `save` kv API is unchanged.
+
 ## [0.4.2] — 2026-06-19
 
 Config and scene hot-reload now actually apply live.

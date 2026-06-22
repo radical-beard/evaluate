@@ -1,0 +1,7 @@
+[nodes.Emitter]
+type = "Node"
+unique = true
+connections = [ { signal = "renamed", to = "Target", method = "queue_free" } ]
+
+[nodes.Target]
+type = "Node"

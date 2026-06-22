@@ -48,7 +48,8 @@ public sealed class Loader
     private Node? _sceneContainer;          // current swappable scene; freed on scene change
     private string? _activeScene;           // name of the active scene
     private string? _pendingScene;          // requested by scene.goto, applied next frame
-    private Persistence? _persistence;      // lazily opened SQLite save store
+    private Persistence? _persistence;      // lazily opened SQLite save store (flat kv)
+    private Sql? _sql;                       // lazily opened full-SQL capability (game schema)
 
     private readonly LuaTable _std;
     private readonly LuaTable _godot;     // ambient: godot.<Type> resolves lazily
@@ -172,9 +173,10 @@ public sealed class Loader
             if (!SystemHooks.Contains(name))
                 throw new EvaluateException(
                     $"{path} registers unknown hook '{name}' (valid: {string.Join(", ", SystemHooks)})");
-            if (name == "on_start" && fm.Scenes.Count > 0)
+            if ((name == "on_start" || name == "on_quit") && fm.Scenes.Count > 0)
                 throw new EvaluateException(
-                    $"{path} registers 'on_start' but is scene-scoped; use 'on_enter' (on_start is global-only)");
+                    $"{path} registers '{name}' but is scene-scoped; '{name}' is global-only " +
+                    "(use 'on_enter'/'on_exit' for per-scene bookends)");
             if ((name == "on_enter" || name == "on_exit") && fm.Scenes.Count == 0)
                 throw new EvaluateException(
                     $"{path} registers '{name}' but is global; '{name}' is for scene-scoped systems");
@@ -204,13 +206,13 @@ public sealed class Loader
     // systems); on_enter/on_exit fire on scene activation (scene-scoped systems);
     // the rest fire while the system is active.
     public static readonly string[] SystemHooks =
-        { "on_start", "on_enter", "on_exit", "on_update", "on_physics_update", "on_input" };
+        { "on_start", "on_quit", "on_enter", "on_exit", "on_update", "on_physics_update", "on_input" };
 
     // Lifecycle hooks a NODE script (`*.node.evt`) may register. on_ready fires
     // when the node enters; on_exit when its container is freed; the rest fire
     // while the node is alive. Each runs with `self` bound to the node.
     public static readonly string[] NodeHooks =
-        { "on_ready", "on_update", "on_physics_update", "on_input", "on_exit" };
+        { "on_ready", "on_update", "on_physics_update", "on_input", "on_exit", "on_quit" };
 
     // Wrap a live Godot object for Lua (used by the host to pass e.g. InputEvents).
     public LuaValue Wrap(GodotObject o) => _godotBinder.WrapInstance(o);
@@ -306,17 +308,37 @@ public sealed class Loader
     // we attach each node's `*.node.evt` behavior script (bound to that node).
     private void InstantiateTree(SceneSpec spec, Node container, List<LoadedNode> nodes, List<Node>? roots = null)
     {
+        var conns = new List<(Node from, ConnectionSpec spec)>();
+        IReadOnlyList<NodeSpec> Resolve(string name) => SceneFile.Parse(_readScript(SceneFileName(name))).Nodes;
+
         void Attach(NodeSpec ns, Node node)
         {
             if (!string.IsNullOrEmpty(ns.Script))
                 nodes.Add(LoadNodeScript(ns.Script!, node, container));
+            foreach (var c in ns.Connections) conns.Add((node, c));
         }
         foreach (var ns in spec.Nodes)
         {
-            var node = SceneBuilder.BuildNode(ns, _godotBinder, Attach);
+            var node = SceneBuilder.BuildNode(ns, _godotBinder, Attach, Resolve);
             container.AddChild(node);
             roots?.Add(node);
+            node.Owner = container;                 // owner chain -> %UniqueName resolves at runtime
+            SetOwnerRecursive(node, container);
         }
+
+        // Wire declarative signal connections now the whole tree exists; `to` resolves from
+        // the scene container (built-in target methods; Lua handlers use obj:connect instead).
+        foreach (var (from, c) in conns)
+        {
+            var target = container.GetNodeOrNull(c.To);
+            if (target is not null) from.Connect(c.Signal, new Callable(target, c.Method));
+            else _log($"connection on '{from.Name}': target '{c.To}' not found");
+        }
+    }
+
+    private static void SetOwnerRecursive(Node node, Node owner)
+    {
+        foreach (var child in node.GetChildren()) { child.Owner = owner; SetOwnerRecursive(child, owner); }
     }
 
     // Load a `*.node.evt` bound to one live node: fresh sandbox with `self`, then
@@ -569,7 +591,108 @@ public sealed class Loader
         "world" => BuildWorldApi(path, ctx),
         "scene" => BuildSceneApi(),
         "save" => BuildSaveApi(),
+        "sql" => BuildSqlApi(),
         _ => throw new EvaluateException($"{path} requests unknown api '{name}'"),
+    };
+
+    // `sql` exposes full SQL to scripts; the game owns its schema (slots, inventory, …),
+    // the framework owns the connection, durability, async, crash-safety:
+    //   sql.exec(stmt[, params])       - a write; returns { changes, last_insert_id } (sync)
+    //   sql.exec_async(stmt[, params]) - a fire-and-forget write (returns immediately)
+    //   sql.query(stmt[, params])      - a read; a list of column->value row tables
+    //   sql.query_row(stmt[, params])  - the first row (or nil)
+    //   sql.transaction(fn)            - run fn inside BEGIN/COMMIT (ROLLBACK if it errors)
+    //   sql.flush()                    - drain pending async writes (e.g. from on_quit)
+    //   sql.snapshot(path)             - a consistent backup copy of the whole DB
+    // Params bind positionally to @p1, @p2, ... from a Lua list (number/string/bool/nil).
+    private LuaValue BuildSqlApi()
+    {
+        _sql ??= new Sql(_log);
+        var api = new LuaTable();
+
+        api["exec"] = new LuaFunction((c, ct) =>
+        {
+            var (ch, id) = _sql.ExecStmt(c.GetArgument<string>(0), ReadParams(c, 1), wait: true);
+            var r = new LuaTable();
+            r["changes"] = (double)ch; r["last_insert_id"] = (double)id;
+            c.Return(r);
+            return new(1);
+        });
+        api["exec_async"] = new LuaFunction((c, ct) =>
+        {
+            _sql.ExecStmt(c.GetArgument<string>(0), ReadParams(c, 1), wait: false);
+            return new(0);
+        });
+        api["query"] = new LuaFunction((c, ct) =>
+        {
+            c.Return(RowsToLua(_sql.QueryStmt(c.GetArgument<string>(0), ReadParams(c, 1))));
+            return new(1);
+        });
+        api["query_row"] = new LuaFunction((c, ct) =>
+        {
+            var rows = _sql.QueryStmt(c.GetArgument<string>(0), ReadParams(c, 1));
+            c.Return(rows.Count > 0 ? RowToLua(rows[0]) : LuaValue.Nil);
+            return new(1);
+        });
+        api["transaction"] = new LuaFunction((c, ct) =>
+        {
+            var fn = c.GetArgument(0);
+            _sql.ExecStmt("BEGIN", System.Array.Empty<object?>(), wait: true);
+            try { Sync(_lua.CallAsync(fn, System.Array.Empty<LuaValue>())); }
+            catch { _sql.ExecStmt("ROLLBACK", System.Array.Empty<object?>(), wait: true); throw; }
+            _sql.ExecStmt("COMMIT", System.Array.Empty<object?>(), wait: true);
+            return new(0);
+        });
+        api["flush"] = new LuaFunction((c, ct) => { _sql.Flush(); return new(0); });
+        api["snapshot"] = new LuaFunction((c, ct) => { _sql.Snapshot(c.GetArgument<string>(0)); return new(0); });
+        return api;
+    }
+
+    // A Lua params list (argument index `from`) -> CLR objects for positional binding.
+    private static List<object?> ReadParams(LuaFunctionExecutionContext c, int from)
+    {
+        var ps = new List<object?>();
+        if (c.ArgumentCount > from && c.GetArgument(from).Type == LuaValueType.Table)
+        {
+            var t = c.GetArgument(from).Read<LuaTable>();
+            int n = t.ArrayLength;
+            for (int i = 1; i <= n; i++) ps.Add(LuaToObj(t[i]));
+        }
+        return ps;
+    }
+
+    private static object? LuaToObj(LuaValue v) => v.Type switch
+    {
+        LuaValueType.Nil => null,
+        LuaValueType.Boolean => v.Read<bool>() ? 1L : 0L,   // SQLite has no bool
+        LuaValueType.Number => v.Read<double>(),
+        LuaValueType.String => v.Read<string>(),
+        _ => v.ToString(),
+    };
+
+    private static LuaValue RowsToLua(List<Dictionary<string, object?>> rows)
+    {
+        var list = new LuaTable();
+        for (int i = 0; i < rows.Count; i++) list[i + 1] = RowToLua(rows[i]);
+        return list;
+    }
+
+    private static LuaValue RowToLua(Dictionary<string, object?> row)
+    {
+        var t = new LuaTable();
+        foreach (var kv in row) t[kv.Key] = ObjToLua(kv.Value);
+        return t;
+    }
+
+    private static LuaValue ObjToLua(object? o) => o switch
+    {
+        null => LuaValue.Nil,
+        long l => (double)l,
+        double d => d,
+        string s => s,
+        bool b => b,
+        byte[] bytes => System.Convert.ToBase64String(bytes),
+        _ => o.ToString() ?? "",
     };
 
     // `scene` is the routing + active-scene capability:

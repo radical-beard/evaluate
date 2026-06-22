@@ -21,6 +21,7 @@ public partial class EvaluateRuntime : Node
     private int _frame;
     private int _quitAfter = -1;          // -1 = run forever (a real game)
     private string? _screenshot;          // dev: capture a frame to PNG, then quit
+    private bool _quitFired;              // on_quit fires exactly once on teardown
 
     public override void _Ready()
     {
@@ -35,6 +36,11 @@ public partial class EvaluateRuntime : Node
 
         _quitAfter = ArgValue(args, "--quit-after") is { } q && int.TryParse(q, out var n) ? n : -1;
         _screenshot = ArgValue(args, "--screenshot");
+
+        // Own the quit path so scripts can persist on exit: a window-close request is
+        // turned into an explicit quit (below), and `on_quit` fires once as the tree
+        // tears down (covers window-close, a script's get_tree():quit(), and --quit-after).
+        GetTree().AutoAcceptQuit = false;
 
         _loader = new Loader(ReadScript, msg => GD.Print($"[evt] {msg}"));
 
@@ -133,6 +139,24 @@ public partial class EvaluateRuntime : Node
     public override void _Input(InputEvent @event)
     {
         if (_loader is not null) CallHook("on_input", _loader.Wrap(@event));
+    }
+
+    // AutoAcceptQuit is off, so a window-close request must be turned into an explicit
+    // quit; `on_quit` then fires via _ExitTree as the tree tears down.
+    public override void _Notification(int what)
+    {
+        if (what == NotificationWMCloseRequest) GetTree().Quit();
+    }
+
+    // The universal quit point: fires `on_quit` exactly once on any teardown, so global
+    // systems/nodes can flush persistence. on_quit is for teardown/persistence — the
+    // scene tree may already be unwinding, so handlers must not rely on other nodes.
+    public override void _ExitTree()
+    {
+        if (_quitFired || _loader is null) return;
+        _quitFired = true;
+        CallHook("on_quit");
+        _watcher?.Dispose();
     }
 
     // Drive a registered lifecycle hook across everything active this frame:

@@ -278,16 +278,44 @@ public sealed class GodotBinder
     {
         if (val.Type == LuaValueType.Table)
         {
+            var t = val.Read<LuaTable>();
+            // Inline sub-resource: { _type = "BoxMesh", size = [1,1,1], ... }
+            if (t["_type"].Type == LuaValueType.String) return BuildResource(t);
+
             var pt = PropertyType(obj, key);
             if (pt is { } vt && IsStruct(vt))
             {
-                var t = val.Read<LuaTable>();
                 return t.ArrayLength > 0 && t.HashMapCount == 0
                     ? PositionalStruct(t, vt)       // [x, y, z, …]
                     : TableToStruct(t, vt);         // {x=…, y=…, …}
             }
         }
+        // Resource-by-path: a res:// string targeting a Resource (Object) property -> load it,
+        // so a scene file can write `texture = "res://art/x.png"` / `mesh = "res://m.tres"`.
+        else if (val.Type == LuaValueType.String)
+        {
+            var s = val.Read<string>();
+            if (s.StartsWith("res://") && PropertyType(obj, key) == Variant.Type.Object
+                && ResourceLoader.Load(s) is { } res)
+                return res;
+        }
         return ToVariant(val);
+    }
+
+    // Construct a Godot Resource from an inline `{ _type = "...", <prop> = <value>, ... }`
+    // table; props are set recursively, so nested sub-resources / res:// paths work.
+    private Variant BuildResource(LuaTable t)
+    {
+        var typeName = t["_type"].Read<string>();
+        var res = Instantiate(typeName)
+            ?? throw new EvaluateException($"inline resource has unknown _type '{typeName}'");
+        foreach (var kv in t)
+        {
+            if (kv.Key.Type != LuaValueType.String) continue;
+            var k = kv.Key.Read<string>();
+            if (k != "_type") SetProperty(res, k, kv.Value);
+        }
+        return res;
     }
 
     // Build a vector/color/quaternion from a 1-based positional list. Non-vector

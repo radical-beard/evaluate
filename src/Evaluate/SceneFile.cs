@@ -13,7 +13,22 @@ public sealed class NodeSpec
     public string Type = "";
     public string? Script;
     public Dictionary<string, object> Props = new();
+    public Dictionary<string, object> Meta = new();   // `meta = {..}` -> node.set_meta
+    public List<string> Groups = new();               // `groups = [..]` -> node.add_to_group
+    public string? Instance;                          // `instance = "scene"` -> that scene's roots become children
+    public bool Unique;                               // `unique = true` -> node.unique_name_in_owner (%Name)
+    public List<ConnectionSpec> Connections = new();  // `connections = [{signal,to,method}]`
     public List<NodeSpec> Children = new();
+}
+
+// One declarative signal wiring: this node's `Signal` -> the `Method` on the node at
+// `To` (a path resolved from the scene root). The target method is a Godot method
+// (built-in like `hide`/`queue_free`); Lua handlers connect in code via obj:connect.
+public sealed class ConnectionSpec
+{
+    public string Signal = "";
+    public string To = "";
+    public string Method = "";
 }
 
 // A parsed `*.scene` file: a node tree, plus (for the reserved `global.scene`
@@ -51,9 +66,11 @@ public static class SceneFile
         return spec;
     }
 
-    // A node's name is its table key; a sub-table is ALWAYS a child node (even one
-    // keyed `type`/`script`); `type`/`script` scalars are reserved; everything else
-    // is an engine property. Every node must declare a `type`.
+    // A node's name is its table key. `meta` (a table) and `groups` (an array) are
+    // reserved STRUCTURAL keys (so a node can't be named `meta`/`groups`); otherwise a
+    // sub-table is ALWAYS a child node (even one keyed `type`/`script`); `type`/`script`
+    // scalars are reserved; everything else is an engine property. Every node needs a
+    // `type` (except a pure `instance=` node — not yet).
     private static NodeSpec ParseNode(string name, TomlTable table)
     {
         if (name.IndexOfAny(ReservedNameChars) >= 0)
@@ -64,7 +81,50 @@ public static class SceneFile
         var node = new NodeSpec { Name = name };
         foreach (var kv in table)
         {
-            if (kv.Value is TomlTable child) { node.Children.Add(ParseNode(kv.Key, child)); continue; }
+            // Reserved structural keys take precedence over the sub-table=child rule.
+            if (kv.Key == "meta")
+            {
+                if (kv.Value is TomlTable mt)
+                    foreach (var mk in mt) node.Meta[mk.Key] = Toml.FromToml(mk.Value);
+                else
+                    throw new EvaluateException($"scene node '{name}': 'meta' must be a table of key = value");
+                continue;
+            }
+            if (kv.Key == "groups")
+            {
+                if (kv.Value is TomlArray ga)
+                    foreach (var g in ga) node.Groups.Add(g?.ToString() ?? "");
+                else
+                    throw new EvaluateException($"scene node '{name}': 'groups' must be an array of strings");
+                continue;
+            }
+            if (kv.Key == "instance") { node.Instance = kv.Value?.ToString(); continue; }
+            if (kv.Key == "unique") { node.Unique = kv.Value is bool ub && ub; continue; }
+            if (kv.Key == "connections")
+            {
+                if (kv.Value is TomlArray ca)
+                    foreach (var item in ca)
+                        if (item is TomlTable ct)
+                            node.Connections.Add(new ConnectionSpec
+                            {
+                                Signal = ct.TryGetValue("signal", out var sg) ? sg?.ToString() ?? "" : "",
+                                To = ct.TryGetValue("to", out var to) ? to?.ToString() ?? "" : "",
+                                Method = ct.TryGetValue("method", out var me) ? me?.ToString() ?? "" : "",
+                            });
+                        else
+                            throw new EvaluateException($"scene node '{name}': each 'connections' entry must be a table");
+                else
+                    throw new EvaluateException($"scene node '{name}': 'connections' must be an array of tables");
+                continue;
+            }
+            if (kv.Value is TomlTable sub)
+            {
+                // A sub-table marked with `_type` is an inline sub-RESOURCE property (e.g.
+                // `mesh = { _type = "BoxMesh", size = [1,1,1] }`), not a child node.
+                if (sub.ContainsKey("_type")) { node.Props[kv.Key] = Toml.FromToml(sub); continue; }
+                node.Children.Add(ParseNode(kv.Key, sub));
+                continue;
+            }
             switch (kv.Key)
             {
                 case "type": node.Type = kv.Value?.ToString() ?? ""; break;

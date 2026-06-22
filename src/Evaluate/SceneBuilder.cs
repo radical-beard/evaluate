@@ -13,7 +13,8 @@ public static class SceneBuilder
     // Build a node and its whole subtree from a spec. `visit` is invoked for each
     // (spec, node) pair after the node and its children exist — the runtime uses
     // it to attach node scripts; the editor passes null.
-    public static Node BuildNode(NodeSpec spec, GodotBinder binder, Action<NodeSpec, Node>? visit = null)
+    public static Node BuildNode(NodeSpec spec, GodotBinder binder, Action<NodeSpec, Node>? visit = null,
+        Func<string, IReadOnlyList<NodeSpec>>? resolveScene = null)
     {
         var obj = binder.Instantiate(spec.Type)
             ?? throw new EvaluateException($"scene node '{spec.Name}' has unknown type '{spec.Type}'");
@@ -22,19 +23,28 @@ public static class SceneBuilder
 
         if (!string.IsNullOrEmpty(spec.Name)) node.Name = spec.Name;
         foreach (var kv in spec.Props) binder.SetProperty(obj, kv.Key, TomlToLua(kv.Value));
+        foreach (var kv in spec.Meta) node.SetMeta(kv.Key, TomlToVariant(kv.Value));
+        foreach (var g in spec.Groups) if (!string.IsNullOrEmpty(g)) node.AddToGroup(g);
+        if (spec.Unique) node.UniqueNameInOwner = true;
 
         foreach (var child in spec.Children)
-            node.AddChild(BuildNode(child, binder, visit));
+            node.AddChild(BuildNode(child, binder, visit, resolveScene));
+
+        // `instance = "scene"`: that scene's root nodes are built as children of this node.
+        if (spec.Instance is { } inst && resolveScene is not null)
+            foreach (var rootSpec in resolveScene(inst))
+                node.AddChild(BuildNode(rootSpec, binder, visit, resolveScene));
 
         visit?.Invoke(spec, node);
         return node;
     }
 
     // Pack a scene's node tree into a PackedScene (editor preview). No scripts run.
-    public static PackedScene BuildPackedScene(SceneSpec spec, GodotBinder binder)
+    public static PackedScene BuildPackedScene(SceneSpec spec, GodotBinder binder,
+        Func<string, IReadOnlyList<NodeSpec>>? resolveScene = null)
     {
         var root = new Node { Name = "Scene" };
-        foreach (var n in spec.Nodes) root.AddChild(BuildNode(n, binder));
+        foreach (var n in spec.Nodes) root.AddChild(BuildNode(n, binder, null, resolveScene));
         SetOwner(root, root);
         var packed = new PackedScene();
         packed.Pack(root);
@@ -65,6 +75,32 @@ public static class SceneBuilder
         Dictionary<string, object> map => DictToLua(map),   // nested/inline tables
         _ => LuaValue.Nil,
     };
+
+    // ---- TOML value -> Godot Variant (for node `meta` via set_meta) ----------
+
+    internal static Variant TomlToVariant(object v) => v switch
+    {
+        bool b => b,
+        double d => d,
+        string s => s,
+        object[] arr => ArrayToVariant(arr),
+        Dictionary<string, object> map => DictToVariant(map),
+        _ => new Variant(),
+    };
+
+    private static Variant ArrayToVariant(object[] arr)
+    {
+        var a = new Godot.Collections.Array();
+        foreach (var e in arr) a.Add(TomlToVariant(e));
+        return a;
+    }
+
+    private static Variant DictToVariant(Dictionary<string, object> map)
+    {
+        var d = new Godot.Collections.Dictionary();
+        foreach (var kv in map) d[kv.Key] = TomlToVariant(kv.Value);
+        return d;
+    }
 
     private static LuaValue ArrayToLua(object[] arr)
     {
