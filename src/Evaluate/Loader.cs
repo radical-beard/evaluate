@@ -17,6 +17,7 @@ public sealed class LoadedSystem
 {
     public string Path = "";
     public List<string> Scenes = new();
+    public List<string> Configs = new();   // declared config TOMLs (a change fires on_load)
     public readonly Dictionary<string, LuaValue> Hooks = new();
 
     public bool IsGlobal => Scenes.Count == 0;
@@ -33,6 +34,7 @@ public sealed class LoadedNode
     public string Path = "";
     public Godot.GodotObject Node = null!;
     public readonly Dictionary<string, LuaValue> Hooks = new();
+    public List<string> Configs = new();   // declared config TOMLs (a change to one fires on_reload)
 }
 
 // The heart of Evaluate. Turns a script's frontmatter signature into a real,
@@ -164,6 +166,7 @@ public sealed class Loader
         var (env, _, fm) = Run(path, new LoadContext(_globalRoot, null));
 
         sys.Scenes = fm.Scenes;
+        sys.Configs = fm.Configs;
         // Each scene the system belongs to is a claim namespace; a global system
         // (no scenes:) claims in the reserved global namespace.
         var namespaces = fm.Scenes.Count > 0 ? fm.Scenes : new List<string> { GlobalNs };
@@ -202,17 +205,23 @@ public sealed class Loader
         return sys;
     }
 
-    // Lifecycle hooks a SYSTEM script may register. on_start fires once (global
-    // systems); on_enter/on_exit fire on scene activation (scene-scoped systems);
-    // the rest fire while the system is active.
+    // Lifecycle hooks a SYSTEM script may register. on_start fires once (global systems);
+    // on_load runs after on_start + on every hot reload (rebuildable setup); on_unload fires
+    // before a reload tears the old setup down; on_enter/on_exit fire on scene activation;
+    // on_focus_in/out + on_pause/on_resume on app focus / tree pause; the rest fire while active.
     public static readonly string[] SystemHooks =
-        { "on_start", "on_quit", "on_enter", "on_exit", "on_update", "on_physics_update", "on_input" };
+        { "on_start", "on_load", "on_unload", "on_quit", "on_enter", "on_exit",
+          "on_focus_in", "on_focus_out", "on_pause", "on_resume",
+          "on_update", "on_physics_update", "on_input" };
 
-    // Lifecycle hooks a NODE script (`*.node.evt`) may register. on_ready fires
-    // when the node enters; on_exit when its container is freed; the rest fire
-    // while the node is alive. Each runs with `self` bound to the node.
+    // Lifecycle hooks a NODE script (`*.node.evt`) may register. on_ready fires ONCE when
+    // the node enters; on_load runs EVERY (re)load — right after on_ready on first load AND
+    // on each hot reload of the script or a declared config (so imperative builders rebuild;
+    // make it idempotent); on_exit when its container is freed; the rest fire while alive.
+    // Each runs with `self` bound.
     public static readonly string[] NodeHooks =
-        { "on_ready", "on_update", "on_physics_update", "on_input", "on_exit", "on_quit" };
+        { "on_ready", "on_load", "on_unload", "on_update", "on_physics_update", "on_input",
+          "on_exit", "on_quit", "on_focus_in", "on_focus_out", "on_pause", "on_resume" };
 
     // Wrap a live Godot object for Lua (used by the host to pass e.g. InputEvents).
     public LuaValue Wrap(GodotObject o) => _godotBinder.WrapInstance(o);
@@ -238,6 +247,7 @@ public sealed class Loader
         _globalManifest = manifest;
         InstantiateTree(manifest, _globalRoot, _globalNodes, _globalLayerRoots);
         foreach (var n in _globalNodes) Fire(n, "on_ready");
+        foreach (var n in _globalNodes) Fire(n, "on_load");
         return manifest.StartScene;
     }
 
@@ -272,6 +282,7 @@ public sealed class Loader
         _activeScene = name;
         InstantiateTree(spec, container, _sceneNodes);
         foreach (var n in _sceneNodes) Fire(n, "on_ready");
+        foreach (var n in _sceneNodes) Fire(n, "on_load");
         foreach (var s in SystemsFor(name)) FireSystem(s, "on_enter");
     }
 
@@ -282,6 +293,13 @@ public sealed class Loader
         var p = _pendingScene;
         _pendingScene = null;
         return p;
+    }
+
+    // Fire on_load on every loaded system — their first-load rebuild point. The host calls
+    // this once after on_start (node on_load is fired by the build path instead).
+    public void FireSystemsLoad()
+    {
+        foreach (var s in _systems) FireSystem(s, "on_load");
     }
 
     // Systems + node scripts whose hooks the host should drive this frame.
@@ -346,7 +364,7 @@ public sealed class Loader
     private LoadedNode LoadNodeScript(string path, GodotObject self, Node container)
     {
         var (env, _, fm) = Run(path, new LoadContext(container, self));
-        var ln = new LoadedNode { Path = path, Node = self };
+        var ln = new LoadedNode { Path = path, Node = self, Configs = fm.Configs };
         foreach (var name in fm.Register)
         {
             if (!NodeHooks.Contains(name))
@@ -392,7 +410,9 @@ public sealed class Loader
         var sys = _systems.Find(s => s.Path == path);
         if (sys != null)
         {
+            FireSystem(sys, "on_unload");         // tear down (old closures) before the body re-runs
             LoadSystem(path);                     // re-run body, refresh hook closures
+            FireSystem(sys, "on_load");           // rebuild against the fresh body
             return $"reloaded system {path} (hooks refreshed, entities preserved)";
         }
 
@@ -418,6 +438,12 @@ public sealed class Loader
             try
             {
                 _tomlCache[path] = BuildTomlTable(path);
+                // A node/system that builds from this config reads the live view at build time,
+                // so re-fire on_unload + on_load to let it rebuild against the new values.
+                foreach (var ln in _globalNodes.Concat(_sceneNodes))
+                    if (ln.Configs.Contains(path)) { Fire(ln, "on_unload"); Fire(ln, "on_load"); }
+                foreach (var s in _systems)
+                    if (s.Configs.Contains(path)) { FireSystem(s, "on_unload"); FireSystem(s, "on_load"); }
                 return $"reloaded config {path} (live)";
             }
             catch (EvaluateException e)
@@ -439,11 +465,14 @@ public sealed class Loader
             foreach (var ln in list)
             {
                 if (ln.Path != path) continue;
+                Fire(ln, "on_unload");   // old closures still valid: tear down BEFORE the body re-runs
                 var (env, _, fm) = Run(path, new LoadContext(container, ln.Node));
                 ln.Hooks.Clear();
+                ln.Configs = fm.Configs;
                 foreach (var name in fm.Register)
                     if (NodeHooks.Contains(name) && env[name].Type == LuaValueType.Function)
                         ln.Hooks[name] = env[name];
+                Fire(ln, "on_load");   // the body's upvalues are fresh; let it rebuild imperative content
                 count++;
             }
             return count;
@@ -476,6 +505,7 @@ public sealed class Loader
         _globalManifest = manifest;
         InstantiateTree(manifest, _globalRoot, _globalNodes, _globalLayerRoots);
         foreach (var n in _globalNodes) Fire(n, "on_ready");
+        foreach (var n in _globalNodes) Fire(n, "on_load");
         return $"reloaded global manifest {ManifestName} (persistent layer rebuilt)";
     }
 

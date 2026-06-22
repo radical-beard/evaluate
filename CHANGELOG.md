@@ -5,6 +5,22 @@ All notable changes to Evaluate are documented here. The format is based on
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While
 the version is `0.x`, minor bumps may include breaking changes.
 
+## [0.5.2] — 2026-06-22
+
+Hot-reload + app-lifecycle hooks.
+
+### Added
+- **`on_load` (node + system scripts)** — runs after `on_ready`/`on_start` on first load
+  AND on every hot reload (of the script OR a declared config `.toml`). The place for
+  idempotent setup you want to hot-reload — imperative builders (UI, environments) now
+  rebuild live instead of needing a restart. `on_ready`/`on_start` stay once-only.
+- **`on_unload` (node + system scripts)** — fires right before a reload tears the old setup
+  down (its closures are still valid), to release what `on_load` built (free spawned nodes,
+  disconnect signals, stop timers). Reload sequence: `on_unload` → body re-runs → `on_load`.
+- **`on_focus_in` / `on_focus_out`** — application focus changes (e.g. flush/autosave on
+  alt-tab, pause-on-focus-loss).
+- **`on_pause` / `on_resume`** — SceneTree pause / unpause.
+
 ## [0.5.1] — 2026-06-22
 
 ### Fixed

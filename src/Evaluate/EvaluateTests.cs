@@ -493,6 +493,57 @@ public static class EvaluateTests
             SceneBuilder.BuildNode(spec.Nodes[0], binder, null, Resolve);
         }));
 
+        // 33: on_load runs on first load AND re-runs on hot reload (script + declared config) (0.5.2)
+        {
+            var sink = new List<string>();
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] = "[nodes.Probe]\ntype = \"Node\"\nscript = \"loader.node.evt\"\n",
+                ["loader.node.evt"] = "---\nconfig:\n - p.toml\nregister:\n - on_load\n---\nfunction on_load() print('load=' .. config.p.n) end\n",
+                ["p.toml"] = "[p]\nn = \"one\"\n",
+            };
+            var root = new Node();
+            var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", sink.Add);
+            loader.SetGlobalRoot(root);
+            loader.LoadGlobalLayerFromFile();                                   // first load -> on_load (n=one)
+            var first = sink.Contains("load=one");
+            src["loader.node.evt"] = src["loader.node.evt"].Replace("'load='", "'reload='");
+            loader.ReloadOnChange("loader.node.evt");                           // script reload -> on_load re-fires
+            var onScript = sink.Contains("reload=one");
+            src["p.toml"] = "[p]\nn = \"two\"\n";
+            loader.ReloadOnChange("p.toml");                                    // config reload -> on_load (n=two)
+            var onConfig = sink.Contains("reload=two");
+            Check("on_load fires on first load + script reload + config reload",
+                first && onScript && onConfig, $"first={first}, script={onScript}, config={onConfig}");
+            root.QueueFree();
+        }
+
+        // 34: system on_load (FireSystemsLoad) + on_unload-before-reload + focus/pause register (0.5.2)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var sink = new List<string>();
+                var src = new Dictionary<string, string>
+                {
+                    ["sys.evt"] = "---\nregister:\n - on_load\n - on_unload\n - on_focus_out\n - on_pause\n---\n" +
+                                  "function on_load() print('sysload') end\nfunction on_unload() print('sysunload') end\n" +
+                                  "function on_focus_out() end\nfunction on_pause() end\n",
+                };
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", sink.Add);
+                loader.LoadSystem("sys.evt");          // registering focus/pause must not throw
+                loader.FireSystemsLoad();              // system first on_load
+                var sysLoad = sink.Contains("sysload");
+                sink.Clear();
+                loader.ReloadOnChange("sys.evt");      // reload -> on_unload THEN on_load
+                var order = sink.Count == 2 && sink[0] == "sysunload" && sink[1] == "sysload";
+                ok = sysLoad && order;
+                detail = $"load={sysLoad}, order={order} [{string.Join(",", sink)}]";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("system on_load + on_unload-before-reload + focus/pause registration", ok, detail);
+        }
+
         log($"[tests] {passed} passed, {failed} failed");
         return failed;
     }

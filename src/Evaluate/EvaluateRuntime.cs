@@ -67,6 +67,7 @@ public partial class EvaluateRuntime : Node
         {
             var start = _loader.LoadGlobalLayerFromFile();
             CallHook("on_start");
+            _loader.FireSystemsLoad();          // systems' first on_load (after on_start)
             if (start is not null)
             {
                 GD.Print($"[evaluate] entering start scene '{start}'");
@@ -141,11 +142,20 @@ public partial class EvaluateRuntime : Node
         if (_loader is not null) CallHook("on_input", _loader.Wrap(@event));
     }
 
-    // AutoAcceptQuit is off, so a window-close request must be turned into an explicit
-    // quit; `on_quit` then fires via _ExitTree as the tree tears down.
+    // App-level notifications routed to script hooks. AutoAcceptQuit is off, so a
+    // window-close request is turned into an explicit quit (on_quit then fires via
+    // _ExitTree). Focus + pause changes fan out to on_focus_*/on_pause/on_resume.
     public override void _Notification(int what)
     {
-        if (what == NotificationWMCloseRequest) GetTree().Quit();
+        if (_loader is null) return;
+        switch (what)
+        {
+            case (int)NotificationWMCloseRequest: GetTree().Quit(); break;
+            case (int)NotificationApplicationFocusOut: CallHook("on_focus_out"); break;
+            case (int)NotificationApplicationFocusIn: CallHook("on_focus_in"); break;
+            case (int)NotificationPaused: CallHook("on_pause"); break;
+            case (int)NotificationUnpaused: CallHook("on_resume"); break;
+        }
     }
 
     // The universal quit point: fires `on_quit` exactly once on any teardown, so global
