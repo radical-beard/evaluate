@@ -5,6 +5,16 @@ All notable changes to Evaluate are documented here. The format is based on
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While
 the version is `0.x`, minor bumps may include breaking changes.
 
+## [0.6.0] — 2026-06-22
+
+### Changed
+- **Renamed the once-only node hook `on_ready` → `on_attach`** (breaking). Now that `on_load`
+  runs on *every* (re)load, `on_ready` was ambiguous; `on_attach` makes the lifecycle clear:
+  it fires ONCE, when the node + its script first attach to the tree (never on reload), while
+  `on_load` fires right after it AND on every hot reload. Migration: change `on_ready` to
+  `on_attach` in `register:` blocks and the function name. (Things that should happen once go
+  in `on_attach`; rebuildable/imperative setup you want to hot-reload goes in `on_load`.)
+
 ## [0.5.2] — 2026-06-22
 
 Hot-reload + app-lifecycle hooks.

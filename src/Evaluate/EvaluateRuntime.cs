@@ -61,7 +61,7 @@ public partial class EvaluateRuntime : Node
                      (sys.IsGlobal ? "(global)" : $"[{string.Join(",", sys.Scenes)}]"));
 
         // Build the persistent layer (instantiates manifest nodes + their
-        // on_ready), run global on_start, then enter the start scene. A malformed
+        // on_attach), run global on_start, then enter the start scene. A malformed
         // manifest/start scene is logged, not fatal — the game still launches.
         try
         {

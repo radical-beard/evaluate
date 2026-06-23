@@ -1,6 +1,6 @@
 ---
 register:
- - on_ready
+ - on_attach
 ---
 -- Node script: `self` is the node it is attached to.
-function on_ready() self:set_meta("ready", true) end
+function on_attach() self:set_meta("ready", true) end

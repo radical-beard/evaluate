@@ -34,7 +34,7 @@ public sealed class LoadedNode
     public string Path = "";
     public Godot.GodotObject Node = null!;
     public readonly Dictionary<string, LuaValue> Hooks = new();
-    public List<string> Configs = new();   // declared config TOMLs (a change to one fires on_reload)
+    public List<string> Configs = new();   // declared config TOMLs (a change to one fires on_load)
 }
 
 // The heart of Evaluate. Turns a script's frontmatter signature into a real,
@@ -214,13 +214,13 @@ public sealed class Loader
           "on_focus_in", "on_focus_out", "on_pause", "on_resume",
           "on_update", "on_physics_update", "on_input" };
 
-    // Lifecycle hooks a NODE script (`*.node.evt`) may register. on_ready fires ONCE when
-    // the node enters; on_load runs EVERY (re)load — right after on_ready on first load AND
-    // on each hot reload of the script or a declared config (so imperative builders rebuild;
-    // make it idempotent); on_exit when its container is freed; the rest fire while alive.
-    // Each runs with `self` bound.
+    // Lifecycle hooks a NODE script (`*.node.evt`) may register. on_attach fires ONCE, when
+    // the node + its script first enter the tree (never again); on_load runs EVERY (re)load —
+    // right after on_attach on first load AND on each hot reload of the script or a declared
+    // config (so imperative builders rebuild; make it idempotent); on_exit when its container
+    // is freed; the rest fire while alive. Each runs with `self` bound.
     public static readonly string[] NodeHooks =
-        { "on_ready", "on_load", "on_unload", "on_update", "on_physics_update", "on_input",
+        { "on_attach", "on_load", "on_unload", "on_update", "on_physics_update", "on_input",
           "on_exit", "on_quit", "on_focus_in", "on_focus_out", "on_pause", "on_resume" };
 
     // Wrap a live Godot object for Lua (used by the host to pass e.g. InputEvents).
@@ -240,13 +240,13 @@ public sealed class Loader
     }
 
     // Build the persistent global layer: instantiate the manifest's nodes under
-    // the global root, attach their node scripts, fire on_ready. Never torn down.
+    // the global root, attach their node scripts, fire on_attach. Never torn down.
     public string? LoadGlobalLayer(SceneSpec manifest)
     {
         if (_globalRoot is null) throw new EvaluateException("LoadGlobalLayer called before SetGlobalRoot");
         _globalManifest = manifest;
         InstantiateTree(manifest, _globalRoot, _globalNodes, _globalLayerRoots);
-        foreach (var n in _globalNodes) Fire(n, "on_ready");
+        foreach (var n in _globalNodes) Fire(n, "on_attach");
         foreach (var n in _globalNodes) Fire(n, "on_load");
         return manifest.StartScene;
     }
@@ -281,7 +281,7 @@ public sealed class Loader
         _sceneContainer = container;
         _activeScene = name;
         InstantiateTree(spec, container, _sceneNodes);
-        foreach (var n in _sceneNodes) Fire(n, "on_ready");
+        foreach (var n in _sceneNodes) Fire(n, "on_attach");
         foreach (var n in _sceneNodes) Fire(n, "on_load");
         foreach (var s in SystemsFor(name)) FireSystem(s, "on_enter");
     }
@@ -482,7 +482,7 @@ public sealed class Loader
 
     // Rebuild the persistent global layer in place from the re-read manifest: fire
     // on_exit for its node scripts, detach + free the manifest's nodes, then
-    // re-instantiate and fire on_ready. The active scene and any world-spawned nodes
+    // re-instantiate and fire on_attach. The active scene and any world-spawned nodes
     // are untouched. NOTE: persistent nodes are recreated, so their runtime state
     // resets — this applies a *structural* manifest change live (it is not
     // state-preserving the way a node-script reload is). Detach-then-QueueFree frees
@@ -504,7 +504,7 @@ public sealed class Loader
         var manifest = SceneFile.Parse(_readScript(ManifestName));
         _globalManifest = manifest;
         InstantiateTree(manifest, _globalRoot, _globalNodes, _globalLayerRoots);
-        foreach (var n in _globalNodes) Fire(n, "on_ready");
+        foreach (var n in _globalNodes) Fire(n, "on_attach");
         foreach (var n in _globalNodes) Fire(n, "on_load");
         return $"reloaded global manifest {ManifestName} (persistent layer rebuilt)";
     }
