@@ -32,10 +32,12 @@ public sealed class ConnectionSpec
 }
 
 // A parsed `*.scene` file: a node tree, plus (for the reserved `global.scene`
-// manifest) the scene to start in.
+// manifest) the scene to start in, and an optional free-text `description` (scene
+// docs as data — survives editor round-trips, unlike comments).
 public sealed class SceneSpec
 {
     public string? StartScene;
+    public string? Description;
     public List<NodeSpec> Nodes = new();   // root-level nodes
 }
 
@@ -57,6 +59,9 @@ public static class SceneFile
 
         if (model.TryGetValue("start_scene", out var ss) && ss is string s)
             spec.StartScene = s;
+
+        if (model.TryGetValue("description", out var ds) && ds is string d)
+            spec.Description = d;
 
         if (model.TryGetValue("nodes", out var n) && n is TomlTable nodes)
             foreach (var kv in nodes)

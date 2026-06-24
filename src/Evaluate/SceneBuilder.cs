@@ -24,8 +24,17 @@ public static class SceneBuilder
         if (!string.IsNullOrEmpty(spec.Name)) node.Name = spec.Name;
         foreach (var kv in spec.Props) binder.SetProperty(obj, kv.Key, TomlToLua(kv.Value));
         foreach (var kv in spec.Meta) node.SetMeta(kv.Key, TomlToVariant(kv.Value));
-        foreach (var g in spec.Groups) if (!string.IsNullOrEmpty(g)) node.AddToGroup(g);
+        // persistent: true so the group is saved when the node is packed (the editor
+        // edit path round-trips through a PackedScene) and shows in the editor Groups tab.
+        foreach (var g in spec.Groups) if (!string.IsNullOrEmpty(g)) node.AddToGroup(g, persistent: true);
         if (spec.Unique) node.UniqueNameInOwner = true;
+
+        // Stash the structural facts that aren't native Godot node state (script,
+        // instance, the author's original property keys, declarative connections) so
+        // SceneWriter can reverse this build back into an equivalent `.scene`.
+        // Namespaced under `__evt_` so it never collides with user `meta`, and
+        // SceneWriter strips the prefix from what it emits.
+        StashRoundtripMeta(node, spec);
 
         foreach (var child in spec.Children)
             node.AddChild(BuildNode(child, binder, visit, resolveScene, instanceChain));
@@ -39,12 +48,49 @@ public static class SceneBuilder
             if (!instanceChain.Add(inst))
                 throw new EvaluateException($"scene instance cycle: '{inst}' is instanced within itself");
             foreach (var rootSpec in resolveScene(inst))
-                node.AddChild(BuildNode(rootSpec, binder, visit, resolveScene, instanceChain));
+            {
+                var child = BuildNode(rootSpec, binder, visit, resolveScene, instanceChain);
+                child.SetMeta(MetaInstanced, true);   // SceneWriter: an instanced root, not an inline child
+                node.AddChild(child);
+            }
             instanceChain.Remove(inst);     // a sibling branch may reuse the same scene (not a cycle)
         }
 
         visit?.Invoke(spec, node);
         return node;
+    }
+
+    // ---- round-trip meta (consumed by SceneWriter) ---------------------------
+
+    // Reserved meta-key namespace for facts SceneWriter needs but a bare Godot node
+    // doesn't carry. Never emitted into a `.scene` file as user `meta`.
+    public const string MetaPrefix     = "__evt_";
+    public const string MetaScript     = MetaPrefix + "script";       // -> `script = "..."`
+    public const string MetaInstance   = MetaPrefix + "instance";     // -> `instance = "..."`
+    public const string MetaPropKeys   = MetaPrefix + "propkeys";     // author's original prop keys
+    public const string MetaConnections = MetaPrefix + "connections"; // -> `connections = [{...}]`
+    public const string MetaInstanced  = MetaPrefix + "instanced";    // a root pulled in by `instance=`
+
+    private static void StashRoundtripMeta(Node node, NodeSpec spec)
+    {
+        if (!string.IsNullOrEmpty(spec.Script)) node.SetMeta(MetaScript, spec.Script);
+        if (spec.Instance is { } inst) node.SetMeta(MetaInstance, inst);
+        if (spec.Props.Count > 0)
+        {
+            var keys = new string[spec.Props.Count];
+            spec.Props.Keys.CopyTo(keys, 0);
+            node.SetMeta(MetaPropKeys, keys);            // PackedStringArray
+        }
+        if (spec.Connections.Count > 0)
+        {
+            var arr = new Godot.Collections.Array();
+            foreach (var c in spec.Connections)
+                arr.Add(new Godot.Collections.Dictionary
+                {
+                    ["signal"] = c.Signal, ["to"] = c.To, ["method"] = c.Method,
+                });
+            node.SetMeta(MetaConnections, arr);
+        }
     }
 
     // Pack a scene's node tree into a PackedScene (editor preview). No scripts run.

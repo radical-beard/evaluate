@@ -544,8 +544,425 @@ public static class EvaluateTests
             Check("system on_load + on_unload-before-reload + focus/pause registration", ok, detail);
         }
 
+        // 35: SceneWriter round-trips primitives + vectors + nesting (parse -> build ->
+        // serialize -> parse yields an equivalent spec; the rebuilt node matches too)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (a, b, text) = RoundTrip(
+                    "start_scene = \"x\"\n" +
+                    "[nodes.Level]\ntype = \"Node3D\"\n" +
+                    "[nodes.Level.Enemy]\ntype = \"Node3D\"\nposition = [3, 0, 0]\nvisible = false\n" +
+                    "[nodes.Level.Enemy.Weapon]\ntype = \"Node3D\"\nposition = [0, 0, 1]\n");
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var c = new Node();
+                foreach (var n in b.Nodes) c.AddChild(SceneBuilder.BuildNode(n, binder));
+                var enemy = c.GetNodeOrNull<Node3D>("Level/Enemy");
+                ok = SpecEquals(a, b) && b.StartScene == "x"
+                    && enemy is not null && enemy.Position == new Vector3(3, 0, 0) && !enemy.Visible;
+                detail = $"equal={SpecEquals(a, b)}, pos={enemy?.Position}, text=<<{text}>>";
+                c.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("SceneWriter round-trips primitives/vectors/nesting", ok, detail);
+        }
+
+        // 36: reserved keys survive — script, groups, meta, unique, connections
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (a, b, _) = RoundTrip(
+                    "[nodes.Emitter]\ntype = \"Node\"\nscript = \"e.node.evt\"\nunique = true\n" +
+                    "groups = [\"player\", \"alive\"]\nmeta = { mode = \"game\", level = 3 }\n" +
+                    "connections = [ { signal = \"renamed\", to = \"Target\", method = \"queue_free\" } ]\n" +
+                    "[nodes.Target]\ntype = \"Node\"\n");
+                var em = b.Nodes.FirstOrDefault(n => n.Name == "Emitter");
+                ok = SpecEquals(a, b) && em is not null && em.Script == "e.node.evt" && em.Unique
+                    && em.Groups.Count == 2 && em.Meta.Count == 2 && em.Connections.Count == 1
+                    && em.Connections[0].Signal == "renamed" && em.Connections[0].Method == "queue_free";
+                detail = $"equal={SpecEquals(a, b)}, script={em?.Script}, conn={em?.Connections.Count}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("SceneWriter round-trips reserved keys (script/groups/meta/unique/connections)", ok, detail);
+        }
+
+        // 37: inline sub-resource property round-trips (mesh = { _type = "BoxMesh", size = [..] })
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (a, b, text) = RoundTrip(
+                    "[nodes.M]\ntype = \"MeshInstance3D\"\nmesh = { _type = \"BoxMesh\", size = [2, 3, 4] }\n");
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var c = new Node();
+                c.AddChild(SceneBuilder.BuildNode(b.Nodes[0], binder));
+                var box = c.GetNodeOrNull<MeshInstance3D>("M")?.Mesh as BoxMesh;
+                ok = SpecEquals(a, b) && box is not null && box.Size == new Vector3(2, 3, 4)
+                    && text.Contains("_type = \"BoxMesh\"");
+                detail = $"equal={SpecEquals(a, b)}, size={box?.Size}";
+                c.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("SceneWriter round-trips inline _type sub-resource", ok, detail);
+        }
+
+        // 38: a res:// resource path round-trips as a string (not expanded inline)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (a, b, text) = RoundTrip("[nodes.M]\ntype = \"MeshInstance3D\"\nmesh = \"res://box.tres\"\n");
+                ok = SpecEquals(a, b) && b.Nodes[0].Props.TryGetValue("mesh", out var m) && (m as string) == "res://box.tres"
+                    && text.Contains("\"res://box.tres\"") && !text.Contains("_type");
+                detail = $"equal={SpecEquals(a, b)}, text=<<{text}>>";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("SceneWriter round-trips a res:// resource path", ok, detail);
+        }
+
+        // 39: spatial transform fidelity — a set Transform3D survives as the clean
+        // position/rotation/scale triple and rebuilds to (approximately) the same transform
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var src = new Node();
+                var n = (Node3D)binder.Instantiate("Node3D")!;
+                n.Name = "Mover";
+                n.Transform = new Transform3D(Basis.FromEuler(new Vector3(0.1f, 0.2f, 0.3f)), new Vector3(1, 2, 3));
+                src.AddChild(n);
+                var text = SceneWriter.WriteContainer(src, binder);
+                var spec = SceneFile.Parse(text);
+                var dst = new Node();
+                dst.AddChild(SceneBuilder.BuildNode(spec.Nodes[0], binder));
+                var rebuilt = dst.GetNodeOrNull<Node3D>("Mover");
+                ok = rebuilt is not null && rebuilt.Transform.Origin.IsEqualApprox(new Vector3(1, 2, 3))
+                    && rebuilt.Transform.Basis.GetEuler().IsEqualApprox(new Vector3(0.1f, 0.2f, 0.3f));
+                detail = $"origin={rebuilt?.Transform.Origin}, euler={rebuilt?.Transform.Basis.GetEuler()}";
+                src.QueueFree(); dst.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("SceneWriter round-trips a spatial transform (pos/rot/scale)", ok, detail);
+        }
+
+        // 40: an instance= node emits `instance` and does NOT inline the instanced children
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var subSpec = SceneFile.Parse("[nodes.Inner]\ntype = \"Node3D\"\n");
+                IReadOnlyList<NodeSpec> Resolve(string nm) => nm == "sub" ? subSpec.Nodes : new List<NodeSpec>();
+                var (a, b, text) = RoundTrip("[nodes.Wrap]\ntype = \"Node3D\"\ninstance = \"sub\"\n", Resolve);
+                ok = SpecEquals(a, b) && b.Nodes[0].Instance == "sub" && b.Nodes[0].Children.Count == 0
+                    && text.Contains("instance = \"sub\"") && !text.Contains("Inner");
+                detail = $"equal={SpecEquals(a, b)}, text=<<{text}>>";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("SceneWriter emits instance= without inlining instanced children", ok, detail);
+        }
+
+        // 41: minimal emission — a plain node writes only `type`; an author-written
+        // value equal to the type default is still preserved
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (_, plain, _) = RoundTrip("[nodes.P]\ntype = \"Node3D\"\n");
+                var (_, zero, _) = RoundTrip("[nodes.P]\ntype = \"Node3D\"\nposition = [0, 0, 0]\n");
+                ok = plain.Nodes[0].Props.Count == 0
+                    && zero.Nodes[0].Props.ContainsKey("position");
+                detail = $"plainProps={plain.Nodes[0].Props.Count}, zeroHasPos={zero.Nodes[0].Props.ContainsKey("position")}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("SceneWriter emits minimal props (default-diff + original-key preserve)", ok, detail);
+        }
+
+        // 42: floats emit cleanly (2.2, not a 17-digit float64 expansion)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (_, _, text) = RoundTrip("[nodes.P]\ntype = \"Node3D\"\nposition = [2.2, 0, 0]\n");
+                ok = text.Contains("[2.2, 0, 0]");
+                detail = $"text=<<{text}>>";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("SceneWriter emits clean float formatting", ok, detail);
+        }
+
+        // 43: a composite-struct property round-trips via a `_type` table (the gap is closed) —
+        // set Aabb in C#, serialize, reparse, rebuild, confirm the value survives
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var src = new Node();
+                var m = (MeshInstance3D)binder.Instantiate("MeshInstance3D")!;
+                m.Name = "M";
+                m.CustomAabb = new Aabb(new Vector3(1, 2, 3), new Vector3(4, 5, 6));
+                src.AddChild(m);
+                var text = SceneWriter.WriteContainer(src, binder);
+                var spec = SceneFile.Parse(text);
+                var dst = new Node();
+                dst.AddChild(SceneBuilder.BuildNode(spec.Nodes[0], binder));
+                var rebuilt = dst.GetNodeOrNull<MeshInstance3D>("M");
+                ok = text.Contains("_type = \"Aabb\"") && rebuilt is not null
+                    && rebuilt.CustomAabb.Position.IsEqualApprox(new Vector3(1, 2, 3))
+                    && rebuilt.CustomAabb.Size.IsEqualApprox(new Vector3(4, 5, 6));
+                detail = $"text=<<{text}>>";
+                src.QueueFree(); dst.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("composite struct (Aabb) round-trips via a _type table", ok, detail);
+        }
+
+        // 44: a REAL on-disk scene file round-trips (parse -> build -> serialize ->
+        // parse) — exercises the writer on actual authored content, not test strings
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var src = Godot.FileAccess.GetFileAsString("res://scripts/global.scene");
+                var a = SceneFile.Parse(src);
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var container = new Node();
+                foreach (var n in a.Nodes) container.AddChild(SceneBuilder.BuildNode(n, binder));
+                var text = SceneWriter.WriteContainer(container, binder, a.StartScene);
+                var b = SceneFile.Parse(text);
+                var player = b.Nodes.FirstOrDefault(n => n.Name == "Player");
+                var cam = player?.Children.FirstOrDefault(n => n.Name == "Camera");
+                ok = SpecEquals(a, b) && b.StartScene == "menu"
+                    && player?.Script == "player.node.evt" && cam is not null
+                    && cam.Props.ContainsKey("position");
+                detail = $"equal={SpecEquals(a, b)}, start={b.StartScene}";
+                container.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("SceneWriter round-trips the real global.scene file", ok, detail);
+        }
+
+        // 45: the EDITOR path — build -> PackedScene.Pack -> Instantiate (a .tscn save +
+        // reopen) -> SceneWriter must still recover script/groups/meta/unique/connections
+        // from the `__evt_*` stash (i.e. Pack preserves node meta across the round-trip)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var spec = SceneFile.Parse(
+                    "[nodes.Emitter]\ntype = \"Node3D\"\nscript = \"e.node.evt\"\nunique = true\n" +
+                    "position = [1, 2, 3]\ngroups = [\"player\"]\nmeta = { mode = \"game\" }\n" +
+                    "connections = [ { signal = \"renamed\", to = \"Target\", method = \"queue_free\" } ]\n" +
+                    "[nodes.Target]\ntype = \"Node\"\n");
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var root = new Node { Name = "S" };
+                foreach (var n in spec.Nodes) root.AddChild(SceneBuilder.BuildNode(n, binder));
+                root.SetMeta("__evt_source", "res://scripts/x.scene");   // plugin's Save targets
+                root.SetMeta("__evt_startscene", "menu");
+                void Own(Node p) { foreach (var c in p.GetChildren()) { c.Owner = root; Own(c); } }
+                Own(root);
+
+                var packed = new PackedScene();
+                packed.Pack(root);
+                root.Free();
+                var reopened = packed.Instantiate();         // == the editor's reopened .tscn
+
+                // The Save path recovers source path + start_scene from the root meta...
+                var srcOk = reopened.GetMeta("__evt_source").AsString() == "res://scripts/x.scene"
+                    && reopened.GetMeta("__evt_startscene").AsString() == "menu";
+                var text = SceneWriter.WriteContainer(reopened, binder, reopened.GetMeta("__evt_startscene").AsString());
+                var b = SceneFile.Parse(text);
+                var em = b.Nodes.FirstOrDefault(n => n.Name == "Emitter");
+                ok = srcOk && b.StartScene == "menu" && em is not null && em.Script == "e.node.evt" && em.Unique
+                    && em.Groups.Contains("player") && em.Meta.ContainsKey("mode")
+                    && em.Connections.Count == 1 && em.Props.ContainsKey("position");
+                detail = $"src={srcOk}, start={b.StartScene}, script={em?.Script}, groups={em?.Groups.Count}, conn={em?.Connections.Count}";
+                reopened.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("editor build->pack->reopen preserves the round-trip stash", ok, detail);
+        }
+
+        // 46: Rect2 property round-trips via a _type table (Sprite2D.region_rect)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var src = new Node();
+                var s = (Sprite2D)binder.Instantiate("Sprite2D")!;
+                s.Name = "S"; s.RegionRect = new Rect2(1, 2, 3, 4);
+                src.AddChild(s);
+                var text = SceneWriter.WriteContainer(src, binder);
+                var dst = new Node();
+                dst.AddChild(SceneBuilder.BuildNode(SceneFile.Parse(text).Nodes[0], binder));
+                var r = dst.GetNodeOrNull<Sprite2D>("S");
+                ok = text.Contains("_type = \"Rect2\"") && r is not null && r.RegionRect == new Rect2(1, 2, 3, 4);
+                detail = $"rect={r?.RegionRect}";
+                src.QueueFree(); dst.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("composite struct (Rect2) round-trips via a _type table", ok, detail);
+        }
+
+        // 47: a Transform2D property round-trips via a _type table — a NON-Node2D transform
+        // (CanvasLayer) is not decomposed, so this exercises the struct-table write + read
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var src = new Node();
+                var c = (CanvasLayer)binder.Instantiate("CanvasLayer")!;
+                c.Name = "C"; c.Transform = new Transform2D(new Vector2(1, 0), new Vector2(0, 1), new Vector2(5, 6));
+                src.AddChild(c);
+                var text = SceneWriter.WriteContainer(src, binder);
+                var dst = new Node();
+                dst.AddChild(SceneBuilder.BuildNode(SceneFile.Parse(text).Nodes[0], binder));
+                var c2 = dst.GetNodeOrNull<CanvasLayer>("C");
+                ok = text.Contains("_type = \"Transform2D\"") && c2 is not null
+                    && c2.Transform.Origin.IsEqualApprox(new Vector2(5, 6));
+                detail = $"origin={c2?.Transform.Origin}";
+                src.QueueFree(); dst.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("composite struct (Transform2D) round-trips via a _type table", ok, detail);
+        }
+
+        // 48: a nested Transform3D `_type` table (Basis sub-table + positional origin) parses + builds
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var spec = SceneFile.Parse(
+                    "[nodes.N]\ntype = \"Node3D\"\n" +
+                    "transform = { _type = \"Transform3D\", " +
+                    "basis = { _type = \"Basis\", row0 = [1,0,0], row1 = [0,1,0], row2 = [0,0,1] }, " +
+                    "origin = [5,2,3] }\n");
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var dst = new Node();
+                dst.AddChild(SceneBuilder.BuildNode(spec.Nodes[0], binder));
+                var n = dst.GetNodeOrNull<Node3D>("N");
+                ok = n is not null && n.Transform.Origin.IsEqualApprox(new Vector3(5, 2, 3))
+                    && n.Transform.Basis.IsEqualApprox(Basis.Identity);
+                detail = $"origin={n?.Transform.Origin}";
+                dst.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("Transform3D _type table (flat-9 basis) parses + builds", ok, detail);
+        }
+
+        // 49: a `/`-keyed property (Control theme override) round-trips as a quoted key
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var binder = new GodotBinder(Lua.LuaState.Create());
+                var src = new Node();
+                var l = (Label)binder.Instantiate("Label")!;
+                l.Name = "L"; l.Set("theme_override_font_sizes/font_size", 24);
+                src.AddChild(l);
+                var text = SceneWriter.WriteContainer(src, binder);
+                var dst = new Node();
+                dst.AddChild(SceneBuilder.BuildNode(SceneFile.Parse(text).Nodes[0], binder));
+                var l2 = dst.GetNodeOrNull<Label>("L");
+                ok = text.Contains("\"theme_override_font_sizes/font_size\"") && l2 is not null
+                    && l2.Get("theme_override_font_sizes/font_size").AsInt32() == 24;
+                detail = $"text=<<{text}>>";
+                src.QueueFree(); dst.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("a /-keyed theme-override property round-trips as a quoted key", ok, detail);
+        }
+
+        // 50: a top-level `description` field round-trips as data (replaces comment preservation)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (a, b, text) = RoundTrip("description = \"the boot menu\"\n[nodes.Menu]\ntype = \"Node\"\n");
+                ok = a.Description == "the boot menu" && b.Description == "the boot menu"
+                    && text.Contains("description = \"the boot menu\"") && SpecEquals(a, b);
+                detail = $"a={a.Description}, b={b.Description}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("top-level description field round-trips", ok, detail);
+        }
+
         log($"[tests] {passed} passed, {failed} failed");
         return failed;
+    }
+
+    // parse -> build under a container -> SceneWriter -> parse again.
+    // Returns (originalSpec, roundTrippedSpec, emittedText).
+    private static (SceneSpec a, SceneSpec b, string text) RoundTrip(
+        string toml, Func<string, IReadOnlyList<NodeSpec>>? resolve = null)
+    {
+        var a = SceneFile.Parse(toml);
+        var binder = new GodotBinder(Lua.LuaState.Create());
+        var container = new Node();
+        foreach (var n in a.Nodes) container.AddChild(SceneBuilder.BuildNode(n, binder, null, resolve));
+        var text = SceneWriter.WriteContainer(container, binder, a.StartScene, a.Description);
+        var b = SceneFile.Parse(text);
+        container.QueueFree();
+        return (a, b, text);
+    }
+
+    private static bool SpecEquals(SceneSpec a, SceneSpec b)
+        => a.StartScene == b.StartScene && a.Description == b.Description && NodesEqual(a.Nodes, b.Nodes);
+
+    private static bool NodesEqual(List<NodeSpec> a, List<NodeSpec> b)
+    {
+        if (a.Count != b.Count) return false;
+        foreach (var na in a)
+        {
+            var nb = b.FirstOrDefault(x => x.Name == na.Name);
+            if (nb is null || !NodeEquals(na, nb)) return false;
+        }
+        return true;
+    }
+
+    private static bool NodeEquals(NodeSpec a, NodeSpec b)
+    {
+        if (a.Name != b.Name || a.Type != b.Type || a.Script != b.Script
+            || a.Instance != b.Instance || a.Unique != b.Unique) return false;
+        if (!SetEquals(a.Groups, b.Groups)) return false;
+        if (a.Connections.Count != b.Connections.Count) return false;
+        for (int i = 0; i < a.Connections.Count; i++)
+            if (a.Connections[i].Signal != b.Connections[i].Signal
+                || a.Connections[i].To != b.Connections[i].To
+                || a.Connections[i].Method != b.Connections[i].Method) return false;
+        return MapEquals(a.Meta, b.Meta) && MapEquals(a.Props, b.Props) && NodesEqual(a.Children, b.Children);
+    }
+
+    private static bool SetEquals(List<string> a, List<string> b)
+        => a.Count == b.Count && a.All(b.Contains);
+
+    private static bool MapEquals(Dictionary<string, object> a, Dictionary<string, object> b)
+    {
+        if (a.Count != b.Count) return false;
+        foreach (var kv in a)
+            if (!b.TryGetValue(kv.Key, out var v) || !ValEquals(kv.Value, v)) return false;
+        return true;
+    }
+
+    // The parse object model: bool / double / string / object[] / Dictionary, with
+    // numeric tolerance so float-vs-double and emission rounding don't read as drift.
+    private static bool ValEquals(object? a, object? b)
+    {
+        if (a is null || b is null) return a is null && b is null;
+        if (a is double da && b is double db)
+            return Math.Abs(da - db) <= 1e-5 * Math.Max(1.0, Math.Max(Math.Abs(da), Math.Abs(db)));
+        if (a is bool ba && b is bool bb) return ba == bb;
+        if (a is string sa && b is string sb) return sa == sb;
+        if (a is object[] xa && b is object[] xb)
+            return xa.Length == xb.Length && !xa.Where((t, i) => !ValEquals(t, xb[i])).Any();
+        if (a is Dictionary<string, object> ma && b is Dictionary<string, object> mb)
+            return MapEquals(ma, mb);
+        return Equals(a, b);
     }
 
     private static bool DoubleRegisterRejected()

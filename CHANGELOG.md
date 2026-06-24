@@ -5,6 +5,60 @@ All notable changes to Evaluate are documented here. The format is based on
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While
 the version is `0.x`, minor bumps may include breaking changes.
 
+## [0.7.0] — 2026-06-24
+
+Godot editor ↔ `.scene` write-back. Edit Evaluate scenes in the Godot editor — move
+nodes, create and place new nodes, set property values, attach node scripts — and save
+the result back to the custom `.scene` (TOML) file. Editor-only: a running game is never
+required (if one is running, its hot-reload picks up the saved file for free).
+
+### Added
+- **`SceneWriter`** — serializes a live Godot node tree back to a `.scene` file (TOML),
+  the inverse of `SceneFile` + `SceneBuilder`. Emits clean, minimal files: only properties
+  that differ from the type's defaults (or that the author originally wrote) are written,
+  spatial transforms emit as the `position`/`rotation`/`scale` triple, floats format
+  shortest (`2.2`, not `2.2000000476837`). Full fidelity for the `.scene` feature set —
+  `script`, `groups`, `meta`, `unique`, `connections`, `instance=` (not re-inlined), and
+  inline `_type` / `res://` resources all round-trip. Public API: `WriteContainer`,
+  `Write`, `WriteNode`.
+- **Editor write-back workflow** (`evaluate_scene` addon) — an "Evaluate" dock (and Tools
+  menu items) to open a `.scene` as an editable native scene (built with the same
+  `SceneBuilder` the runtime uses), edit it with the normal Godot tools, and **Save to
+  .scene**. The read-only import preview is unchanged and coexists.
+- **Full builtin-type fidelity, source-generated** — `_type` now names a **struct** as well
+  as a resource, so composite structs that have no plain-table form (a bare `{…}` parses as a
+  child node) can live in a `.scene`:
+  `custom_aabb = { _type = "Aabb", position = [1,2,3], size = [4,5,6] }`,
+  `transform = { _type = "Transform3D", basis = { _type = "Basis", row0 = [1,0,0], row1 = [0,1,0], row2 = [0,0,1] }, origin = [5,2,3] }`.
+  An all-scalar struct (a vector/color) is a positional array; a composite struct is a nested
+  `_type` table. The conversions are **emitted at build time by a source generator** that
+  enumerates every Godot builtin struct from the GodotSharp reference — so all 16
+  (`Vector2/2i/3/3i/4/4i`, `Color`, `Quaternion`, `Rect2/2i`, `Plane`, `Aabb`, `Basis`,
+  `Transform2D/3D`, `Projection`) are covered with **no hand-written per-type code and no
+  runtime reflection** (AOT/trim safe). A new Godot builtin is picked up automatically.
+- **`/`-keyed properties** (e.g. Control theme overrides like
+  `theme_override_colors/font_color`) round-trip — written as quoted TOML keys and applied
+  via `obj.Set("a/b", v)`.
+- **Scene `description`** — an optional top-level `description = "…"` (sibling of
+  `start_scene`), parsed into `SceneSpec.Description` and round-tripped as data. Scene docs
+  live here instead of in comments, so they survive an editor save; the editor carries it on
+  the edited root's metadata.
+
+### Changed
+- **Scene `groups` are now persistent** (`AddToGroup(persistent: true)`), so a group
+  survives being packed and shows in the editor's Groups tab. Runtime behavior
+  (`is_in_group`, group lookup) is unchanged.
+
+### Internal
+- `SceneBuilder.BuildNode` stashes the facts a bare node can't carry (`script`,
+  `instance`, the author's original property keys, declarative `connections`) as reserved
+  `__evt_*` node meta, which `SceneWriter` reads back and never emits as user `meta`.
+- New `StructCodecGenerator` (in `Evaluate.Generator`) emits `GodotStructCodec` —
+  reflection-free `Decompose`/`Recompose` for every builtin struct, discovered from the
+  Variant type enum. Field-backed structs round-trip via their settable fields; the few
+  property-backed ones (`Rect2`/`Aabb`/`Plane`/`Rect2i`) via their name-matching constructor.
+  `GodotBinder` and `SceneWriter` consume it instead of hand-written per-struct switches.
+
 ## [0.6.0] — 2026-06-22
 
 ### Changed

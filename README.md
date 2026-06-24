@@ -48,9 +48,16 @@ hot-reloaded by default.
   - **`*.scene`** files (TOML content) declare a node tree as keyed, nested tables —
     `[nodes.Player]` then `[nodes.Player.Camera]` makes Camera a child of Player.
     A node's name is the table key; reserved keys `type`/`script`; a **sub-table is
-    a child node** and a **scalar/array is a property** (`position = [x, y, z]`).
-    Parsed with Tomlyn. Instantiated under a per-scene container that is **freed
-    wholesale** on switch.
+    a child node** and a **scalar/array is a property** (`position = [x, y, z]`). A
+    sub-table tagged with **`_type`** is a *property*, not a child — it names an inline
+    resource (`mesh = { _type = "BoxMesh", size = [1,1,1] }`) **or a builtin struct**
+    (`custom_aabb = { _type = "Aabb", position = [1,2,3], size = [4,5,6] }`), which is how
+    composite structs like `Transform3D`/`Rect2`/`Basis`/`Projection` are written. A
+    property key may be quoted to carry a `/` (Control theme overrides:
+    `"theme_override_colors/font_color" = [..]`). An optional top-level
+    **`description = "…"`** holds scene docs as data. Parsed with Tomlyn; instantiated
+    under a per-scene container that is **freed wholesale** on switch. The editor addon
+    can round-trip all of this back to the `.scene` (see below).
   - **`*.node.evt`** is one node's behavior, attached via the scene file; its
     hooks run with **`self`** bound to that node (no spawning in the script).
   - **`*.evt`** systems are conductors: no `scenes:` ⇒ **global** (always run);
@@ -58,15 +65,19 @@ hot-reloaded by default.
     routing — `scene.change(name)` (applied at the next frame boundary, never
     mid-hook), `scene.current()`, `scene.find(path)` (unique by node path, e.g.
     `"Level/Enemy"`), `scene.add(node)`.
-- **Editor preview (optional addon).** A `.scene` file is TOML, which the Godot
-  editor doesn't render natively. The `dev/addons/evaluate_scene` addon registers an
+- **Editor preview + write-back (optional addon).** A `.scene` file is TOML, which the
+  Godot editor doesn't render natively. The `dev/addons/evaluate_scene` addon registers an
   `EditorImportPlugin` that converts `.scene` → a `PackedScene` (via the *same*
-  `SceneFile`/`SceneBuilder` the runtime uses), so the editor shows and renders the
-  node tree. Editor-only (`#if TOOLS`); the runtime never touches the import — it
-  parses `.scene` directly, so runtime hot-reload is unaffected. The addon is **not**
-  part of the NuGet package (the runtime library carries no editor types); a game
-  that wants editor preview copies `dev/addons/evaluate_scene/` into its own
-  `res://addons/` and enables it — the conversion logic comes from the library.
+  `SceneFile`/`SceneBuilder` the runtime uses), so the editor shows and renders the node
+  tree. It also adds an **"Evaluate" dock** (and Tools-menu entries) to open a `.scene` as
+  an *editable* native scene, edit it with the normal editor — move nodes, create and place
+  new nodes, set properties, attach a node script via a `__evt_script` metadata entry — and
+  **Save to .scene**, which serializes the edited tree back to the TOML file via
+  `SceneWriter` (the inverse of `SceneFile`/`SceneBuilder`). Editor-only (`#if TOOLS`) and
+  needs no running game (a running game's hot-reload picks the saved file up for free). The
+  addon is **not** part of the NuGet package (the runtime library carries no editor types);
+  a game copies `dev/addons/evaluate_scene/` into its own `res://addons/` and enables it —
+  the build/serialize logic comes from the library.
 - **Lifecycle hooks.** `register:` wires Godot's Node lifecycle. **System hooks:**
   `on_start` (global, once), `on_enter`/`on_exit` (scene-scoped, per activation),
   `on_update(dt)`, `on_physics_update(dt)`, `on_input(event)`. **Node hooks**
