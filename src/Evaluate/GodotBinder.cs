@@ -284,13 +284,13 @@ public sealed class GodotBinder
             {
                 var typeName = t["_type"].Read<string>();
                 return GodotStructCodec.TypeByName(typeName) is { } st
-                    ? GodotStructCodec.Recompose(st, LuaToObjModel(val))   // builtin struct
+                    ? GodotStructCodec.Recompose(st, TableToObjModel(t))   // builtin struct
                     : BuildResource(t);                                    // Resource
             }
 
             var pt = PropertyType(obj, key);
             if (pt is { } vt && GodotStructCodec.IsStruct(vt))
-                return GodotStructCodec.Recompose(vt, LuaToObjModel(val));
+                return GodotStructCodec.Recompose(vt, TableToObjModel(t));
         }
         // Resource-by-path: a res:// string targeting a Resource (Object) property -> load it,
         // so a scene file can write `texture = "res://art/x.png"` / `mesh = "res://m.tres"`.
