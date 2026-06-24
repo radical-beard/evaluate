@@ -2,7 +2,7 @@
 using Godot;
 using Evaluate;
 
-namespace EvaluateDev;
+namespace Evaluate.Editor;
 
 // Imports a `.scene` file (TOML content) into a PackedScene for the editor. It
 // reuses the exact same SceneFile parser + SceneBuilder the runtime uses, so the

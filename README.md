@@ -76,8 +76,12 @@ hot-reloaded by default.
   `SceneWriter` (the inverse of `SceneFile`/`SceneBuilder`). Editor-only (`#if TOOLS`) and
   needs no running game (a running game's hot-reload picks the saved file up for free). The
   addon is **not** part of the NuGet package (the runtime library carries no editor types);
-  a game copies `dev/addons/evaluate_scene/` into its own `res://addons/` and enables it —
-  the build/serialize logic comes from the library.
+  instead it ships as a drop-in zip on each [GitHub release](https://github.com/radical-beard/evaluate/releases)
+  (`evaluate_scene-<version>.zip`): extract it into your project to get
+  `res://addons/evaluate_scene/`, then enable the plugin in Project Settings (it needs the
+  `RadicalBeard.Evaluate` package for the build/serialize logic). A C# editor addon can't be a
+  bare DLL — its `.cs` must live under `res://addons/` and compile with the game — so the zip
+  carries the source; the stable `Evaluate.Editor` namespace means it drops in verbatim.
 - **Lifecycle hooks.** `register:` wires Godot's Node lifecycle. **System hooks:**
   `on_start` (global, once), `on_enter`/`on_exit` (scene-scoped, per activation),
   `on_update(dt)`, `on_physics_update(dt)`, `on_input(event)`. **Node hooks**

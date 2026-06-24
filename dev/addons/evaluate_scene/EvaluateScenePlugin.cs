@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using Evaluate;
 
-namespace EvaluateDev;
+namespace Evaluate.Editor;
 
 // Editor-only addon for Evaluate `.scene` files (TOML). Two halves:
 //   * Import — renders a `.scene` as a read-only PackedScene preview so the editor

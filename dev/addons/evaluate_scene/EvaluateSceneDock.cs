@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Godot;
 
-namespace EvaluateDev;
+namespace Evaluate.Editor;
 
 // The "Evaluate" editor dock: pick a `.scene`, Open it for editing (native tree),
 // edit with the normal Godot tools, then Save it back to the `.scene` TOML. The

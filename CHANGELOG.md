@@ -5,6 +5,25 @@ All notable changes to Evaluate are documented here. The format is based on
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While
 the version is `0.x`, minor bumps may include breaking changes.
 
+## [0.7.1] — 2026-06-24
+
+Editor-addon distribution + a follow-up fix.
+
+### Added
+- **The `evaluate_scene` editor addon is now distributed as a drop-in zip** attached to each
+  GitHub release (`evaluate_scene-<version>.zip`, built by the `release-addon` workflow). A
+  game installs it without building from source: download, extract into the project (gives
+  `res://addons/evaluate_scene/`), and enable the plugin. Requires the `RadicalBeard.Evaluate`
+  package (≥ this version). Also suitable for a Godot AssetLib entry.
+
+### Changed
+- **Addon namespace is now the stable `Evaluate.Editor`** (was the per-game `EvaluateDev`),
+  so the folder drops into any project verbatim — no more per-game namespace edits.
+
+### Fixed
+- Nullable warnings in the struct-codec recompose call sites (pass the non-null
+  `TableToObjModel(t)`); no behavior change.
+
 ## [0.7.0] — 2026-06-24
 
 Godot editor ↔ `.scene` write-back. Edit Evaluate scenes in the Godot editor — move
