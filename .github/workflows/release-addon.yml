@@ -1,8 +1,9 @@
 name: Release addon
 
-# On a version tag, package the evaluate_scene editor addon as a drop-in zip and
-# attach it to the GitHub release, so games install it without building from source:
-# download, extract into the project (gives res://addons/evaluate_scene/), enable.
+# On a version tag: (1) package the evaluate_scene editor addon as a drop-in zip and
+# attach it to the GitHub release; (2) push the addon straight to the AssetLib mirror
+# repo (radical-beard/evaluate-scene-addon) so it syncs instantly — no waiting on the
+# mirror's daily poll. The mirror push uses a write-scoped deploy key (MIRROR_DEPLOY_KEY).
 on:
   workflow_dispatch:
   push:
@@ -29,6 +30,7 @@ jobs:
           ( cd staging && zip -r "../evaluate_scene-$version.zip" addons )
 
       - name: Attach to the GitHub release
+        if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -37,3 +39,35 @@ jobs:
           gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 \
             || gh release create "$GITHUB_REF_NAME" --verify-tag --title "Evaluate $version" --generate-notes
           gh release upload "$GITHUB_REF_NAME" "evaluate_scene-$version.zip" --clobber
+
+      # ---- instant sync to the AssetLib mirror repo ----
+      - name: Check out the mirror repo
+        if: github.ref_type == 'tag'
+        uses: actions/checkout@v6
+        with:
+          repository: radical-beard/evaluate-scene-addon
+          ssh-key: ${{ secrets.MIRROR_DEPLOY_KEY }}
+          fetch-depth: 0
+          path: mirror
+
+      - name: Sync the addon into the mirror and push
+        if: github.ref_type == 'tag'
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          rm -rf mirror/addons/evaluate_scene
+          mkdir -p mirror/addons
+          cp -r dev/addons/evaluate_scene mirror/addons/evaluate_scene
+          find mirror/addons/evaluate_scene -name '*.uid' -delete
+          cd mirror
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "Sync evaluate_scene addon from evaluate@${version}"
+            git push
+          fi
+          if ! git rev-parse "v${version}" >/dev/null 2>&1; then
+            git tag "v${version}"
+            git push origin "v${version}"
+          fi
