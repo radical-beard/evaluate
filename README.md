@@ -1,3 +1,5 @@
+<p align="center"><img src="logo.png" alt="Evaluate" width="180"></p>
+
 # Evaluate
 
 A data-driven, moddable game framework built as an extension that runs **inside
