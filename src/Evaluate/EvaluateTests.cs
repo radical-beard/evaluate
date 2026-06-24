@@ -892,6 +892,21 @@ public static class EvaluateTests
             Check("top-level description field round-trips", ok, detail);
         }
 
+        // 51: runtime struct properties read back as NAMED-field tables (.size.x, .basis.z),
+        // not the codec's positional serialization repr — regression guard for the script API
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var handle = NewLoader().Require("struct_read.evt").Read<LuaTable>();
+                var result = handle["result"].Type == LuaValueType.String ? handle["result"].Read<string>() : "";
+                ok = result == "true,true,true";
+                detail = $"result=\"{result}\" (rect,aabb,basis)";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("runtime struct properties are named-field (.size.x / .basis.z)", ok, detail);
+        }
+
         log($"[tests] {passed} passed, {failed} failed");
         return failed;
     }

@@ -1,0 +1,822 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "Godot" [ref=e6] [cursor=pointer]:
+            - /url: https://godotengine.org
+            - img "Godot" [ref=e7]
+          - link "| Asset Library" [ref=e8] [cursor=pointer]:
+            - /url: /asset-library
+        - generic [ref=e9]:
+          - list [ref=e10]:
+            - listitem [ref=e11]:
+              - link "Assets" [ref=e12] [cursor=pointer]:
+                - /url: /asset-library/asset
+          - list [ref=e13]:
+            - listitem [ref=e14]:
+              - link "Feed" [ref=e15] [cursor=pointer]:
+                - /url: /asset-library/user/feed
+            - listitem [ref=e16]:
+              - link "My Assets" [ref=e17] [cursor=pointer]:
+                - /url: /asset-library/asset?user=radbeard
+            - listitem
+            - listitem [ref=e18]:
+              - link "Submit Asset" [ref=e19] [cursor=pointer]:
+                - /url: /asset-library/asset/submit
+            - listitem [ref=e20]:
+              - link "Logout (radbeard)" [ref=e21] [cursor=pointer]:
+                - /url: /asset-library/logout
+  - main [ref=e22]:
+    - generic [ref=e23]:
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - textbox "Search for assets" [ref=e26]:
+            - /placeholder: Search for...
+          - button "Search" [ref=e28] [cursor=pointer]
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - generic [ref=e31]: Category
+            - combobox "Category" [ref=e32] [cursor=pointer]:
+              - option "Any" [selected]
+              - option "2D Tools"
+              - option "3D Tools"
+              - option "Shaders"
+              - option "Materials"
+              - option "Tools"
+              - option "Scripts"
+              - option "Misc"
+              - option "Templates"
+              - option "Projects"
+              - option "Demos"
+          - generic [ref=e33]:
+            - generic [ref=e34]: Support level
+            - generic [ref=e35] [cursor=pointer]:
+              - checkbox "Testing" [ref=e36]
+              - text: Testing
+            - generic [ref=e37] [cursor=pointer]:
+              - checkbox "Community" [ref=e38]
+              - text: Community
+            - generic [ref=e39] [cursor=pointer]:
+              - checkbox "Featured" [ref=e40]
+              - text: Featured
+          - generic [ref=e41]:
+            - generic [ref=e42]: Godot version
+            - combobox "Godot version" [ref=e43] [cursor=pointer]:
+              - option "Any" [selected]
+              - option "2.0"
+              - option "2.1"
+              - option "2.2"
+              - option "3.0"
+              - option "3.1"
+              - option "3.2"
+              - option "3.3"
+              - option "3.4"
+              - option "3.5"
+              - option "3.6"
+              - option "4.0"
+              - option "4.1"
+              - option "4.2"
+              - option "4.3"
+              - option "4.4"
+              - option "4.5"
+              - option "4.6"
+              - option "Unknown"
+              - option "Custom build"
+          - generic [ref=e44]:
+            - generic [ref=e45]: License
+            - combobox "License" [ref=e46] [cursor=pointer]:
+              - option "Any" [selected]
+              - option "MIT"
+              - option "MPL-2.0"
+              - option "GPL v3"
+              - option "GPL v2"
+              - option "LGPL v3"
+              - option "LGPL v2.1"
+              - option "LGPL v2"
+              - option "AGPL v3"
+              - option "European Union Public License 1.2"
+              - option "Apache 2.0"
+              - option "CC0 1.0 Universal"
+              - option "CC BY 4.0 International"
+              - option "CC BY 3.0 Unported"
+              - option "CC BY-SA 4.0 International"
+              - option "CC BY-SA 3.0 Unported"
+              - option "BSD 2-clause License"
+              - option "BSD 3-clause License"
+              - option "Boost Software License"
+              - option "ISC License"
+              - option "The Unlicense License"
+              - option "Proprietary (see LICENSE file)"
+          - generic [ref=e47]:
+            - generic [ref=e48]: Order by
+            - combobox "Order by" [ref=e49] [cursor=pointer]:
+              - option "License"
+              - option "Name"
+              - option "Updated" [selected]
+            - generic [ref=e50] [cursor=pointer]:
+              - checkbox "Reverse" [ref=e51]
+              - text: Reverse
+      - generic [ref=e52]:
+        - list [ref=e53]:
+          - listitem [ref=e54]:
+            - link "Gemini GD's icon Gemini GD Tools 4.6 Community GPLv3" [ref=e55] [cursor=pointer]:
+              - /url: /asset-library/asset/5158
+              - img "Gemini GD's icon" [ref=e56]
+              - generic [ref=e57]:
+                - heading "Gemini GD" [level=4] [ref=e58]
+                - generic [ref=e59]:
+                  - generic [ref=e60]:
+                    - generic [ref=e61]: Tools
+                    - generic [ref=e62]: "4.6"
+                    - generic [ref=e63]: Community
+                  - generic [ref=e65]: GPLv3
+            - generic [ref=e66]:
+              - link "daniel@omniimpact.com" [ref=e67] [cursor=pointer]:
+                - /url: "?user=daniel@omniimpact.com"
+              - generic [ref=e68]: 0.5 | 2026-06-23
+          - listitem [ref=e69]:
+            - link "JRPG-Battle-Engine's icon JRPG-Battle-Engine Templates 4.1 Community MIT" [ref=e70] [cursor=pointer]:
+              - /url: /asset-library/asset/5177
+              - img "JRPG-Battle-Engine's icon" [ref=e71]
+              - generic [ref=e72]:
+                - heading "JRPG-Battle-Engine" [level=4] [ref=e73]
+                - generic [ref=e74]:
+                  - generic [ref=e75]:
+                    - generic [ref=e76]: Templates
+                    - generic [ref=e77]: "4.1"
+                    - generic [ref=e78]: Community
+                  - generic [ref=e80]: MIT
+            - generic [ref=e81]:
+              - link "mlie" [ref=e82] [cursor=pointer]:
+                - /url: "?user=mlie"
+              - generic [ref=e83]: 0.3 | 2026-06-23
+          - listitem [ref=e84]:
+            - link "Lit - 2D Lighting Engine's icon Lit - 2D Lighting Engine 2D Tools 4.4 Community MIT" [ref=e85] [cursor=pointer]:
+              - /url: /asset-library/asset/5303
+              - img "Lit - 2D Lighting Engine's icon" [ref=e86]
+              - generic [ref=e87]:
+                - heading "Lit - 2D Lighting Engine" [level=4] [ref=e88]
+                - generic [ref=e89]:
+                  - generic [ref=e90]:
+                    - generic [ref=e91]: 2D Tools
+                    - generic [ref=e92]: "4.4"
+                    - generic [ref=e93]: Community
+                  - generic [ref=e95]: MIT
+            - generic [ref=e96]:
+              - link "raddedd" [ref=e97] [cursor=pointer]:
+                - /url: "?user=raddedd"
+              - generic [ref=e98]: 1.0.0 | 2026-06-23
+          - listitem [ref=e99]:
+            - link "Card Combat Engine — Turn-Based Card Battle Logic for Godot 4 's icon Card Combat Engine — Turn-Based Card Battle Logic for Godot 4 Scripts 4.6 Community AGPLv3" [ref=e100] [cursor=pointer]:
+              - /url: /asset-library/asset/5291
+              - img "Card Combat Engine — Turn-Based Card Battle Logic for Godot 4 's icon" [ref=e101]
+              - generic [ref=e102]:
+                - heading "Card Combat Engine — Turn-Based Card Battle Logic for Godot 4" [level=4] [ref=e103]
+                - generic [ref=e104]:
+                  - generic [ref=e105]:
+                    - generic [ref=e106]: Scripts
+                    - generic [ref=e107]: "4.6"
+                    - generic [ref=e108]: Community
+                  - generic [ref=e110]: AGPLv3
+            - generic [ref=e111]:
+              - link "Dimcairion" [ref=e112] [cursor=pointer]:
+                - /url: "?user=Dimcairion"
+              - generic [ref=e113]: v1.0.0 | 2026-06-23
+          - listitem [ref=e114]:
+            - link "@icons's icon @icons Misc 4.0 Community MIT" [ref=e115] [cursor=pointer]:
+              - /url: /asset-library/asset/5302
+              - img "@icons's icon" [ref=e116]
+              - generic [ref=e117]:
+                - heading "@icons" [level=4] [ref=e118]
+                - generic [ref=e119]:
+                  - generic [ref=e120]:
+                    - generic [ref=e121]: Misc
+                    - generic [ref=e122]: "4.0"
+                    - generic [ref=e123]: Community
+                  - generic [ref=e125]: MIT
+            - generic [ref=e126]:
+              - link "Voxybuns" [ref=e127] [cursor=pointer]:
+                - /url: "?user=Voxybuns"
+              - generic [ref=e128]: 1.2.1 | 2026-06-23
+          - listitem [ref=e129]:
+            - link "Golem-AI's icon Golem-AI Tools 4.2 Community MIT" [ref=e130] [cursor=pointer]:
+              - /url: /asset-library/asset/5267
+              - img "Golem-AI's icon" [ref=e131]
+              - generic [ref=e132]:
+                - heading "Golem-AI" [level=4] [ref=e133]
+                - generic [ref=e134]:
+                  - generic [ref=e135]:
+                    - generic [ref=e136]: Tools
+                    - generic [ref=e137]: "4.2"
+                    - generic [ref=e138]: Community
+                  - generic [ref=e140]: MIT
+            - generic [ref=e141]:
+              - link "sancheznotdev" [ref=e142] [cursor=pointer]:
+                - /url: "?user=sancheznotdev"
+              - generic [ref=e143]: 1.4.7 | 2026-06-23
+          - listitem [ref=e144]:
+            - link "Scene Paletter's icon Scene Paletter Tools 4.5 Community MIT" [ref=e145] [cursor=pointer]:
+              - /url: /asset-library/asset/4730
+              - img "Scene Paletter's icon" [ref=e146]
+              - generic [ref=e147]:
+                - heading "Scene Paletter" [level=4] [ref=e148]
+                - generic [ref=e149]:
+                  - generic [ref=e150]:
+                    - generic [ref=e151]: Tools
+                    - generic [ref=e152]: "4.5"
+                    - generic [ref=e153]: Community
+                  - generic [ref=e155]: MIT
+            - generic [ref=e156]:
+              - link "Flopper" [ref=e157] [cursor=pointer]:
+                - /url: "?user=Flopper"
+              - generic [ref=e158]: 0.1.3 | 2026-06-23
+          - listitem [ref=e159]:
+            - link "Godot-MCP's icon Godot-MCP Tools 4.3 Community Apache-2.0" [ref=e160] [cursor=pointer]:
+              - /url: /asset-library/asset/5245
+              - img "Godot-MCP's icon" [ref=e161]
+              - generic [ref=e162]:
+                - heading "Godot-MCP" [level=4] [ref=e163]
+                - generic [ref=e164]:
+                  - generic [ref=e165]:
+                    - generic [ref=e166]: Tools
+                    - generic [ref=e167]: "4.3"
+                    - generic [ref=e168]: Community
+                  - generic [ref=e170]: Apache-2.0
+            - generic [ref=e171]:
+              - link "IvanMurzak" [ref=e172] [cursor=pointer]:
+                - /url: "?user=IvanMurzak"
+              - generic [ref=e173]: 0.13.2 | 2026-06-23
+          - listitem [ref=e174]:
+            - link "Smart Camera Lite's icon Smart Camera Lite 3D Tools 4.0 Community MIT" [ref=e175] [cursor=pointer]:
+              - /url: /asset-library/asset/5301
+              - img "Smart Camera Lite's icon" [ref=e176]
+              - generic [ref=e177]:
+                - heading "Smart Camera Lite" [level=4] [ref=e178]
+                - generic [ref=e179]:
+                  - generic [ref=e180]:
+                    - generic [ref=e181]: 3D Tools
+                    - generic [ref=e182]: "4.0"
+                    - generic [ref=e183]: Community
+                  - generic [ref=e185]: MIT
+            - generic [ref=e186]:
+              - link "Godot_Forge" [ref=e187] [cursor=pointer]:
+                - /url: "?user=Godot_Forge"
+              - generic [ref=e188]: 1.0.0 | 2026-06-23
+          - listitem [ref=e189]:
+            - link "Quest System Lite's icon Quest System Lite Scripts 4.0 Community MIT" [ref=e190] [cursor=pointer]:
+              - /url: /asset-library/asset/5300
+              - img "Quest System Lite's icon" [ref=e191]
+              - generic [ref=e192]:
+                - heading "Quest System Lite" [level=4] [ref=e193]
+                - generic [ref=e194]:
+                  - generic [ref=e195]:
+                    - generic [ref=e196]: Scripts
+                    - generic [ref=e197]: "4.0"
+                    - generic [ref=e198]: Community
+                  - generic [ref=e200]: MIT
+            - generic [ref=e201]:
+              - link "Godot_Forge" [ref=e202] [cursor=pointer]:
+                - /url: "?user=Godot_Forge"
+              - generic [ref=e203]: 1.0.0 | 2026-06-23
+          - listitem [ref=e204]:
+            - link "Object Pool Lite's icon Object Pool Lite Scripts 4.0 Community MIT" [ref=e205] [cursor=pointer]:
+              - /url: /asset-library/asset/5299
+              - img "Object Pool Lite's icon" [ref=e206]
+              - generic [ref=e207]:
+                - heading "Object Pool Lite" [level=4] [ref=e208]
+                - generic [ref=e209]:
+                  - generic [ref=e210]:
+                    - generic [ref=e211]: Scripts
+                    - generic [ref=e212]: "4.0"
+                    - generic [ref=e213]: Community
+                  - generic [ref=e215]: MIT
+            - generic [ref=e216]:
+              - link "Godot_Forge" [ref=e217] [cursor=pointer]:
+                - /url: "?user=Godot_Forge"
+              - generic [ref=e218]: 1.0.0 | 2026-06-23
+          - listitem [ref=e219]:
+            - link "Health & Damage System Lite's icon Health & Damage System Lite Scripts 4.0 Community MIT" [ref=e220] [cursor=pointer]:
+              - /url: /asset-library/asset/5298
+              - img "Health & Damage System Lite's icon" [ref=e221]
+              - generic [ref=e222]:
+                - heading "Health & Damage System Lite" [level=4] [ref=e223]
+                - generic [ref=e224]:
+                  - generic [ref=e225]:
+                    - generic [ref=e226]: Scripts
+                    - generic [ref=e227]: "4.0"
+                    - generic [ref=e228]: Community
+                  - generic [ref=e230]: MIT
+            - generic [ref=e231]:
+              - link "Godot_Forge" [ref=e232] [cursor=pointer]:
+                - /url: "?user=Godot_Forge"
+              - generic [ref=e233]: 1.0.0 | 2026-06-23
+          - listitem [ref=e234]:
+            - link "State Machine Lite's icon State Machine Lite Scripts 4.0 Community MIT" [ref=e235] [cursor=pointer]:
+              - /url: /asset-library/asset/5297
+              - img "State Machine Lite's icon" [ref=e236]
+              - generic [ref=e237]:
+                - heading "State Machine Lite" [level=4] [ref=e238]
+                - generic [ref=e239]:
+                  - generic [ref=e240]:
+                    - generic [ref=e241]: Scripts
+                    - generic [ref=e242]: "4.0"
+                    - generic [ref=e243]: Community
+                  - generic [ref=e245]: MIT
+            - generic [ref=e246]:
+              - link "Godot_Forge" [ref=e247] [cursor=pointer]:
+                - /url: "?user=Godot_Forge"
+              - generic [ref=e248]: 1.0.0 | 2026-06-23
+          - listitem [ref=e249]:
+            - link "Virtual Joystick DX's icon Virtual Joystick DX Tools 4.5 Community MIT" [ref=e250] [cursor=pointer]:
+              - /url: /asset-library/asset/5256
+              - img "Virtual Joystick DX's icon" [ref=e251]
+              - generic [ref=e252]:
+                - heading "Virtual Joystick DX" [level=4] [ref=e253]
+                - generic [ref=e254]:
+                  - generic [ref=e255]:
+                    - generic [ref=e256]: Tools
+                    - generic [ref=e257]: "4.5"
+                    - generic [ref=e258]: Community
+                  - generic [ref=e260]: MIT
+            - generic [ref=e261]:
+              - link "Repechul" [ref=e262] [cursor=pointer]:
+                - /url: "?user=Repechul"
+              - generic [ref=e263]: 0.3a Refactor | 2026-06-23
+          - listitem [ref=e264]:
+            - link "Beckett (AI MCP for Godot)'s icon Beckett (AI MCP for Godot) Tools 4.4 Community MIT" [ref=e265] [cursor=pointer]:
+              - /url: /asset-library/asset/5296
+              - img "Beckett (AI MCP for Godot)'s icon" [ref=e266]
+              - generic [ref=e267]:
+                - heading "Beckett (AI MCP for Godot)" [level=4] [ref=e268]
+                - generic [ref=e269]:
+                  - generic [ref=e270]:
+                    - generic [ref=e271]: Tools
+                    - generic [ref=e272]: "4.4"
+                    - generic [ref=e273]: Community
+                  - generic [ref=e275]: MIT
+            - generic [ref=e276]:
+              - link "becketts" [ref=e277] [cursor=pointer]:
+                - /url: "?user=becketts"
+              - generic [ref=e278]: 1.2.0 | 2026-06-23
+          - listitem [ref=e279]:
+            - link "PresetDictArray's icon PresetDictArray Scripts 4.6 Community MIT" [ref=e280] [cursor=pointer]:
+              - /url: /asset-library/asset/5240
+              - img "PresetDictArray's icon" [ref=e281]
+              - generic [ref=e282]:
+                - heading "PresetDictArray" [level=4] [ref=e283]
+                - generic [ref=e284]:
+                  - generic [ref=e285]:
+                    - generic [ref=e286]: Scripts
+                    - generic [ref=e287]: "4.6"
+                    - generic [ref=e288]: Community
+                  - generic [ref=e290]: MIT
+            - generic [ref=e291]:
+              - link "Freswinn" [ref=e292] [cursor=pointer]:
+                - /url: "?user=Freswinn"
+              - generic [ref=e293]: 1.2 | 2026-06-23
+          - listitem [ref=e294]:
+            - link "Exponaut - Strategic Collectathon Platformer's icon Exponaut - Strategic Collectathon Platformer Projects 4.4 Community MIT" [ref=e295] [cursor=pointer]:
+              - /url: /asset-library/asset/2692
+              - img "Exponaut - Strategic Collectathon Platformer's icon" [ref=e296]
+              - generic [ref=e297]:
+                - heading "Exponaut - Strategic Collectathon Platformer" [level=4] [ref=e298]
+                - generic [ref=e299]:
+                  - generic [ref=e300]:
+                    - generic [ref=e301]: Projects
+                    - generic [ref=e302]: "4.4"
+                    - generic [ref=e303]: Community
+                  - generic [ref=e305]: MIT
+            - generic [ref=e306]:
+              - link "Pawlogates" [ref=e307] [cursor=pointer]:
+                - /url: "?user=Pawlogates"
+              - generic [ref=e308]: 0.9.6.6 | 2026-06-22
+          - listitem [ref=e309]:
+            - link "Godot Agent CLI's icon Godot Agent CLI Tools 4.4 Community MIT" [ref=e310] [cursor=pointer]:
+              - /url: /asset-library/asset/5295
+              - img "Godot Agent CLI's icon" [ref=e311]
+              - generic [ref=e312]:
+                - heading "Godot Agent CLI" [level=4] [ref=e313]
+                - generic [ref=e314]:
+                  - generic [ref=e315]:
+                    - generic [ref=e316]: Tools
+                    - generic [ref=e317]: "4.4"
+                    - generic [ref=e318]: Community
+                  - generic [ref=e320]: MIT
+            - generic [ref=e321]:
+              - link "tibormester" [ref=e322] [cursor=pointer]:
+                - /url: "?user=tibormester"
+              - generic [ref=e323]: 0.1.0 | 2026-06-22
+          - listitem [ref=e324]:
+            - link "Maze2D's icon Maze2D 2D Tools 4.0 Community Unlicense" [ref=e325] [cursor=pointer]:
+              - /url: /asset-library/asset/5281
+              - img "Maze2D's icon" [ref=e326]
+              - generic [ref=e327]:
+                - heading "Maze2D" [level=4] [ref=e328]
+                - generic [ref=e329]:
+                  - generic [ref=e330]:
+                    - generic [ref=e331]: 2D Tools
+                    - generic [ref=e332]: "4.0"
+                    - generic [ref=e333]: Community
+                  - generic [ref=e335]: Unlicense
+            - generic [ref=e336]:
+              - link "bennbollay" [ref=e337] [cursor=pointer]:
+                - /url: "?user=bennbollay"
+              - generic [ref=e338]: 1.1.0 | 2026-06-22
+          - listitem [ref=e339]:
+            - link "ScatterShot's icon ScatterShot 3D Tools 4.5 Community MIT" [ref=e340] [cursor=pointer]:
+              - /url: /asset-library/asset/4566
+              - img "ScatterShot's icon" [ref=e341]
+              - generic [ref=e342]:
+                - heading "ScatterShot" [level=4] [ref=e343]
+                - generic [ref=e344]:
+                  - generic [ref=e345]:
+                    - generic [ref=e346]: 3D Tools
+                    - generic [ref=e347]: "4.5"
+                    - generic [ref=e348]: Community
+                  - generic [ref=e350]: MIT
+            - generic [ref=e351]:
+              - link "etodd" [ref=e352] [cursor=pointer]:
+                - /url: "?user=etodd"
+              - generic [ref=e353]: 1.0.5 | 2026-06-22
+          - listitem [ref=e354]:
+            - 'link "Talo Game Services: open-source leaderboards, analytics and multiplayer''s icon Talo Game Services: open-source leaderboards, analytics and multiplayer Tools 4.6 Community MIT" [ref=e355] [cursor=pointer]':
+              - /url: /asset-library/asset/2936
+              - 'img "Talo Game Services: open-source leaderboards, analytics and multiplayer''s icon" [ref=e356]'
+              - generic [ref=e357]:
+                - 'heading "Talo Game Services: open-source leaderboards, analytics and multiplayer" [level=4] [ref=e358]'
+                - generic [ref=e359]:
+                  - generic [ref=e360]:
+                    - generic [ref=e361]: Tools
+                    - generic [ref=e362]: "4.6"
+                    - generic [ref=e363]: Community
+                  - generic [ref=e365]: MIT
+            - generic [ref=e366]:
+              - link "trytalo" [ref=e367] [cursor=pointer]:
+                - /url: "?user=trytalo"
+              - generic [ref=e368]: 0.49.1 | 2026-06-22
+          - listitem [ref=e369]:
+            - link "PixelMaker's icon PixelMaker Tools 4.6 Community MIT" [ref=e370] [cursor=pointer]:
+              - /url: /asset-library/asset/5294
+              - img "PixelMaker's icon" [ref=e371]
+              - generic [ref=e372]:
+                - heading "PixelMaker" [level=4] [ref=e373]
+                - generic [ref=e374]:
+                  - generic [ref=e375]:
+                    - generic [ref=e376]: Tools
+                    - generic [ref=e377]: "4.6"
+                    - generic [ref=e378]: Community
+                  - generic [ref=e380]: MIT
+            - generic [ref=e381]:
+              - link "gleeco" [ref=e382] [cursor=pointer]:
+                - /url: "?user=gleeco"
+              - generic [ref=e383]: 1.0 | 2026-06-22
+          - listitem [ref=e384]:
+            - link "Surfaces's icon Surfaces 3D Tools 4.5 Community MIT" [ref=e385] [cursor=pointer]:
+              - /url: /asset-library/asset/4683
+              - img "Surfaces's icon" [ref=e386]
+              - generic [ref=e387]:
+                - heading "Surfaces" [level=4] [ref=e388]
+                - generic [ref=e389]:
+                  - generic [ref=e390]:
+                    - generic [ref=e391]: 3D Tools
+                    - generic [ref=e392]: "4.5"
+                    - generic [ref=e393]: Community
+                  - generic [ref=e395]: MIT
+            - generic [ref=e396]:
+              - link "etodd" [ref=e397] [cursor=pointer]:
+                - /url: "?user=etodd"
+              - generic [ref=e398]: 1.0.0 | 2026-06-22
+          - listitem [ref=e399]:
+            - link "Comedot ECS Template's icon Comedot ECS Template Templates 4.6 Community MIT" [ref=e400] [cursor=pointer]:
+              - /url: /asset-library/asset/3887
+              - img "Comedot ECS Template's icon" [ref=e401]
+              - generic [ref=e402]:
+                - heading "Comedot ECS Template" [level=4] [ref=e403]
+                - generic [ref=e404]:
+                  - generic [ref=e405]:
+                    - generic [ref=e406]: Templates
+                    - generic [ref=e407]: "4.6"
+                    - generic [ref=e408]: Community
+                  - generic [ref=e410]: MIT
+            - generic [ref=e411]:
+              - link "Syntaks.io" [ref=e412] [cursor=pointer]:
+                - /url: "?user=Syntaks.io"
+              - generic [ref=e413]: 4.7.0.100.69 | 2026-06-22
+          - listitem [ref=e414]:
+            - 'link "Alicenzia: License Manager''s icon Alicenzia: License Manager Tools 4.4 Community MIT" [ref=e415] [cursor=pointer]':
+              - /url: /asset-library/asset/5180
+              - 'img "Alicenzia: License Manager''s icon" [ref=e416]'
+              - generic [ref=e417]:
+                - 'heading "Alicenzia: License Manager" [level=4] [ref=e418]'
+                - generic [ref=e419]:
+                  - generic [ref=e420]:
+                    - generic [ref=e421]: Tools
+                    - generic [ref=e422]: "4.4"
+                    - generic [ref=e423]: Community
+                  - generic [ref=e425]: MIT
+            - generic [ref=e426]:
+              - link "etherealxx" [ref=e427] [cursor=pointer]:
+                - /url: "?user=etherealxx"
+              - generic [ref=e428]: 0.0.24-alpha1 | 2026-06-22
+          - listitem [ref=e429]:
+            - link "Klotho — Deterministic multiplayer for Godot(.NET)'s icon Klotho — Deterministic multiplayer for Godot(.NET) Scripts 4.4 Community Apache-2.0" [ref=e430] [cursor=pointer]:
+              - /url: /asset-library/asset/5234
+              - img "Klotho — Deterministic multiplayer for Godot(.NET)'s icon" [ref=e431]
+              - generic [ref=e432]:
+                - heading "Klotho — Deterministic multiplayer for Godot(.NET)" [level=4] [ref=e433]
+                - generic [ref=e434]:
+                  - generic [ref=e435]:
+                    - generic [ref=e436]: Scripts
+                    - generic [ref=e437]: "4.4"
+                    - generic [ref=e438]: Community
+                  - generic [ref=e440]: Apache-2.0
+            - generic [ref=e441]:
+              - link "xpTURN" [ref=e442] [cursor=pointer]:
+                - /url: "?user=xpTURN"
+              - generic [ref=e443]: 0.3.4 | 2026-06-22
+          - listitem [ref=e444]:
+            - link "Audio Manager Lite's icon Audio Manager Lite Scripts 4.4 Community MIT" [ref=e445] [cursor=pointer]:
+              - /url: /asset-library/asset/5293
+              - img "Audio Manager Lite's icon" [ref=e446]
+              - generic [ref=e447]:
+                - heading "Audio Manager Lite" [level=4] [ref=e448]
+                - generic [ref=e449]:
+                  - generic [ref=e450]:
+                    - generic [ref=e451]: Scripts
+                    - generic [ref=e452]: "4.4"
+                    - generic [ref=e453]: Community
+                  - generic [ref=e455]: MIT
+            - generic [ref=e456]:
+              - link "Godot_Forge" [ref=e457] [cursor=pointer]:
+                - /url: "?user=Godot_Forge"
+              - generic [ref=e458]: 1.0.0 | 2026-06-22
+          - listitem [ref=e459]:
+            - link "Compositor Lens Effects / Lens flare's icon Compositor Lens Effects / Lens flare Shaders 4.4 Community MIT" [ref=e460] [cursor=pointer]:
+              - /url: /asset-library/asset/5292
+              - img "Compositor Lens Effects / Lens flare's icon" [ref=e461]
+              - generic [ref=e462]:
+                - heading "Compositor Lens Effects / Lens flare" [level=4] [ref=e463]
+                - generic [ref=e464]:
+                  - generic [ref=e465]:
+                    - generic [ref=e466]: Shaders
+                    - generic [ref=e467]: "4.4"
+                    - generic [ref=e468]: Community
+                  - generic [ref=e470]: MIT
+            - generic [ref=e471]:
+              - link "ARez" [ref=e472] [cursor=pointer]:
+                - /url: "?user=ARez"
+              - generic [ref=e473]: 1.0 | 2026-06-22
+          - listitem [ref=e474]:
+            - link "Scalable Vector Shapes 2D - Draw and Animate Curves's icon Scalable Vector Shapes 2D - Draw and Animate Curves 2D Tools 4.4 Community MIT" [ref=e475] [cursor=pointer]:
+              - /url: /asset-library/asset/3878
+              - img "Scalable Vector Shapes 2D - Draw and Animate Curves's icon" [ref=e476]
+              - generic [ref=e477]:
+                - heading "Scalable Vector Shapes 2D - Draw and Animate Curves" [level=4] [ref=e478]
+                - generic [ref=e479]:
+                  - generic [ref=e480]:
+                    - generic [ref=e481]: 2D Tools
+                    - generic [ref=e482]: "4.4"
+                    - generic [ref=e483]: Community
+                  - generic [ref=e485]: MIT
+            - generic [ref=e486]:
+              - link "renevanderark" [ref=e487] [cursor=pointer]:
+                - /url: "?user=renevanderark"
+              - generic [ref=e488]: 2.24.7 | 2026-06-22
+          - listitem [ref=e489]:
+            - link "Settings Menu Lite's icon Settings Menu Lite Tools 4.4 Community MIT" [ref=e490] [cursor=pointer]:
+              - /url: /asset-library/asset/5290
+              - img "Settings Menu Lite's icon" [ref=e491]
+              - generic [ref=e492]:
+                - heading "Settings Menu Lite" [level=4] [ref=e493]
+                - generic [ref=e494]:
+                  - generic [ref=e495]:
+                    - generic [ref=e496]: Tools
+                    - generic [ref=e497]: "4.4"
+                    - generic [ref=e498]: Community
+                  - generic [ref=e500]: MIT
+            - generic [ref=e501]:
+              - link "Godot_Forge" [ref=e502] [cursor=pointer]:
+                - /url: "?user=Godot_Forge"
+              - generic [ref=e503]: 1.0.0 | 2026-06-22
+          - listitem [ref=e504]:
+            - link "Mirror3D's icon Mirror3D Shaders 4.4 Community MIT" [ref=e505] [cursor=pointer]:
+              - /url: /asset-library/asset/3983
+              - img "Mirror3D's icon" [ref=e506]
+              - generic [ref=e507]:
+                - heading "Mirror3D" [level=4] [ref=e508]
+                - generic [ref=e509]:
+                  - generic [ref=e510]:
+                    - generic [ref=e511]: Shaders
+                    - generic [ref=e512]: "4.4"
+                    - generic [ref=e513]: Community
+                  - generic [ref=e515]: MIT
+            - generic [ref=e516]:
+              - link "Joy-less" [ref=e517] [cursor=pointer]:
+                - /url: "?user=Joy-less"
+              - generic [ref=e518]: 1.9 | 2026-06-22
+          - listitem [ref=e519]:
+            - link "Gwynbleidd-plugin's icon Gwynbleidd-plugin Scripts 4.0 Community MIT" [ref=e520] [cursor=pointer]:
+              - /url: /asset-library/asset/5262
+              - img "Gwynbleidd-plugin's icon" [ref=e521]
+              - generic [ref=e522]:
+                - heading "Gwynbleidd-plugin" [level=4] [ref=e523]
+                - generic [ref=e524]:
+                  - generic [ref=e525]:
+                    - generic [ref=e526]: Scripts
+                    - generic [ref=e527]: "4.0"
+                    - generic [ref=e528]: Community
+                  - generic [ref=e530]: MIT
+            - generic [ref=e531]:
+              - link "slime3000fly" [ref=e532] [cursor=pointer]:
+                - /url: "?user=slime3000fly"
+              - generic [ref=e533]: 1.1 | 2026-06-22
+          - listitem [ref=e534]:
+            - link "CentriFuGe's icon CentriFuGe Tools 4.5 Community AGPLv3" [ref=e535] [cursor=pointer]:
+              - /url: /asset-library/asset/5289
+              - img "CentriFuGe's icon" [ref=e536]
+              - generic [ref=e537]:
+                - heading "CentriFuGe" [level=4] [ref=e538]
+                - generic [ref=e539]:
+                  - generic [ref=e540]:
+                    - generic [ref=e541]: Tools
+                    - generic [ref=e542]: "4.5"
+                    - generic [ref=e543]: Community
+                  - generic [ref=e545]: AGPLv3
+            - generic [ref=e546]:
+              - link "coolmule0" [ref=e547] [cursor=pointer]:
+                - /url: "?user=coolmule0"
+              - generic [ref=e548]: 0.1.0 | 2026-06-22
+          - listitem [ref=e549]:
+            - link "Ragdoll_Human_Being's icon Ragdoll_Human_Being Projects 4.6 Community MIT" [ref=e550] [cursor=pointer]:
+              - /url: /asset-library/asset/5288
+              - img "Ragdoll_Human_Being's icon" [ref=e551]
+              - generic [ref=e552]:
+                - heading "Ragdoll_Human_Being" [level=4] [ref=e553]
+                - generic [ref=e554]:
+                  - generic [ref=e555]:
+                    - generic [ref=e556]: Projects
+                    - generic [ref=e557]: "4.6"
+                    - generic [ref=e558]: Community
+                  - generic [ref=e560]: MIT
+            - generic [ref=e561]:
+              - link "BRN365gg" [ref=e562] [cursor=pointer]:
+                - /url: "?user=BRN365gg"
+              - generic [ref=e563]: 1.0 | 2026-06-21
+          - listitem [ref=e564]:
+            - link "Scene Transitions Lite's icon Scene Transitions Lite Tools 4.4 Community MIT" [ref=e565] [cursor=pointer]:
+              - /url: /asset-library/asset/5287
+              - img "Scene Transitions Lite's icon" [ref=e566]
+              - generic [ref=e567]:
+                - heading "Scene Transitions Lite" [level=4] [ref=e568]
+                - generic [ref=e569]:
+                  - generic [ref=e570]:
+                    - generic [ref=e571]: Tools
+                    - generic [ref=e572]: "4.4"
+                    - generic [ref=e573]: Community
+                  - generic [ref=e575]: MIT
+            - generic [ref=e576]:
+              - link "Godot_Forge" [ref=e577] [cursor=pointer]:
+                - /url: "?user= Godot_Forge"
+              - generic [ref=e578]: 1.0.0 | 2026-06-21
+          - listitem [ref=e579]:
+            - link "Dialogue System Lite's icon Dialogue System Lite Tools 4.4 Community MIT" [ref=e580] [cursor=pointer]:
+              - /url: /asset-library/asset/5286
+              - img "Dialogue System Lite's icon" [ref=e581]
+              - generic [ref=e582]:
+                - heading "Dialogue System Lite" [level=4] [ref=e583]
+                - generic [ref=e584]:
+                  - generic [ref=e585]:
+                    - generic [ref=e586]: Tools
+                    - generic [ref=e587]: "4.4"
+                    - generic [ref=e588]: Community
+                  - generic [ref=e590]: MIT
+            - generic [ref=e591]:
+              - link "Godot_Forge" [ref=e592] [cursor=pointer]:
+                - /url: "?user=Godot_Forge"
+              - generic [ref=e593]: 1.0.0 | 2026-06-21
+          - listitem [ref=e594]:
+            - link "Grid Inventory Lite's icon Grid Inventory Lite Tools 4.4 Community MIT" [ref=e595] [cursor=pointer]:
+              - /url: /asset-library/asset/5285
+              - img "Grid Inventory Lite's icon" [ref=e596]
+              - generic [ref=e597]:
+                - heading "Grid Inventory Lite" [level=4] [ref=e598]
+                - generic [ref=e599]:
+                  - generic [ref=e600]:
+                    - generic [ref=e601]: Tools
+                    - generic [ref=e602]: "4.4"
+                    - generic [ref=e603]: Community
+                  - generic [ref=e605]: MIT
+            - generic [ref=e606]:
+              - link "Godot_Forge" [ref=e607] [cursor=pointer]:
+                - /url: "?user= Godot_Forge"
+              - generic [ref=e608]: 1.0.0 | 2026-06-21
+          - listitem [ref=e609]:
+            - link "EasySave Lite's icon EasySave Lite Tools 4.4 Community MIT" [ref=e610] [cursor=pointer]:
+              - /url: /asset-library/asset/5284
+              - img "EasySave Lite's icon" [ref=e611]
+              - generic [ref=e612]:
+                - heading "EasySave Lite" [level=4] [ref=e613]
+                - generic [ref=e614]:
+                  - generic [ref=e615]:
+                    - generic [ref=e616]: Tools
+                    - generic [ref=e617]: "4.4"
+                    - generic [ref=e618]: Community
+                  - generic [ref=e620]: MIT
+            - generic [ref=e621]:
+              - link "Godot_Forge" [ref=e622] [cursor=pointer]:
+                - /url: "?user= Godot_Forge"
+              - generic [ref=e623]: 1.0.0 | 2026-06-21
+          - listitem [ref=e624]:
+            - link "Guitarrada (Rhythm Game template)'s icon Guitarrada (Rhythm Game template) Templates 4.5 Community MIT" [ref=e625] [cursor=pointer]:
+              - /url: /asset-library/asset/5092
+              - img "Guitarrada (Rhythm Game template)'s icon" [ref=e626]
+              - generic [ref=e627]:
+                - heading "Guitarrada (Rhythm Game template)" [level=4] [ref=e628]
+                - generic [ref=e629]:
+                  - generic [ref=e630]:
+                    - generic [ref=e631]: Templates
+                    - generic [ref=e632]: "4.5"
+                    - generic [ref=e633]: Community
+                  - generic [ref=e635]: MIT
+            - generic [ref=e636]:
+              - link "sendoestudio" [ref=e637] [cursor=pointer]:
+                - /url: "?user=sendoestudio"
+              - generic [ref=e638]: 1.1.1 | 2026-06-21
+          - listitem [ref=e639]:
+            - link "Inspector Notes's icon Inspector Notes Tools 4.0 Community MIT" [ref=e640] [cursor=pointer]:
+              - /url: /asset-library/asset/5283
+              - img "Inspector Notes's icon" [ref=e641]
+              - generic [ref=e642]:
+                - heading "Inspector Notes" [level=4] [ref=e643]
+                - generic [ref=e644]:
+                  - generic [ref=e645]:
+                    - generic [ref=e646]: Tools
+                    - generic [ref=e647]: "4.0"
+                    - generic [ref=e648]: Community
+                  - generic [ref=e650]: MIT
+            - generic [ref=e651]:
+              - link "Coffandro" [ref=e652] [cursor=pointer]:
+                - /url: "?user=Coffandro"
+              - generic [ref=e653]: 1.0.0 | 2026-06-21
+        - navigation "Page navigation" [ref=e654]:
+          - list [ref=e655]:
+            - generic [ref=e656]: «
+            - listitem:
+              - link "1" [ref=e657]:
+                - /url: "?page=0&sort=updated"
+            - generic [ref=e658]: (current)
+            - listitem:
+              - link "2" [ref=e659] [cursor=pointer]:
+                - /url: "?page=1&sort=updated"
+            - listitem:
+              - link "3" [ref=e660] [cursor=pointer]:
+                - /url: "?page=2&sort=updated"
+            - listitem:
+              - generic [ref=e661]: …
+            - listitem:
+              - link "130" [ref=e662] [cursor=pointer]:
+                - /url: "?page=129&sort=updated"
+            - listitem:
+              - link "Next" [ref=e663] [cursor=pointer]:
+                - /url: "?page=1&sort=updated"
+                - text: »
+        - generic [ref=e664]:
+          - generic [ref=e665]:
+            - text: "Items per page:"
+            - group "Page size" [ref=e666]:
+              - link "Per page" [ref=e667] [cursor=pointer]:
+                - /url: "?max_results=40&page=0&sort=updated"
+                - text: "40"
+              - link "Per page" [ref=e668] [cursor=pointer]:
+                - /url: "?max_results=100&page=0&sort=updated"
+                - text: "100"
+              - link "Per page" [ref=e669] [cursor=pointer]:
+                - /url: "?max_results=200&page=0&sort=updated"
+                - text: "200"
+              - link "Per page" [ref=e670] [cursor=pointer]:
+                - /url: "?max_results=500&page=0&sort=updated"
+                - text: "500"
+          - generic [ref=e671]: 40 items per page, 5168 items total.
+  - contentinfo [ref=e672]:
+    - generic [ref=e674]:
+      - separator [ref=e675]
+      - paragraph [ref=e676]:
+        - text: Copyright © 2026 The Godot Engine community - MIT licensed
+        - link "Change Password" [ref=e677] [cursor=pointer]:
+          - /url: /asset-library/change_password
+        - generic [ref=e678]:
+          - text: Currently running version
+          - link "9606cb6" [ref=e679] [cursor=pointer]:
+            - /url: https://github.com/godotengine/asset-library/commit/9606cb6629dd703596b5f39798e0c9363df29582
+          - text: .
+      - paragraph [ref=e680]:
+        - text: "Links:"
+        - link "GitHub repository" [ref=e681] [cursor=pointer]:
+          - /url: https://github.com/godotengine/asset-library
+        - text: "|"
+        - link "Issues" [ref=e682] [cursor=pointer]:
+          - /url: https://github.com/godotengine/asset-library/issues
+        - text: "|"
+        - link "Godot Engine homepage" [ref=e683] [cursor=pointer]:
+          - /url: https://godotengine.org

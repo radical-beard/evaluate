@@ -1,0 +1,292 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "Godot" [ref=e6] [cursor=pointer]:
+            - /url: https://godotengine.org
+            - img "Godot" [ref=e7]
+          - link "| Asset Library" [ref=e8] [cursor=pointer]:
+            - /url: /asset-library
+        - generic [ref=e9]:
+          - list [ref=e10]:
+            - listitem [ref=e11]:
+              - link "Assets" [ref=e12] [cursor=pointer]:
+                - /url: /asset-library/asset
+          - list [ref=e13]:
+            - listitem [ref=e14]:
+              - link "Feed" [ref=e15] [cursor=pointer]:
+                - /url: /asset-library/user/feed
+            - listitem [ref=e16]:
+              - link "My Assets" [ref=e17] [cursor=pointer]:
+                - /url: /asset-library/asset?user=radbeard
+            - listitem
+            - listitem [ref=e18]:
+              - link "Submit Asset" [ref=e19] [cursor=pointer]:
+                - /url: /asset-library/asset/submit
+            - listitem [ref=e20]:
+              - link "Logout (radbeard)" [ref=e21] [cursor=pointer]:
+                - /url: /asset-library/logout
+  - main [ref=e22]:
+    - group "Submit Asset" [ref=e24]:
+      - generic [ref=e25]: Submit Asset
+      - paragraph [ref=e26]:
+        - text: Before submitting, please read the
+        - link "Submitting to the Asset Library" [ref=e27] [cursor=pointer]:
+          - /url: https://docs.godotengine.org/en/latest/community/asset_library/submitting_to_assetlib.html
+        - text: article for guidelines and instructions.
+      - generic [ref=e28]:
+        - generic [ref=e29]: Asset Name *
+        - textbox "Asset Name *" [ref=e31]:
+          - /placeholder: One-button game creation tool
+          - text: Evaluate Scene Editor
+      - generic [ref=e32]:
+        - generic [ref=e33]: Description *
+        - textbox "Description *" [ref=e35]:
+          - /placeholder: "This tool allows you to make games with the click of a button.\nIt supports..."
+          - text: Edit Evaluate .scene (TOML) files in the Godot editor — move and create nodes, set property values, and attach node scripts — then save back to the .scene file. Also renders .scene files as read-only previews. Requires the RadicalBeard.Evaluate NuGet package (>= 0.7.1) in your C# project.
+      - generic [ref=e36]:
+        - generic [ref=e37]: Category *
+        - combobox "Category *" [ref=e39]:
+          - option "Select..."
+          - option "2D Tools"
+          - option "3D Tools"
+          - option "Shaders"
+          - option "Materials"
+          - option "Tools" [selected]
+          - option "Scripts"
+          - option "Misc"
+          - option "Templates"
+          - option "Projects"
+          - option "Demos"
+      - generic [ref=e40]:
+        - generic [ref=e41]: License *
+        - generic [ref=e42]:
+          - combobox "License *" [ref=e43]:
+            - option "Select..."
+            - option "MIT" [selected]
+            - option "MPL-2.0"
+            - option "GPL v3"
+            - option "GPL v2"
+            - option "LGPL v3"
+            - option "LGPL v2.1"
+            - option "LGPL v2"
+            - option "AGPL v3"
+            - option "European Union Public License 1.2"
+            - option "Apache 2.0"
+            - option "CC0 1.0 Universal"
+            - option "CC BY 4.0 International"
+            - option "CC BY 3.0 Unported"
+            - option "CC BY-SA 4.0 International"
+            - option "CC BY-SA 3.0 Unported"
+            - option "BSD 2-clause License"
+            - option "BSD 3-clause License"
+            - option "Boost Software License"
+            - option "ISC License"
+            - option "The Unlicense License"
+            - option "Proprietary (see LICENSE file)"
+          - generic [ref=e44]:
+            - text: The license under which the asset is available. Check
+            - link "opensource.org" [ref=e45] [cursor=pointer]:
+              - /url: https://opensource.org/licenses
+            - text: for a more detailed description of each. In case an OSI-approved license you are using is missing, please add the license in
+            - link "this file" [ref=e46] [cursor=pointer]:
+              - /url: https://github.com/godotengine/godot-asset-library/blob/master/src/constants.php
+            - text: and open a pull request.
+          - generic [ref=e47]:
+            - strong [ref=e48]: "Note:"
+            - text: The license you specify here should also be included in the repository you are submitting under a standard name, such as LICENSE or LICENSE.md
+      - generic [ref=e49]:
+        - generic [ref=e50]: Repository host *
+        - generic [ref=e51]:
+          - combobox "Repository host *" [ref=e52]:
+            - option "Select..."
+            - option "GitHub" [selected]
+            - option "GitLab"
+            - option "BitBucket"
+            - option "Gogs/Gitea/Codeberg"
+            - option "cgit"
+            - option "Custom"
+          - generic [ref=e53]:
+            - text: The site or service hosting your repository.
+            - text: The
+            - strong [ref=e54]: Custom
+            - text: download provider can be used to link to premade ZIP archives, such as those uploaded on GitHub Releases. This is useful for GDNative/GDExtension add-ons which contain precompiled binaries. This can also be useful when
+            - link "including submodules in the ZIP" [ref=e55] [cursor=pointer]:
+              - /url: https://stackoverflow.com/questions/14783127/git-archive-export-with-submodules-git-archive-all-recursive
+            - text: is desired (as submodules are
+            - emphasis [ref=e56]: not
+            - text: included in automatically generated ZIPs from GitHub or GitLab).
+            - text: If your repository host is missing, you might like to
+            - link "open an issue" [ref=e57] [cursor=pointer]:
+              - /url: https://github.com/godotengine/asset-library/issues
+            - text: about it.
+      - generic [ref=e58]:
+        - generic [ref=e59]: Repository URL *
+        - generic [ref=e60]:
+          - textbox "Repository URL *" [ref=e61]:
+            - /placeholder: https://host.example/user/repository
+            - text: https://github.com/radical-beard/evaluate-scene-addon
+          - generic [ref=e62]: The URL you use to browse your repository.
+          - generic [ref=e63]:
+            - strong [ref=e64]: "Note:"
+            - text: Do not give the clone URL (the one that ends in
+            - code [ref=e65]: .git
+            - text: ), but give the one you use to browse your code.
+          - generic [ref=e66]:
+            - text: When using the
+            - strong [ref=e67]: Custom
+            - text: download provider, this is used for browsing only.
+      - generic [ref=e68]:
+        - generic [ref=e69]: Issues URL
+        - generic [ref=e70]:
+          - textbox "Issues URL" [ref=e71]:
+            - /placeholder: https://host.example/user/repository/issues
+            - text: https://github.com/radical-beard/evaluate/issues
+          - generic [ref=e72]: Optional, in case you are not using the one supplied by the repository host. Leave empty if unsure.
+      - generic [ref=e73]:
+        - generic [ref=e74]: Minimum Godot version *
+        - generic [ref=e75]:
+          - combobox "Minimum Godot version *" [ref=e76]:
+            - option "Select..."
+            - option "2.0"
+            - option "2.1"
+            - option "2.2"
+            - option "3.0"
+            - option "3.1"
+            - option "3.2"
+            - option "3.3"
+            - option "3.4"
+            - option "3.5"
+            - option "3.6"
+            - option "4.0"
+            - option "4.1"
+            - option "4.2"
+            - option "4.3"
+            - option "4.4"
+            - option "4.5"
+            - option "4.6" [selected]
+            - option "Unknown"
+            - option "Custom build"
+          - generic [ref=e77]:
+            - text: The
+            - emphasis [ref=e78]: oldest
+            - text: version of Godot the asset works with.
+            - text: In the Godot editor and project manager, the asset will be displayed for all versions that are compatible (within the same major version).
+            - text: "For example:"
+            - list [ref=e79]:
+              - listitem [ref=e80]:
+                - text: If your asset works with Godot 4.1 and later, use
+                - strong [ref=e81]: "4.1"
+                - text: as the minimum Godot version.
+              - listitem [ref=e82]:
+                - text: If your asset works with Godot 3.5 but not Godot 4.0 or later, use
+                - strong [ref=e83]: "3.5"
+                - text: as the minimum Godot version.
+      - generic [ref=e84]:
+        - generic [ref=e85]: Asset Version *
+        - textbox "Asset Version *" [ref=e87]:
+          - /placeholder: e.g. 1.0.0 or 1.0
+          - text: 0.7.1
+      - generic [ref=e88]:
+        - generic [ref=e89]: Download Commit/URL *
+        - generic [ref=e90]:
+          - textbox "Download Commit/URL *" [ref=e91]:
+            - /placeholder: Git commit hash (or download URL if using Custom download provider)
+            - text: 11d7e633216f6ebb95cd73586246ffe587932e5e
+          - generic [ref=e92]:
+            - text: The commit hash that should be downloaded. Expects 40 or 64 hexadecimal digits
+            - emphasis [ref=e93]: fully
+            - text: specifying a Git commit.
+          - generic [ref=e94]:
+            - text: When using the
+            - strong [ref=e95]: Custom
+            - text: download provider, this must be set to the full download URL instead of a commit hash.
+      - generic [ref=e96]:
+        - generic [ref=e97]: Icon URL *
+        - textbox "Icon URL *" [active] [ref=e99]:
+          - /placeholder: https://host.example/user/repository/raw/icon.(png|jpg)
+          - text: https://raw.githubusercontent.com/radical-beard/evaluate-scene-addon/main/icon.png
+      - generic [ref=e100]:
+        - generic [ref=e102]:
+          - text: Add preview
+          - generic [ref=e103]:
+            - checkbox "Enable" [ref=e104]
+            - text: Enable
+        - generic [ref=e105]:
+          - generic [ref=e106]:
+            - generic [ref=e107]: Type *
+            - combobox "Type *" [ref=e109]:
+              - option "Image" [selected]
+              - option "Video"
+          - generic [ref=e110]:
+            - generic [ref=e111]: Image/YouTube Link *
+            - textbox "Image/YouTube Link *" [ref=e113]:
+              - /placeholder: Image/YouTube Link
+          - generic [ref=e114]:
+            - generic [ref=e115]: Link to thumbnail
+            - textbox "Link to thumbnail" [ref=e117]:
+              - /placeholder: Image Link
+      - generic [ref=e118]:
+        - generic [ref=e120]:
+          - text: Add preview
+          - generic [ref=e121]:
+            - checkbox "Enable" [ref=e122]
+            - text: Enable
+        - generic [ref=e123]:
+          - generic [ref=e124]:
+            - generic [ref=e125]: Type *
+            - combobox "Type *" [ref=e127]:
+              - option "Image" [selected]
+              - option "Video"
+          - generic [ref=e128]:
+            - generic [ref=e129]: Image/YouTube Link *
+            - textbox "Image/YouTube Link *" [ref=e131]:
+              - /placeholder: Image/YouTube Link
+          - generic [ref=e132]:
+            - generic [ref=e133]: Link to thumbnail
+            - textbox "Link to thumbnail" [ref=e135]:
+              - /placeholder: Image Link
+      - generic [ref=e136]:
+        - generic [ref=e138]:
+          - text: Add preview
+          - generic [ref=e139]:
+            - checkbox "Enable" [ref=e140]
+            - text: Enable
+        - generic [ref=e141]:
+          - generic [ref=e142]:
+            - generic [ref=e143]: Type *
+            - combobox "Type *" [ref=e145]:
+              - option "Image" [selected]
+              - option "Video"
+          - generic [ref=e146]:
+            - generic [ref=e147]: Image/YouTube Link *
+            - textbox "Image/YouTube Link *" [ref=e149]:
+              - /placeholder: Image/YouTube Link
+          - generic [ref=e150]:
+            - generic [ref=e151]: Link to thumbnail
+            - textbox "Link to thumbnail" [ref=e153]:
+              - /placeholder: Image Link
+      - button [ref=e157] [cursor=pointer]: Submit
+  - contentinfo [ref=e158]:
+    - generic [ref=e160]:
+      - separator [ref=e161]
+      - paragraph [ref=e162]:
+        - text: Copyright © 2026 The Godot Engine community - MIT licensed
+        - link "Change Password" [ref=e163] [cursor=pointer]:
+          - /url: /asset-library/change_password
+        - generic [ref=e164]:
+          - text: Currently running version
+          - link "9606cb6" [ref=e165] [cursor=pointer]:
+            - /url: https://github.com/godotengine/asset-library/commit/9606cb6629dd703596b5f39798e0c9363df29582
+          - text: .
+      - paragraph [ref=e166]:
+        - text: "Links:"
+        - link "GitHub repository" [ref=e167] [cursor=pointer]:
+          - /url: https://github.com/godotengine/asset-library
+        - text: "|"
+        - link "Issues" [ref=e168] [cursor=pointer]:
+          - /url: https://github.com/godotengine/asset-library/issues
+        - text: "|"
+        - link "Godot Engine homepage" [ref=e169] [cursor=pointer]:
+          - /url: https://godotengine.org

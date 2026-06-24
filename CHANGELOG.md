@@ -5,6 +5,19 @@ All notable changes to Evaluate are documented here. The format is based on
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While
 the version is `0.x`, minor bumps may include breaking changes.
 
+## [0.7.2] — 2026-06-24
+
+### Fixed
+- **Runtime struct reads are named-field again** (regression from 0.7.0). The source-gen
+  refactor routed the runtime/script struct-read path (`ToLua`) through the serialization
+  codec, so long-tail structs (`Rect2`, `Aabb`, `Plane`, `Quaternion`, `Vector4`, `Basis`,
+  `Transform2D/3D`, `Projection`) came back as the codec's positional/`_type` repr — making
+  `self.region_rect.size.x`, `self.transform.basis.z`, etc. read `nil`. The runtime API is
+  now decoupled from serialization: scripts get **named-field** tables (`{x=…}`,
+  `{position={…}, size={…}}`, basis as `{x,y,z}` columns), while `.scene` files keep the
+  positional / `_type` form (a bare `{x,y,z}` table in a file would parse as a child node).
+  `Vector2`/`Vector3`/`Color` were unaffected (rich `std`-backed types).
+
 ## [0.7.1] — 2026-06-24
 
 Editor-addon distribution + a follow-up fix.

@@ -1,0 +1,53 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "Godot" [ref=e6] [cursor=pointer]:
+            - /url: https://godotengine.org
+            - img "Godot" [ref=e7]
+          - link "| Asset Library" [ref=e8] [cursor=pointer]:
+            - /url: /asset-library
+        - generic [ref=e9]:
+          - list [ref=e10]:
+            - listitem [ref=e11]:
+              - link "Assets" [ref=e12] [cursor=pointer]:
+                - /url: /asset-library/asset
+          - list [ref=e13]:
+            - listitem [ref=e14]:
+              - link "Login/Register" [ref=e15] [cursor=pointer]:
+                - /url: /asset-library/login
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - generic [ref=e19]: Username
+        - textbox "Username" [ref=e20]
+      - generic [ref=e21]:
+        - generic [ref=e22]: Password
+        - textbox "Password" [ref=e23]
+      - generic [ref=e24]:
+        - button "Login" [ref=e25] [cursor=pointer]
+        - link "Register" [ref=e26] [cursor=pointer]:
+          - /url: /asset-library/register
+        - link "Forgot password" [ref=e27] [cursor=pointer]:
+          - /url: /asset-library/forgot_password
+  - contentinfo [ref=e28]:
+    - generic [ref=e30]:
+      - separator [ref=e31]
+      - paragraph [ref=e32]:
+        - text: Copyright © 2026 The Godot Engine community - MIT licensed
+        - generic [ref=e33]:
+          - text: Currently running version
+          - link "9606cb6" [ref=e34] [cursor=pointer]:
+            - /url: https://github.com/godotengine/asset-library/commit/9606cb6629dd703596b5f39798e0c9363df29582
+          - text: .
+      - paragraph [ref=e35]:
+        - text: "Links:"
+        - link "GitHub repository" [ref=e36] [cursor=pointer]:
+          - /url: https://github.com/godotengine/asset-library
+        - text: "|"
+        - link "Issues" [ref=e37] [cursor=pointer]:
+          - /url: https://github.com/godotengine/asset-library/issues
+        - text: "|"
+        - link "Godot Engine homepage" [ref=e38] [cursor=pointer]:
+          - /url: https://godotengine.org

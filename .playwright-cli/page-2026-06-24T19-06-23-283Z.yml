@@ -1,0 +1,116 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "Godot" [ref=e6] [cursor=pointer]:
+            - /url: https://godotengine.org
+            - img "Godot" [ref=e7]
+          - link "| Asset Library" [ref=e8] [cursor=pointer]:
+            - /url: /asset-library
+        - generic [ref=e9]:
+          - list [ref=e10]:
+            - listitem [ref=e11]:
+              - link "Assets" [ref=e12] [cursor=pointer]:
+                - /url: /asset-library/asset
+          - list [ref=e13]:
+            - listitem [ref=e14]:
+              - link "Feed" [ref=e15] [cursor=pointer]:
+                - /url: /asset-library/user/feed
+            - listitem [ref=e16]:
+              - link "My Assets" [ref=e17] [cursor=pointer]:
+                - /url: /asset-library/asset?user=radbeard
+            - listitem
+            - listitem [ref=e18]:
+              - link "Submit Asset" [ref=e19] [cursor=pointer]:
+                - /url: /asset-library/asset/submit
+            - listitem [ref=e20]:
+              - link "Logout (radbeard)" [ref=e21] [cursor=pointer]:
+                - /url: /asset-library/logout
+  - main [ref=e22]:
+    - heading "Creation of asset \"EvaLuate Scene Editor\" New" [level=1] [ref=e23]:
+      - text: Creation of asset
+      - link "\"EvaLuate Scene Editor\"" [ref=e24] [cursor=pointer]:
+        - /url: "#"
+      - text: New
+    - link "Edit modifications" [ref=e26] [cursor=pointer]:
+      - /url: /asset-library/asset/edit/23368/edit
+    - alert [ref=e27]:
+      - text: This new asset is currently pending approval by our moderators.
+      - strong [ref=e28]: Only when it is approved, it would be searchable
+      - text: . To access this page again later, you can use the
+      - emphasis [ref=e29]: "\"View pending\""
+      - text: button on the "My assets" page, or just use the "Feed" button in the toolbar.
+    - table [ref=e30]:
+      - rowgroup [ref=e31]:
+        - row "New/Edit" [ref=e32]:
+          - columnheader [ref=e33]
+          - columnheader "New/Edit" [ref=e34]
+      - rowgroup [ref=e35]:
+        - row "Title EvaLuate Scene Editor" [ref=e36]:
+          - rowheader "Title" [ref=e37]
+          - cell "EvaLuate Scene Editor" [ref=e38]
+        - row "Description Edit EvaLuate .scene (TOML) files in the Godot editor — move and create nodes, set property values, and attach node scripts — then save back to the .scene file. Also renders .scene files as read-only previews. Requires the RadicalBeard.Evaluate NuGet package (>= 0.7.1) in your C# project." [ref=e39]:
+          - rowheader "Description" [ref=e40]
+          - cell "Edit EvaLuate .scene (TOML) files in the Godot editor — move and create nodes, set property values, and attach node scripts — then save back to the .scene file. Also renders .scene files as read-only previews. Requires the RadicalBeard.Evaluate NuGet package (>= 0.7.1) in your C# project." [ref=e41]
+        - row "Category Tools" [ref=e42]:
+          - rowheader "Category" [ref=e43]
+          - cell "Tools" [ref=e44]
+        - row "License MIT" [ref=e45]:
+          - rowheader "License" [ref=e46]
+          - cell "MIT" [ref=e47]
+        - row "Repository Provider GitHub" [ref=e48]:
+          - rowheader "Repository Provider" [ref=e49]
+          - cell "GitHub" [ref=e50]
+        - row "Repository Url https://github.com/radical-beard/evaluate-scene-addon" [ref=e51]:
+          - rowheader "Repository Url" [ref=e52]
+          - cell "https://github.com/radical-beard/evaluate-scene-addon" [ref=e53]:
+            - link "https://github.com/radical-beard/evaluate-scene-addon" [ref=e54] [cursor=pointer]:
+              - /url: https://github.com/radical-beard/evaluate-scene-addon
+        - row "Issues Url https://github.com/radical-beard/evaluate/issues" [ref=e55]:
+          - rowheader "Issues Url" [ref=e56]
+          - cell "https://github.com/radical-beard/evaluate/issues" [ref=e57]:
+            - link "https://github.com/radical-beard/evaluate/issues" [ref=e58] [cursor=pointer]:
+              - /url: https://github.com/radical-beard/evaluate/issues
+        - row "Godot version Godot 4.6" [ref=e59]:
+          - rowheader "Godot version" [ref=e60]
+          - cell "Godot 4.6" [ref=e61]
+        - row "Version String 0.7.1" [ref=e62]:
+          - rowheader "Version String" [ref=e63]
+          - cell "0.7.1" [ref=e64]
+        - row "Download Commit 11d7e633216f6ebb95cd73586246ffe587932e5e" [ref=e65]:
+          - rowheader "Download Commit" [ref=e66]
+          - cell "11d7e633216f6ebb95cd73586246ffe587932e5e" [ref=e67]
+        - row "Download Url (Computed) https://github.com/radical-beard/evaluate-scene-addon/archive/11d7e633216f6ebb95cd73586246ffe587932e5e.zip" [ref=e68]:
+          - rowheader "Download Url (Computed)" [ref=e69]
+          - cell "https://github.com/radical-beard/evaluate-scene-addon/archive/11d7e633216f6ebb95cd73586246ffe587932e5e.zip" [ref=e70]:
+            - link "https://github.com/radical-beard/evaluate-scene-addon/archive/11d7e633216f6ebb95cd73586246ffe587932e5e.zip" [ref=e71] [cursor=pointer]:
+              - /url: https://github.com/radical-beard/evaluate-scene-addon/archive/11d7e633216f6ebb95cd73586246ffe587932e5e.zip
+        - row "Icon Url https://raw.githubusercontent.com/radical-beard/evaluate-scene-addon/main/icon.png" [ref=e72]:
+          - rowheader "Icon Url" [ref=e73]
+          - cell "https://raw.githubusercontent.com/radical-beard/evaluate-scene-addon/main/icon.png" [ref=e74]:
+            - link "https://raw.githubusercontent.com/radical-beard/evaluate-scene-addon/main/icon.png" [ref=e75] [cursor=pointer]:
+              - /url: https://raw.githubusercontent.com/radical-beard/evaluate-scene-addon/main/icon.png
+            - img [ref=e76]
+  - contentinfo [ref=e77]:
+    - generic [ref=e79]:
+      - separator [ref=e80]
+      - paragraph [ref=e81]:
+        - text: Copyright © 2026 The Godot Engine community - MIT licensed
+        - link "Change Password" [ref=e82] [cursor=pointer]:
+          - /url: /asset-library/change_password
+        - generic [ref=e83]:
+          - text: Currently running version
+          - link "9606cb6" [ref=e84] [cursor=pointer]:
+            - /url: https://github.com/godotengine/asset-library/commit/9606cb6629dd703596b5f39798e0c9363df29582
+          - text: .
+      - paragraph [ref=e85]:
+        - text: "Links:"
+        - link "GitHub repository" [ref=e86] [cursor=pointer]:
+          - /url: https://github.com/godotengine/asset-library
+        - text: "|"
+        - link "Issues" [ref=e87] [cursor=pointer]:
+          - /url: https://github.com/godotengine/asset-library/issues
+        - text: "|"
+        - link "Godot Engine homepage" [ref=e88] [cursor=pointer]:
+          - /url: https://godotengine.org

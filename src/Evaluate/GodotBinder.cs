@@ -220,8 +220,23 @@ public sealed class GodotBinder
         Variant.Type.Vector3 => new EvaluateVec3(v.AsVector3().X, v.AsVector3().Y, v.AsVector3().Z),
         Variant.Type.Color => MakeColor(v.AsColor()),
 
-        // Every other builtin struct (Vector4, Quaternion, Rect2, Aabb, Basis,
-        // Transform2D/3D, Projection, …) goes through the generated codec — `_ =>` below.
+        // Long-tail structs -> named-field Lua tables (the runtime/script API: `self.size.x`,
+        // `self.basis.z`). Write-back is target-type-aware. This is deliberately DISTINCT from
+        // the codec's serialization repr (positional / `_type`), which exists for clean `.scene`
+        // files — scripts read named fields; files store positional arrays.
+        Variant.Type.Vector4 => V4T(v.AsVector4()),
+        Variant.Type.Vector2I => Tbl(("x", (double)v.AsVector2I().X), ("y", (double)v.AsVector2I().Y)),
+        Variant.Type.Vector3I => Tbl(("x", (double)v.AsVector3I().X), ("y", (double)v.AsVector3I().Y), ("z", (double)v.AsVector3I().Z)),
+        Variant.Type.Vector4I => Tbl(("x", (double)v.AsVector4I().X), ("y", (double)v.AsVector4I().Y), ("z", (double)v.AsVector4I().Z), ("w", (double)v.AsVector4I().W)),
+        Variant.Type.Quaternion => QuatT(v.AsQuaternion()),
+        Variant.Type.Rect2 => Tbl(("position", V2T(v.AsRect2().Position)), ("size", V2T(v.AsRect2().Size))),
+        Variant.Type.Rect2I => Tbl(("position", V2IT(v.AsRect2I().Position)), ("size", V2IT(v.AsRect2I().Size))),
+        Variant.Type.Plane => Tbl(("normal", V3T(v.AsPlane().Normal)), ("d", (double)v.AsPlane().D)),
+        Variant.Type.Aabb => Tbl(("position", V3T(v.AsAabb().Position)), ("size", V3T(v.AsAabb().Size))),
+        Variant.Type.Basis => BasisT(v.AsBasis()),
+        Variant.Type.Transform2D => Tbl(("x", V2T(v.AsTransform2D().X)), ("y", V2T(v.AsTransform2D().Y)), ("origin", V2T(v.AsTransform2D().Origin))),
+        Variant.Type.Transform3D => Tbl(("basis", BasisT(v.AsTransform3D().Basis)), ("origin", V3T(v.AsTransform3D().Origin))),
+        Variant.Type.Projection => Tbl(("x", V4T(v.AsProjection().X)), ("y", V4T(v.AsProjection().Y)), ("z", V4T(v.AsProjection().Z)), ("w", V4T(v.AsProjection().W))),
 
         // Packed arrays -> Lua list tables.
         Variant.Type.PackedByteArray => Pack(v.AsByteArray(), b => (double)b),
@@ -235,13 +250,8 @@ public sealed class GodotBinder
         Variant.Type.PackedVector4Array => Pack(v.AsVector4Array(), V4T),
         Variant.Type.PackedColorArray => Pack(v.AsColorArray(), c => MakeColor(c)),
 
-        _ => StructOrString(v),                         // builtin struct via codec, else string
+        _ => v.ToString(),                              // anything still unmapped: string
     };
-
-    // A builtin struct -> its neutral repr as a Lua value (the codec's positional array /
-    // `_type` table, marshalled to a Lua table). Non-structs fall back to a string.
-    private static LuaValue StructOrString(Variant v) =>
-        GodotStructCodec.Decompose(v) is { } o ? SceneBuilder.TomlToLua(o) : v.ToString();
 
     // ---- struct <-> Lua-table helpers ----------------------------------------
 
@@ -253,6 +263,7 @@ public sealed class GodotBinder
     }
 
     private static LuaValue V2T(Vector2 v) => Tbl(("x", (double)v.X), ("y", (double)v.Y));
+    private static LuaValue V2IT(Vector2I v) => Tbl(("x", (double)v.X), ("y", (double)v.Y));
     private static LuaValue V3T(Vector3 v) => Tbl(("x", (double)v.X), ("y", (double)v.Y), ("z", (double)v.Z));
     private static LuaValue V4T(Vector4 v) => Tbl(("x", (double)v.X), ("y", (double)v.Y), ("z", (double)v.Z), ("w", (double)v.W));
     private static LuaValue QuatT(Quaternion q) => Tbl(("x", (double)q.X), ("y", (double)q.Y), ("z", (double)q.Z), ("w", (double)q.W));
@@ -290,7 +301,9 @@ public sealed class GodotBinder
 
             var pt = PropertyType(obj, key);
             if (pt is { } vt && GodotStructCodec.IsStruct(vt))
-                return GodotStructCodec.Recompose(vt, TableToObjModel(t));
+                return t.ArrayLength > 0 && t.HashMapCount == 0
+                    ? PositionalStruct(t, vt)       // [x, y, z, …]
+                    : TableToStruct(t, vt);         // {x=…, y=…, …} (named runtime form)
         }
         // Resource-by-path: a res:// string targeting a Resource (Object) property -> load it,
         // so a scene file can write `texture = "res://art/x.png"` / `mesh = "res://m.tres"`.
@@ -333,11 +346,51 @@ public sealed class GodotBinder
         return map.TryGetValue(key, out var t) ? t : null;
     }
 
-    // Build a Variant struct from a Lua table (named `{x=…}`, positional `[x,…]`, or a
-    // `_type` table) via the generated, reflection-free codec. Kept for the static-method
-    // marshalling path (StructFromLua); property writes call GodotStructCodec directly.
-    private static Variant TableToStruct(LuaTable t, Variant.Type vt) =>
-        GodotStructCodec.Recompose(vt, TableToObjModel(t));
+    // Build a Variant struct from the named runtime table form (`{x=…}`, `{position={…},…}`,
+    // basis as `{x,y,z}` columns) — the shape ToLua hands scripts. The positional / `_type`
+    // `.scene` forms go through GodotStructCodec instead (see ToSetValue).
+    private static Variant TableToStruct(LuaTable t, Variant.Type vt) => vt switch
+    {
+        Variant.Type.Vector2 => new Vector2(F(t, "x"), F(t, "y")),
+        Variant.Type.Vector3 => new Vector3(F(t, "x"), F(t, "y"), F(t, "z")),
+        Variant.Type.Vector4 => new Vector4(F(t, "x"), F(t, "y"), F(t, "z"), F(t, "w")),
+        Variant.Type.Vector2I => new Vector2I(I(t, "x"), I(t, "y")),
+        Variant.Type.Vector3I => new Vector3I(I(t, "x"), I(t, "y"), I(t, "z")),
+        Variant.Type.Vector4I => new Vector4I(I(t, "x"), I(t, "y"), I(t, "z"), I(t, "w")),
+        Variant.Type.Color => new Color(F(t, "r"), F(t, "g"), F(t, "b"), t["a"].Type == LuaValueType.Number ? F(t, "a") : 1f),
+        Variant.Type.Quaternion => new Quaternion(F(t, "x"), F(t, "y"), F(t, "z"), F(t, "w")),
+        Variant.Type.Rect2 => new Rect2(Vec2(t["position"]), Vec2(t["size"])),
+        Variant.Type.Rect2I => new Rect2I(Vec2I(t["position"]), Vec2I(t["size"])),
+        Variant.Type.Plane => new Plane(Vec3(t["normal"]), F(t, "d")),
+        Variant.Type.Aabb => new Aabb(Vec3(t["position"]), Vec3(t["size"])),
+        Variant.Type.Basis => ReadBasis(t),
+        Variant.Type.Transform2D => new Transform2D(Vec2(t["x"]), Vec2(t["y"]), Vec2(t["origin"])),
+        Variant.Type.Transform3D => new Transform3D(
+            t["basis"].Type == LuaValueType.Table ? ReadBasis(t["basis"].Read<LuaTable>()) : Basis.Identity,
+            Vec3(t["origin"])),
+        Variant.Type.Projection => new Projection(Vec4(t["x"]), Vec4(t["y"]), Vec4(t["z"]), Vec4(t["w"])),
+        _ => new Variant(),
+    };
+
+    // Build a vector/color/quaternion from a 1-based positional list; other structs fall
+    // back to named fields.
+    private static Variant PositionalStruct(LuaTable t, Variant.Type vt)
+    {
+        float E(int i) => t[i].Type == LuaValueType.Number ? (float)t[i].Read<double>() : 0f;
+        int Ei(int i) => t[i].Type == LuaValueType.Number ? (int)t[i].Read<double>() : 0;
+        return vt switch
+        {
+            Variant.Type.Vector2 => new Vector2(E(1), E(2)),
+            Variant.Type.Vector3 => new Vector3(E(1), E(2), E(3)),
+            Variant.Type.Vector4 => new Vector4(E(1), E(2), E(3), E(4)),
+            Variant.Type.Vector2I => new Vector2I(Ei(1), Ei(2)),
+            Variant.Type.Vector3I => new Vector3I(Ei(1), Ei(2), Ei(3)),
+            Variant.Type.Vector4I => new Vector4I(Ei(1), Ei(2), Ei(3), Ei(4)),
+            Variant.Type.Color => new Color(E(1), E(2), E(3), t.ArrayLength >= 4 ? E(4) : 1f),
+            Variant.Type.Quaternion => new Quaternion(E(1), E(2), E(3), E(4)),
+            _ => TableToStruct(t, vt),
+        };
+    }
 
     // Lua value -> Evaluate's neutral object model (double / string / bool / object[] /
     // Dictionary<string,object>) the struct codec consumes. Cold path (struct props only).
@@ -365,8 +418,15 @@ public sealed class GodotBinder
     }
 
     private static float F(LuaTable t, string k) => t[k].Type == LuaValueType.Number ? (float)t[k].Read<double>() : 0f;
+    private static int I(LuaTable t, string k) => t[k].Type == LuaValueType.Number ? (int)t[k].Read<double>() : 0;
     private static float P(LuaTable t, int i) => t[i].Type == LuaValueType.Number ? (float)t[i].Read<double>() : 0f;
     private static bool IsList(LuaTable t, int n) => t.ArrayLength >= n && t.HashMapCount == 0;
+
+    // Read a Basis from named axis columns `{x,y,z}` (each a Vector3 — the runtime form,
+    // matching BasisT) OR a flat 9-element list.
+    private static Basis ReadBasis(LuaTable t) => IsList(t, 9)
+        ? new Basis(new Vector3(P(t, 1), P(t, 2), P(t, 3)), new Vector3(P(t, 4), P(t, 5), P(t, 6)), new Vector3(P(t, 7), P(t, 8), P(t, 9)))
+        : new Basis(Vec3(t["x"]), Vec3(t["y"]), Vec3(t["z"]));
 
     // Read a Vector2/3 from a std userdata, a named `{x,y[,z]}` table, or a positional list
     // (used by the packed-array element marshalling).
@@ -382,6 +442,18 @@ public sealed class GodotBinder
     {
         if (v.TryRead<EvaluateVec3>(out var e3)) return new Vector3((float)e3.X, (float)e3.Y, (float)e3.Z);
         if (v.Type == LuaValueType.Table) { var t = v.Read<LuaTable>(); return IsList(t, 3) ? new Vector3(P(t, 1), P(t, 2), P(t, 3)) : new Vector3(F(t, "x"), F(t, "y"), F(t, "z")); }
+        return default;
+    }
+
+    private static Vector4 Vec4(LuaValue v)
+    {
+        if (v.Type == LuaValueType.Table) { var t = v.Read<LuaTable>(); return IsList(t, 4) ? new Vector4(P(t, 1), P(t, 2), P(t, 3), P(t, 4)) : new Vector4(F(t, "x"), F(t, "y"), F(t, "z"), F(t, "w")); }
+        return default;
+    }
+
+    private static Vector2I Vec2I(LuaValue v)
+    {
+        if (v.Type == LuaValueType.Table) { var t = v.Read<LuaTable>(); return IsList(t, 2) ? new Vector2I((int)P(t, 1), (int)P(t, 2)) : new Vector2I(I(t, "x"), I(t, "y")); }
         return default;
     }
 
