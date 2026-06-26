@@ -1,0 +1,5 @@
+# Defaults for the global showcase system (showcase.evt).
+# Exposed to Lua as the `config.game` table.
+[game]
+title = "Evaluate Demo"   # string with a # that must not be treated as a comment
+debug = true

@@ -5,6 +5,29 @@ All notable changes to Evaluate are documented here. The format is based on
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While
 the version is `0.x`, minor bumps may include breaking changes.
 
+## [Unreleased]
+
+### Added
+- **`--emit-api <dir>` — generate the full Lua API spec for consumers.** A new runtime
+  command (`godot --headless --path . -- --emit-api downloads/spec`, alongside `--test`)
+  dumps the entire Lua surface a script sees, read **live**: the `godot.*` classes/methods/
+  properties/signals come from engine `ClassDB` introspection; enums/constants/statics and
+  the class set from GodotSharp reflection; `std.*` from the `[LuaObject]` types; the
+  capability apis by walking the tables `Loader` builds; hooks/frontmatter from the runtime's
+  own arrays. Nothing is hand-written or hard-coded, so it auto-adapts to new Godot versions
+  (including GDExtension classes) and to new `[LuaObject]`/api additions with zero
+  registration. Outputs `evaluate-api.json` (machine-readable), LuaCATS `---@meta` files
+  (`godot-core`/`godot-full`/`std`/`evt-apis`, for editor autocomplete via lua-language-server),
+  and `evaluate-api.md` (human/LLM reference). Implemented in `EvaluateDocs` (`src/Evaluate/`),
+  the runtime analogue of the build-time `Evaluate.Generator`.
+- **`downloads/` — drop-in resources for consumers.** A committed, pre-generated `spec/`
+  (the above) plus a downloadable **agent skill** (`skill/evaluate-scripting/`) that teaches
+  an LLM the frontmatter contract, sandbox rules, lifecycle hooks, scene grammar, and how to
+  look up exact API names — with verbatim example scripts and a common-mistakes guide. Copy
+  the contents into a project to get IDE autocomplete and agent onboarding. A new
+  `emit-downloads` workflow regenerates the spec against the release's Godot and attaches
+  `evaluate-downloads-<version>.zip` to each GitHub release.
+
 ## [0.7.2] — 2026-06-24
 
 ### Fixed

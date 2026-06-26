@@ -1,0 +1,10873 @@
+---@meta
+-- EvaLuate godot.* — the engine surface for this Godot build.
+-- Instance members are engine snake_case (node:get_node(), node.position);
+-- enums/constants/new are C# PascalCase (godot.Timer.new(), godot.Key.Space).
+
+---@class godot
+---@field AcceptDialog Godot.AcceptDialog.__type
+---@field AimModifier3D Godot.AimModifier3D.__type
+---@field AnimatableBody2D Godot.AnimatableBody2D.__type
+---@field AnimatableBody3D Godot.AnimatableBody3D.__type
+---@field AnimatedSprite2D Godot.AnimatedSprite2D.__type
+---@field AnimatedSprite3D Godot.AnimatedSprite3D.__type
+---@field AnimationMixer Godot.AnimationMixer.__type
+---@field AnimationPlayer Godot.AnimationPlayer.__type
+---@field AnimationTree Godot.AnimationTree.__type
+---@field Area2D Godot.Area2D.__type
+---@field Area3D Godot.Area3D.__type
+---@field AspectRatioContainer Godot.AspectRatioContainer.__type
+---@field AudioListener2D Godot.AudioListener2D.__type
+---@field AudioListener3D Godot.AudioListener3D.__type
+---@field AudioStreamPlayer Godot.AudioStreamPlayer.__type
+---@field AudioStreamPlayer2D Godot.AudioStreamPlayer2D.__type
+---@field AudioStreamPlayer3D Godot.AudioStreamPlayer3D.__type
+---@field BackBufferCopy Godot.BackBufferCopy.__type
+---@field BaseButton Godot.BaseButton.__type
+---@field Bone2D Godot.Bone2D.__type
+---@field BoneAttachment3D Godot.BoneAttachment3D.__type
+---@field BoneConstraint3D Godot.BoneConstraint3D.__type
+---@field BoneTwistDisperser3D Godot.BoneTwistDisperser3D.__type
+---@field BoxContainer Godot.BoxContainer.__type
+---@field Button Godot.Button.__type
+---@field Camera2D Godot.Camera2D.__type
+---@field Camera3D Godot.Camera3D.__type
+---@field CanvasGroup Godot.CanvasGroup.__type
+---@field CanvasItem Godot.CanvasItem.__type
+---@field CanvasLayer Godot.CanvasLayer.__type
+---@field CanvasModulate Godot.CanvasModulate.__type
+---@field Ccdik3D Godot.Ccdik3D.__type
+---@field CenterContainer Godot.CenterContainer.__type
+---@field ChainIK3D Godot.ChainIK3D.__type
+---@field CharacterBody2D Godot.CharacterBody2D.__type
+---@field CharacterBody3D Godot.CharacterBody3D.__type
+---@field CheckBox Godot.CheckBox.__type
+---@field CheckButton Godot.CheckButton.__type
+---@field CodeEdit Godot.CodeEdit.__type
+---@field CollisionObject2D Godot.CollisionObject2D.__type
+---@field CollisionObject3D Godot.CollisionObject3D.__type
+---@field CollisionPolygon2D Godot.CollisionPolygon2D.__type
+---@field CollisionPolygon3D Godot.CollisionPolygon3D.__type
+---@field CollisionShape2D Godot.CollisionShape2D.__type
+---@field CollisionShape3D Godot.CollisionShape3D.__type
+---@field ColorPicker Godot.ColorPicker.__type
+---@field ColorPickerButton Godot.ColorPickerButton.__type
+---@field ColorRect Godot.ColorRect.__type
+---@field ConeTwistJoint3D Godot.ConeTwistJoint3D.__type
+---@field ConfirmationDialog Godot.ConfirmationDialog.__type
+---@field Container Godot.Container.__type
+---@field Control Godot.Control.__type
+---@field ConvertTransformModifier3D Godot.ConvertTransformModifier3D.__type
+---@field CopyTransformModifier3D Godot.CopyTransformModifier3D.__type
+---@field CpuParticles2D Godot.CpuParticles2D.__type
+---@field CpuParticles3D Godot.CpuParticles3D.__type
+---@field CsgBox3D Godot.CsgBox3D.__type
+---@field CsgCombiner3D Godot.CsgCombiner3D.__type
+---@field CsgCylinder3D Godot.CsgCylinder3D.__type
+---@field CsgMesh3D Godot.CsgMesh3D.__type
+---@field CsgPolygon3D Godot.CsgPolygon3D.__type
+---@field CsgPrimitive3D Godot.CsgPrimitive3D.__type
+---@field CsgShape3D Godot.CsgShape3D.__type
+---@field CsgSphere3D Godot.CsgSphere3D.__type
+---@field CsgTorus3D Godot.CsgTorus3D.__type
+---@field DampedSpringJoint2D Godot.DampedSpringJoint2D.__type
+---@field Decal Godot.Decal.__type
+---@field DirectionalLight2D Godot.DirectionalLight2D.__type
+---@field DirectionalLight3D Godot.DirectionalLight3D.__type
+---@field Fabrik3D Godot.Fabrik3D.__type
+---@field FileDialog Godot.FileDialog.__type
+---@field FlowContainer Godot.FlowContainer.__type
+---@field FogVolume Godot.FogVolume.__type
+---@field FoldableContainer Godot.FoldableContainer.__type
+---@field Generic6DofJoint3D Godot.Generic6DofJoint3D.__type
+---@field GeometryInstance3D Godot.GeometryInstance3D.__type
+---@field GodotObject Godot.GodotObject.__type
+---@field GpuParticles2D Godot.GpuParticles2D.__type
+---@field GpuParticles3D Godot.GpuParticles3D.__type
+---@field GpuParticlesAttractor3D Godot.GpuParticlesAttractor3D.__type
+---@field GpuParticlesAttractorBox3D Godot.GpuParticlesAttractorBox3D.__type
+---@field GpuParticlesAttractorSphere3D Godot.GpuParticlesAttractorSphere3D.__type
+---@field GpuParticlesAttractorVectorField3D Godot.GpuParticlesAttractorVectorField3D.__type
+---@field GpuParticlesCollision3D Godot.GpuParticlesCollision3D.__type
+---@field GpuParticlesCollisionBox3D Godot.GpuParticlesCollisionBox3D.__type
+---@field GpuParticlesCollisionHeightField3D Godot.GpuParticlesCollisionHeightField3D.__type
+---@field GpuParticlesCollisionSdf3D Godot.GpuParticlesCollisionSdf3D.__type
+---@field GpuParticlesCollisionSphere3D Godot.GpuParticlesCollisionSphere3D.__type
+---@field GraphEdit Godot.GraphEdit.__type
+---@field GraphElement Godot.GraphElement.__type
+---@field GraphFrame Godot.GraphFrame.__type
+---@field GraphNode Godot.GraphNode.__type
+---@field GridContainer Godot.GridContainer.__type
+---@field GridMap Godot.GridMap.__type
+---@field GrooveJoint2D Godot.GrooveJoint2D.__type
+---@field HBoxContainer Godot.HBoxContainer.__type
+---@field HFlowContainer Godot.HFlowContainer.__type
+---@field HingeJoint3D Godot.HingeJoint3D.__type
+---@field HScrollBar Godot.HScrollBar.__type
+---@field HSeparator Godot.HSeparator.__type
+---@field HSlider Godot.HSlider.__type
+---@field HSplitContainer Godot.HSplitContainer.__type
+---@field HttpRequest Godot.HttpRequest.__type
+---@field IKModifier3D Godot.IKModifier3D.__type
+---@field ImporterMeshInstance3D Godot.ImporterMeshInstance3D.__type
+---@field InstancePlaceholder Godot.InstancePlaceholder.__type
+---@field ItemList Godot.ItemList.__type
+---@field IterateIK3D Godot.IterateIK3D.__type
+---@field JacobianIK3D Godot.JacobianIK3D.__type
+---@field Joint2D Godot.Joint2D.__type
+---@field Joint3D Godot.Joint3D.__type
+---@field Label Godot.Label.__type
+---@field Label3D Godot.Label3D.__type
+---@field Light2D Godot.Light2D.__type
+---@field Light3D Godot.Light3D.__type
+---@field LightmapGI Godot.LightmapGI.__type
+---@field LightmapProbe Godot.LightmapProbe.__type
+---@field LightOccluder2D Godot.LightOccluder2D.__type
+---@field LimitAngularVelocityModifier3D Godot.LimitAngularVelocityModifier3D.__type
+---@field Line2D Godot.Line2D.__type
+---@field LineEdit Godot.LineEdit.__type
+---@field LinkButton Godot.LinkButton.__type
+---@field LookAtModifier3D Godot.LookAtModifier3D.__type
+---@field MarginContainer Godot.MarginContainer.__type
+---@field Marker2D Godot.Marker2D.__type
+---@field Marker3D Godot.Marker3D.__type
+---@field MenuBar Godot.MenuBar.__type
+---@field MenuButton Godot.MenuButton.__type
+---@field MeshInstance2D Godot.MeshInstance2D.__type
+---@field MeshInstance3D Godot.MeshInstance3D.__type
+---@field MissingNode Godot.MissingNode.__type
+---@field ModifierBoneTarget3D Godot.ModifierBoneTarget3D.__type
+---@field MultiMeshInstance2D Godot.MultiMeshInstance2D.__type
+---@field MultiMeshInstance3D Godot.MultiMeshInstance3D.__type
+---@field MultiplayerSpawner Godot.MultiplayerSpawner.__type
+---@field MultiplayerSynchronizer Godot.MultiplayerSynchronizer.__type
+---@field NavigationAgent2D Godot.NavigationAgent2D.__type
+---@field NavigationAgent3D Godot.NavigationAgent3D.__type
+---@field NavigationLink2D Godot.NavigationLink2D.__type
+---@field NavigationLink3D Godot.NavigationLink3D.__type
+---@field NavigationObstacle2D Godot.NavigationObstacle2D.__type
+---@field NavigationObstacle3D Godot.NavigationObstacle3D.__type
+---@field NavigationRegion2D Godot.NavigationRegion2D.__type
+---@field NavigationRegion3D Godot.NavigationRegion3D.__type
+---@field NinePatchRect Godot.NinePatchRect.__type
+---@field Node Godot.Node.__type
+---@field Node2D Godot.Node2D.__type
+---@field Node3D Godot.Node3D.__type
+---@field OccluderInstance3D Godot.OccluderInstance3D.__type
+---@field OmniLight3D Godot.OmniLight3D.__type
+---@field OpenXRCompositionLayer Godot.OpenXRCompositionLayer.__type
+---@field OpenXRCompositionLayerCylinder Godot.OpenXRCompositionLayerCylinder.__type
+---@field OpenXRCompositionLayerEquirect Godot.OpenXRCompositionLayerEquirect.__type
+---@field OpenXRCompositionLayerQuad Godot.OpenXRCompositionLayerQuad.__type
+---@field OpenXRHand Godot.OpenXRHand.__type
+---@field OpenXRRenderModel Godot.OpenXRRenderModel.__type
+---@field OpenXRRenderModelManager Godot.OpenXRRenderModelManager.__type
+---@field OpenXRVisibilityMask Godot.OpenXRVisibilityMask.__type
+---@field OptionButton Godot.OptionButton.__type
+---@field Panel Godot.Panel.__type
+---@field PanelContainer Godot.PanelContainer.__type
+---@field Parallax2D Godot.Parallax2D.__type
+---@field ParallaxBackground Godot.ParallaxBackground.__type
+---@field ParallaxLayer Godot.ParallaxLayer.__type
+---@field Path2D Godot.Path2D.__type
+---@field Path3D Godot.Path3D.__type
+---@field PathFollow2D Godot.PathFollow2D.__type
+---@field PathFollow3D Godot.PathFollow3D.__type
+---@field PhysicalBone2D Godot.PhysicalBone2D.__type
+---@field PhysicalBone3D Godot.PhysicalBone3D.__type
+---@field PhysicalBoneSimulator3D Godot.PhysicalBoneSimulator3D.__type
+---@field PhysicsBody2D Godot.PhysicsBody2D.__type
+---@field PhysicsBody3D Godot.PhysicsBody3D.__type
+---@field PinJoint2D Godot.PinJoint2D.__type
+---@field PinJoint3D Godot.PinJoint3D.__type
+---@field PointLight2D Godot.PointLight2D.__type
+---@field Polygon2D Godot.Polygon2D.__type
+---@field Popup Godot.Popup.__type
+---@field PopupMenu Godot.PopupMenu.__type
+---@field PopupPanel Godot.PopupPanel.__type
+---@field ProgressBar Godot.ProgressBar.__type
+---@field Range Godot.Range.__type
+---@field RayCast2D Godot.RayCast2D.__type
+---@field RayCast3D Godot.RayCast3D.__type
+---@field RefCounted Godot.RefCounted.__type
+---@field ReferenceRect Godot.ReferenceRect.__type
+---@field ReflectionProbe Godot.ReflectionProbe.__type
+---@field RemoteTransform2D Godot.RemoteTransform2D.__type
+---@field RemoteTransform3D Godot.RemoteTransform3D.__type
+---@field Resource Godot.Resource.__type
+---@field ResourcePreloader Godot.ResourcePreloader.__type
+---@field RetargetModifier3D Godot.RetargetModifier3D.__type
+---@field RichTextLabel Godot.RichTextLabel.__type
+---@field RigidBody2D Godot.RigidBody2D.__type
+---@field RigidBody3D Godot.RigidBody3D.__type
+---@field RootMotionView Godot.RootMotionView.__type
+---@field ScrollBar Godot.ScrollBar.__type
+---@field ScrollContainer Godot.ScrollContainer.__type
+---@field Separator Godot.Separator.__type
+---@field ShaderGlobalsOverride Godot.ShaderGlobalsOverride.__type
+---@field ShapeCast2D Godot.ShapeCast2D.__type
+---@field ShapeCast3D Godot.ShapeCast3D.__type
+---@field Skeleton2D Godot.Skeleton2D.__type
+---@field Skeleton3D Godot.Skeleton3D.__type
+---@field SkeletonIK3D Godot.SkeletonIK3D.__type
+---@field SkeletonModifier3D Godot.SkeletonModifier3D.__type
+---@field Slider Godot.Slider.__type
+---@field SliderJoint3D Godot.SliderJoint3D.__type
+---@field SoftBody3D Godot.SoftBody3D.__type
+---@field SpinBox Godot.SpinBox.__type
+---@field SplineIK3D Godot.SplineIK3D.__type
+---@field SplitContainer Godot.SplitContainer.__type
+---@field SpotLight3D Godot.SpotLight3D.__type
+---@field SpringArm3D Godot.SpringArm3D.__type
+---@field SpringBoneCollision3D Godot.SpringBoneCollision3D.__type
+---@field SpringBoneCollisionCapsule3D Godot.SpringBoneCollisionCapsule3D.__type
+---@field SpringBoneCollisionPlane3D Godot.SpringBoneCollisionPlane3D.__type
+---@field SpringBoneCollisionSphere3D Godot.SpringBoneCollisionSphere3D.__type
+---@field SpringBoneSimulator3D Godot.SpringBoneSimulator3D.__type
+---@field Sprite2D Godot.Sprite2D.__type
+---@field Sprite3D Godot.Sprite3D.__type
+---@field SpriteBase3D Godot.SpriteBase3D.__type
+---@field StaticBody2D Godot.StaticBody2D.__type
+---@field StaticBody3D Godot.StaticBody3D.__type
+---@field StatusIndicator Godot.StatusIndicator.__type
+---@field SubViewport Godot.SubViewport.__type
+---@field SubViewportContainer Godot.SubViewportContainer.__type
+---@field TabBar Godot.TabBar.__type
+---@field TabContainer Godot.TabContainer.__type
+---@field TextEdit Godot.TextEdit.__type
+---@field TextureButton Godot.TextureButton.__type
+---@field TextureProgressBar Godot.TextureProgressBar.__type
+---@field TextureRect Godot.TextureRect.__type
+---@field TileMap Godot.TileMap.__type
+---@field TileMapLayer Godot.TileMapLayer.__type
+---@field Timer Godot.Timer.__type
+---@field TouchScreenButton Godot.TouchScreenButton.__type
+---@field Tree Godot.Tree.__type
+---@field TwoBoneIK3D Godot.TwoBoneIK3D.__type
+---@field VBoxContainer Godot.VBoxContainer.__type
+---@field VehicleBody3D Godot.VehicleBody3D.__type
+---@field VehicleWheel3D Godot.VehicleWheel3D.__type
+---@field VFlowContainer Godot.VFlowContainer.__type
+---@field VideoStreamPlayer Godot.VideoStreamPlayer.__type
+---@field Viewport Godot.Viewport.__type
+---@field VisibleOnScreenEnabler2D Godot.VisibleOnScreenEnabler2D.__type
+---@field VisibleOnScreenEnabler3D Godot.VisibleOnScreenEnabler3D.__type
+---@field VisibleOnScreenNotifier2D Godot.VisibleOnScreenNotifier2D.__type
+---@field VisibleOnScreenNotifier3D Godot.VisibleOnScreenNotifier3D.__type
+---@field VisualInstance3D Godot.VisualInstance3D.__type
+---@field VoxelGI Godot.VoxelGI.__type
+---@field VScrollBar Godot.VScrollBar.__type
+---@field VSeparator Godot.VSeparator.__type
+---@field VSlider Godot.VSlider.__type
+---@field VSplitContainer Godot.VSplitContainer.__type
+---@field Window Godot.Window.__type
+---@field WorldEnvironment Godot.WorldEnvironment.__type
+---@field XRAnchor3D Godot.XRAnchor3D.__type
+---@field XRBodyModifier3D Godot.XRBodyModifier3D.__type
+---@field XRCamera3D Godot.XRCamera3D.__type
+---@field XRController3D Godot.XRController3D.__type
+---@field XRFaceModifier3D Godot.XRFaceModifier3D.__type
+---@field XRHandModifier3D Godot.XRHandModifier3D.__type
+---@field XRNode3D Godot.XRNode3D.__type
+---@field XROrigin3D Godot.XROrigin3D.__type
+---@field ClockDirection Godot.ClockDirection
+---@field Corner Godot.Corner
+---@field Error Godot.Error
+---@field EulerOrder Godot.EulerOrder
+---@field HorizontalAlignment Godot.HorizontalAlignment
+---@field InlineAlignment Godot.InlineAlignment
+---@field JoyAxis Godot.JoyAxis
+---@field JoyButton Godot.JoyButton
+---@field Key Godot.Key
+---@field KeyLocation Godot.KeyLocation
+---@field KeyModifierMask Godot.KeyModifierMask
+---@field MethodFlags Godot.MethodFlags
+---@field MidiMessage Godot.MidiMessage
+---@field MouseButton Godot.MouseButton
+---@field MouseButtonMask Godot.MouseButtonMask
+---@field Orientation Godot.Orientation
+---@field PropertyHint Godot.PropertyHint
+---@field PropertyUsageFlags Godot.PropertyUsageFlags
+---@field Side Godot.Side
+---@field VerticalAlignment Godot.VerticalAlignment
+godot = {}
+
+---@class Godot.AcceptDialog : Godot.Window
+---@field dialog_autowrap boolean
+---@field dialog_close_on_escape boolean
+---@field dialog_hide_on_ok boolean
+---@field dialog_text string
+---@field ok_button_text string
+---@field canceled Godot.Signal
+---@field confirmed Godot.Signal
+---@field custom_action Godot.Signal
+---@field add_button fun(self: Godot.AcceptDialog, text: string, right: boolean, action: string): Godot.Button
+---@field add_cancel_button fun(self: Godot.AcceptDialog, name: string): Godot.Button
+---@field get_close_on_escape fun(self: Godot.AcceptDialog): boolean
+---@field get_hide_on_ok fun(self: Godot.AcceptDialog): boolean
+---@field get_label fun(self: Godot.AcceptDialog): Godot.Label
+---@field get_ok_button fun(self: Godot.AcceptDialog): Godot.Button
+---@field get_ok_button_text fun(self: Godot.AcceptDialog): string
+---@field get_text fun(self: Godot.AcceptDialog): string
+---@field has_autowrap fun(self: Godot.AcceptDialog): boolean
+---@field register_text_enter fun(self: Godot.AcceptDialog, line_edit: Godot.LineEdit)
+---@field remove_button fun(self: Godot.AcceptDialog, button: Godot.Button)
+---@field set_autowrap fun(self: Godot.AcceptDialog, autowrap: boolean)
+---@field set_close_on_escape fun(self: Godot.AcceptDialog, enabled: boolean)
+---@field set_hide_on_ok fun(self: Godot.AcceptDialog, enabled: boolean)
+---@field set_ok_button_text fun(self: Godot.AcceptDialog, text: string)
+---@field set_text fun(self: Godot.AcceptDialog, text: string)
+---@class Godot.AcceptDialog.__type
+---@field new fun(): Godot.AcceptDialog
+
+---@class Godot.AimModifier3D : Godot.BoneConstraint3D
+---@field setting_count integer
+---@field get_forward_axis fun(self: Godot.AimModifier3D, index: integer): integer
+---@field get_primary_rotation_axis fun(self: Godot.AimModifier3D, index: integer): integer
+---@field is_relative fun(self: Godot.AimModifier3D, index: integer): boolean
+---@field is_using_euler fun(self: Godot.AimModifier3D, index: integer): boolean
+---@field is_using_secondary_rotation fun(self: Godot.AimModifier3D, index: integer): boolean
+---@field set_forward_axis fun(self: Godot.AimModifier3D, index: integer, axis: integer)
+---@field set_primary_rotation_axis fun(self: Godot.AimModifier3D, index: integer, axis: integer)
+---@field set_relative fun(self: Godot.AimModifier3D, index: integer, enabled: boolean)
+---@field set_use_euler fun(self: Godot.AimModifier3D, index: integer, enabled: boolean)
+---@field set_use_secondary_rotation fun(self: Godot.AimModifier3D, index: integer, enabled: boolean)
+---@class Godot.AimModifier3D.__type
+---@field new fun(): Godot.AimModifier3D
+
+---@class Godot.AnimatableBody2D : Godot.StaticBody2D
+---@field sync_to_physics boolean
+---@field is_sync_to_physics_enabled fun(self: Godot.AnimatableBody2D): boolean
+---@field set_sync_to_physics fun(self: Godot.AnimatableBody2D, enable: boolean)
+---@class Godot.AnimatableBody2D.__type
+---@field new fun(): Godot.AnimatableBody2D
+
+---@class Godot.AnimatableBody3D : Godot.StaticBody3D
+---@field sync_to_physics boolean
+---@field is_sync_to_physics_enabled fun(self: Godot.AnimatableBody3D): boolean
+---@field set_sync_to_physics fun(self: Godot.AnimatableBody3D, enable: boolean)
+---@class Godot.AnimatableBody3D.__type
+---@field new fun(): Godot.AnimatableBody3D
+
+---@class Godot.AnimatedSprite2D : Godot.Node2D
+---@field animation string
+---@field autoplay string
+---@field centered boolean
+---@field flip_h boolean
+---@field flip_v boolean
+---@field frame integer
+---@field frame_progress number
+---@field offset Godot.Vector2
+---@field speed_scale number
+---@field sprite_frames Godot.SpriteFrames
+---@field animation_changed Godot.Signal
+---@field animation_finished Godot.Signal
+---@field animation_looped Godot.Signal
+---@field frame_changed Godot.Signal
+---@field sprite_frames_changed Godot.Signal
+---@field get_animation fun(self: Godot.AnimatedSprite2D): string
+---@field get_autoplay fun(self: Godot.AnimatedSprite2D): string
+---@field get_frame fun(self: Godot.AnimatedSprite2D): integer
+---@field get_frame_progress fun(self: Godot.AnimatedSprite2D): number
+---@field get_offset fun(self: Godot.AnimatedSprite2D): Godot.Vector2
+---@field get_playing_speed fun(self: Godot.AnimatedSprite2D): number
+---@field get_speed_scale fun(self: Godot.AnimatedSprite2D): number
+---@field get_sprite_frames fun(self: Godot.AnimatedSprite2D): Godot.SpriteFrames
+---@field is_centered fun(self: Godot.AnimatedSprite2D): boolean
+---@field is_flipped_h fun(self: Godot.AnimatedSprite2D): boolean
+---@field is_flipped_v fun(self: Godot.AnimatedSprite2D): boolean
+---@field is_playing fun(self: Godot.AnimatedSprite2D): boolean
+---@field pause fun(self: Godot.AnimatedSprite2D)
+---@field play fun(self: Godot.AnimatedSprite2D, name: string, custom_speed: number, from_end: boolean)
+---@field play_backwards fun(self: Godot.AnimatedSprite2D, name: string)
+---@field set_animation fun(self: Godot.AnimatedSprite2D, name: string)
+---@field set_autoplay fun(self: Godot.AnimatedSprite2D, name: string)
+---@field set_centered fun(self: Godot.AnimatedSprite2D, centered: boolean)
+---@field set_flip_h fun(self: Godot.AnimatedSprite2D, flip_h: boolean)
+---@field set_flip_v fun(self: Godot.AnimatedSprite2D, flip_v: boolean)
+---@field set_frame fun(self: Godot.AnimatedSprite2D, frame: integer)
+---@field set_frame_and_progress fun(self: Godot.AnimatedSprite2D, frame: integer, progress: number)
+---@field set_frame_progress fun(self: Godot.AnimatedSprite2D, progress: number)
+---@field set_offset fun(self: Godot.AnimatedSprite2D, offset: Godot.Vector2)
+---@field set_speed_scale fun(self: Godot.AnimatedSprite2D, speed_scale: number)
+---@field set_sprite_frames fun(self: Godot.AnimatedSprite2D, sprite_frames: Godot.SpriteFrames)
+---@field stop fun(self: Godot.AnimatedSprite2D)
+---@class Godot.AnimatedSprite2D.__type
+---@field new fun(): Godot.AnimatedSprite2D
+
+---@class Godot.AnimatedSprite3D : Godot.SpriteBase3D
+---@field animation string
+---@field autoplay string
+---@field frame integer
+---@field frame_progress number
+---@field speed_scale number
+---@field sprite_frames Godot.SpriteFrames
+---@field animation_changed Godot.Signal
+---@field animation_finished Godot.Signal
+---@field animation_looped Godot.Signal
+---@field frame_changed Godot.Signal
+---@field sprite_frames_changed Godot.Signal
+---@field get_animation fun(self: Godot.AnimatedSprite3D): string
+---@field get_autoplay fun(self: Godot.AnimatedSprite3D): string
+---@field get_frame fun(self: Godot.AnimatedSprite3D): integer
+---@field get_frame_progress fun(self: Godot.AnimatedSprite3D): number
+---@field get_playing_speed fun(self: Godot.AnimatedSprite3D): number
+---@field get_speed_scale fun(self: Godot.AnimatedSprite3D): number
+---@field get_sprite_frames fun(self: Godot.AnimatedSprite3D): Godot.SpriteFrames
+---@field is_playing fun(self: Godot.AnimatedSprite3D): boolean
+---@field pause fun(self: Godot.AnimatedSprite3D)
+---@field play fun(self: Godot.AnimatedSprite3D, name: string, custom_speed: number, from_end: boolean)
+---@field play_backwards fun(self: Godot.AnimatedSprite3D, name: string)
+---@field set_animation fun(self: Godot.AnimatedSprite3D, name: string)
+---@field set_autoplay fun(self: Godot.AnimatedSprite3D, name: string)
+---@field set_frame fun(self: Godot.AnimatedSprite3D, frame: integer)
+---@field set_frame_and_progress fun(self: Godot.AnimatedSprite3D, frame: integer, progress: number)
+---@field set_frame_progress fun(self: Godot.AnimatedSprite3D, progress: number)
+---@field set_speed_scale fun(self: Godot.AnimatedSprite3D, speed_scale: number)
+---@field set_sprite_frames fun(self: Godot.AnimatedSprite3D, sprite_frames: Godot.SpriteFrames)
+---@field stop fun(self: Godot.AnimatedSprite3D)
+---@class Godot.AnimatedSprite3D.__type
+---@field new fun(): Godot.AnimatedSprite3D
+
+---@class Godot.AnimationMixer : Godot.Node
+---@field active boolean
+---@field audio_max_polyphony integer
+---@field callback_mode_discrete integer
+---@field callback_mode_method integer
+---@field callback_mode_process integer
+---@field deterministic boolean
+---@field reset_on_save boolean
+---@field root_motion_local boolean
+---@field root_motion_track string
+---@field root_node string
+---@field animation_finished Godot.Signal
+---@field animation_libraries_updated Godot.Signal
+---@field animation_list_changed Godot.Signal
+---@field animation_started Godot.Signal
+---@field caches_cleared Godot.Signal
+---@field mixer_applied Godot.Signal
+---@field mixer_updated Godot.Signal
+---@field add_animation_library fun(self: Godot.AnimationMixer, name: string, library: Godot.AnimationLibrary): integer
+---@field advance fun(self: Godot.AnimationMixer, delta: number)
+---@field capture fun(self: Godot.AnimationMixer, name: string, duration: number, trans_type: integer, ease_type: integer)
+---@field clear_caches fun(self: Godot.AnimationMixer)
+---@field find_animation fun(self: Godot.AnimationMixer, animation: Godot.Animation): string
+---@field find_animation_library fun(self: Godot.AnimationMixer, animation: Godot.Animation): string
+---@field get_animation fun(self: Godot.AnimationMixer, name: string): Godot.Animation
+---@field get_animation_library fun(self: Godot.AnimationMixer, name: string): Godot.AnimationLibrary
+---@field get_animation_library_list fun(self: Godot.AnimationMixer): table
+---@field get_animation_list fun(self: Godot.AnimationMixer): table
+---@field get_audio_max_polyphony fun(self: Godot.AnimationMixer): integer
+---@field get_callback_mode_discrete fun(self: Godot.AnimationMixer): integer
+---@field get_callback_mode_method fun(self: Godot.AnimationMixer): integer
+---@field get_callback_mode_process fun(self: Godot.AnimationMixer): integer
+---@field get_root_motion_position fun(self: Godot.AnimationMixer): Godot.Vector3
+---@field get_root_motion_position_accumulator fun(self: Godot.AnimationMixer): Godot.Vector3
+---@field get_root_motion_rotation fun(self: Godot.AnimationMixer): Godot.Quaternion
+---@field get_root_motion_rotation_accumulator fun(self: Godot.AnimationMixer): Godot.Quaternion
+---@field get_root_motion_scale fun(self: Godot.AnimationMixer): Godot.Vector3
+---@field get_root_motion_scale_accumulator fun(self: Godot.AnimationMixer): Godot.Vector3
+---@field get_root_motion_track fun(self: Godot.AnimationMixer): string
+---@field get_root_node fun(self: Godot.AnimationMixer): string
+---@field has_animation fun(self: Godot.AnimationMixer, name: string): boolean
+---@field has_animation_library fun(self: Godot.AnimationMixer, name: string): boolean
+---@field is_active fun(self: Godot.AnimationMixer): boolean
+---@field is_deterministic fun(self: Godot.AnimationMixer): boolean
+---@field is_reset_on_save_enabled fun(self: Godot.AnimationMixer): boolean
+---@field is_root_motion_local fun(self: Godot.AnimationMixer): boolean
+---@field remove_animation_library fun(self: Godot.AnimationMixer, name: string)
+---@field rename_animation_library fun(self: Godot.AnimationMixer, name: string, newname: string)
+---@field set_active fun(self: Godot.AnimationMixer, active: boolean)
+---@field set_audio_max_polyphony fun(self: Godot.AnimationMixer, max_polyphony: integer)
+---@field set_callback_mode_discrete fun(self: Godot.AnimationMixer, mode: integer)
+---@field set_callback_mode_method fun(self: Godot.AnimationMixer, mode: integer)
+---@field set_callback_mode_process fun(self: Godot.AnimationMixer, mode: integer)
+---@field set_deterministic fun(self: Godot.AnimationMixer, deterministic: boolean)
+---@field set_reset_on_save_enabled fun(self: Godot.AnimationMixer, enabled: boolean)
+---@field set_root_motion_local fun(self: Godot.AnimationMixer, enabled: boolean)
+---@field set_root_motion_track fun(self: Godot.AnimationMixer, path: string)
+---@field set_root_node fun(self: Godot.AnimationMixer, path: string)
+---@class Godot.AnimationMixer.__type
+---@field new fun(): Godot.AnimationMixer
+---@field AnimationCallbackModeDiscrete Godot.AnimationMixer.AnimationCallbackModeDiscrete
+---@field AnimationCallbackModeMethod Godot.AnimationMixer.AnimationCallbackModeMethod
+---@field AnimationCallbackModeProcess Godot.AnimationMixer.AnimationCallbackModeProcess
+---@class Godot.AnimationMixer.AnimationCallbackModeDiscrete
+---@field Dominant integer
+---@field Recessive integer
+---@field ForceContinuous integer
+---@class Godot.AnimationMixer.AnimationCallbackModeMethod
+---@field Deferred integer
+---@field Immediate integer
+---@class Godot.AnimationMixer.AnimationCallbackModeProcess
+---@field Physics integer
+---@field Idle integer
+---@field Manual integer
+
+---@class Godot.AnimationPlayer : Godot.AnimationMixer
+---@field assigned_animation string
+---@field autoplay string
+---@field current_animation string
+---@field current_animation_length number
+---@field current_animation_position number
+---@field movie_quit_on_finish boolean
+---@field playback_auto_capture boolean
+---@field playback_auto_capture_duration number
+---@field playback_auto_capture_ease_type integer
+---@field playback_auto_capture_transition_type integer
+---@field playback_default_blend_time number
+---@field speed_scale number
+---@field animation_changed Godot.Signal
+---@field current_animation_changed Godot.Signal
+---@field animation_get_next fun(self: Godot.AnimationPlayer, animation_from: string): string
+---@field animation_set_next fun(self: Godot.AnimationPlayer, animation_from: string, animation_to: string)
+---@field clear_queue fun(self: Godot.AnimationPlayer)
+---@field get_assigned_animation fun(self: Godot.AnimationPlayer): string
+---@field get_auto_capture_duration fun(self: Godot.AnimationPlayer): number
+---@field get_auto_capture_ease_type fun(self: Godot.AnimationPlayer): integer
+---@field get_auto_capture_transition_type fun(self: Godot.AnimationPlayer): integer
+---@field get_autoplay fun(self: Godot.AnimationPlayer): string
+---@field get_blend_time fun(self: Godot.AnimationPlayer, animation_from: string, animation_to: string): number
+---@field get_current_animation fun(self: Godot.AnimationPlayer): string
+---@field get_current_animation_length fun(self: Godot.AnimationPlayer): number
+---@field get_current_animation_position fun(self: Godot.AnimationPlayer): number
+---@field get_default_blend_time fun(self: Godot.AnimationPlayer): number
+---@field get_method_call_mode fun(self: Godot.AnimationPlayer): integer
+---@field get_playing_speed fun(self: Godot.AnimationPlayer): number
+---@field get_process_callback fun(self: Godot.AnimationPlayer): integer
+---@field get_queue fun(self: Godot.AnimationPlayer): table
+---@field get_root fun(self: Godot.AnimationPlayer): string
+---@field get_section_end_time fun(self: Godot.AnimationPlayer): number
+---@field get_section_start_time fun(self: Godot.AnimationPlayer): number
+---@field get_speed_scale fun(self: Godot.AnimationPlayer): number
+---@field has_section fun(self: Godot.AnimationPlayer): boolean
+---@field is_animation_active fun(self: Godot.AnimationPlayer): boolean
+---@field is_auto_capture fun(self: Godot.AnimationPlayer): boolean
+---@field is_movie_quit_on_finish_enabled fun(self: Godot.AnimationPlayer): boolean
+---@field is_playing fun(self: Godot.AnimationPlayer): boolean
+---@field pause fun(self: Godot.AnimationPlayer)
+---@field play fun(self: Godot.AnimationPlayer, name: string, custom_blend: number, custom_speed: number, from_end: boolean)
+---@field play_backwards fun(self: Godot.AnimationPlayer, name: string, custom_blend: number)
+---@field play_section fun(self: Godot.AnimationPlayer, name: string, start_time: number, end_time: number, custom_blend: number, custom_speed: number, from_end: boolean)
+---@field play_section_backwards fun(self: Godot.AnimationPlayer, name: string, start_time: number, end_time: number, custom_blend: number)
+---@field play_section_with_markers fun(self: Godot.AnimationPlayer, name: string, start_marker: string, end_marker: string, custom_blend: number, custom_speed: number, from_end: boolean)
+---@field play_section_with_markers_backwards fun(self: Godot.AnimationPlayer, name: string, start_marker: string, end_marker: string, custom_blend: number)
+---@field play_with_capture fun(self: Godot.AnimationPlayer, name: string, duration: number, custom_blend: number, custom_speed: number, from_end: boolean, trans_type: integer, ease_type: integer)
+---@field queue fun(self: Godot.AnimationPlayer, name: string)
+---@field reset_section fun(self: Godot.AnimationPlayer)
+---@field seek fun(self: Godot.AnimationPlayer, seconds: number, update: boolean, update_only: boolean)
+---@field set_assigned_animation fun(self: Godot.AnimationPlayer, animation: string)
+---@field set_auto_capture fun(self: Godot.AnimationPlayer, auto_capture: boolean)
+---@field set_auto_capture_duration fun(self: Godot.AnimationPlayer, auto_capture_duration: number)
+---@field set_auto_capture_ease_type fun(self: Godot.AnimationPlayer, auto_capture_ease_type: integer)
+---@field set_auto_capture_transition_type fun(self: Godot.AnimationPlayer, auto_capture_transition_type: integer)
+---@field set_autoplay fun(self: Godot.AnimationPlayer, name: string)
+---@field set_blend_time fun(self: Godot.AnimationPlayer, animation_from: string, animation_to: string, sec: number)
+---@field set_current_animation fun(self: Godot.AnimationPlayer, animation: string)
+---@field set_default_blend_time fun(self: Godot.AnimationPlayer, sec: number)
+---@field set_method_call_mode fun(self: Godot.AnimationPlayer, mode: integer)
+---@field set_movie_quit_on_finish_enabled fun(self: Godot.AnimationPlayer, enabled: boolean)
+---@field set_process_callback fun(self: Godot.AnimationPlayer, mode: integer)
+---@field set_root fun(self: Godot.AnimationPlayer, path: string)
+---@field set_section fun(self: Godot.AnimationPlayer, start_time: number, end_time: number)
+---@field set_section_with_markers fun(self: Godot.AnimationPlayer, start_marker: string, end_marker: string)
+---@field set_speed_scale fun(self: Godot.AnimationPlayer, speed: number)
+---@field stop fun(self: Godot.AnimationPlayer, keep_state: boolean)
+---@class Godot.AnimationPlayer.__type
+---@field new fun(): Godot.AnimationPlayer
+---@field AnimationMethodCallMode Godot.AnimationPlayer.AnimationMethodCallMode
+---@field AnimationProcessCallback Godot.AnimationPlayer.AnimationProcessCallback
+---@class Godot.AnimationPlayer.AnimationMethodCallMode
+---@field Deferred integer
+---@field Immediate integer
+---@class Godot.AnimationPlayer.AnimationProcessCallback
+---@field Physics integer
+---@field Idle integer
+---@field Manual integer
+
+---@class Godot.AnimationTree : Godot.AnimationMixer
+---@field advance_expression_base_node string
+---@field anim_player string
+---@field tree_root Godot.AnimationRootNode
+---@field animation_player_changed Godot.Signal
+---@field get_advance_expression_base_node fun(self: Godot.AnimationTree): string
+---@field get_animation_player fun(self: Godot.AnimationTree): string
+---@field get_process_callback fun(self: Godot.AnimationTree): integer
+---@field get_tree_root fun(self: Godot.AnimationTree): Godot.AnimationRootNode
+---@field set_advance_expression_base_node fun(self: Godot.AnimationTree, path: string)
+---@field set_animation_player fun(self: Godot.AnimationTree, path: string)
+---@field set_process_callback fun(self: Godot.AnimationTree, mode: integer)
+---@field set_tree_root fun(self: Godot.AnimationTree, animation_node: Godot.AnimationRootNode)
+---@class Godot.AnimationTree.__type
+---@field new fun(): Godot.AnimationTree
+---@field AnimationProcessCallback Godot.AnimationTree.AnimationProcessCallback
+---@class Godot.AnimationTree.AnimationProcessCallback
+---@field Physics integer
+---@field Idle integer
+---@field Manual integer
+
+---@class Godot.Area2D : Godot.CollisionObject2D
+---@field angular_damp number
+---@field angular_damp_space_override integer
+---@field audio_bus_name string
+---@field audio_bus_override boolean
+---@field gravity number
+---@field gravity_direction Godot.Vector2
+---@field gravity_point boolean
+---@field gravity_point_center Godot.Vector2
+---@field gravity_point_unit_distance number
+---@field gravity_space_override integer
+---@field linear_damp number
+---@field linear_damp_space_override integer
+---@field monitorable boolean
+---@field monitoring boolean
+---@field priority integer
+---@field area_entered Godot.Signal
+---@field area_exited Godot.Signal
+---@field area_shape_entered Godot.Signal
+---@field area_shape_exited Godot.Signal
+---@field body_entered Godot.Signal
+---@field body_exited Godot.Signal
+---@field body_shape_entered Godot.Signal
+---@field body_shape_exited Godot.Signal
+---@field get_angular_damp fun(self: Godot.Area2D): number
+---@field get_angular_damp_space_override_mode fun(self: Godot.Area2D): integer
+---@field get_audio_bus_name fun(self: Godot.Area2D): string
+---@field get_gravity fun(self: Godot.Area2D): number
+---@field get_gravity_direction fun(self: Godot.Area2D): Godot.Vector2
+---@field get_gravity_point_center fun(self: Godot.Area2D): Godot.Vector2
+---@field get_gravity_point_unit_distance fun(self: Godot.Area2D): number
+---@field get_gravity_space_override_mode fun(self: Godot.Area2D): integer
+---@field get_linear_damp fun(self: Godot.Area2D): number
+---@field get_linear_damp_space_override_mode fun(self: Godot.Area2D): integer
+---@field get_overlapping_areas fun(self: Godot.Area2D): table
+---@field get_overlapping_bodies fun(self: Godot.Area2D): table
+---@field get_priority fun(self: Godot.Area2D): integer
+---@field has_overlapping_areas fun(self: Godot.Area2D): boolean
+---@field has_overlapping_bodies fun(self: Godot.Area2D): boolean
+---@field is_gravity_a_point fun(self: Godot.Area2D): boolean
+---@field is_monitorable fun(self: Godot.Area2D): boolean
+---@field is_monitoring fun(self: Godot.Area2D): boolean
+---@field is_overriding_audio_bus fun(self: Godot.Area2D): boolean
+---@field overlaps_area fun(self: Godot.Area2D, area: Godot.Node): boolean
+---@field overlaps_body fun(self: Godot.Area2D, body: Godot.Node): boolean
+---@field set_angular_damp fun(self: Godot.Area2D, angular_damp: number)
+---@field set_angular_damp_space_override_mode fun(self: Godot.Area2D, space_override_mode: integer)
+---@field set_audio_bus_name fun(self: Godot.Area2D, name: string)
+---@field set_audio_bus_override fun(self: Godot.Area2D, enable: boolean)
+---@field set_gravity fun(self: Godot.Area2D, gravity: number)
+---@field set_gravity_direction fun(self: Godot.Area2D, direction: Godot.Vector2)
+---@field set_gravity_is_point fun(self: Godot.Area2D, enable: boolean)
+---@field set_gravity_point_center fun(self: Godot.Area2D, center: Godot.Vector2)
+---@field set_gravity_point_unit_distance fun(self: Godot.Area2D, distance_scale: number)
+---@field set_gravity_space_override_mode fun(self: Godot.Area2D, space_override_mode: integer)
+---@field set_linear_damp fun(self: Godot.Area2D, linear_damp: number)
+---@field set_linear_damp_space_override_mode fun(self: Godot.Area2D, space_override_mode: integer)
+---@field set_monitorable fun(self: Godot.Area2D, enable: boolean)
+---@field set_monitoring fun(self: Godot.Area2D, enable: boolean)
+---@field set_priority fun(self: Godot.Area2D, priority: integer)
+---@class Godot.Area2D.__type
+---@field new fun(): Godot.Area2D
+---@field SpaceOverride Godot.Area2D.SpaceOverride
+---@class Godot.Area2D.SpaceOverride
+---@field Disabled integer
+---@field Combine integer
+---@field CombineReplace integer
+---@field Replace integer
+---@field ReplaceCombine integer
+
+---@class Godot.Area3D : Godot.CollisionObject3D
+---@field angular_damp number
+---@field angular_damp_space_override integer
+---@field audio_bus_name string
+---@field audio_bus_override boolean
+---@field gravity number
+---@field gravity_direction Godot.Vector3
+---@field gravity_point boolean
+---@field gravity_point_center Godot.Vector3
+---@field gravity_point_unit_distance number
+---@field gravity_space_override integer
+---@field linear_damp number
+---@field linear_damp_space_override integer
+---@field monitorable boolean
+---@field monitoring boolean
+---@field priority integer
+---@field reverb_bus_amount number
+---@field reverb_bus_enabled boolean
+---@field reverb_bus_name string
+---@field reverb_bus_uniformity number
+---@field wind_attenuation_factor number
+---@field wind_force_magnitude number
+---@field wind_source_path string
+---@field area_entered Godot.Signal
+---@field area_exited Godot.Signal
+---@field area_shape_entered Godot.Signal
+---@field area_shape_exited Godot.Signal
+---@field body_entered Godot.Signal
+---@field body_exited Godot.Signal
+---@field body_shape_entered Godot.Signal
+---@field body_shape_exited Godot.Signal
+---@field get_angular_damp fun(self: Godot.Area3D): number
+---@field get_angular_damp_space_override_mode fun(self: Godot.Area3D): integer
+---@field get_audio_bus_name fun(self: Godot.Area3D): string
+---@field get_gravity fun(self: Godot.Area3D): number
+---@field get_gravity_direction fun(self: Godot.Area3D): Godot.Vector3
+---@field get_gravity_point_center fun(self: Godot.Area3D): Godot.Vector3
+---@field get_gravity_point_unit_distance fun(self: Godot.Area3D): number
+---@field get_gravity_space_override_mode fun(self: Godot.Area3D): integer
+---@field get_linear_damp fun(self: Godot.Area3D): number
+---@field get_linear_damp_space_override_mode fun(self: Godot.Area3D): integer
+---@field get_overlapping_areas fun(self: Godot.Area3D): table
+---@field get_overlapping_bodies fun(self: Godot.Area3D): table
+---@field get_priority fun(self: Godot.Area3D): integer
+---@field get_reverb_amount fun(self: Godot.Area3D): number
+---@field get_reverb_bus_name fun(self: Godot.Area3D): string
+---@field get_reverb_uniformity fun(self: Godot.Area3D): number
+---@field get_wind_attenuation_factor fun(self: Godot.Area3D): number
+---@field get_wind_force_magnitude fun(self: Godot.Area3D): number
+---@field get_wind_source_path fun(self: Godot.Area3D): string
+---@field has_overlapping_areas fun(self: Godot.Area3D): boolean
+---@field has_overlapping_bodies fun(self: Godot.Area3D): boolean
+---@field is_gravity_a_point fun(self: Godot.Area3D): boolean
+---@field is_monitorable fun(self: Godot.Area3D): boolean
+---@field is_monitoring fun(self: Godot.Area3D): boolean
+---@field is_overriding_audio_bus fun(self: Godot.Area3D): boolean
+---@field is_using_reverb_bus fun(self: Godot.Area3D): boolean
+---@field overlaps_area fun(self: Godot.Area3D, area: Godot.Node): boolean
+---@field overlaps_body fun(self: Godot.Area3D, body: Godot.Node): boolean
+---@field set_angular_damp fun(self: Godot.Area3D, angular_damp: number)
+---@field set_angular_damp_space_override_mode fun(self: Godot.Area3D, space_override_mode: integer)
+---@field set_audio_bus_name fun(self: Godot.Area3D, name: string)
+---@field set_audio_bus_override fun(self: Godot.Area3D, enable: boolean)
+---@field set_gravity fun(self: Godot.Area3D, gravity: number)
+---@field set_gravity_direction fun(self: Godot.Area3D, direction: Godot.Vector3)
+---@field set_gravity_is_point fun(self: Godot.Area3D, enable: boolean)
+---@field set_gravity_point_center fun(self: Godot.Area3D, center: Godot.Vector3)
+---@field set_gravity_point_unit_distance fun(self: Godot.Area3D, distance_scale: number)
+---@field set_gravity_space_override_mode fun(self: Godot.Area3D, space_override_mode: integer)
+---@field set_linear_damp fun(self: Godot.Area3D, linear_damp: number)
+---@field set_linear_damp_space_override_mode fun(self: Godot.Area3D, space_override_mode: integer)
+---@field set_monitorable fun(self: Godot.Area3D, enable: boolean)
+---@field set_monitoring fun(self: Godot.Area3D, enable: boolean)
+---@field set_priority fun(self: Godot.Area3D, priority: integer)
+---@field set_reverb_amount fun(self: Godot.Area3D, amount: number)
+---@field set_reverb_bus_name fun(self: Godot.Area3D, name: string)
+---@field set_reverb_uniformity fun(self: Godot.Area3D, amount: number)
+---@field set_use_reverb_bus fun(self: Godot.Area3D, enable: boolean)
+---@field set_wind_attenuation_factor fun(self: Godot.Area3D, wind_attenuation_factor: number)
+---@field set_wind_force_magnitude fun(self: Godot.Area3D, wind_force_magnitude: number)
+---@field set_wind_source_path fun(self: Godot.Area3D, wind_source_path: string)
+---@class Godot.Area3D.__type
+---@field new fun(): Godot.Area3D
+---@field SpaceOverride Godot.Area3D.SpaceOverride
+---@class Godot.Area3D.SpaceOverride
+---@field Disabled integer
+---@field Combine integer
+---@field CombineReplace integer
+---@field Replace integer
+---@field ReplaceCombine integer
+
+---@class Godot.AspectRatioContainer : Godot.Container
+---@field alignment_horizontal integer
+---@field alignment_vertical integer
+---@field ratio number
+---@field stretch_mode integer
+---@field get_alignment_horizontal fun(self: Godot.AspectRatioContainer): integer
+---@field get_alignment_vertical fun(self: Godot.AspectRatioContainer): integer
+---@field get_ratio fun(self: Godot.AspectRatioContainer): number
+---@field get_stretch_mode fun(self: Godot.AspectRatioContainer): integer
+---@field set_alignment_horizontal fun(self: Godot.AspectRatioContainer, alignment_horizontal: integer)
+---@field set_alignment_vertical fun(self: Godot.AspectRatioContainer, alignment_vertical: integer)
+---@field set_ratio fun(self: Godot.AspectRatioContainer, ratio: number)
+---@field set_stretch_mode fun(self: Godot.AspectRatioContainer, stretch_mode: integer)
+---@class Godot.AspectRatioContainer.__type
+---@field new fun(): Godot.AspectRatioContainer
+---@field AlignmentMode Godot.AspectRatioContainer.AlignmentMode
+---@field StretchModeEnum Godot.AspectRatioContainer.StretchModeEnum
+---@class Godot.AspectRatioContainer.AlignmentMode
+---@field Begin integer
+---@field Center integer
+---@field End integer
+---@class Godot.AspectRatioContainer.StretchModeEnum
+---@field WidthControlsHeight integer
+---@field HeightControlsWidth integer
+---@field Fit integer
+---@field Cover integer
+
+---@class Godot.AudioListener2D : Godot.Node2D
+---@field clear_current fun(self: Godot.AudioListener2D)
+---@field is_current fun(self: Godot.AudioListener2D): boolean
+---@field make_current fun(self: Godot.AudioListener2D)
+---@class Godot.AudioListener2D.__type
+---@field new fun(): Godot.AudioListener2D
+
+---@class Godot.AudioListener3D : Godot.Node3D
+---@field doppler_tracking integer
+---@field clear_current fun(self: Godot.AudioListener3D)
+---@field get_doppler_tracking fun(self: Godot.AudioListener3D): integer
+---@field get_listener_transform fun(self: Godot.AudioListener3D): Godot.Transform3D
+---@field is_current fun(self: Godot.AudioListener3D): boolean
+---@field make_current fun(self: Godot.AudioListener3D)
+---@field set_doppler_tracking fun(self: Godot.AudioListener3D, mode: integer)
+---@class Godot.AudioListener3D.__type
+---@field new fun(): Godot.AudioListener3D
+---@field DopplerTrackingEnum Godot.AudioListener3D.DopplerTrackingEnum
+---@class Godot.AudioListener3D.DopplerTrackingEnum
+---@field Disabled integer
+---@field IdleStep integer
+---@field PhysicsStep integer
+
+---@class Godot.AudioStreamPlayer : Godot.Node
+---@field autoplay boolean
+---@field bus string
+---@field max_polyphony integer
+---@field mix_target integer
+---@field pitch_scale number
+---@field playback_type integer
+---@field playing boolean
+---@field stream Godot.AudioStream
+---@field stream_paused boolean
+---@field volume_db number
+---@field volume_linear number
+---@field finished Godot.Signal
+---@field get_bus fun(self: Godot.AudioStreamPlayer): string
+---@field get_max_polyphony fun(self: Godot.AudioStreamPlayer): integer
+---@field get_mix_target fun(self: Godot.AudioStreamPlayer): integer
+---@field get_pitch_scale fun(self: Godot.AudioStreamPlayer): number
+---@field get_playback_position fun(self: Godot.AudioStreamPlayer): number
+---@field get_playback_type fun(self: Godot.AudioStreamPlayer): integer
+---@field get_stream fun(self: Godot.AudioStreamPlayer): Godot.AudioStream
+---@field get_stream_paused fun(self: Godot.AudioStreamPlayer): boolean
+---@field get_stream_playback fun(self: Godot.AudioStreamPlayer): Godot.AudioStreamPlayback
+---@field get_volume_db fun(self: Godot.AudioStreamPlayer): number
+---@field get_volume_linear fun(self: Godot.AudioStreamPlayer): number
+---@field has_stream_playback fun(self: Godot.AudioStreamPlayer): boolean
+---@field is_autoplay_enabled fun(self: Godot.AudioStreamPlayer): boolean
+---@field is_playing fun(self: Godot.AudioStreamPlayer): boolean
+---@field play fun(self: Godot.AudioStreamPlayer, from_position: number)
+---@field seek fun(self: Godot.AudioStreamPlayer, to_position: number)
+---@field set_autoplay fun(self: Godot.AudioStreamPlayer, enable: boolean)
+---@field set_bus fun(self: Godot.AudioStreamPlayer, bus: string)
+---@field set_max_polyphony fun(self: Godot.AudioStreamPlayer, max_polyphony: integer)
+---@field set_mix_target fun(self: Godot.AudioStreamPlayer, mix_target: integer)
+---@field set_pitch_scale fun(self: Godot.AudioStreamPlayer, pitch_scale: number)
+---@field set_playback_type fun(self: Godot.AudioStreamPlayer, playback_type: integer)
+---@field set_playing fun(self: Godot.AudioStreamPlayer, enable: boolean)
+---@field set_stream fun(self: Godot.AudioStreamPlayer, stream: Godot.AudioStream)
+---@field set_stream_paused fun(self: Godot.AudioStreamPlayer, pause: boolean)
+---@field set_volume_db fun(self: Godot.AudioStreamPlayer, volume_db: number)
+---@field set_volume_linear fun(self: Godot.AudioStreamPlayer, volume_linear: number)
+---@field stop fun(self: Godot.AudioStreamPlayer)
+---@class Godot.AudioStreamPlayer.__type
+---@field new fun(): Godot.AudioStreamPlayer
+---@field MixTargetEnum Godot.AudioStreamPlayer.MixTargetEnum
+---@class Godot.AudioStreamPlayer.MixTargetEnum
+---@field Stereo integer
+---@field Surround integer
+---@field Center integer
+
+---@class Godot.AudioStreamPlayer2D : Godot.Node2D
+---@field area_mask integer
+---@field attenuation number
+---@field autoplay boolean
+---@field bus string
+---@field max_distance number
+---@field max_polyphony integer
+---@field panning_strength number
+---@field pitch_scale number
+---@field playback_type integer
+---@field playing boolean
+---@field stream Godot.AudioStream
+---@field stream_paused boolean
+---@field volume_db number
+---@field volume_linear number
+---@field finished Godot.Signal
+---@field get_area_mask fun(self: Godot.AudioStreamPlayer2D): integer
+---@field get_attenuation fun(self: Godot.AudioStreamPlayer2D): number
+---@field get_bus fun(self: Godot.AudioStreamPlayer2D): string
+---@field get_max_distance fun(self: Godot.AudioStreamPlayer2D): number
+---@field get_max_polyphony fun(self: Godot.AudioStreamPlayer2D): integer
+---@field get_panning_strength fun(self: Godot.AudioStreamPlayer2D): number
+---@field get_pitch_scale fun(self: Godot.AudioStreamPlayer2D): number
+---@field get_playback_position fun(self: Godot.AudioStreamPlayer2D): number
+---@field get_playback_type fun(self: Godot.AudioStreamPlayer2D): integer
+---@field get_stream fun(self: Godot.AudioStreamPlayer2D): Godot.AudioStream
+---@field get_stream_paused fun(self: Godot.AudioStreamPlayer2D): boolean
+---@field get_stream_playback fun(self: Godot.AudioStreamPlayer2D): Godot.AudioStreamPlayback
+---@field get_volume_db fun(self: Godot.AudioStreamPlayer2D): number
+---@field get_volume_linear fun(self: Godot.AudioStreamPlayer2D): number
+---@field has_stream_playback fun(self: Godot.AudioStreamPlayer2D): boolean
+---@field is_autoplay_enabled fun(self: Godot.AudioStreamPlayer2D): boolean
+---@field is_playing fun(self: Godot.AudioStreamPlayer2D): boolean
+---@field play fun(self: Godot.AudioStreamPlayer2D, from_position: number)
+---@field seek fun(self: Godot.AudioStreamPlayer2D, to_position: number)
+---@field set_area_mask fun(self: Godot.AudioStreamPlayer2D, mask: integer)
+---@field set_attenuation fun(self: Godot.AudioStreamPlayer2D, curve: number)
+---@field set_autoplay fun(self: Godot.AudioStreamPlayer2D, enable: boolean)
+---@field set_bus fun(self: Godot.AudioStreamPlayer2D, bus: string)
+---@field set_max_distance fun(self: Godot.AudioStreamPlayer2D, pixels: number)
+---@field set_max_polyphony fun(self: Godot.AudioStreamPlayer2D, max_polyphony: integer)
+---@field set_panning_strength fun(self: Godot.AudioStreamPlayer2D, panning_strength: number)
+---@field set_pitch_scale fun(self: Godot.AudioStreamPlayer2D, pitch_scale: number)
+---@field set_playback_type fun(self: Godot.AudioStreamPlayer2D, playback_type: integer)
+---@field set_playing fun(self: Godot.AudioStreamPlayer2D, enable: boolean)
+---@field set_stream fun(self: Godot.AudioStreamPlayer2D, stream: Godot.AudioStream)
+---@field set_stream_paused fun(self: Godot.AudioStreamPlayer2D, pause: boolean)
+---@field set_volume_db fun(self: Godot.AudioStreamPlayer2D, volume_db: number)
+---@field set_volume_linear fun(self: Godot.AudioStreamPlayer2D, volume_linear: number)
+---@field stop fun(self: Godot.AudioStreamPlayer2D)
+---@class Godot.AudioStreamPlayer2D.__type
+---@field new fun(): Godot.AudioStreamPlayer2D
+
+---@class Godot.AudioStreamPlayer3D : Godot.Node3D
+---@field area_mask integer
+---@field attenuation_filter_cutoff_hz number
+---@field attenuation_filter_db number
+---@field attenuation_model integer
+---@field autoplay boolean
+---@field bus string
+---@field doppler_tracking integer
+---@field emission_angle_degrees number
+---@field emission_angle_enabled boolean
+---@field emission_angle_filter_attenuation_db number
+---@field max_db number
+---@field max_distance number
+---@field max_polyphony integer
+---@field panning_strength number
+---@field pitch_scale number
+---@field playback_type integer
+---@field playing boolean
+---@field stream Godot.AudioStream
+---@field stream_paused boolean
+---@field unit_size number
+---@field volume_db number
+---@field volume_linear number
+---@field finished Godot.Signal
+---@field get_area_mask fun(self: Godot.AudioStreamPlayer3D): integer
+---@field get_attenuation_filter_cutoff_hz fun(self: Godot.AudioStreamPlayer3D): number
+---@field get_attenuation_filter_db fun(self: Godot.AudioStreamPlayer3D): number
+---@field get_attenuation_model fun(self: Godot.AudioStreamPlayer3D): integer
+---@field get_bus fun(self: Godot.AudioStreamPlayer3D): string
+---@field get_doppler_tracking fun(self: Godot.AudioStreamPlayer3D): integer
+---@field get_emission_angle fun(self: Godot.AudioStreamPlayer3D): number
+---@field get_emission_angle_filter_attenuation_db fun(self: Godot.AudioStreamPlayer3D): number
+---@field get_max_db fun(self: Godot.AudioStreamPlayer3D): number
+---@field get_max_distance fun(self: Godot.AudioStreamPlayer3D): number
+---@field get_max_polyphony fun(self: Godot.AudioStreamPlayer3D): integer
+---@field get_panning_strength fun(self: Godot.AudioStreamPlayer3D): number
+---@field get_pitch_scale fun(self: Godot.AudioStreamPlayer3D): number
+---@field get_playback_position fun(self: Godot.AudioStreamPlayer3D): number
+---@field get_playback_type fun(self: Godot.AudioStreamPlayer3D): integer
+---@field get_stream fun(self: Godot.AudioStreamPlayer3D): Godot.AudioStream
+---@field get_stream_paused fun(self: Godot.AudioStreamPlayer3D): boolean
+---@field get_stream_playback fun(self: Godot.AudioStreamPlayer3D): Godot.AudioStreamPlayback
+---@field get_unit_size fun(self: Godot.AudioStreamPlayer3D): number
+---@field get_volume_db fun(self: Godot.AudioStreamPlayer3D): number
+---@field get_volume_linear fun(self: Godot.AudioStreamPlayer3D): number
+---@field has_stream_playback fun(self: Godot.AudioStreamPlayer3D): boolean
+---@field is_autoplay_enabled fun(self: Godot.AudioStreamPlayer3D): boolean
+---@field is_emission_angle_enabled fun(self: Godot.AudioStreamPlayer3D): boolean
+---@field is_playing fun(self: Godot.AudioStreamPlayer3D): boolean
+---@field play fun(self: Godot.AudioStreamPlayer3D, from_position: number)
+---@field seek fun(self: Godot.AudioStreamPlayer3D, to_position: number)
+---@field set_area_mask fun(self: Godot.AudioStreamPlayer3D, mask: integer)
+---@field set_attenuation_filter_cutoff_hz fun(self: Godot.AudioStreamPlayer3D, degrees: number)
+---@field set_attenuation_filter_db fun(self: Godot.AudioStreamPlayer3D, db: number)
+---@field set_attenuation_model fun(self: Godot.AudioStreamPlayer3D, model: integer)
+---@field set_autoplay fun(self: Godot.AudioStreamPlayer3D, enable: boolean)
+---@field set_bus fun(self: Godot.AudioStreamPlayer3D, bus: string)
+---@field set_doppler_tracking fun(self: Godot.AudioStreamPlayer3D, mode: integer)
+---@field set_emission_angle fun(self: Godot.AudioStreamPlayer3D, degrees: number)
+---@field set_emission_angle_enabled fun(self: Godot.AudioStreamPlayer3D, enabled: boolean)
+---@field set_emission_angle_filter_attenuation_db fun(self: Godot.AudioStreamPlayer3D, db: number)
+---@field set_max_db fun(self: Godot.AudioStreamPlayer3D, max_db: number)
+---@field set_max_distance fun(self: Godot.AudioStreamPlayer3D, meters: number)
+---@field set_max_polyphony fun(self: Godot.AudioStreamPlayer3D, max_polyphony: integer)
+---@field set_panning_strength fun(self: Godot.AudioStreamPlayer3D, panning_strength: number)
+---@field set_pitch_scale fun(self: Godot.AudioStreamPlayer3D, pitch_scale: number)
+---@field set_playback_type fun(self: Godot.AudioStreamPlayer3D, playback_type: integer)
+---@field set_playing fun(self: Godot.AudioStreamPlayer3D, enable: boolean)
+---@field set_stream fun(self: Godot.AudioStreamPlayer3D, stream: Godot.AudioStream)
+---@field set_stream_paused fun(self: Godot.AudioStreamPlayer3D, pause: boolean)
+---@field set_unit_size fun(self: Godot.AudioStreamPlayer3D, unit_size: number)
+---@field set_volume_db fun(self: Godot.AudioStreamPlayer3D, volume_db: number)
+---@field set_volume_linear fun(self: Godot.AudioStreamPlayer3D, volume_linear: number)
+---@field stop fun(self: Godot.AudioStreamPlayer3D)
+---@class Godot.AudioStreamPlayer3D.__type
+---@field new fun(): Godot.AudioStreamPlayer3D
+---@field AttenuationModelEnum Godot.AudioStreamPlayer3D.AttenuationModelEnum
+---@field DopplerTrackingEnum Godot.AudioStreamPlayer3D.DopplerTrackingEnum
+---@class Godot.AudioStreamPlayer3D.AttenuationModelEnum
+---@field InverseDistance integer
+---@field InverseSquareDistance integer
+---@field Logarithmic integer
+---@field Disabled integer
+---@class Godot.AudioStreamPlayer3D.DopplerTrackingEnum
+---@field Disabled integer
+---@field IdleStep integer
+---@field PhysicsStep integer
+
+---@class Godot.BackBufferCopy : Godot.Node2D
+---@field copy_mode integer
+---@field rect Godot.Rect2
+---@field get_copy_mode fun(self: Godot.BackBufferCopy): integer
+---@field get_rect fun(self: Godot.BackBufferCopy): Godot.Rect2
+---@field set_copy_mode fun(self: Godot.BackBufferCopy, copy_mode: integer)
+---@field set_rect fun(self: Godot.BackBufferCopy, rect: Godot.Rect2)
+---@class Godot.BackBufferCopy.__type
+---@field new fun(): Godot.BackBufferCopy
+---@field CopyModeEnum Godot.BackBufferCopy.CopyModeEnum
+---@class Godot.BackBufferCopy.CopyModeEnum
+---@field Disabled integer
+---@field Rect integer
+---@field Viewport integer
+
+---@class Godot.BaseButton : Godot.Control
+---@field action_mode integer
+---@field button_group Godot.ButtonGroup
+---@field button_mask integer
+---@field button_pressed boolean
+---@field disabled boolean
+---@field keep_pressed_outside boolean
+---@field shortcut Godot.Shortcut
+---@field shortcut_feedback boolean
+---@field shortcut_in_tooltip boolean
+---@field toggle_mode boolean
+---@field button_down Godot.Signal
+---@field button_up Godot.Signal
+---@field pressed Godot.Signal
+---@field toggled Godot.Signal
+---@field get_action_mode fun(self: Godot.BaseButton): integer
+---@field get_button_group fun(self: Godot.BaseButton): Godot.ButtonGroup
+---@field get_button_mask fun(self: Godot.BaseButton): integer
+---@field get_draw_mode fun(self: Godot.BaseButton): integer
+---@field get_shortcut fun(self: Godot.BaseButton): Godot.Shortcut
+---@field is_disabled fun(self: Godot.BaseButton): boolean
+---@field is_hovered fun(self: Godot.BaseButton): boolean
+---@field is_keep_pressed_outside fun(self: Godot.BaseButton): boolean
+---@field is_pressed fun(self: Godot.BaseButton): boolean
+---@field is_shortcut_feedback fun(self: Godot.BaseButton): boolean
+---@field is_shortcut_in_tooltip_enabled fun(self: Godot.BaseButton): boolean
+---@field is_toggle_mode fun(self: Godot.BaseButton): boolean
+---@field set_action_mode fun(self: Godot.BaseButton, mode: integer)
+---@field set_button_group fun(self: Godot.BaseButton, button_group: Godot.ButtonGroup)
+---@field set_button_mask fun(self: Godot.BaseButton, mask: integer)
+---@field set_disabled fun(self: Godot.BaseButton, disabled: boolean)
+---@field set_keep_pressed_outside fun(self: Godot.BaseButton, enabled: boolean)
+---@field set_pressed fun(self: Godot.BaseButton, pressed: boolean)
+---@field set_pressed_no_signal fun(self: Godot.BaseButton, pressed: boolean)
+---@field set_shortcut fun(self: Godot.BaseButton, shortcut: Godot.Shortcut)
+---@field set_shortcut_feedback fun(self: Godot.BaseButton, enabled: boolean)
+---@field set_shortcut_in_tooltip fun(self: Godot.BaseButton, enabled: boolean)
+---@field set_toggle_mode fun(self: Godot.BaseButton, enabled: boolean)
+---@class Godot.BaseButton.__type
+---@field new fun(): Godot.BaseButton
+---@field ActionModeEnum Godot.BaseButton.ActionModeEnum
+---@field DrawMode Godot.BaseButton.DrawMode
+---@class Godot.BaseButton.ActionModeEnum
+---@field Press integer
+---@field Release integer
+---@class Godot.BaseButton.DrawMode
+---@field Normal integer
+---@field Pressed integer
+---@field Hover integer
+---@field Disabled integer
+---@field HoverPressed integer
+
+---@class Godot.Bone2D : Godot.Node2D
+---@field rest Godot.Transform2D
+---@field apply_rest fun(self: Godot.Bone2D)
+---@field get_autocalculate_length_and_angle fun(self: Godot.Bone2D): boolean
+---@field get_bone_angle fun(self: Godot.Bone2D): number
+---@field get_index_in_skeleton fun(self: Godot.Bone2D): integer
+---@field get_length fun(self: Godot.Bone2D): number
+---@field get_rest fun(self: Godot.Bone2D): Godot.Transform2D
+---@field get_skeleton_rest fun(self: Godot.Bone2D): Godot.Transform2D
+---@field set_autocalculate_length_and_angle fun(self: Godot.Bone2D, auto_calculate: boolean)
+---@field set_bone_angle fun(self: Godot.Bone2D, angle: number)
+---@field set_length fun(self: Godot.Bone2D, length: number)
+---@field set_rest fun(self: Godot.Bone2D, rest: Godot.Transform2D)
+---@class Godot.Bone2D.__type
+---@field new fun(): Godot.Bone2D
+
+---@class Godot.BoneAttachment3D : Godot.Node3D
+---@field bone_idx integer
+---@field bone_name string
+---@field external_skeleton string
+---@field override_pose boolean
+---@field use_external_skeleton boolean
+---@field get_bone_idx fun(self: Godot.BoneAttachment3D): integer
+---@field get_bone_name fun(self: Godot.BoneAttachment3D): string
+---@field get_external_skeleton fun(self: Godot.BoneAttachment3D): string
+---@field get_override_pose fun(self: Godot.BoneAttachment3D): boolean
+---@field get_skeleton fun(self: Godot.BoneAttachment3D): Godot.Skeleton3D
+---@field get_use_external_skeleton fun(self: Godot.BoneAttachment3D): boolean
+---@field on_skeleton_update fun(self: Godot.BoneAttachment3D)
+---@field set_bone_idx fun(self: Godot.BoneAttachment3D, bone_idx: integer)
+---@field set_bone_name fun(self: Godot.BoneAttachment3D, bone_name: string)
+---@field set_external_skeleton fun(self: Godot.BoneAttachment3D, external_skeleton: string)
+---@field set_override_pose fun(self: Godot.BoneAttachment3D, override_pose: boolean)
+---@field set_use_external_skeleton fun(self: Godot.BoneAttachment3D, use_external_skeleton: boolean)
+---@class Godot.BoneAttachment3D.__type
+---@field new fun(): Godot.BoneAttachment3D
+
+---@class Godot.BoneConstraint3D : Godot.SkeletonModifier3D
+---@field clear_setting fun(self: Godot.BoneConstraint3D)
+---@field get_amount fun(self: Godot.BoneConstraint3D, index: integer): number
+---@field get_apply_bone fun(self: Godot.BoneConstraint3D, index: integer): integer
+---@field get_apply_bone_name fun(self: Godot.BoneConstraint3D, index: integer): string
+---@field get_reference_bone fun(self: Godot.BoneConstraint3D, index: integer): integer
+---@field get_reference_bone_name fun(self: Godot.BoneConstraint3D, index: integer): string
+---@field get_reference_node fun(self: Godot.BoneConstraint3D, index: integer): string
+---@field get_reference_type fun(self: Godot.BoneConstraint3D, index: integer): integer
+---@field get_setting_count fun(self: Godot.BoneConstraint3D): integer
+---@field set_amount fun(self: Godot.BoneConstraint3D, index: integer, amount: number)
+---@field set_apply_bone fun(self: Godot.BoneConstraint3D, index: integer, bone: integer)
+---@field set_apply_bone_name fun(self: Godot.BoneConstraint3D, index: integer, bone_name: string)
+---@field set_reference_bone fun(self: Godot.BoneConstraint3D, index: integer, bone: integer)
+---@field set_reference_bone_name fun(self: Godot.BoneConstraint3D, index: integer, bone_name: string)
+---@field set_reference_node fun(self: Godot.BoneConstraint3D, index: integer, node: string)
+---@field set_reference_type fun(self: Godot.BoneConstraint3D, index: integer, type: integer)
+---@field set_setting_count fun(self: Godot.BoneConstraint3D, count: integer)
+---@class Godot.BoneConstraint3D.__type
+---@field new fun(): Godot.BoneConstraint3D
+---@field ReferenceType Godot.BoneConstraint3D.ReferenceType
+---@class Godot.BoneConstraint3D.ReferenceType
+---@field Bone integer
+---@field Node integer
+
+---@class Godot.BoneTwistDisperser3D : Godot.SkeletonModifier3D
+---@field mutable_bone_axes boolean
+---@field setting_count integer
+---@field are_bone_axes_mutable fun(self: Godot.BoneTwistDisperser3D): boolean
+---@field clear_settings fun(self: Godot.BoneTwistDisperser3D)
+---@field get_damping_curve fun(self: Godot.BoneTwistDisperser3D, index: integer): Godot.Curve
+---@field get_disperse_mode fun(self: Godot.BoneTwistDisperser3D, index: integer): integer
+---@field get_end_bone fun(self: Godot.BoneTwistDisperser3D, index: integer): integer
+---@field get_end_bone_direction fun(self: Godot.BoneTwistDisperser3D, index: integer): integer
+---@field get_end_bone_name fun(self: Godot.BoneTwistDisperser3D, index: integer): string
+---@field get_joint_bone fun(self: Godot.BoneTwistDisperser3D, index: integer, joint: integer): integer
+---@field get_joint_bone_name fun(self: Godot.BoneTwistDisperser3D, index: integer, joint: integer): string
+---@field get_joint_count fun(self: Godot.BoneTwistDisperser3D, index: integer): integer
+---@field get_joint_twist_amount fun(self: Godot.BoneTwistDisperser3D, index: integer, joint: integer): number
+---@field get_reference_bone fun(self: Godot.BoneTwistDisperser3D, index: integer): integer
+---@field get_reference_bone_name fun(self: Godot.BoneTwistDisperser3D, index: integer): string
+---@field get_root_bone fun(self: Godot.BoneTwistDisperser3D, index: integer): integer
+---@field get_root_bone_name fun(self: Godot.BoneTwistDisperser3D, index: integer): string
+---@field get_setting_count fun(self: Godot.BoneTwistDisperser3D): integer
+---@field get_twist_from fun(self: Godot.BoneTwistDisperser3D, index: integer): Godot.Quaternion
+---@field get_weight_position fun(self: Godot.BoneTwistDisperser3D, index: integer): number
+---@field is_end_bone_extended fun(self: Godot.BoneTwistDisperser3D, index: integer): boolean
+---@field is_twist_from_rest fun(self: Godot.BoneTwistDisperser3D, index: integer): boolean
+---@field set_damping_curve fun(self: Godot.BoneTwistDisperser3D, index: integer, curve: Godot.Curve)
+---@field set_disperse_mode fun(self: Godot.BoneTwistDisperser3D, index: integer, disperse_mode: integer)
+---@field set_end_bone fun(self: Godot.BoneTwistDisperser3D, index: integer, bone: integer)
+---@field set_end_bone_direction fun(self: Godot.BoneTwistDisperser3D, index: integer, bone_direction: integer)
+---@field set_end_bone_name fun(self: Godot.BoneTwistDisperser3D, index: integer, bone_name: string)
+---@field set_extend_end_bone fun(self: Godot.BoneTwistDisperser3D, index: integer, enabled: boolean)
+---@field set_joint_twist_amount fun(self: Godot.BoneTwistDisperser3D, index: integer, joint: integer, twist_amount: number)
+---@field set_mutable_bone_axes fun(self: Godot.BoneTwistDisperser3D, enabled: boolean)
+---@field set_root_bone fun(self: Godot.BoneTwistDisperser3D, index: integer, bone: integer)
+---@field set_root_bone_name fun(self: Godot.BoneTwistDisperser3D, index: integer, bone_name: string)
+---@field set_setting_count fun(self: Godot.BoneTwistDisperser3D, count: integer)
+---@field set_twist_from fun(self: Godot.BoneTwistDisperser3D, index: integer, from: Godot.Quaternion)
+---@field set_twist_from_rest fun(self: Godot.BoneTwistDisperser3D, index: integer, enabled: boolean)
+---@field set_weight_position fun(self: Godot.BoneTwistDisperser3D, index: integer, weight_position: number)
+---@class Godot.BoneTwistDisperser3D.__type
+---@field new fun(): Godot.BoneTwistDisperser3D
+---@field DisperseMode Godot.BoneTwistDisperser3D.DisperseMode
+---@class Godot.BoneTwistDisperser3D.DisperseMode
+---@field Even integer
+---@field Weighted integer
+---@field Custom integer
+
+---@class Godot.BoxContainer : Godot.Container
+---@field alignment integer
+---@field vertical boolean
+---@field add_spacer fun(self: Godot.BoxContainer, begin: boolean): Godot.Control
+---@field get_alignment fun(self: Godot.BoxContainer): integer
+---@field is_vertical fun(self: Godot.BoxContainer): boolean
+---@field set_alignment fun(self: Godot.BoxContainer, alignment: integer)
+---@field set_vertical fun(self: Godot.BoxContainer, vertical: boolean)
+---@class Godot.BoxContainer.__type
+---@field new fun(): Godot.BoxContainer
+---@field AlignmentMode Godot.BoxContainer.AlignmentMode
+---@class Godot.BoxContainer.AlignmentMode
+---@field Begin integer
+---@field Center integer
+---@field End integer
+
+---@class Godot.Button : Godot.BaseButton
+---@field alignment integer
+---@field autowrap_mode integer
+---@field autowrap_trim_flags integer
+---@field clip_text boolean
+---@field expand_icon boolean
+---@field flat boolean
+---@field icon Godot.Texture2D
+---@field icon_alignment integer
+---@field language string
+---@field text string
+---@field text_direction integer
+---@field text_overrun_behavior integer
+---@field vertical_icon_alignment integer
+---@field get_autowrap_mode fun(self: Godot.Button): integer
+---@field get_autowrap_trim_flags fun(self: Godot.Button): integer
+---@field get_button_icon fun(self: Godot.Button): Godot.Texture2D
+---@field get_clip_text fun(self: Godot.Button): boolean
+---@field get_icon_alignment fun(self: Godot.Button): integer
+---@field get_language fun(self: Godot.Button): string
+---@field get_text fun(self: Godot.Button): string
+---@field get_text_alignment fun(self: Godot.Button): integer
+---@field get_text_direction fun(self: Godot.Button): integer
+---@field get_text_overrun_behavior fun(self: Godot.Button): integer
+---@field get_vertical_icon_alignment fun(self: Godot.Button): integer
+---@field is_expand_icon fun(self: Godot.Button): boolean
+---@field is_flat fun(self: Godot.Button): boolean
+---@field set_autowrap_mode fun(self: Godot.Button, autowrap_mode: integer)
+---@field set_autowrap_trim_flags fun(self: Godot.Button, autowrap_trim_flags: integer)
+---@field set_button_icon fun(self: Godot.Button, texture: Godot.Texture2D)
+---@field set_clip_text fun(self: Godot.Button, enabled: boolean)
+---@field set_expand_icon fun(self: Godot.Button, enabled: boolean)
+---@field set_flat fun(self: Godot.Button, enabled: boolean)
+---@field set_icon_alignment fun(self: Godot.Button, icon_alignment: integer)
+---@field set_language fun(self: Godot.Button, language: string)
+---@field set_text fun(self: Godot.Button, text: string)
+---@field set_text_alignment fun(self: Godot.Button, alignment: integer)
+---@field set_text_direction fun(self: Godot.Button, direction: integer)
+---@field set_text_overrun_behavior fun(self: Godot.Button, overrun_behavior: integer)
+---@field set_vertical_icon_alignment fun(self: Godot.Button, vertical_icon_alignment: integer)
+---@class Godot.Button.__type
+---@field new fun(): Godot.Button
+
+---@class Godot.Camera2D : Godot.Node2D
+---@field anchor_mode integer
+---@field custom_viewport Godot.Viewport
+---@field drag_bottom_margin number
+---@field drag_horizontal_enabled boolean
+---@field drag_horizontal_offset number
+---@field drag_left_margin number
+---@field drag_right_margin number
+---@field drag_top_margin number
+---@field drag_vertical_enabled boolean
+---@field drag_vertical_offset number
+---@field editor_draw_drag_margin boolean
+---@field editor_draw_limits boolean
+---@field editor_draw_screen boolean
+---@field enabled boolean
+---@field ignore_rotation boolean
+---@field limit_bottom integer
+---@field limit_enabled boolean
+---@field limit_left integer
+---@field limit_right integer
+---@field limit_smoothed boolean
+---@field limit_top integer
+---@field offset Godot.Vector2
+---@field position_smoothing_enabled boolean
+---@field position_smoothing_speed number
+---@field process_callback integer
+---@field rotation_smoothing_enabled boolean
+---@field rotation_smoothing_speed number
+---@field zoom Godot.Vector2
+---@field align fun(self: Godot.Camera2D)
+---@field force_update_scroll fun(self: Godot.Camera2D)
+---@field get_anchor_mode fun(self: Godot.Camera2D): integer
+---@field get_custom_viewport fun(self: Godot.Camera2D): Godot.Node
+---@field get_drag_horizontal_offset fun(self: Godot.Camera2D): number
+---@field get_drag_margin fun(self: Godot.Camera2D, margin: integer): number
+---@field get_drag_vertical_offset fun(self: Godot.Camera2D): number
+---@field get_limit fun(self: Godot.Camera2D, margin: integer): integer
+---@field get_offset fun(self: Godot.Camera2D): Godot.Vector2
+---@field get_position_smoothing_speed fun(self: Godot.Camera2D): number
+---@field get_process_callback fun(self: Godot.Camera2D): integer
+---@field get_rotation_smoothing_speed fun(self: Godot.Camera2D): number
+---@field get_screen_center_position fun(self: Godot.Camera2D): Godot.Vector2
+---@field get_screen_rotation fun(self: Godot.Camera2D): number
+---@field get_target_position fun(self: Godot.Camera2D): Godot.Vector2
+---@field get_zoom fun(self: Godot.Camera2D): Godot.Vector2
+---@field is_current fun(self: Godot.Camera2D): boolean
+---@field is_drag_horizontal_enabled fun(self: Godot.Camera2D): boolean
+---@field is_drag_vertical_enabled fun(self: Godot.Camera2D): boolean
+---@field is_enabled fun(self: Godot.Camera2D): boolean
+---@field is_ignoring_rotation fun(self: Godot.Camera2D): boolean
+---@field is_limit_drawing_enabled fun(self: Godot.Camera2D): boolean
+---@field is_limit_enabled fun(self: Godot.Camera2D): boolean
+---@field is_limit_smoothing_enabled fun(self: Godot.Camera2D): boolean
+---@field is_margin_drawing_enabled fun(self: Godot.Camera2D): boolean
+---@field is_position_smoothing_enabled fun(self: Godot.Camera2D): boolean
+---@field is_rotation_smoothing_enabled fun(self: Godot.Camera2D): boolean
+---@field is_screen_drawing_enabled fun(self: Godot.Camera2D): boolean
+---@field make_current fun(self: Godot.Camera2D)
+---@field reset_smoothing fun(self: Godot.Camera2D)
+---@field set_anchor_mode fun(self: Godot.Camera2D, anchor_mode: integer)
+---@field set_custom_viewport fun(self: Godot.Camera2D, viewport: Godot.Node)
+---@field set_drag_horizontal_enabled fun(self: Godot.Camera2D, enabled: boolean)
+---@field set_drag_horizontal_offset fun(self: Godot.Camera2D, offset: number)
+---@field set_drag_margin fun(self: Godot.Camera2D, margin: integer, drag_margin: number)
+---@field set_drag_vertical_enabled fun(self: Godot.Camera2D, enabled: boolean)
+---@field set_drag_vertical_offset fun(self: Godot.Camera2D, offset: number)
+---@field set_enabled fun(self: Godot.Camera2D, enabled: boolean)
+---@field set_ignore_rotation fun(self: Godot.Camera2D, ignore: boolean)
+---@field set_limit fun(self: Godot.Camera2D, margin: integer, limit: integer)
+---@field set_limit_drawing_enabled fun(self: Godot.Camera2D, limit_drawing_enabled: boolean)
+---@field set_limit_enabled fun(self: Godot.Camera2D, limit_enabled: boolean)
+---@field set_limit_smoothing_enabled fun(self: Godot.Camera2D, limit_smoothing_enabled: boolean)
+---@field set_margin_drawing_enabled fun(self: Godot.Camera2D, margin_drawing_enabled: boolean)
+---@field set_offset fun(self: Godot.Camera2D, offset: Godot.Vector2)
+---@field set_position_smoothing_enabled fun(self: Godot.Camera2D, enabled: boolean)
+---@field set_position_smoothing_speed fun(self: Godot.Camera2D, position_smoothing_speed: number)
+---@field set_process_callback fun(self: Godot.Camera2D, mode: integer)
+---@field set_rotation_smoothing_enabled fun(self: Godot.Camera2D, enabled: boolean)
+---@field set_rotation_smoothing_speed fun(self: Godot.Camera2D, speed: number)
+---@field set_screen_drawing_enabled fun(self: Godot.Camera2D, screen_drawing_enabled: boolean)
+---@field set_zoom fun(self: Godot.Camera2D, zoom: Godot.Vector2)
+---@class Godot.Camera2D.__type
+---@field new fun(): Godot.Camera2D
+---@field AnchorModeEnum Godot.Camera2D.AnchorModeEnum
+---@field Camera2DProcessCallback Godot.Camera2D.Camera2DProcessCallback
+---@class Godot.Camera2D.AnchorModeEnum
+---@field FixedTopLeft integer
+---@field DragCenter integer
+---@class Godot.Camera2D.Camera2DProcessCallback
+---@field Physics integer
+---@field Idle integer
+
+---@class Godot.Camera3D : Godot.Node3D
+---@field attributes Godot.CameraAttributesPractical,CameraAttributesPhysical
+---@field compositor Godot.Compositor
+---@field cull_mask integer
+---@field current boolean
+---@field doppler_tracking integer
+---@field environment Godot.Environment
+---@field far number
+---@field fov number
+---@field frustum_offset Godot.Vector2
+---@field h_offset number
+---@field keep_aspect integer
+---@field near number
+---@field projection integer
+---@field size number
+---@field v_offset number
+---@field clear_current fun(self: Godot.Camera3D, enable_next: boolean)
+---@field get_attributes fun(self: Godot.Camera3D): Godot.CameraAttributes
+---@field get_camera_projection fun(self: Godot.Camera3D): Godot.Projection
+---@field get_camera_rid fun(self: Godot.Camera3D): Godot.Rid
+---@field get_camera_transform fun(self: Godot.Camera3D): Godot.Transform3D
+---@field get_compositor fun(self: Godot.Camera3D): Godot.Compositor
+---@field get_cull_mask fun(self: Godot.Camera3D): integer
+---@field get_cull_mask_value fun(self: Godot.Camera3D, layer_number: integer): boolean
+---@field get_doppler_tracking fun(self: Godot.Camera3D): integer
+---@field get_environment fun(self: Godot.Camera3D): Godot.Environment
+---@field get_far fun(self: Godot.Camera3D): number
+---@field get_fov fun(self: Godot.Camera3D): number
+---@field get_frustum fun(self: Godot.Camera3D): table
+---@field get_frustum_offset fun(self: Godot.Camera3D): Godot.Vector2
+---@field get_h_offset fun(self: Godot.Camera3D): number
+---@field get_keep_aspect_mode fun(self: Godot.Camera3D): integer
+---@field get_near fun(self: Godot.Camera3D): number
+---@field get_projection fun(self: Godot.Camera3D): integer
+---@field get_pyramid_shape_rid fun(self: Godot.Camera3D): Godot.Rid
+---@field get_size fun(self: Godot.Camera3D): number
+---@field get_v_offset fun(self: Godot.Camera3D): number
+---@field is_current fun(self: Godot.Camera3D): boolean
+---@field is_position_behind fun(self: Godot.Camera3D, world_point: Godot.Vector3): boolean
+---@field is_position_in_frustum fun(self: Godot.Camera3D, world_point: Godot.Vector3): boolean
+---@field make_current fun(self: Godot.Camera3D)
+---@field project_local_ray_normal fun(self: Godot.Camera3D, screen_point: Godot.Vector2): Godot.Vector3
+---@field project_position fun(self: Godot.Camera3D, screen_point: Godot.Vector2, z_depth: number): Godot.Vector3
+---@field project_ray_normal fun(self: Godot.Camera3D, screen_point: Godot.Vector2): Godot.Vector3
+---@field project_ray_origin fun(self: Godot.Camera3D, screen_point: Godot.Vector2): Godot.Vector3
+---@field set_attributes fun(self: Godot.Camera3D, env: Godot.CameraAttributes)
+---@field set_compositor fun(self: Godot.Camera3D, compositor: Godot.Compositor)
+---@field set_cull_mask fun(self: Godot.Camera3D, mask: integer)
+---@field set_cull_mask_value fun(self: Godot.Camera3D, layer_number: integer, value: boolean)
+---@field set_current fun(self: Godot.Camera3D, enabled: boolean)
+---@field set_doppler_tracking fun(self: Godot.Camera3D, mode: integer)
+---@field set_environment fun(self: Godot.Camera3D, env: Godot.Environment)
+---@field set_far fun(self: Godot.Camera3D, far: number)
+---@field set_fov fun(self: Godot.Camera3D, fov: number)
+---@field set_frustum fun(self: Godot.Camera3D, size: number, offset: Godot.Vector2, z_near: number, z_far: number)
+---@field set_frustum_offset fun(self: Godot.Camera3D, offset: Godot.Vector2)
+---@field set_h_offset fun(self: Godot.Camera3D, offset: number)
+---@field set_keep_aspect_mode fun(self: Godot.Camera3D, mode: integer)
+---@field set_near fun(self: Godot.Camera3D, near: number)
+---@field set_orthogonal fun(self: Godot.Camera3D, size: number, z_near: number, z_far: number)
+---@field set_perspective fun(self: Godot.Camera3D, fov: number, z_near: number, z_far: number)
+---@field set_projection fun(self: Godot.Camera3D, mode: integer)
+---@field set_size fun(self: Godot.Camera3D, size: number)
+---@field set_v_offset fun(self: Godot.Camera3D, offset: number)
+---@field unproject_position fun(self: Godot.Camera3D, world_point: Godot.Vector3): Godot.Vector2
+---@class Godot.Camera3D.__type
+---@field new fun(): Godot.Camera3D
+---@field DopplerTrackingEnum Godot.Camera3D.DopplerTrackingEnum
+---@field KeepAspectEnum Godot.Camera3D.KeepAspectEnum
+---@field ProjectionType Godot.Camera3D.ProjectionType
+---@class Godot.Camera3D.DopplerTrackingEnum
+---@field Disabled integer
+---@field IdleStep integer
+---@field PhysicsStep integer
+---@class Godot.Camera3D.KeepAspectEnum
+---@field Width integer
+---@field Height integer
+---@class Godot.Camera3D.ProjectionType
+---@field Perspective integer
+---@field Orthogonal integer
+---@field Frustum integer
+
+---@class Godot.CanvasGroup : Godot.Node2D
+---@field clear_margin number
+---@field fit_margin number
+---@field use_mipmaps boolean
+---@field get_clear_margin fun(self: Godot.CanvasGroup): number
+---@field get_fit_margin fun(self: Godot.CanvasGroup): number
+---@field is_using_mipmaps fun(self: Godot.CanvasGroup): boolean
+---@field set_clear_margin fun(self: Godot.CanvasGroup, clear_margin: number)
+---@field set_fit_margin fun(self: Godot.CanvasGroup, fit_margin: number)
+---@field set_use_mipmaps fun(self: Godot.CanvasGroup, use_mipmaps: boolean)
+---@class Godot.CanvasGroup.__type
+---@field new fun(): Godot.CanvasGroup
+
+---@class Godot.CanvasItem : Godot.Node
+---@field clip_children integer
+---@field light_mask integer
+---@field material Godot.CanvasItemMaterial,ShaderMaterial
+---@field modulate Godot.Color
+---@field self_modulate Godot.Color
+---@field show_behind_parent boolean
+---@field texture_filter integer
+---@field texture_repeat integer
+---@field top_level boolean
+---@field use_parent_material boolean
+---@field visibility_layer integer
+---@field visible boolean
+---@field y_sort_enabled boolean
+---@field z_as_relative boolean
+---@field z_index integer
+---@field draw Godot.Signal
+---@field hidden Godot.Signal
+---@field item_rect_changed Godot.Signal
+---@field visibility_changed Godot.Signal
+---@field draw_animation_slice fun(self: Godot.CanvasItem, animation_length: number, slice_begin: number, slice_end: number, offset: number)
+---@field draw_arc fun(self: Godot.CanvasItem, center: Godot.Vector2, radius: number, start_angle: number, end_angle: number, point_count: integer, color: Godot.Color, width: number, antialiased: boolean)
+---@field draw_char fun(self: Godot.CanvasItem, font: Godot.Font, pos: Godot.Vector2, char: string, font_size: integer, modulate: Godot.Color, oversampling: number)
+---@field draw_char_outline fun(self: Godot.CanvasItem, font: Godot.Font, pos: Godot.Vector2, char: string, font_size: integer, size: integer, modulate: Godot.Color, oversampling: number)
+---@field draw_circle fun(self: Godot.CanvasItem, position: Godot.Vector2, radius: number, color: Godot.Color, filled: boolean, width: number, antialiased: boolean)
+---@field draw_colored_polygon fun(self: Godot.CanvasItem, points: table, color: Godot.Color, uvs: table, texture: Godot.Texture2D)
+---@field draw_dashed_line fun(self: Godot.CanvasItem, from: Godot.Vector2, to: Godot.Vector2, color: Godot.Color, width: number, dash: number, aligned: boolean, antialiased: boolean)
+---@field draw_ellipse fun(self: Godot.CanvasItem, position: Godot.Vector2, major: number, minor: number, color: Godot.Color, filled: boolean, width: number, antialiased: boolean)
+---@field draw_ellipse_arc fun(self: Godot.CanvasItem, center: Godot.Vector2, major: number, minor: number, start_angle: number, end_angle: number, point_count: integer, color: Godot.Color, width: number, antialiased: boolean)
+---@field draw_end_animation fun(self: Godot.CanvasItem)
+---@field draw_lcd_texture_rect_region fun(self: Godot.CanvasItem, texture: Godot.Texture2D, rect: Godot.Rect2, src_rect: Godot.Rect2, modulate: Godot.Color)
+---@field draw_line fun(self: Godot.CanvasItem, from: Godot.Vector2, to: Godot.Vector2, color: Godot.Color, width: number, antialiased: boolean)
+---@field draw_mesh fun(self: Godot.CanvasItem, mesh: Godot.Mesh, texture: Godot.Texture2D, transform: Godot.Transform2D, modulate: Godot.Color)
+---@field draw_msdf_texture_rect_region fun(self: Godot.CanvasItem, texture: Godot.Texture2D, rect: Godot.Rect2, src_rect: Godot.Rect2, modulate: Godot.Color, outline: number, pixel_range: number, scale: number)
+---@field draw_multiline fun(self: Godot.CanvasItem, points: table, color: Godot.Color, width: number, antialiased: boolean)
+---@field draw_multiline_colors fun(self: Godot.CanvasItem, points: table, colors: table, width: number, antialiased: boolean)
+---@field draw_multiline_string fun(self: Godot.CanvasItem, font: Godot.Font, pos: Godot.Vector2, text: string, alignment: integer, width: number, font_size: integer, max_lines: integer, modulate: Godot.Color, brk_flags: integer, justification_flags: integer, direction: integer, orientation: integer, oversampling: number)
+---@field draw_multiline_string_outline fun(self: Godot.CanvasItem, font: Godot.Font, pos: Godot.Vector2, text: string, alignment: integer, width: number, font_size: integer, max_lines: integer, size: integer, modulate: Godot.Color, brk_flags: integer, justification_flags: integer, direction: integer, orientation: integer, oversampling: number)
+---@field draw_multimesh fun(self: Godot.CanvasItem, multimesh: Godot.MultiMesh, texture: Godot.Texture2D)
+---@field draw_polygon fun(self: Godot.CanvasItem, points: table, colors: table, uvs: table, texture: Godot.Texture2D)
+---@field draw_polyline fun(self: Godot.CanvasItem, points: table, color: Godot.Color, width: number, antialiased: boolean)
+---@field draw_polyline_colors fun(self: Godot.CanvasItem, points: table, colors: table, width: number, antialiased: boolean)
+---@field draw_primitive fun(self: Godot.CanvasItem, points: table, colors: table, uvs: table, texture: Godot.Texture2D)
+---@field draw_rect fun(self: Godot.CanvasItem, rect: Godot.Rect2, color: Godot.Color, filled: boolean, width: number, antialiased: boolean)
+---@field draw_set_transform fun(self: Godot.CanvasItem, position: Godot.Vector2, rotation: number, scale: Godot.Vector2)
+---@field draw_set_transform_matrix fun(self: Godot.CanvasItem, xform: Godot.Transform2D)
+---@field draw_string fun(self: Godot.CanvasItem, font: Godot.Font, pos: Godot.Vector2, text: string, alignment: integer, width: number, font_size: integer, modulate: Godot.Color, justification_flags: integer, direction: integer, orientation: integer, oversampling: number)
+---@field draw_string_outline fun(self: Godot.CanvasItem, font: Godot.Font, pos: Godot.Vector2, text: string, alignment: integer, width: number, font_size: integer, size: integer, modulate: Godot.Color, justification_flags: integer, direction: integer, orientation: integer, oversampling: number)
+---@field draw_style_box fun(self: Godot.CanvasItem, style_box: Godot.StyleBox, rect: Godot.Rect2)
+---@field draw_texture fun(self: Godot.CanvasItem, texture: Godot.Texture2D, position: Godot.Vector2, modulate: Godot.Color)
+---@field draw_texture_rect fun(self: Godot.CanvasItem, texture: Godot.Texture2D, rect: Godot.Rect2, tile: boolean, modulate: Godot.Color, transpose: boolean)
+---@field draw_texture_rect_region fun(self: Godot.CanvasItem, texture: Godot.Texture2D, rect: Godot.Rect2, src_rect: Godot.Rect2, modulate: Godot.Color, transpose: boolean, clip_uv: boolean)
+---@field force_update_transform fun(self: Godot.CanvasItem)
+---@field get_canvas fun(self: Godot.CanvasItem): Godot.Rid
+---@field get_canvas_item fun(self: Godot.CanvasItem): Godot.Rid
+---@field get_canvas_layer_node fun(self: Godot.CanvasItem): Godot.CanvasLayer
+---@field get_canvas_transform fun(self: Godot.CanvasItem): Godot.Transform2D
+---@field get_clip_children_mode fun(self: Godot.CanvasItem): integer
+---@field get_global_mouse_position fun(self: Godot.CanvasItem): Godot.Vector2
+---@field get_global_transform fun(self: Godot.CanvasItem): Godot.Transform2D
+---@field get_global_transform_with_canvas fun(self: Godot.CanvasItem): Godot.Transform2D
+---@field get_instance_shader_parameter fun(self: Godot.CanvasItem, name: string)
+---@field get_light_mask fun(self: Godot.CanvasItem): integer
+---@field get_local_mouse_position fun(self: Godot.CanvasItem): Godot.Vector2
+---@field get_material fun(self: Godot.CanvasItem): Godot.Material
+---@field get_modulate fun(self: Godot.CanvasItem): Godot.Color
+---@field get_screen_transform fun(self: Godot.CanvasItem): Godot.Transform2D
+---@field get_self_modulate fun(self: Godot.CanvasItem): Godot.Color
+---@field get_texture_filter fun(self: Godot.CanvasItem): integer
+---@field get_texture_repeat fun(self: Godot.CanvasItem): integer
+---@field get_transform fun(self: Godot.CanvasItem): Godot.Transform2D
+---@field get_use_parent_material fun(self: Godot.CanvasItem): boolean
+---@field get_viewport_rect fun(self: Godot.CanvasItem): Godot.Rect2
+---@field get_viewport_transform fun(self: Godot.CanvasItem): Godot.Transform2D
+---@field get_visibility_layer fun(self: Godot.CanvasItem): integer
+---@field get_visibility_layer_bit fun(self: Godot.CanvasItem, layer: integer): boolean
+---@field get_world_2d fun(self: Godot.CanvasItem): Godot.World2D
+---@field get_z_index fun(self: Godot.CanvasItem): integer
+---@field hide fun(self: Godot.CanvasItem)
+---@field is_draw_behind_parent_enabled fun(self: Godot.CanvasItem): boolean
+---@field is_local_transform_notification_enabled fun(self: Godot.CanvasItem): boolean
+---@field is_set_as_top_level fun(self: Godot.CanvasItem): boolean
+---@field is_transform_notification_enabled fun(self: Godot.CanvasItem): boolean
+---@field is_visible fun(self: Godot.CanvasItem): boolean
+---@field is_visible_in_tree fun(self: Godot.CanvasItem): boolean
+---@field is_y_sort_enabled fun(self: Godot.CanvasItem): boolean
+---@field is_z_relative fun(self: Godot.CanvasItem): boolean
+---@field make_canvas_position_local fun(self: Godot.CanvasItem, viewport_point: Godot.Vector2): Godot.Vector2
+---@field make_input_local fun(self: Godot.CanvasItem, event: Godot.InputEvent): Godot.InputEvent
+---@field move_to_front fun(self: Godot.CanvasItem)
+---@field queue_redraw fun(self: Godot.CanvasItem)
+---@field set_as_top_level fun(self: Godot.CanvasItem, enable: boolean)
+---@field set_clip_children_mode fun(self: Godot.CanvasItem, mode: integer)
+---@field set_draw_behind_parent fun(self: Godot.CanvasItem, enable: boolean)
+---@field set_instance_shader_parameter fun(self: Godot.CanvasItem, name: string, value: any)
+---@field set_light_mask fun(self: Godot.CanvasItem, light_mask: integer)
+---@field set_material fun(self: Godot.CanvasItem, material: Godot.Material)
+---@field set_modulate fun(self: Godot.CanvasItem, modulate: Godot.Color)
+---@field set_notify_local_transform fun(self: Godot.CanvasItem, enable: boolean)
+---@field set_notify_transform fun(self: Godot.CanvasItem, enable: boolean)
+---@field set_self_modulate fun(self: Godot.CanvasItem, self_modulate: Godot.Color)
+---@field set_texture_filter fun(self: Godot.CanvasItem, mode: integer)
+---@field set_texture_repeat fun(self: Godot.CanvasItem, mode: integer)
+---@field set_use_parent_material fun(self: Godot.CanvasItem, enable: boolean)
+---@field set_visibility_layer fun(self: Godot.CanvasItem, layer: integer)
+---@field set_visibility_layer_bit fun(self: Godot.CanvasItem, layer: integer, enabled: boolean)
+---@field set_visible fun(self: Godot.CanvasItem, visible: boolean)
+---@field set_y_sort_enabled fun(self: Godot.CanvasItem, enabled: boolean)
+---@field set_z_as_relative fun(self: Godot.CanvasItem, enable: boolean)
+---@field set_z_index fun(self: Godot.CanvasItem, z_index: integer)
+---@field show fun(self: Godot.CanvasItem)
+---@class Godot.CanvasItem.__type
+---@field new fun(): Godot.CanvasItem
+---@field NotificationTransformChanged integer
+---@field NotificationLocalTransformChanged integer
+---@field NotificationDraw integer
+---@field NotificationVisibilityChanged integer
+---@field NotificationEnterCanvas integer
+---@field NotificationExitCanvas integer
+---@field NotificationWorld2DChanged integer
+---@field ClipChildrenMode Godot.CanvasItem.ClipChildrenMode
+---@field TextureFilterEnum Godot.CanvasItem.TextureFilterEnum
+---@field TextureRepeatEnum Godot.CanvasItem.TextureRepeatEnum
+---@class Godot.CanvasItem.ClipChildrenMode
+---@field Disabled integer
+---@field Only integer
+---@field AndDraw integer
+---@field Max integer
+---@class Godot.CanvasItem.TextureFilterEnum
+---@field ParentNode integer
+---@field Nearest integer
+---@field Linear integer
+---@field NearestWithMipmaps integer
+---@field LinearWithMipmaps integer
+---@field NearestWithMipmapsAnisotropic integer
+---@field LinearWithMipmapsAnisotropic integer
+---@field Max integer
+---@class Godot.CanvasItem.TextureRepeatEnum
+---@field ParentNode integer
+---@field Disabled integer
+---@field Enabled integer
+---@field Mirror integer
+---@field Max integer
+
+---@class Godot.CanvasLayer : Godot.Node
+---@field custom_viewport Godot.Viewport
+---@field follow_viewport_enabled boolean
+---@field follow_viewport_scale number
+---@field layer integer
+---@field offset Godot.Vector2
+---@field rotation number
+---@field scale Godot.Vector2
+---@field transform Godot.Transform2D
+---@field visible boolean
+---@field visibility_changed Godot.Signal
+---@field get_canvas fun(self: Godot.CanvasLayer): Godot.Rid
+---@field get_custom_viewport fun(self: Godot.CanvasLayer): Godot.Node
+---@field get_final_transform fun(self: Godot.CanvasLayer): Godot.Transform2D
+---@field get_follow_viewport_scale fun(self: Godot.CanvasLayer): number
+---@field get_layer fun(self: Godot.CanvasLayer): integer
+---@field get_offset fun(self: Godot.CanvasLayer): Godot.Vector2
+---@field get_rotation fun(self: Godot.CanvasLayer): number
+---@field get_scale fun(self: Godot.CanvasLayer): Godot.Vector2
+---@field get_transform fun(self: Godot.CanvasLayer): Godot.Transform2D
+---@field hide fun(self: Godot.CanvasLayer)
+---@field is_following_viewport fun(self: Godot.CanvasLayer): boolean
+---@field is_visible fun(self: Godot.CanvasLayer): boolean
+---@field set_custom_viewport fun(self: Godot.CanvasLayer, viewport: Godot.Node)
+---@field set_follow_viewport fun(self: Godot.CanvasLayer, enable: boolean)
+---@field set_follow_viewport_scale fun(self: Godot.CanvasLayer, scale: number)
+---@field set_layer fun(self: Godot.CanvasLayer, layer: integer)
+---@field set_offset fun(self: Godot.CanvasLayer, offset: Godot.Vector2)
+---@field set_rotation fun(self: Godot.CanvasLayer, radians: number)
+---@field set_scale fun(self: Godot.CanvasLayer, scale: Godot.Vector2)
+---@field set_transform fun(self: Godot.CanvasLayer, transform: Godot.Transform2D)
+---@field set_visible fun(self: Godot.CanvasLayer, visible: boolean)
+---@field show fun(self: Godot.CanvasLayer)
+---@class Godot.CanvasLayer.__type
+---@field new fun(): Godot.CanvasLayer
+
+---@class Godot.CanvasModulate : Godot.Node2D
+---@field color Godot.Color
+---@field get_color fun(self: Godot.CanvasModulate): Godot.Color
+---@field set_color fun(self: Godot.CanvasModulate, color: Godot.Color)
+---@class Godot.CanvasModulate.__type
+---@field new fun(): Godot.CanvasModulate
+
+---@class Godot.Ccdik3D : Godot.IterateIK3D
+---@class Godot.Ccdik3D.__type
+---@field new fun(): Godot.Ccdik3D
+
+---@class Godot.CenterContainer : Godot.Container
+---@field use_top_left boolean
+---@field is_using_top_left fun(self: Godot.CenterContainer): boolean
+---@field set_use_top_left fun(self: Godot.CenterContainer, enable: boolean)
+---@class Godot.CenterContainer.__type
+---@field new fun(): Godot.CenterContainer
+
+---@class Godot.ChainIK3D : Godot.IKModifier3D
+---@field get_end_bone fun(self: Godot.ChainIK3D, index: integer): integer
+---@field get_end_bone_direction fun(self: Godot.ChainIK3D, index: integer): integer
+---@field get_end_bone_length fun(self: Godot.ChainIK3D, index: integer): number
+---@field get_end_bone_name fun(self: Godot.ChainIK3D, index: integer): string
+---@field get_joint_bone fun(self: Godot.ChainIK3D, index: integer, joint: integer): integer
+---@field get_joint_bone_name fun(self: Godot.ChainIK3D, index: integer, joint: integer): string
+---@field get_joint_count fun(self: Godot.ChainIK3D, index: integer): integer
+---@field get_root_bone fun(self: Godot.ChainIK3D, index: integer): integer
+---@field get_root_bone_name fun(self: Godot.ChainIK3D, index: integer): string
+---@field is_end_bone_extended fun(self: Godot.ChainIK3D, index: integer): boolean
+---@field set_end_bone fun(self: Godot.ChainIK3D, index: integer, bone: integer)
+---@field set_end_bone_direction fun(self: Godot.ChainIK3D, index: integer, bone_direction: integer)
+---@field set_end_bone_length fun(self: Godot.ChainIK3D, index: integer, length: number)
+---@field set_end_bone_name fun(self: Godot.ChainIK3D, index: integer, bone_name: string)
+---@field set_extend_end_bone fun(self: Godot.ChainIK3D, index: integer, enabled: boolean)
+---@field set_root_bone fun(self: Godot.ChainIK3D, index: integer, bone: integer)
+---@field set_root_bone_name fun(self: Godot.ChainIK3D, index: integer, bone_name: string)
+---@class Godot.ChainIK3D.__type
+---@field new fun(): Godot.ChainIK3D
+
+---@class Godot.CharacterBody2D : Godot.PhysicsBody2D
+---@field floor_block_on_wall boolean
+---@field floor_constant_speed boolean
+---@field floor_max_angle number
+---@field floor_snap_length number
+---@field floor_stop_on_slope boolean
+---@field max_slides integer
+---@field motion_mode integer
+---@field platform_floor_layers integer
+---@field platform_on_leave integer
+---@field platform_wall_layers integer
+---@field safe_margin number
+---@field slide_on_ceiling boolean
+---@field up_direction Godot.Vector2
+---@field velocity Godot.Vector2
+---@field wall_min_slide_angle number
+---@field apply_floor_snap fun(self: Godot.CharacterBody2D)
+---@field get_floor_angle fun(self: Godot.CharacterBody2D, up_direction: Godot.Vector2): number
+---@field get_floor_max_angle fun(self: Godot.CharacterBody2D): number
+---@field get_floor_normal fun(self: Godot.CharacterBody2D): Godot.Vector2
+---@field get_floor_snap_length fun(self: Godot.CharacterBody2D): number
+---@field get_last_motion fun(self: Godot.CharacterBody2D): Godot.Vector2
+---@field get_last_slide_collision fun(self: Godot.CharacterBody2D): Godot.KinematicCollision2D
+---@field get_max_slides fun(self: Godot.CharacterBody2D): integer
+---@field get_motion_mode fun(self: Godot.CharacterBody2D): integer
+---@field get_platform_floor_layers fun(self: Godot.CharacterBody2D): integer
+---@field get_platform_on_leave fun(self: Godot.CharacterBody2D): integer
+---@field get_platform_velocity fun(self: Godot.CharacterBody2D): Godot.Vector2
+---@field get_platform_wall_layers fun(self: Godot.CharacterBody2D): integer
+---@field get_position_delta fun(self: Godot.CharacterBody2D): Godot.Vector2
+---@field get_real_velocity fun(self: Godot.CharacterBody2D): Godot.Vector2
+---@field get_safe_margin fun(self: Godot.CharacterBody2D): number
+---@field get_slide_collision fun(self: Godot.CharacterBody2D, slide_idx: integer): Godot.KinematicCollision2D
+---@field get_slide_collision_count fun(self: Godot.CharacterBody2D): integer
+---@field get_up_direction fun(self: Godot.CharacterBody2D): Godot.Vector2
+---@field get_velocity fun(self: Godot.CharacterBody2D): Godot.Vector2
+---@field get_wall_min_slide_angle fun(self: Godot.CharacterBody2D): number
+---@field get_wall_normal fun(self: Godot.CharacterBody2D): Godot.Vector2
+---@field is_floor_block_on_wall_enabled fun(self: Godot.CharacterBody2D): boolean
+---@field is_floor_constant_speed_enabled fun(self: Godot.CharacterBody2D): boolean
+---@field is_floor_stop_on_slope_enabled fun(self: Godot.CharacterBody2D): boolean
+---@field is_on_ceiling fun(self: Godot.CharacterBody2D): boolean
+---@field is_on_ceiling_only fun(self: Godot.CharacterBody2D): boolean
+---@field is_on_floor fun(self: Godot.CharacterBody2D): boolean
+---@field is_on_floor_only fun(self: Godot.CharacterBody2D): boolean
+---@field is_on_wall fun(self: Godot.CharacterBody2D): boolean
+---@field is_on_wall_only fun(self: Godot.CharacterBody2D): boolean
+---@field is_slide_on_ceiling_enabled fun(self: Godot.CharacterBody2D): boolean
+---@field move_and_slide fun(self: Godot.CharacterBody2D): boolean
+---@field set_floor_block_on_wall_enabled fun(self: Godot.CharacterBody2D, enabled: boolean)
+---@field set_floor_constant_speed_enabled fun(self: Godot.CharacterBody2D, enabled: boolean)
+---@field set_floor_max_angle fun(self: Godot.CharacterBody2D, radians: number)
+---@field set_floor_snap_length fun(self: Godot.CharacterBody2D, floor_snap_length: number)
+---@field set_floor_stop_on_slope_enabled fun(self: Godot.CharacterBody2D, enabled: boolean)
+---@field set_max_slides fun(self: Godot.CharacterBody2D, max_slides: integer)
+---@field set_motion_mode fun(self: Godot.CharacterBody2D, mode: integer)
+---@field set_platform_floor_layers fun(self: Godot.CharacterBody2D, exclude_layer: integer)
+---@field set_platform_on_leave fun(self: Godot.CharacterBody2D, on_leave_apply_velocity: integer)
+---@field set_platform_wall_layers fun(self: Godot.CharacterBody2D, exclude_layer: integer)
+---@field set_safe_margin fun(self: Godot.CharacterBody2D, margin: number)
+---@field set_slide_on_ceiling_enabled fun(self: Godot.CharacterBody2D, enabled: boolean)
+---@field set_up_direction fun(self: Godot.CharacterBody2D, up_direction: Godot.Vector2)
+---@field set_velocity fun(self: Godot.CharacterBody2D, velocity: Godot.Vector2)
+---@field set_wall_min_slide_angle fun(self: Godot.CharacterBody2D, radians: number)
+---@class Godot.CharacterBody2D.__type
+---@field new fun(): Godot.CharacterBody2D
+---@field MotionModeEnum Godot.CharacterBody2D.MotionModeEnum
+---@field PlatformOnLeaveEnum Godot.CharacterBody2D.PlatformOnLeaveEnum
+---@class Godot.CharacterBody2D.MotionModeEnum
+---@field Grounded integer
+---@field Floating integer
+---@class Godot.CharacterBody2D.PlatformOnLeaveEnum
+---@field AddVelocity integer
+---@field AddUpwardVelocity integer
+---@field DoNothing integer
+
+---@class Godot.CharacterBody3D : Godot.PhysicsBody3D
+---@field floor_block_on_wall boolean
+---@field floor_constant_speed boolean
+---@field floor_max_angle number
+---@field floor_snap_length number
+---@field floor_stop_on_slope boolean
+---@field max_slides integer
+---@field motion_mode integer
+---@field platform_floor_layers integer
+---@field platform_on_leave integer
+---@field platform_wall_layers integer
+---@field safe_margin number
+---@field slide_on_ceiling boolean
+---@field up_direction Godot.Vector3
+---@field velocity Godot.Vector3
+---@field wall_min_slide_angle number
+---@field apply_floor_snap fun(self: Godot.CharacterBody3D)
+---@field get_floor_angle fun(self: Godot.CharacterBody3D, up_direction: Godot.Vector3): number
+---@field get_floor_max_angle fun(self: Godot.CharacterBody3D): number
+---@field get_floor_normal fun(self: Godot.CharacterBody3D): Godot.Vector3
+---@field get_floor_snap_length fun(self: Godot.CharacterBody3D): number
+---@field get_last_motion fun(self: Godot.CharacterBody3D): Godot.Vector3
+---@field get_last_slide_collision fun(self: Godot.CharacterBody3D): Godot.KinematicCollision3D
+---@field get_max_slides fun(self: Godot.CharacterBody3D): integer
+---@field get_motion_mode fun(self: Godot.CharacterBody3D): integer
+---@field get_platform_angular_velocity fun(self: Godot.CharacterBody3D): Godot.Vector3
+---@field get_platform_floor_layers fun(self: Godot.CharacterBody3D): integer
+---@field get_platform_on_leave fun(self: Godot.CharacterBody3D): integer
+---@field get_platform_velocity fun(self: Godot.CharacterBody3D): Godot.Vector3
+---@field get_platform_wall_layers fun(self: Godot.CharacterBody3D): integer
+---@field get_position_delta fun(self: Godot.CharacterBody3D): Godot.Vector3
+---@field get_real_velocity fun(self: Godot.CharacterBody3D): Godot.Vector3
+---@field get_safe_margin fun(self: Godot.CharacterBody3D): number
+---@field get_slide_collision fun(self: Godot.CharacterBody3D, slide_idx: integer): Godot.KinematicCollision3D
+---@field get_slide_collision_count fun(self: Godot.CharacterBody3D): integer
+---@field get_up_direction fun(self: Godot.CharacterBody3D): Godot.Vector3
+---@field get_velocity fun(self: Godot.CharacterBody3D): Godot.Vector3
+---@field get_wall_min_slide_angle fun(self: Godot.CharacterBody3D): number
+---@field get_wall_normal fun(self: Godot.CharacterBody3D): Godot.Vector3
+---@field is_floor_block_on_wall_enabled fun(self: Godot.CharacterBody3D): boolean
+---@field is_floor_constant_speed_enabled fun(self: Godot.CharacterBody3D): boolean
+---@field is_floor_stop_on_slope_enabled fun(self: Godot.CharacterBody3D): boolean
+---@field is_on_ceiling fun(self: Godot.CharacterBody3D): boolean
+---@field is_on_ceiling_only fun(self: Godot.CharacterBody3D): boolean
+---@field is_on_floor fun(self: Godot.CharacterBody3D): boolean
+---@field is_on_floor_only fun(self: Godot.CharacterBody3D): boolean
+---@field is_on_wall fun(self: Godot.CharacterBody3D): boolean
+---@field is_on_wall_only fun(self: Godot.CharacterBody3D): boolean
+---@field is_slide_on_ceiling_enabled fun(self: Godot.CharacterBody3D): boolean
+---@field move_and_slide fun(self: Godot.CharacterBody3D): boolean
+---@field set_floor_block_on_wall_enabled fun(self: Godot.CharacterBody3D, enabled: boolean)
+---@field set_floor_constant_speed_enabled fun(self: Godot.CharacterBody3D, enabled: boolean)
+---@field set_floor_max_angle fun(self: Godot.CharacterBody3D, radians: number)
+---@field set_floor_snap_length fun(self: Godot.CharacterBody3D, floor_snap_length: number)
+---@field set_floor_stop_on_slope_enabled fun(self: Godot.CharacterBody3D, enabled: boolean)
+---@field set_max_slides fun(self: Godot.CharacterBody3D, max_slides: integer)
+---@field set_motion_mode fun(self: Godot.CharacterBody3D, mode: integer)
+---@field set_platform_floor_layers fun(self: Godot.CharacterBody3D, exclude_layer: integer)
+---@field set_platform_on_leave fun(self: Godot.CharacterBody3D, on_leave_apply_velocity: integer)
+---@field set_platform_wall_layers fun(self: Godot.CharacterBody3D, exclude_layer: integer)
+---@field set_safe_margin fun(self: Godot.CharacterBody3D, margin: number)
+---@field set_slide_on_ceiling_enabled fun(self: Godot.CharacterBody3D, enabled: boolean)
+---@field set_up_direction fun(self: Godot.CharacterBody3D, up_direction: Godot.Vector3)
+---@field set_velocity fun(self: Godot.CharacterBody3D, velocity: Godot.Vector3)
+---@field set_wall_min_slide_angle fun(self: Godot.CharacterBody3D, radians: number)
+---@class Godot.CharacterBody3D.__type
+---@field new fun(): Godot.CharacterBody3D
+---@field MotionModeEnum Godot.CharacterBody3D.MotionModeEnum
+---@field PlatformOnLeaveEnum Godot.CharacterBody3D.PlatformOnLeaveEnum
+---@class Godot.CharacterBody3D.MotionModeEnum
+---@field Grounded integer
+---@field Floating integer
+---@class Godot.CharacterBody3D.PlatformOnLeaveEnum
+---@field AddVelocity integer
+---@field AddUpwardVelocity integer
+---@field DoNothing integer
+
+---@class Godot.CheckBox : Godot.Button
+---@class Godot.CheckBox.__type
+---@field new fun(): Godot.CheckBox
+
+---@class Godot.CheckButton : Godot.Button
+---@class Godot.CheckButton.__type
+---@field new fun(): Godot.CheckButton
+
+---@class Godot.CodeEdit : Godot.TextEdit
+---@field auto_brace_completion_enabled boolean
+---@field auto_brace_completion_highlight_matching boolean
+---@field auto_brace_completion_pairs table
+---@field code_completion_enabled boolean
+---@field code_completion_prefixes table
+---@field delimiter_comments table
+---@field delimiter_strings table
+---@field gutters_draw_bookmarks boolean
+---@field gutters_draw_breakpoints_gutter boolean
+---@field gutters_draw_executing_lines boolean
+---@field gutters_draw_fold_gutter boolean
+---@field gutters_draw_line_numbers boolean
+---@field gutters_line_numbers_min_digits integer
+---@field gutters_zero_pad_line_numbers boolean
+---@field indent_automatic boolean
+---@field indent_automatic_prefixes table
+---@field indent_size integer
+---@field indent_use_spaces boolean
+---@field line_folding boolean
+---@field line_length_guidelines table
+---@field symbol_lookup_on_click boolean
+---@field symbol_tooltip_on_hover boolean
+---@field breakpoint_toggled Godot.Signal
+---@field code_completion_requested Godot.Signal
+---@field symbol_hovered Godot.Signal
+---@field symbol_lookup Godot.Signal
+---@field symbol_validate Godot.Signal
+---@field add_auto_brace_completion_pair fun(self: Godot.CodeEdit, start_key: string, end_key: string)
+---@field add_code_completion_option fun(self: Godot.CodeEdit, type: integer, display_text: string, insert_text: string, text_color: Godot.Color, icon: Godot.Resource, value: any, location: integer)
+---@field add_comment_delimiter fun(self: Godot.CodeEdit, start_key: string, end_key: string, line_only: boolean)
+---@field add_string_delimiter fun(self: Godot.CodeEdit, start_key: string, end_key: string, line_only: boolean)
+---@field can_fold_line fun(self: Godot.CodeEdit, line: integer): boolean
+---@field cancel_code_completion fun(self: Godot.CodeEdit)
+---@field clear_bookmarked_lines fun(self: Godot.CodeEdit)
+---@field clear_breakpointed_lines fun(self: Godot.CodeEdit)
+---@field clear_comment_delimiters fun(self: Godot.CodeEdit)
+---@field clear_executing_lines fun(self: Godot.CodeEdit)
+---@field clear_string_delimiters fun(self: Godot.CodeEdit)
+---@field confirm_code_completion fun(self: Godot.CodeEdit, replace: boolean)
+---@field convert_indent fun(self: Godot.CodeEdit, from_line: integer, to_line: integer)
+---@field create_code_region fun(self: Godot.CodeEdit)
+---@field delete_lines fun(self: Godot.CodeEdit)
+---@field do_indent fun(self: Godot.CodeEdit)
+---@field duplicate_lines fun(self: Godot.CodeEdit)
+---@field duplicate_selection fun(self: Godot.CodeEdit)
+---@field fold_all_lines fun(self: Godot.CodeEdit)
+---@field fold_line fun(self: Godot.CodeEdit, line: integer)
+---@field get_auto_brace_completion_close_key fun(self: Godot.CodeEdit, open_key: string): string
+---@field get_auto_brace_completion_pairs fun(self: Godot.CodeEdit): table
+---@field get_auto_indent_prefixes fun(self: Godot.CodeEdit): table
+---@field get_bookmarked_lines fun(self: Godot.CodeEdit): table
+---@field get_breakpointed_lines fun(self: Godot.CodeEdit): table
+---@field get_code_completion_option fun(self: Godot.CodeEdit, index: integer): table
+---@field get_code_completion_options fun(self: Godot.CodeEdit): table
+---@field get_code_completion_prefixes fun(self: Godot.CodeEdit): table
+---@field get_code_completion_selected_index fun(self: Godot.CodeEdit): integer
+---@field get_code_region_end_tag fun(self: Godot.CodeEdit): string
+---@field get_code_region_start_tag fun(self: Godot.CodeEdit): string
+---@field get_comment_delimiters fun(self: Godot.CodeEdit): table
+---@field get_delimiter_end_key fun(self: Godot.CodeEdit, delimiter_index: integer): string
+---@field get_delimiter_end_position fun(self: Godot.CodeEdit, line: integer, column: integer): Godot.Vector2
+---@field get_delimiter_start_key fun(self: Godot.CodeEdit, delimiter_index: integer): string
+---@field get_delimiter_start_position fun(self: Godot.CodeEdit, line: integer, column: integer): Godot.Vector2
+---@field get_executing_lines fun(self: Godot.CodeEdit): table
+---@field get_folded_lines fun(self: Godot.CodeEdit): table
+---@field get_indent_size fun(self: Godot.CodeEdit): integer
+---@field get_line_length_guidelines fun(self: Godot.CodeEdit): table
+---@field get_line_numbers_min_digits fun(self: Godot.CodeEdit): integer
+---@field get_string_delimiters fun(self: Godot.CodeEdit): table
+---@field get_text_for_code_completion fun(self: Godot.CodeEdit): string
+---@field get_text_for_symbol_lookup fun(self: Godot.CodeEdit): string
+---@field get_text_with_cursor_char fun(self: Godot.CodeEdit, line: integer, column: integer): string
+---@field has_auto_brace_completion_close_key fun(self: Godot.CodeEdit, close_key: string): boolean
+---@field has_auto_brace_completion_open_key fun(self: Godot.CodeEdit, open_key: string): boolean
+---@field has_comment_delimiter fun(self: Godot.CodeEdit, start_key: string): boolean
+---@field has_string_delimiter fun(self: Godot.CodeEdit, start_key: string): boolean
+---@field indent_lines fun(self: Godot.CodeEdit)
+---@field is_auto_brace_completion_enabled fun(self: Godot.CodeEdit): boolean
+---@field is_auto_indent_enabled fun(self: Godot.CodeEdit): boolean
+---@field is_code_completion_enabled fun(self: Godot.CodeEdit): boolean
+---@field is_draw_line_numbers_enabled fun(self: Godot.CodeEdit): boolean
+---@field is_drawing_bookmarks_gutter fun(self: Godot.CodeEdit): boolean
+---@field is_drawing_breakpoints_gutter fun(self: Godot.CodeEdit): boolean
+---@field is_drawing_executing_lines_gutter fun(self: Godot.CodeEdit): boolean
+---@field is_drawing_fold_gutter fun(self: Godot.CodeEdit): boolean
+---@field is_highlight_matching_braces_enabled fun(self: Godot.CodeEdit): boolean
+---@field is_in_comment fun(self: Godot.CodeEdit, line: integer, column: integer): integer
+---@field is_in_string fun(self: Godot.CodeEdit, line: integer, column: integer): integer
+---@field is_indent_using_spaces fun(self: Godot.CodeEdit): boolean
+---@field is_line_bookmarked fun(self: Godot.CodeEdit, line: integer): boolean
+---@field is_line_breakpointed fun(self: Godot.CodeEdit, line: integer): boolean
+---@field is_line_code_region_end fun(self: Godot.CodeEdit, line: integer): boolean
+---@field is_line_code_region_start fun(self: Godot.CodeEdit, line: integer): boolean
+---@field is_line_executing fun(self: Godot.CodeEdit, line: integer): boolean
+---@field is_line_folded fun(self: Godot.CodeEdit, line: integer): boolean
+---@field is_line_folding_enabled fun(self: Godot.CodeEdit): boolean
+---@field is_line_numbers_zero_padded fun(self: Godot.CodeEdit): boolean
+---@field is_symbol_lookup_on_click_enabled fun(self: Godot.CodeEdit): boolean
+---@field is_symbol_tooltip_on_hover_enabled fun(self: Godot.CodeEdit): boolean
+---@field move_lines_down fun(self: Godot.CodeEdit)
+---@field move_lines_up fun(self: Godot.CodeEdit)
+---@field remove_comment_delimiter fun(self: Godot.CodeEdit, start_key: string)
+---@field remove_string_delimiter fun(self: Godot.CodeEdit, start_key: string)
+---@field request_code_completion fun(self: Godot.CodeEdit, force: boolean)
+---@field set_auto_brace_completion_enabled fun(self: Godot.CodeEdit, enable: boolean)
+---@field set_auto_brace_completion_pairs fun(self: Godot.CodeEdit, pairs: table)
+---@field set_auto_indent_enabled fun(self: Godot.CodeEdit, enable: boolean)
+---@field set_auto_indent_prefixes fun(self: Godot.CodeEdit, prefixes: table)
+---@field set_code_completion_enabled fun(self: Godot.CodeEdit, enable: boolean)
+---@field set_code_completion_prefixes fun(self: Godot.CodeEdit, prefixes: table)
+---@field set_code_completion_selected_index fun(self: Godot.CodeEdit, index: integer)
+---@field set_code_hint fun(self: Godot.CodeEdit, code_hint: string)
+---@field set_code_hint_draw_below fun(self: Godot.CodeEdit, draw_below: boolean)
+---@field set_code_region_tags fun(self: Godot.CodeEdit, start: string, _end: string)
+---@field set_comment_delimiters fun(self: Godot.CodeEdit, comment_delimiters: table)
+---@field set_draw_bookmarks_gutter fun(self: Godot.CodeEdit, enable: boolean)
+---@field set_draw_breakpoints_gutter fun(self: Godot.CodeEdit, enable: boolean)
+---@field set_draw_executing_lines_gutter fun(self: Godot.CodeEdit, enable: boolean)
+---@field set_draw_fold_gutter fun(self: Godot.CodeEdit, enable: boolean)
+---@field set_draw_line_numbers fun(self: Godot.CodeEdit, enable: boolean)
+---@field set_highlight_matching_braces_enabled fun(self: Godot.CodeEdit, enable: boolean)
+---@field set_indent_size fun(self: Godot.CodeEdit, size: integer)
+---@field set_indent_using_spaces fun(self: Godot.CodeEdit, use_spaces: boolean)
+---@field set_line_as_bookmarked fun(self: Godot.CodeEdit, line: integer, bookmarked: boolean)
+---@field set_line_as_breakpoint fun(self: Godot.CodeEdit, line: integer, breakpointed: boolean)
+---@field set_line_as_executing fun(self: Godot.CodeEdit, line: integer, executing: boolean)
+---@field set_line_folding_enabled fun(self: Godot.CodeEdit, enabled: boolean)
+---@field set_line_length_guidelines fun(self: Godot.CodeEdit, guideline_columns: table)
+---@field set_line_numbers_min_digits fun(self: Godot.CodeEdit, count: integer)
+---@field set_line_numbers_zero_padded fun(self: Godot.CodeEdit, enable: boolean)
+---@field set_string_delimiters fun(self: Godot.CodeEdit, string_delimiters: table)
+---@field set_symbol_lookup_on_click_enabled fun(self: Godot.CodeEdit, enable: boolean)
+---@field set_symbol_lookup_word_as_valid fun(self: Godot.CodeEdit, valid: boolean)
+---@field set_symbol_tooltip_on_hover_enabled fun(self: Godot.CodeEdit, enable: boolean)
+---@field toggle_foldable_line fun(self: Godot.CodeEdit, line: integer)
+---@field toggle_foldable_lines_at_carets fun(self: Godot.CodeEdit)
+---@field unfold_all_lines fun(self: Godot.CodeEdit)
+---@field unfold_line fun(self: Godot.CodeEdit, line: integer)
+---@field unindent_lines fun(self: Godot.CodeEdit)
+---@field update_code_completion_options fun(self: Godot.CodeEdit, force: boolean)
+---@class Godot.CodeEdit.__type
+---@field new fun(): Godot.CodeEdit
+---@field CodeCompletionKind Godot.CodeEdit.CodeCompletionKind
+---@field CodeCompletionLocation Godot.CodeEdit.CodeCompletionLocation
+---@class Godot.CodeEdit.CodeCompletionKind
+---@field Class integer
+---@field Function integer
+---@field Signal integer
+---@field Variable integer
+---@field Member integer
+---@field Enum integer
+---@field Constant integer
+---@field NodePath integer
+---@field FilePath integer
+---@field PlainText integer
+---@class Godot.CodeEdit.CodeCompletionLocation
+---@field Local integer
+---@field ParentMask integer
+---@field OtherUserCode integer
+---@field Other integer
+
+---@class Godot.CollisionObject2D : Godot.Node2D
+---@field collision_layer integer
+---@field collision_mask integer
+---@field collision_priority number
+---@field disable_mode integer
+---@field input_pickable boolean
+---@field input_event Godot.Signal
+---@field mouse_entered Godot.Signal
+---@field mouse_exited Godot.Signal
+---@field mouse_shape_entered Godot.Signal
+---@field mouse_shape_exited Godot.Signal
+---@field create_shape_owner fun(self: Godot.CollisionObject2D, owner: Godot.Object): integer
+---@field get_collision_layer fun(self: Godot.CollisionObject2D): integer
+---@field get_collision_layer_value fun(self: Godot.CollisionObject2D, layer_number: integer): boolean
+---@field get_collision_mask fun(self: Godot.CollisionObject2D): integer
+---@field get_collision_mask_value fun(self: Godot.CollisionObject2D, layer_number: integer): boolean
+---@field get_collision_priority fun(self: Godot.CollisionObject2D): number
+---@field get_disable_mode fun(self: Godot.CollisionObject2D): integer
+---@field get_rid fun(self: Godot.CollisionObject2D): Godot.Rid
+---@field get_shape_owner_one_way_collision_margin fun(self: Godot.CollisionObject2D, owner_id: integer): number
+---@field get_shape_owners fun(self: Godot.CollisionObject2D): table
+---@field is_pickable fun(self: Godot.CollisionObject2D): boolean
+---@field is_shape_owner_disabled fun(self: Godot.CollisionObject2D, owner_id: integer): boolean
+---@field is_shape_owner_one_way_collision_enabled fun(self: Godot.CollisionObject2D, owner_id: integer): boolean
+---@field remove_shape_owner fun(self: Godot.CollisionObject2D, owner_id: integer)
+---@field set_collision_layer fun(self: Godot.CollisionObject2D, layer: integer)
+---@field set_collision_layer_value fun(self: Godot.CollisionObject2D, layer_number: integer, value: boolean)
+---@field set_collision_mask fun(self: Godot.CollisionObject2D, mask: integer)
+---@field set_collision_mask_value fun(self: Godot.CollisionObject2D, layer_number: integer, value: boolean)
+---@field set_collision_priority fun(self: Godot.CollisionObject2D, priority: number)
+---@field set_disable_mode fun(self: Godot.CollisionObject2D, mode: integer)
+---@field set_pickable fun(self: Godot.CollisionObject2D, enabled: boolean)
+---@field shape_find_owner fun(self: Godot.CollisionObject2D, shape_index: integer): integer
+---@field shape_owner_add_shape fun(self: Godot.CollisionObject2D, owner_id: integer, shape: Godot.Shape2D)
+---@field shape_owner_clear_shapes fun(self: Godot.CollisionObject2D, owner_id: integer)
+---@field shape_owner_get_owner fun(self: Godot.CollisionObject2D, owner_id: integer): Godot.Object
+---@field shape_owner_get_shape fun(self: Godot.CollisionObject2D, owner_id: integer, shape_id: integer): Godot.Shape2D
+---@field shape_owner_get_shape_count fun(self: Godot.CollisionObject2D, owner_id: integer): integer
+---@field shape_owner_get_shape_index fun(self: Godot.CollisionObject2D, owner_id: integer, shape_id: integer): integer
+---@field shape_owner_get_transform fun(self: Godot.CollisionObject2D, owner_id: integer): Godot.Transform2D
+---@field shape_owner_remove_shape fun(self: Godot.CollisionObject2D, owner_id: integer, shape_id: integer)
+---@field shape_owner_set_disabled fun(self: Godot.CollisionObject2D, owner_id: integer, disabled: boolean)
+---@field shape_owner_set_one_way_collision fun(self: Godot.CollisionObject2D, owner_id: integer, enable: boolean)
+---@field shape_owner_set_one_way_collision_margin fun(self: Godot.CollisionObject2D, owner_id: integer, margin: number)
+---@field shape_owner_set_transform fun(self: Godot.CollisionObject2D, owner_id: integer, transform: Godot.Transform2D)
+---@class Godot.CollisionObject2D.__type
+---@field new fun(): Godot.CollisionObject2D
+---@field DisableModeEnum Godot.CollisionObject2D.DisableModeEnum
+---@class Godot.CollisionObject2D.DisableModeEnum
+---@field Remove integer
+---@field MakeStatic integer
+---@field KeepActive integer
+
+---@class Godot.CollisionObject3D : Godot.Node3D
+---@field collision_layer integer
+---@field collision_mask integer
+---@field collision_priority number
+---@field disable_mode integer
+---@field input_capture_on_drag boolean
+---@field input_ray_pickable boolean
+---@field input_event Godot.Signal
+---@field mouse_entered Godot.Signal
+---@field mouse_exited Godot.Signal
+---@field create_shape_owner fun(self: Godot.CollisionObject3D, owner: Godot.Object): integer
+---@field get_capture_input_on_drag fun(self: Godot.CollisionObject3D): boolean
+---@field get_collision_layer fun(self: Godot.CollisionObject3D): integer
+---@field get_collision_layer_value fun(self: Godot.CollisionObject3D, layer_number: integer): boolean
+---@field get_collision_mask fun(self: Godot.CollisionObject3D): integer
+---@field get_collision_mask_value fun(self: Godot.CollisionObject3D, layer_number: integer): boolean
+---@field get_collision_priority fun(self: Godot.CollisionObject3D): number
+---@field get_disable_mode fun(self: Godot.CollisionObject3D): integer
+---@field get_rid fun(self: Godot.CollisionObject3D): Godot.Rid
+---@field get_shape_owners fun(self: Godot.CollisionObject3D): table
+---@field is_ray_pickable fun(self: Godot.CollisionObject3D): boolean
+---@field is_shape_owner_disabled fun(self: Godot.CollisionObject3D, owner_id: integer): boolean
+---@field remove_shape_owner fun(self: Godot.CollisionObject3D, owner_id: integer)
+---@field set_capture_input_on_drag fun(self: Godot.CollisionObject3D, enable: boolean)
+---@field set_collision_layer fun(self: Godot.CollisionObject3D, layer: integer)
+---@field set_collision_layer_value fun(self: Godot.CollisionObject3D, layer_number: integer, value: boolean)
+---@field set_collision_mask fun(self: Godot.CollisionObject3D, mask: integer)
+---@field set_collision_mask_value fun(self: Godot.CollisionObject3D, layer_number: integer, value: boolean)
+---@field set_collision_priority fun(self: Godot.CollisionObject3D, priority: number)
+---@field set_disable_mode fun(self: Godot.CollisionObject3D, mode: integer)
+---@field set_ray_pickable fun(self: Godot.CollisionObject3D, ray_pickable: boolean)
+---@field shape_find_owner fun(self: Godot.CollisionObject3D, shape_index: integer): integer
+---@field shape_owner_add_shape fun(self: Godot.CollisionObject3D, owner_id: integer, shape: Godot.Shape3D)
+---@field shape_owner_clear_shapes fun(self: Godot.CollisionObject3D, owner_id: integer)
+---@field shape_owner_get_owner fun(self: Godot.CollisionObject3D, owner_id: integer): Godot.Object
+---@field shape_owner_get_shape fun(self: Godot.CollisionObject3D, owner_id: integer, shape_id: integer): Godot.Shape3D
+---@field shape_owner_get_shape_count fun(self: Godot.CollisionObject3D, owner_id: integer): integer
+---@field shape_owner_get_shape_index fun(self: Godot.CollisionObject3D, owner_id: integer, shape_id: integer): integer
+---@field shape_owner_get_transform fun(self: Godot.CollisionObject3D, owner_id: integer): Godot.Transform3D
+---@field shape_owner_remove_shape fun(self: Godot.CollisionObject3D, owner_id: integer, shape_id: integer)
+---@field shape_owner_set_disabled fun(self: Godot.CollisionObject3D, owner_id: integer, disabled: boolean)
+---@field shape_owner_set_transform fun(self: Godot.CollisionObject3D, owner_id: integer, transform: Godot.Transform3D)
+---@class Godot.CollisionObject3D.__type
+---@field new fun(): Godot.CollisionObject3D
+---@field DisableModeEnum Godot.CollisionObject3D.DisableModeEnum
+---@class Godot.CollisionObject3D.DisableModeEnum
+---@field Remove integer
+---@field MakeStatic integer
+---@field KeepActive integer
+
+---@class Godot.CollisionPolygon2D : Godot.Node2D
+---@field build_mode integer
+---@field disabled boolean
+---@field one_way_collision boolean
+---@field one_way_collision_margin number
+---@field polygon table
+---@field get_build_mode fun(self: Godot.CollisionPolygon2D): integer
+---@field get_one_way_collision_margin fun(self: Godot.CollisionPolygon2D): number
+---@field get_polygon fun(self: Godot.CollisionPolygon2D): table
+---@field is_disabled fun(self: Godot.CollisionPolygon2D): boolean
+---@field is_one_way_collision_enabled fun(self: Godot.CollisionPolygon2D): boolean
+---@field set_build_mode fun(self: Godot.CollisionPolygon2D, build_mode: integer)
+---@field set_disabled fun(self: Godot.CollisionPolygon2D, disabled: boolean)
+---@field set_one_way_collision fun(self: Godot.CollisionPolygon2D, enabled: boolean)
+---@field set_one_way_collision_margin fun(self: Godot.CollisionPolygon2D, margin: number)
+---@field set_polygon fun(self: Godot.CollisionPolygon2D, polygon: table)
+---@class Godot.CollisionPolygon2D.__type
+---@field new fun(): Godot.CollisionPolygon2D
+---@field BuildModeEnum Godot.CollisionPolygon2D.BuildModeEnum
+---@class Godot.CollisionPolygon2D.BuildModeEnum
+---@field Solids integer
+---@field Segments integer
+
+---@class Godot.CollisionPolygon3D : Godot.Node3D
+---@field debug_color Godot.Color
+---@field debug_fill boolean
+---@field depth number
+---@field disabled boolean
+---@field margin number
+---@field polygon table
+---@field get_debug_color fun(self: Godot.CollisionPolygon3D): Godot.Color
+---@field get_depth fun(self: Godot.CollisionPolygon3D): number
+---@field get_enable_debug_fill fun(self: Godot.CollisionPolygon3D): boolean
+---@field get_margin fun(self: Godot.CollisionPolygon3D): number
+---@field get_polygon fun(self: Godot.CollisionPolygon3D): table
+---@field is_disabled fun(self: Godot.CollisionPolygon3D): boolean
+---@field set_debug_color fun(self: Godot.CollisionPolygon3D, color: Godot.Color)
+---@field set_depth fun(self: Godot.CollisionPolygon3D, depth: number)
+---@field set_disabled fun(self: Godot.CollisionPolygon3D, disabled: boolean)
+---@field set_enable_debug_fill fun(self: Godot.CollisionPolygon3D, enable: boolean)
+---@field set_margin fun(self: Godot.CollisionPolygon3D, margin: number)
+---@field set_polygon fun(self: Godot.CollisionPolygon3D, polygon: table)
+---@class Godot.CollisionPolygon3D.__type
+---@field new fun(): Godot.CollisionPolygon3D
+
+---@class Godot.CollisionShape2D : Godot.Node2D
+---@field debug_color Godot.Color
+---@field disabled boolean
+---@field one_way_collision boolean
+---@field one_way_collision_margin number
+---@field shape Godot.Shape2D
+---@field get_debug_color fun(self: Godot.CollisionShape2D): Godot.Color
+---@field get_one_way_collision_margin fun(self: Godot.CollisionShape2D): number
+---@field get_shape fun(self: Godot.CollisionShape2D): Godot.Shape2D
+---@field is_disabled fun(self: Godot.CollisionShape2D): boolean
+---@field is_one_way_collision_enabled fun(self: Godot.CollisionShape2D): boolean
+---@field set_debug_color fun(self: Godot.CollisionShape2D, color: Godot.Color)
+---@field set_disabled fun(self: Godot.CollisionShape2D, disabled: boolean)
+---@field set_one_way_collision fun(self: Godot.CollisionShape2D, enabled: boolean)
+---@field set_one_way_collision_margin fun(self: Godot.CollisionShape2D, margin: number)
+---@field set_shape fun(self: Godot.CollisionShape2D, shape: Godot.Shape2D)
+---@class Godot.CollisionShape2D.__type
+---@field new fun(): Godot.CollisionShape2D
+
+---@class Godot.CollisionShape3D : Godot.Node3D
+---@field debug_color Godot.Color
+---@field debug_fill boolean
+---@field disabled boolean
+---@field shape Godot.Shape3D
+---@field get_debug_color fun(self: Godot.CollisionShape3D): Godot.Color
+---@field get_enable_debug_fill fun(self: Godot.CollisionShape3D): boolean
+---@field get_shape fun(self: Godot.CollisionShape3D): Godot.Shape3D
+---@field is_disabled fun(self: Godot.CollisionShape3D): boolean
+---@field make_convex_from_siblings fun(self: Godot.CollisionShape3D)
+---@field resource_changed fun(self: Godot.CollisionShape3D, resource: Godot.Resource)
+---@field set_debug_color fun(self: Godot.CollisionShape3D, color: Godot.Color)
+---@field set_disabled fun(self: Godot.CollisionShape3D, enable: boolean)
+---@field set_enable_debug_fill fun(self: Godot.CollisionShape3D, enable: boolean)
+---@field set_shape fun(self: Godot.CollisionShape3D, shape: Godot.Shape3D)
+---@class Godot.CollisionShape3D.__type
+---@field new fun(): Godot.CollisionShape3D
+
+---@class Godot.ColorPicker : Godot.VBoxContainer
+---@field can_add_swatches boolean
+---@field color Godot.Color
+---@field color_mode integer
+---@field color_modes_visible boolean
+---@field deferred_mode boolean
+---@field edit_alpha boolean
+---@field edit_intensity boolean
+---@field hex_visible boolean
+---@field picker_shape integer
+---@field presets_visible boolean
+---@field sampler_visible boolean
+---@field sliders_visible boolean
+---@field color_changed Godot.Signal
+---@field preset_added Godot.Signal
+---@field preset_removed Godot.Signal
+---@field add_preset fun(self: Godot.ColorPicker, color: Godot.Color)
+---@field add_recent_preset fun(self: Godot.ColorPicker, color: Godot.Color)
+---@field are_modes_visible fun(self: Godot.ColorPicker): boolean
+---@field are_presets_visible fun(self: Godot.ColorPicker): boolean
+---@field are_sliders_visible fun(self: Godot.ColorPicker): boolean
+---@field are_swatches_enabled fun(self: Godot.ColorPicker): boolean
+---@field erase_preset fun(self: Godot.ColorPicker, color: Godot.Color)
+---@field erase_recent_preset fun(self: Godot.ColorPicker, color: Godot.Color)
+---@field get_color_mode fun(self: Godot.ColorPicker): integer
+---@field get_pick_color fun(self: Godot.ColorPicker): Godot.Color
+---@field get_picker_shape fun(self: Godot.ColorPicker): integer
+---@field get_presets fun(self: Godot.ColorPicker): table
+---@field get_recent_presets fun(self: Godot.ColorPicker): table
+---@field is_deferred_mode fun(self: Godot.ColorPicker): boolean
+---@field is_editing_alpha fun(self: Godot.ColorPicker): boolean
+---@field is_editing_intensity fun(self: Godot.ColorPicker): boolean
+---@field is_hex_visible fun(self: Godot.ColorPicker): boolean
+---@field is_sampler_visible fun(self: Godot.ColorPicker): boolean
+---@field set_can_add_swatches fun(self: Godot.ColorPicker, enabled: boolean)
+---@field set_color_mode fun(self: Godot.ColorPicker, color_mode: integer)
+---@field set_deferred_mode fun(self: Godot.ColorPicker, mode: boolean)
+---@field set_edit_alpha fun(self: Godot.ColorPicker, show: boolean)
+---@field set_edit_intensity fun(self: Godot.ColorPicker, show: boolean)
+---@field set_hex_visible fun(self: Godot.ColorPicker, visible: boolean)
+---@field set_modes_visible fun(self: Godot.ColorPicker, visible: boolean)
+---@field set_pick_color fun(self: Godot.ColorPicker, color: Godot.Color)
+---@field set_picker_shape fun(self: Godot.ColorPicker, shape: integer)
+---@field set_presets_visible fun(self: Godot.ColorPicker, visible: boolean)
+---@field set_sampler_visible fun(self: Godot.ColorPicker, visible: boolean)
+---@field set_sliders_visible fun(self: Godot.ColorPicker, visible: boolean)
+---@class Godot.ColorPicker.__type
+---@field new fun(): Godot.ColorPicker
+---@field ColorModeType Godot.ColorPicker.ColorModeType
+---@field PickerShapeType Godot.ColorPicker.PickerShapeType
+---@class Godot.ColorPicker.ColorModeType
+---@field Rgb integer
+---@field Hsv integer
+---@field Raw integer
+---@field Linear integer
+---@field Okhsl integer
+---@class Godot.ColorPicker.PickerShapeType
+---@field HsvRectangle integer
+---@field HsvWheel integer
+---@field VhsCircle integer
+---@field OkhslCircle integer
+---@field None integer
+---@field OkHsRectangle integer
+---@field OkHlRectangle integer
+
+---@class Godot.ColorPickerButton : Godot.Button
+---@field color Godot.Color
+---@field edit_alpha boolean
+---@field edit_intensity boolean
+---@field color_changed Godot.Signal
+---@field picker_created Godot.Signal
+---@field popup_closed Godot.Signal
+---@field get_pick_color fun(self: Godot.ColorPickerButton): Godot.Color
+---@field get_picker fun(self: Godot.ColorPickerButton): Godot.ColorPicker
+---@field get_popup fun(self: Godot.ColorPickerButton): Godot.PopupPanel
+---@field is_editing_alpha fun(self: Godot.ColorPickerButton): boolean
+---@field is_editing_intensity fun(self: Godot.ColorPickerButton): boolean
+---@field set_edit_alpha fun(self: Godot.ColorPickerButton, show: boolean)
+---@field set_edit_intensity fun(self: Godot.ColorPickerButton, show: boolean)
+---@field set_pick_color fun(self: Godot.ColorPickerButton, color: Godot.Color)
+---@class Godot.ColorPickerButton.__type
+---@field new fun(): Godot.ColorPickerButton
+
+---@class Godot.ColorRect : Godot.Control
+---@field color Godot.Color
+---@field get_color fun(self: Godot.ColorRect): Godot.Color
+---@field set_color fun(self: Godot.ColorRect, color: Godot.Color)
+---@class Godot.ColorRect.__type
+---@field new fun(): Godot.ColorRect
+
+---@class Godot.ConeTwistJoint3D : Godot.Joint3D
+---@field bias number
+---@field relaxation number
+---@field softness number
+---@field swing_span number
+---@field twist_span number
+---@field get_param fun(self: Godot.ConeTwistJoint3D, param: integer): number
+---@field set_param fun(self: Godot.ConeTwistJoint3D, param: integer, value: number)
+---@class Godot.ConeTwistJoint3D.__type
+---@field new fun(): Godot.ConeTwistJoint3D
+---@field Param Godot.ConeTwistJoint3D.Param
+---@class Godot.ConeTwistJoint3D.Param
+---@field SwingSpan integer
+---@field TwistSpan integer
+---@field Bias integer
+---@field Softness integer
+---@field Relaxation integer
+---@field Max integer
+
+---@class Godot.ConfirmationDialog : Godot.AcceptDialog
+---@field cancel_button_text string
+---@field get_cancel_button fun(self: Godot.ConfirmationDialog): Godot.Button
+---@field get_cancel_button_text fun(self: Godot.ConfirmationDialog): string
+---@field set_cancel_button_text fun(self: Godot.ConfirmationDialog, text: string)
+---@class Godot.ConfirmationDialog.__type
+---@field new fun(): Godot.ConfirmationDialog
+
+---@class Godot.Container : Godot.Control
+---@field pre_sort_children Godot.Signal
+---@field sort_children Godot.Signal
+---@field fit_child_in_rect fun(self: Godot.Container, child: Godot.Control, rect: Godot.Rect2)
+---@field queue_sort fun(self: Godot.Container)
+---@class Godot.Container.__type
+---@field new fun(): Godot.Container
+---@field NotificationPreSortChildren integer
+---@field NotificationSortChildren integer
+
+---@class Godot.Control : Godot.CanvasItem
+---@field accessibility_controls_nodes table
+---@field accessibility_described_by_nodes table
+---@field accessibility_description string
+---@field accessibility_flow_to_nodes table
+---@field accessibility_labeled_by_nodes table
+---@field accessibility_live integer
+---@field accessibility_name string
+---@field anchor_bottom number
+---@field anchor_left number
+---@field anchor_right number
+---@field anchor_top number
+---@field anchors_preset integer
+---@field auto_translate boolean
+---@field clip_contents boolean
+---@field custom_minimum_size Godot.Vector2
+---@field focus_behavior_recursive integer
+---@field focus_mode integer
+---@field focus_neighbor_bottom string
+---@field focus_neighbor_left string
+---@field focus_neighbor_right string
+---@field focus_neighbor_top string
+---@field focus_next string
+---@field focus_previous string
+---@field global_position Godot.Vector2
+---@field grow_horizontal integer
+---@field grow_vertical integer
+---@field layout_direction integer
+---@field layout_mode integer
+---@field localize_numeral_system boolean
+---@field mouse_behavior_recursive integer
+---@field mouse_default_cursor_shape integer
+---@field mouse_filter integer
+---@field mouse_force_pass_scroll_events boolean
+---@field offset_bottom number
+---@field offset_left number
+---@field offset_right number
+---@field offset_top number
+---@field pivot_offset Godot.Vector2
+---@field pivot_offset_ratio Godot.Vector2
+---@field position Godot.Vector2
+---@field rotation number
+---@field rotation_degrees number
+---@field scale Godot.Vector2
+---@field shortcut_context Godot.Object
+---@field size Godot.Vector2
+---@field size_flags_horizontal integer
+---@field size_flags_stretch_ratio number
+---@field size_flags_vertical integer
+---@field theme Godot.Theme
+---@field theme_type_variation string
+---@field tooltip_auto_translate_mode integer
+---@field tooltip_text string
+---@field focus_entered Godot.Signal
+---@field focus_exited Godot.Signal
+---@field gui_input Godot.Signal
+---@field minimum_size_changed Godot.Signal
+---@field mouse_entered Godot.Signal
+---@field mouse_exited Godot.Signal
+---@field resized Godot.Signal
+---@field size_flags_changed Godot.Signal
+---@field theme_changed Godot.Signal
+---@field accept_event fun(self: Godot.Control)
+---@field accessibility_drag fun(self: Godot.Control)
+---@field accessibility_drop fun(self: Godot.Control)
+---@field add_theme_color_override fun(self: Godot.Control, name: string, color: Godot.Color)
+---@field add_theme_constant_override fun(self: Godot.Control, name: string, constant: integer)
+---@field add_theme_font_override fun(self: Godot.Control, name: string, font: Godot.Font)
+---@field add_theme_font_size_override fun(self: Godot.Control, name: string, font_size: integer)
+---@field add_theme_icon_override fun(self: Godot.Control, name: string, texture: Godot.Texture2D)
+---@field add_theme_stylebox_override fun(self: Godot.Control, name: string, stylebox: Godot.StyleBox)
+---@field begin_bulk_theme_override fun(self: Godot.Control)
+---@field end_bulk_theme_override fun(self: Godot.Control)
+---@field find_next_valid_focus fun(self: Godot.Control): Godot.Control
+---@field find_prev_valid_focus fun(self: Godot.Control): Godot.Control
+---@field find_valid_focus_neighbor fun(self: Godot.Control, side: integer): Godot.Control
+---@field force_drag fun(self: Godot.Control, data: any, preview: Godot.Control)
+---@field get_accessibility_controls_nodes fun(self: Godot.Control): table
+---@field get_accessibility_described_by_nodes fun(self: Godot.Control): table
+---@field get_accessibility_description fun(self: Godot.Control): string
+---@field get_accessibility_flow_to_nodes fun(self: Godot.Control): table
+---@field get_accessibility_labeled_by_nodes fun(self: Godot.Control): table
+---@field get_accessibility_live fun(self: Godot.Control): integer
+---@field get_accessibility_name fun(self: Godot.Control): string
+---@field get_anchor fun(self: Godot.Control, side: integer): number
+---@field get_begin fun(self: Godot.Control): Godot.Vector2
+---@field get_combined_minimum_size fun(self: Godot.Control): Godot.Vector2
+---@field get_combined_pivot_offset fun(self: Godot.Control): Godot.Vector2
+---@field get_cursor_shape fun(self: Godot.Control, position: Godot.Vector2): integer
+---@field get_custom_minimum_size fun(self: Godot.Control): Godot.Vector2
+---@field get_default_cursor_shape fun(self: Godot.Control): integer
+---@field get_end fun(self: Godot.Control): Godot.Vector2
+---@field get_focus_behavior_recursive fun(self: Godot.Control): integer
+---@field get_focus_mode fun(self: Godot.Control): integer
+---@field get_focus_mode_with_override fun(self: Godot.Control): integer
+---@field get_focus_neighbor fun(self: Godot.Control, side: integer): string
+---@field get_focus_next fun(self: Godot.Control): string
+---@field get_focus_previous fun(self: Godot.Control): string
+---@field get_global_position fun(self: Godot.Control): Godot.Vector2
+---@field get_global_rect fun(self: Godot.Control): Godot.Rect2
+---@field get_h_grow_direction fun(self: Godot.Control): integer
+---@field get_h_size_flags fun(self: Godot.Control): integer
+---@field get_layout_direction fun(self: Godot.Control): integer
+---@field get_minimum_size fun(self: Godot.Control): Godot.Vector2
+---@field get_mouse_behavior_recursive fun(self: Godot.Control): integer
+---@field get_mouse_filter fun(self: Godot.Control): integer
+---@field get_mouse_filter_with_override fun(self: Godot.Control): integer
+---@field get_offset fun(self: Godot.Control, offset: integer): number
+---@field get_parent_area_size fun(self: Godot.Control): Godot.Vector2
+---@field get_parent_control fun(self: Godot.Control): Godot.Control
+---@field get_pivot_offset fun(self: Godot.Control): Godot.Vector2
+---@field get_pivot_offset_ratio fun(self: Godot.Control): Godot.Vector2
+---@field get_position fun(self: Godot.Control): Godot.Vector2
+---@field get_rect fun(self: Godot.Control): Godot.Rect2
+---@field get_rotation fun(self: Godot.Control): number
+---@field get_rotation_degrees fun(self: Godot.Control): number
+---@field get_scale fun(self: Godot.Control): Godot.Vector2
+---@field get_screen_position fun(self: Godot.Control): Godot.Vector2
+---@field get_shortcut_context fun(self: Godot.Control): Godot.Node
+---@field get_size fun(self: Godot.Control): Godot.Vector2
+---@field get_stretch_ratio fun(self: Godot.Control): number
+---@field get_theme fun(self: Godot.Control): Godot.Theme
+---@field get_theme_color fun(self: Godot.Control, name: string, theme_type: string): Godot.Color
+---@field get_theme_constant fun(self: Godot.Control, name: string, theme_type: string): integer
+---@field get_theme_default_base_scale fun(self: Godot.Control): number
+---@field get_theme_default_font fun(self: Godot.Control): Godot.Font
+---@field get_theme_default_font_size fun(self: Godot.Control): integer
+---@field get_theme_font fun(self: Godot.Control, name: string, theme_type: string): Godot.Font
+---@field get_theme_font_size fun(self: Godot.Control, name: string, theme_type: string): integer
+---@field get_theme_icon fun(self: Godot.Control, name: string, theme_type: string): Godot.Texture2D
+---@field get_theme_stylebox fun(self: Godot.Control, name: string, theme_type: string): Godot.StyleBox
+---@field get_theme_type_variation fun(self: Godot.Control): string
+---@field get_tooltip fun(self: Godot.Control, at_position: Godot.Vector2): string
+---@field get_tooltip_auto_translate_mode fun(self: Godot.Control): integer
+---@field get_tooltip_text fun(self: Godot.Control): string
+---@field get_v_grow_direction fun(self: Godot.Control): integer
+---@field get_v_size_flags fun(self: Godot.Control): integer
+---@field grab_click_focus fun(self: Godot.Control)
+---@field grab_focus fun(self: Godot.Control, hide_focus: boolean)
+---@field has_focus fun(self: Godot.Control, ignore_hidden_focus: boolean): boolean
+---@field has_theme_color fun(self: Godot.Control, name: string, theme_type: string): boolean
+---@field has_theme_color_override fun(self: Godot.Control, name: string): boolean
+---@field has_theme_constant fun(self: Godot.Control, name: string, theme_type: string): boolean
+---@field has_theme_constant_override fun(self: Godot.Control, name: string): boolean
+---@field has_theme_font fun(self: Godot.Control, name: string, theme_type: string): boolean
+---@field has_theme_font_override fun(self: Godot.Control, name: string): boolean
+---@field has_theme_font_size fun(self: Godot.Control, name: string, theme_type: string): boolean
+---@field has_theme_font_size_override fun(self: Godot.Control, name: string): boolean
+---@field has_theme_icon fun(self: Godot.Control, name: string, theme_type: string): boolean
+---@field has_theme_icon_override fun(self: Godot.Control, name: string): boolean
+---@field has_theme_stylebox fun(self: Godot.Control, name: string, theme_type: string): boolean
+---@field has_theme_stylebox_override fun(self: Godot.Control, name: string): boolean
+---@field is_auto_translating fun(self: Godot.Control): boolean
+---@field is_clipping_contents fun(self: Godot.Control): boolean
+---@field is_drag_successful fun(self: Godot.Control): boolean
+---@field is_force_pass_scroll_events fun(self: Godot.Control): boolean
+---@field is_layout_rtl fun(self: Godot.Control): boolean
+---@field is_localizing_numeral_system fun(self: Godot.Control): boolean
+---@field release_focus fun(self: Godot.Control)
+---@field remove_theme_color_override fun(self: Godot.Control, name: string)
+---@field remove_theme_constant_override fun(self: Godot.Control, name: string)
+---@field remove_theme_font_override fun(self: Godot.Control, name: string)
+---@field remove_theme_font_size_override fun(self: Godot.Control, name: string)
+---@field remove_theme_icon_override fun(self: Godot.Control, name: string)
+---@field remove_theme_stylebox_override fun(self: Godot.Control, name: string)
+---@field reset_size fun(self: Godot.Control)
+---@field set_accessibility_controls_nodes fun(self: Godot.Control, node_path: table)
+---@field set_accessibility_described_by_nodes fun(self: Godot.Control, node_path: table)
+---@field set_accessibility_description fun(self: Godot.Control, description: string)
+---@field set_accessibility_flow_to_nodes fun(self: Godot.Control, node_path: table)
+---@field set_accessibility_labeled_by_nodes fun(self: Godot.Control, node_path: table)
+---@field set_accessibility_live fun(self: Godot.Control, mode: integer)
+---@field set_accessibility_name fun(self: Godot.Control, name: string)
+---@field set_anchor fun(self: Godot.Control, side: integer, anchor: number, keep_offset: boolean, push_opposite_anchor: boolean)
+---@field set_anchor_and_offset fun(self: Godot.Control, side: integer, anchor: number, offset: number, push_opposite_anchor: boolean)
+---@field set_anchors_and_offsets_preset fun(self: Godot.Control, preset: integer, resize_mode: integer, margin: integer)
+---@field set_anchors_preset fun(self: Godot.Control, preset: integer, keep_offsets: boolean)
+---@field set_auto_translate fun(self: Godot.Control, enable: boolean)
+---@field set_begin fun(self: Godot.Control, position: Godot.Vector2)
+---@field set_clip_contents fun(self: Godot.Control, enable: boolean)
+---@field set_custom_minimum_size fun(self: Godot.Control, size: Godot.Vector2)
+---@field set_default_cursor_shape fun(self: Godot.Control, shape: integer)
+---@field set_drag_forwarding fun(self: Godot.Control, drag_func: function, can_drop_func: function, drop_func: function)
+---@field set_drag_preview fun(self: Godot.Control, control: Godot.Control)
+---@field set_end fun(self: Godot.Control, position: Godot.Vector2)
+---@field set_focus_behavior_recursive fun(self: Godot.Control, focus_behavior_recursive: integer)
+---@field set_focus_mode fun(self: Godot.Control, mode: integer)
+---@field set_focus_neighbor fun(self: Godot.Control, side: integer, neighbor: string)
+---@field set_focus_next fun(self: Godot.Control, next: string)
+---@field set_focus_previous fun(self: Godot.Control, previous: string)
+---@field set_force_pass_scroll_events fun(self: Godot.Control, force_pass_scroll_events: boolean)
+---@field set_global_position fun(self: Godot.Control, position: Godot.Vector2, keep_offsets: boolean)
+---@field set_h_grow_direction fun(self: Godot.Control, direction: integer)
+---@field set_h_size_flags fun(self: Godot.Control, flags: integer)
+---@field set_layout_direction fun(self: Godot.Control, direction: integer)
+---@field set_localize_numeral_system fun(self: Godot.Control, enable: boolean)
+---@field set_mouse_behavior_recursive fun(self: Godot.Control, mouse_behavior_recursive: integer)
+---@field set_mouse_filter fun(self: Godot.Control, filter: integer)
+---@field set_offset fun(self: Godot.Control, side: integer, offset: number)
+---@field set_offsets_preset fun(self: Godot.Control, preset: integer, resize_mode: integer, margin: integer)
+---@field set_pivot_offset fun(self: Godot.Control, pivot_offset: Godot.Vector2)
+---@field set_pivot_offset_ratio fun(self: Godot.Control, ratio: Godot.Vector2)
+---@field set_position fun(self: Godot.Control, position: Godot.Vector2, keep_offsets: boolean)
+---@field set_rotation fun(self: Godot.Control, radians: number)
+---@field set_rotation_degrees fun(self: Godot.Control, degrees: number)
+---@field set_scale fun(self: Godot.Control, scale: Godot.Vector2)
+---@field set_shortcut_context fun(self: Godot.Control, node: Godot.Node)
+---@field set_size fun(self: Godot.Control, size: Godot.Vector2, keep_offsets: boolean)
+---@field set_stretch_ratio fun(self: Godot.Control, ratio: number)
+---@field set_theme fun(self: Godot.Control, theme: Godot.Theme)
+---@field set_theme_type_variation fun(self: Godot.Control, theme_type: string)
+---@field set_tooltip_auto_translate_mode fun(self: Godot.Control, mode: integer)
+---@field set_tooltip_text fun(self: Godot.Control, hint: string)
+---@field set_v_grow_direction fun(self: Godot.Control, direction: integer)
+---@field set_v_size_flags fun(self: Godot.Control, flags: integer)
+---@field update_minimum_size fun(self: Godot.Control)
+---@field warp_mouse fun(self: Godot.Control, position: Godot.Vector2)
+---@class Godot.Control.__type
+---@field new fun(): Godot.Control
+---@field NotificationResized integer
+---@field NotificationMouseEnter integer
+---@field NotificationMouseExit integer
+---@field NotificationMouseEnterSelf integer
+---@field NotificationMouseExitSelf integer
+---@field NotificationFocusEnter integer
+---@field NotificationFocusExit integer
+---@field NotificationThemeChanged integer
+---@field NotificationScrollBegin integer
+---@field NotificationScrollEnd integer
+---@field NotificationLayoutDirectionChanged integer
+---@field Anchor Godot.Control.Anchor
+---@field CursorShape Godot.Control.CursorShape
+---@field FocusBehaviorRecursiveEnum Godot.Control.FocusBehaviorRecursiveEnum
+---@field FocusModeEnum Godot.Control.FocusModeEnum
+---@field GrowDirection Godot.Control.GrowDirection
+---@field LayoutDirectionEnum Godot.Control.LayoutDirectionEnum
+---@field LayoutPreset Godot.Control.LayoutPreset
+---@field LayoutPresetMode Godot.Control.LayoutPresetMode
+---@field MouseBehaviorRecursiveEnum Godot.Control.MouseBehaviorRecursiveEnum
+---@field MouseFilterEnum Godot.Control.MouseFilterEnum
+---@field SizeFlags Godot.Control.SizeFlags
+---@field TextDirection Godot.Control.TextDirection
+---@class Godot.Control.Anchor
+---@field Begin integer
+---@field End integer
+---@class Godot.Control.CursorShape
+---@field Arrow integer
+---@field Ibeam integer
+---@field PointingHand integer
+---@field Cross integer
+---@field Wait integer
+---@field Busy integer
+---@field Drag integer
+---@field CanDrop integer
+---@field Forbidden integer
+---@field Vsize integer
+---@field Hsize integer
+---@field Bdiagsize integer
+---@field Fdiagsize integer
+---@field Move integer
+---@field Vsplit integer
+---@field Hsplit integer
+---@field Help integer
+---@class Godot.Control.FocusBehaviorRecursiveEnum
+---@field Inherited integer
+---@field Disabled integer
+---@field Enabled integer
+---@class Godot.Control.FocusModeEnum
+---@field None integer
+---@field Click integer
+---@field All integer
+---@field Accessibility integer
+---@class Godot.Control.GrowDirection
+---@field Begin integer
+---@field End integer
+---@field Both integer
+---@class Godot.Control.LayoutDirectionEnum
+---@field Inherited integer
+---@field ApplicationLocale integer
+---@field Locale integer
+---@field Ltr integer
+---@field Rtl integer
+---@field SystemLocale integer
+---@field Max integer
+---@class Godot.Control.LayoutPreset
+---@field TopLeft integer
+---@field TopRight integer
+---@field BottomLeft integer
+---@field BottomRight integer
+---@field CenterLeft integer
+---@field CenterTop integer
+---@field CenterRight integer
+---@field CenterBottom integer
+---@field Center integer
+---@field LeftWide integer
+---@field TopWide integer
+---@field RightWide integer
+---@field BottomWide integer
+---@field VcenterWide integer
+---@field HcenterWide integer
+---@field FullRect integer
+---@class Godot.Control.LayoutPresetMode
+---@field Minsize integer
+---@field KeepWidth integer
+---@field KeepHeight integer
+---@field KeepSize integer
+---@class Godot.Control.MouseBehaviorRecursiveEnum
+---@field Inherited integer
+---@field Disabled integer
+---@field Enabled integer
+---@class Godot.Control.MouseFilterEnum
+---@field Stop integer
+---@field Pass integer
+---@field Ignore integer
+---@class Godot.Control.SizeFlags
+---@field ShrinkBegin integer
+---@field Fill integer
+---@field Expand integer
+---@field ExpandFill integer
+---@field ShrinkCenter integer
+---@field ShrinkEnd integer
+---@class Godot.Control.TextDirection
+---@field Auto integer
+---@field Ltr integer
+---@field Rtl integer
+---@field Inherited integer
+
+---@class Godot.ConvertTransformModifier3D : Godot.BoneConstraint3D
+---@field setting_count integer
+---@field get_apply_axis fun(self: Godot.ConvertTransformModifier3D, index: integer): integer
+---@field get_apply_range_max fun(self: Godot.ConvertTransformModifier3D, index: integer): number
+---@field get_apply_range_min fun(self: Godot.ConvertTransformModifier3D, index: integer): number
+---@field get_apply_transform_mode fun(self: Godot.ConvertTransformModifier3D, index: integer): integer
+---@field get_reference_axis fun(self: Godot.ConvertTransformModifier3D, index: integer): integer
+---@field get_reference_range_max fun(self: Godot.ConvertTransformModifier3D, index: integer): number
+---@field get_reference_range_min fun(self: Godot.ConvertTransformModifier3D, index: integer): number
+---@field get_reference_transform_mode fun(self: Godot.ConvertTransformModifier3D, index: integer): integer
+---@field is_additive fun(self: Godot.ConvertTransformModifier3D, index: integer): boolean
+---@field is_relative fun(self: Godot.ConvertTransformModifier3D, index: integer): boolean
+---@field set_additive fun(self: Godot.ConvertTransformModifier3D, index: integer, enabled: boolean)
+---@field set_apply_axis fun(self: Godot.ConvertTransformModifier3D, index: integer, axis: integer)
+---@field set_apply_range_max fun(self: Godot.ConvertTransformModifier3D, index: integer, range_max: number)
+---@field set_apply_range_min fun(self: Godot.ConvertTransformModifier3D, index: integer, range_min: number)
+---@field set_apply_transform_mode fun(self: Godot.ConvertTransformModifier3D, index: integer, transform_mode: integer)
+---@field set_reference_axis fun(self: Godot.ConvertTransformModifier3D, index: integer, axis: integer)
+---@field set_reference_range_max fun(self: Godot.ConvertTransformModifier3D, index: integer, range_max: number)
+---@field set_reference_range_min fun(self: Godot.ConvertTransformModifier3D, index: integer, range_min: number)
+---@field set_reference_transform_mode fun(self: Godot.ConvertTransformModifier3D, index: integer, transform_mode: integer)
+---@field set_relative fun(self: Godot.ConvertTransformModifier3D, index: integer, enabled: boolean)
+---@class Godot.ConvertTransformModifier3D.__type
+---@field new fun(): Godot.ConvertTransformModifier3D
+---@field TransformMode Godot.ConvertTransformModifier3D.TransformMode
+---@class Godot.ConvertTransformModifier3D.TransformMode
+---@field Position integer
+---@field Rotation integer
+---@field Scale integer
+
+---@class Godot.CopyTransformModifier3D : Godot.BoneConstraint3D
+---@field setting_count integer
+---@field get_axis_flags fun(self: Godot.CopyTransformModifier3D, index: integer): integer
+---@field get_copy_flags fun(self: Godot.CopyTransformModifier3D, index: integer): integer
+---@field get_invert_flags fun(self: Godot.CopyTransformModifier3D, index: integer): integer
+---@field is_additive fun(self: Godot.CopyTransformModifier3D, index: integer): boolean
+---@field is_axis_x_enabled fun(self: Godot.CopyTransformModifier3D, index: integer): boolean
+---@field is_axis_x_inverted fun(self: Godot.CopyTransformModifier3D, index: integer): boolean
+---@field is_axis_y_enabled fun(self: Godot.CopyTransformModifier3D, index: integer): boolean
+---@field is_axis_y_inverted fun(self: Godot.CopyTransformModifier3D, index: integer): boolean
+---@field is_axis_z_enabled fun(self: Godot.CopyTransformModifier3D, index: integer): boolean
+---@field is_axis_z_inverted fun(self: Godot.CopyTransformModifier3D, index: integer): boolean
+---@field is_position_copying fun(self: Godot.CopyTransformModifier3D, index: integer): boolean
+---@field is_relative fun(self: Godot.CopyTransformModifier3D, index: integer): boolean
+---@field is_rotation_copying fun(self: Godot.CopyTransformModifier3D, index: integer): boolean
+---@field is_scale_copying fun(self: Godot.CopyTransformModifier3D, index: integer): boolean
+---@field set_additive fun(self: Godot.CopyTransformModifier3D, index: integer, enabled: boolean)
+---@field set_axis_flags fun(self: Godot.CopyTransformModifier3D, index: integer, axis_flags: integer)
+---@field set_axis_x_enabled fun(self: Godot.CopyTransformModifier3D, index: integer, enabled: boolean)
+---@field set_axis_x_inverted fun(self: Godot.CopyTransformModifier3D, index: integer, enabled: boolean)
+---@field set_axis_y_enabled fun(self: Godot.CopyTransformModifier3D, index: integer, enabled: boolean)
+---@field set_axis_y_inverted fun(self: Godot.CopyTransformModifier3D, index: integer, enabled: boolean)
+---@field set_axis_z_enabled fun(self: Godot.CopyTransformModifier3D, index: integer, enabled: boolean)
+---@field set_axis_z_inverted fun(self: Godot.CopyTransformModifier3D, index: integer, enabled: boolean)
+---@field set_copy_flags fun(self: Godot.CopyTransformModifier3D, index: integer, copy_flags: integer)
+---@field set_copy_position fun(self: Godot.CopyTransformModifier3D, index: integer, enabled: boolean)
+---@field set_copy_rotation fun(self: Godot.CopyTransformModifier3D, index: integer, enabled: boolean)
+---@field set_copy_scale fun(self: Godot.CopyTransformModifier3D, index: integer, enabled: boolean)
+---@field set_invert_flags fun(self: Godot.CopyTransformModifier3D, index: integer, axis_flags: integer)
+---@field set_relative fun(self: Godot.CopyTransformModifier3D, index: integer, enabled: boolean)
+---@class Godot.CopyTransformModifier3D.__type
+---@field new fun(): Godot.CopyTransformModifier3D
+---@field AxisFlag Godot.CopyTransformModifier3D.AxisFlag
+---@field TransformFlag Godot.CopyTransformModifier3D.TransformFlag
+---@class Godot.CopyTransformModifier3D.AxisFlag
+---@field X integer
+---@field Y integer
+---@field Z integer
+---@field All integer
+---@class Godot.CopyTransformModifier3D.TransformFlag
+---@field Position integer
+---@field Rotation integer
+---@field Scale integer
+---@field All integer
+
+---@class Godot.CpuParticles2D : Godot.Node2D
+---@class Godot.CpuParticles2D.__type
+---@field new fun(): Godot.CpuParticles2D
+---@field DrawOrderEnum Godot.CpuParticles2D.DrawOrderEnum
+---@field EmissionShapeEnum Godot.CpuParticles2D.EmissionShapeEnum
+---@field Parameter Godot.CpuParticles2D.Parameter
+---@field ParticleFlags Godot.CpuParticles2D.ParticleFlags
+---@class Godot.CpuParticles2D.DrawOrderEnum
+---@field Index integer
+---@field Lifetime integer
+---@class Godot.CpuParticles2D.EmissionShapeEnum
+---@field Point integer
+---@field Sphere integer
+---@field SphereSurface integer
+---@field Rectangle integer
+---@field Points integer
+---@field DirectedPoints integer
+---@field Ring integer
+---@field Max integer
+---@class Godot.CpuParticles2D.Parameter
+---@field InitialLinearVelocity integer
+---@field AngularVelocity integer
+---@field OrbitVelocity integer
+---@field LinearAccel integer
+---@field RadialAccel integer
+---@field TangentialAccel integer
+---@field Damping integer
+---@field Angle integer
+---@field Scale integer
+---@field HueVariation integer
+---@field AnimSpeed integer
+---@field AnimOffset integer
+---@field Max integer
+---@class Godot.CpuParticles2D.ParticleFlags
+---@field AlignYToVelocity integer
+---@field RotateY integer
+---@field DisableZ integer
+---@field Max integer
+
+---@class Godot.CpuParticles3D : Godot.GeometryInstance3D
+---@class Godot.CpuParticles3D.__type
+---@field new fun(): Godot.CpuParticles3D
+---@field DrawOrderEnum Godot.CpuParticles3D.DrawOrderEnum
+---@field EmissionShapeEnum Godot.CpuParticles3D.EmissionShapeEnum
+---@field Parameter Godot.CpuParticles3D.Parameter
+---@field ParticleFlags Godot.CpuParticles3D.ParticleFlags
+---@class Godot.CpuParticles3D.DrawOrderEnum
+---@field Index integer
+---@field Lifetime integer
+---@field ViewDepth integer
+---@class Godot.CpuParticles3D.EmissionShapeEnum
+---@field Point integer
+---@field Sphere integer
+---@field SphereSurface integer
+---@field Box integer
+---@field Points integer
+---@field DirectedPoints integer
+---@field Ring integer
+---@field Max integer
+---@class Godot.CpuParticles3D.Parameter
+---@field InitialLinearVelocity integer
+---@field AngularVelocity integer
+---@field OrbitVelocity integer
+---@field LinearAccel integer
+---@field RadialAccel integer
+---@field TangentialAccel integer
+---@field Damping integer
+---@field Angle integer
+---@field Scale integer
+---@field HueVariation integer
+---@field AnimSpeed integer
+---@field AnimOffset integer
+---@field Max integer
+---@class Godot.CpuParticles3D.ParticleFlags
+---@field AlignYToVelocity integer
+---@field RotateY integer
+---@field DisableZ integer
+---@field Max integer
+
+---@class Godot.CsgBox3D : Godot.CsgPrimitive3D
+---@class Godot.CsgBox3D.__type
+---@field new fun(): Godot.CsgBox3D
+
+---@class Godot.CsgCombiner3D : Godot.CsgShape3D
+---@class Godot.CsgCombiner3D.__type
+---@field new fun(): Godot.CsgCombiner3D
+
+---@class Godot.CsgCylinder3D : Godot.CsgPrimitive3D
+---@class Godot.CsgCylinder3D.__type
+---@field new fun(): Godot.CsgCylinder3D
+
+---@class Godot.CsgMesh3D : Godot.CsgPrimitive3D
+---@class Godot.CsgMesh3D.__type
+---@field new fun(): Godot.CsgMesh3D
+
+---@class Godot.CsgPolygon3D : Godot.CsgPrimitive3D
+---@class Godot.CsgPolygon3D.__type
+---@field new fun(): Godot.CsgPolygon3D
+---@field ModeEnum Godot.CsgPolygon3D.ModeEnum
+---@field PathIntervalTypeEnum Godot.CsgPolygon3D.PathIntervalTypeEnum
+---@field PathRotationEnum Godot.CsgPolygon3D.PathRotationEnum
+---@class Godot.CsgPolygon3D.ModeEnum
+---@field Depth integer
+---@field Spin integer
+---@field Path integer
+---@class Godot.CsgPolygon3D.PathIntervalTypeEnum
+---@field Distance integer
+---@field Subdivide integer
+---@class Godot.CsgPolygon3D.PathRotationEnum
+---@field Polygon integer
+---@field Path integer
+---@field PathFollow integer
+
+---@class Godot.CsgPrimitive3D : Godot.CsgShape3D
+---@class Godot.CsgPrimitive3D.__type
+---@field new fun(): Godot.CsgPrimitive3D
+
+---@class Godot.CsgShape3D : Godot.GeometryInstance3D
+---@class Godot.CsgShape3D.__type
+---@field new fun(): Godot.CsgShape3D
+---@field OperationEnum Godot.CsgShape3D.OperationEnum
+---@class Godot.CsgShape3D.OperationEnum
+---@field Union integer
+---@field Intersection integer
+---@field Subtraction integer
+
+---@class Godot.CsgSphere3D : Godot.CsgPrimitive3D
+---@class Godot.CsgSphere3D.__type
+---@field new fun(): Godot.CsgSphere3D
+
+---@class Godot.CsgTorus3D : Godot.CsgPrimitive3D
+---@class Godot.CsgTorus3D.__type
+---@field new fun(): Godot.CsgTorus3D
+
+---@class Godot.DampedSpringJoint2D : Godot.Joint2D
+---@field damping number
+---@field length number
+---@field rest_length number
+---@field stiffness number
+---@field get_damping fun(self: Godot.DampedSpringJoint2D): number
+---@field get_length fun(self: Godot.DampedSpringJoint2D): number
+---@field get_rest_length fun(self: Godot.DampedSpringJoint2D): number
+---@field get_stiffness fun(self: Godot.DampedSpringJoint2D): number
+---@field set_damping fun(self: Godot.DampedSpringJoint2D, damping: number)
+---@field set_length fun(self: Godot.DampedSpringJoint2D, length: number)
+---@field set_rest_length fun(self: Godot.DampedSpringJoint2D, rest_length: number)
+---@field set_stiffness fun(self: Godot.DampedSpringJoint2D, stiffness: number)
+---@class Godot.DampedSpringJoint2D.__type
+---@field new fun(): Godot.DampedSpringJoint2D
+
+---@class Godot.Decal : Godot.VisualInstance3D
+---@field albedo_mix number
+---@field cull_mask integer
+---@field distance_fade_begin number
+---@field distance_fade_enabled boolean
+---@field distance_fade_length number
+---@field emission_energy number
+---@field lower_fade number
+---@field modulate Godot.Color
+---@field normal_fade number
+---@field size Godot.Vector3
+---@field texture_albedo Godot.Texture2D,-AnimatedTexture,-AtlasTexture,-CameraTexture,-CanvasTexture,-MeshTexture,-Texture2DRD,-ViewportTexture
+---@field texture_emission Godot.Texture2D,-AnimatedTexture,-AtlasTexture,-CameraTexture,-CanvasTexture,-MeshTexture,-Texture2DRD,-ViewportTexture
+---@field texture_normal Godot.Texture2D,-AnimatedTexture,-AtlasTexture,-CameraTexture,-CanvasTexture,-MeshTexture,-Texture2DRD,-ViewportTexture
+---@field texture_orm Godot.Texture2D,-AnimatedTexture,-AtlasTexture,-CameraTexture,-CanvasTexture,-MeshTexture,-Texture2DRD,-ViewportTexture
+---@field upper_fade number
+---@field get_albedo_mix fun(self: Godot.Decal): number
+---@field get_cull_mask fun(self: Godot.Decal): integer
+---@field get_distance_fade_begin fun(self: Godot.Decal): number
+---@field get_distance_fade_length fun(self: Godot.Decal): number
+---@field get_emission_energy fun(self: Godot.Decal): number
+---@field get_lower_fade fun(self: Godot.Decal): number
+---@field get_modulate fun(self: Godot.Decal): Godot.Color
+---@field get_normal_fade fun(self: Godot.Decal): number
+---@field get_size fun(self: Godot.Decal): Godot.Vector3
+---@field get_texture fun(self: Godot.Decal, type: integer): Godot.Texture2D
+---@field get_upper_fade fun(self: Godot.Decal): number
+---@field is_distance_fade_enabled fun(self: Godot.Decal): boolean
+---@field set_albedo_mix fun(self: Godot.Decal, energy: number)
+---@field set_cull_mask fun(self: Godot.Decal, mask: integer)
+---@field set_distance_fade_begin fun(self: Godot.Decal, distance: number)
+---@field set_distance_fade_length fun(self: Godot.Decal, distance: number)
+---@field set_emission_energy fun(self: Godot.Decal, energy: number)
+---@field set_enable_distance_fade fun(self: Godot.Decal, enable: boolean)
+---@field set_lower_fade fun(self: Godot.Decal, fade: number)
+---@field set_modulate fun(self: Godot.Decal, color: Godot.Color)
+---@field set_normal_fade fun(self: Godot.Decal, fade: number)
+---@field set_size fun(self: Godot.Decal, size: Godot.Vector3)
+---@field set_texture fun(self: Godot.Decal, type: integer, texture: Godot.Texture2D)
+---@field set_upper_fade fun(self: Godot.Decal, fade: number)
+---@class Godot.Decal.__type
+---@field new fun(): Godot.Decal
+---@field DecalTexture Godot.Decal.DecalTexture
+---@class Godot.Decal.DecalTexture
+---@field Albedo integer
+---@field Normal integer
+---@field Orm integer
+---@field Emission integer
+---@field Max integer
+
+---@class Godot.DirectionalLight2D : Godot.Light2D
+---@field height number
+---@field max_distance number
+---@field get_max_distance fun(self: Godot.DirectionalLight2D): number
+---@field set_max_distance fun(self: Godot.DirectionalLight2D, pixels: number)
+---@class Godot.DirectionalLight2D.__type
+---@field new fun(): Godot.DirectionalLight2D
+
+---@class Godot.DirectionalLight3D : Godot.Light3D
+---@field directional_shadow_blend_splits boolean
+---@field directional_shadow_fade_start number
+---@field directional_shadow_max_distance number
+---@field directional_shadow_mode integer
+---@field directional_shadow_pancake_size number
+---@field directional_shadow_split_1 number
+---@field directional_shadow_split_2 number
+---@field directional_shadow_split_3 number
+---@field sky_mode integer
+---@field get_shadow_mode fun(self: Godot.DirectionalLight3D): integer
+---@field get_sky_mode fun(self: Godot.DirectionalLight3D): integer
+---@field is_blend_splits_enabled fun(self: Godot.DirectionalLight3D): boolean
+---@field set_blend_splits fun(self: Godot.DirectionalLight3D, enabled: boolean)
+---@field set_shadow_mode fun(self: Godot.DirectionalLight3D, mode: integer)
+---@field set_sky_mode fun(self: Godot.DirectionalLight3D, mode: integer)
+---@class Godot.DirectionalLight3D.__type
+---@field new fun(): Godot.DirectionalLight3D
+---@field ShadowMode Godot.DirectionalLight3D.ShadowMode
+---@field SkyModeEnum Godot.DirectionalLight3D.SkyModeEnum
+---@class Godot.DirectionalLight3D.ShadowMode
+---@field Orthogonal integer
+---@field Parallel2Splits integer
+---@field Parallel4Splits integer
+---@class Godot.DirectionalLight3D.SkyModeEnum
+---@field LightAndSky integer
+---@field LightOnly integer
+---@field SkyOnly integer
+
+---@class Godot.Fabrik3D : Godot.IterateIK3D
+---@class Godot.Fabrik3D.__type
+---@field new fun(): Godot.Fabrik3D
+
+---@class Godot.FileDialog : Godot.ConfirmationDialog
+---@field access integer
+---@field current_dir string
+---@field current_file string
+---@field current_path string
+---@field deleting_enabled boolean
+---@field display_mode integer
+---@field favorites_enabled boolean
+---@field file_filter_toggle_enabled boolean
+---@field file_mode integer
+---@field file_sort_options_enabled boolean
+---@field filename_filter string
+---@field filters table
+---@field folder_creation_enabled boolean
+---@field hidden_files_toggle_enabled boolean
+---@field layout_toggle_enabled boolean
+---@field mode_overrides_title boolean
+---@field option_count integer
+---@field overwrite_warning_enabled boolean
+---@field recent_list_enabled boolean
+---@field root_subfolder string
+---@field show_hidden_files boolean
+---@field use_native_dialog boolean
+---@field dir_selected Godot.Signal
+---@field file_selected Godot.Signal
+---@field filename_filter_changed Godot.Signal
+---@field files_selected Godot.Signal
+---@field add_filter fun(self: Godot.FileDialog, filter: string, description: string, mime_type: string)
+---@field add_option fun(self: Godot.FileDialog, name: string, values: table, default_value_index: integer)
+---@field clear_filename_filter fun(self: Godot.FileDialog)
+---@field clear_filters fun(self: Godot.FileDialog)
+---@field deselect_all fun(self: Godot.FileDialog)
+---@field get_access fun(self: Godot.FileDialog): integer
+---@field get_current_dir fun(self: Godot.FileDialog): string
+---@field get_current_file fun(self: Godot.FileDialog): string
+---@field get_current_path fun(self: Godot.FileDialog): string
+---@field get_display_mode fun(self: Godot.FileDialog): integer
+---@field get_file_mode fun(self: Godot.FileDialog): integer
+---@field get_filename_filter fun(self: Godot.FileDialog): string
+---@field get_filters fun(self: Godot.FileDialog): table
+---@field get_line_edit fun(self: Godot.FileDialog): Godot.LineEdit
+---@field get_option_count fun(self: Godot.FileDialog): integer
+---@field get_option_default fun(self: Godot.FileDialog, option: integer): integer
+---@field get_option_name fun(self: Godot.FileDialog, option: integer): string
+---@field get_option_values fun(self: Godot.FileDialog, option: integer): table
+---@field get_root_subfolder fun(self: Godot.FileDialog): string
+---@field get_selected_options fun(self: Godot.FileDialog): table
+---@field get_use_native_dialog fun(self: Godot.FileDialog): boolean
+---@field get_vbox fun(self: Godot.FileDialog): Godot.VBoxContainer
+---@field invalidate fun(self: Godot.FileDialog)
+---@field is_customization_flag_enabled fun(self: Godot.FileDialog, flag: integer): boolean
+---@field is_mode_overriding_title fun(self: Godot.FileDialog): boolean
+---@field is_showing_hidden_files fun(self: Godot.FileDialog): boolean
+---@field popup_file_dialog fun(self: Godot.FileDialog)
+---@field set_access fun(self: Godot.FileDialog, access: integer)
+---@field set_current_dir fun(self: Godot.FileDialog, dir: string)
+---@field set_current_file fun(self: Godot.FileDialog, file: string)
+---@field set_current_path fun(self: Godot.FileDialog, path: string)
+---@field set_customization_flag_enabled fun(self: Godot.FileDialog, flag: integer, enabled: boolean)
+---@field set_display_mode fun(self: Godot.FileDialog, mode: integer)
+---@field set_file_mode fun(self: Godot.FileDialog, mode: integer)
+---@field set_filename_filter fun(self: Godot.FileDialog, filter: string)
+---@field set_filters fun(self: Godot.FileDialog, filters: table)
+---@field set_mode_overrides_title fun(self: Godot.FileDialog, override: boolean)
+---@field set_option_count fun(self: Godot.FileDialog, count: integer)
+---@field set_option_default fun(self: Godot.FileDialog, option: integer, default_value_index: integer)
+---@field set_option_name fun(self: Godot.FileDialog, option: integer, name: string)
+---@field set_option_values fun(self: Godot.FileDialog, option: integer, values: table)
+---@field set_root_subfolder fun(self: Godot.FileDialog, dir: string)
+---@field set_show_hidden_files fun(self: Godot.FileDialog, show: boolean)
+---@field set_use_native_dialog fun(self: Godot.FileDialog, native: boolean)
+---@class Godot.FileDialog.__type
+---@field new fun(): Godot.FileDialog
+---@field GetFavoriteList fun(): any
+---@field GetRecentList fun(): any
+---@field SetFavoriteList fun(favorites: any)
+---@field SetRecentList fun(recents: any)
+---@field AccessEnum Godot.FileDialog.AccessEnum
+---@field Customization Godot.FileDialog.Customization
+---@field DisplayModeEnum Godot.FileDialog.DisplayModeEnum
+---@field FileModeEnum Godot.FileDialog.FileModeEnum
+---@class Godot.FileDialog.AccessEnum
+---@field Resources integer
+---@field Userdata integer
+---@field Filesystem integer
+---@class Godot.FileDialog.Customization
+---@field HiddenFiles integer
+---@field CreateFolder integer
+---@field FileFilter integer
+---@field FileSort integer
+---@field Favorites integer
+---@field Recent integer
+---@field Layout integer
+---@field OverwriteWarning integer
+---@field Delete integer
+---@class Godot.FileDialog.DisplayModeEnum
+---@field Thumbnails integer
+---@field List integer
+---@class Godot.FileDialog.FileModeEnum
+---@field OpenFile integer
+---@field OpenFiles integer
+---@field OpenDir integer
+---@field OpenAny integer
+---@field SaveFile integer
+
+---@class Godot.FlowContainer : Godot.Container
+---@field alignment integer
+---@field last_wrap_alignment integer
+---@field reverse_fill boolean
+---@field vertical boolean
+---@field get_alignment fun(self: Godot.FlowContainer): integer
+---@field get_last_wrap_alignment fun(self: Godot.FlowContainer): integer
+---@field get_line_count fun(self: Godot.FlowContainer): integer
+---@field is_reverse_fill fun(self: Godot.FlowContainer): boolean
+---@field is_vertical fun(self: Godot.FlowContainer): boolean
+---@field set_alignment fun(self: Godot.FlowContainer, alignment: integer)
+---@field set_last_wrap_alignment fun(self: Godot.FlowContainer, last_wrap_alignment: integer)
+---@field set_reverse_fill fun(self: Godot.FlowContainer, reverse_fill: boolean)
+---@field set_vertical fun(self: Godot.FlowContainer, vertical: boolean)
+---@class Godot.FlowContainer.__type
+---@field new fun(): Godot.FlowContainer
+---@field AlignmentMode Godot.FlowContainer.AlignmentMode
+---@field LastWrapAlignmentMode Godot.FlowContainer.LastWrapAlignmentMode
+---@class Godot.FlowContainer.AlignmentMode
+---@field Begin integer
+---@field Center integer
+---@field End integer
+---@class Godot.FlowContainer.LastWrapAlignmentMode
+---@field Inherit integer
+---@field Begin integer
+---@field Center integer
+---@field End integer
+
+---@class Godot.FogVolume : Godot.VisualInstance3D
+---@field material Godot.FogMaterial,ShaderMaterial
+---@field shape integer
+---@field size Godot.Vector3
+---@field get_material fun(self: Godot.FogVolume): Godot.Material
+---@field get_shape fun(self: Godot.FogVolume): integer
+---@field get_size fun(self: Godot.FogVolume): Godot.Vector3
+---@field set_material fun(self: Godot.FogVolume, material: Godot.Material)
+---@field set_shape fun(self: Godot.FogVolume, shape: integer)
+---@field set_size fun(self: Godot.FogVolume, size: Godot.Vector3)
+---@class Godot.FogVolume.__type
+---@field new fun(): Godot.FogVolume
+
+---@class Godot.FoldableContainer : Godot.Container
+---@field foldable_group Godot.FoldableGroup
+---@field folded boolean
+---@field language string
+---@field title string
+---@field title_alignment integer
+---@field title_position integer
+---@field title_text_direction integer
+---@field title_text_overrun_behavior integer
+---@field folding_changed Godot.Signal
+---@field add_title_bar_control fun(self: Godot.FoldableContainer, control: Godot.Control)
+---@field expand fun(self: Godot.FoldableContainer)
+---@field fold fun(self: Godot.FoldableContainer)
+---@field get_foldable_group fun(self: Godot.FoldableContainer): Godot.FoldableGroup
+---@field get_language fun(self: Godot.FoldableContainer): string
+---@field get_title fun(self: Godot.FoldableContainer): string
+---@field get_title_alignment fun(self: Godot.FoldableContainer): integer
+---@field get_title_position fun(self: Godot.FoldableContainer): integer
+---@field get_title_text_direction fun(self: Godot.FoldableContainer): integer
+---@field get_title_text_overrun_behavior fun(self: Godot.FoldableContainer): integer
+---@field is_folded fun(self: Godot.FoldableContainer): boolean
+---@field remove_title_bar_control fun(self: Godot.FoldableContainer, control: Godot.Control)
+---@field set_foldable_group fun(self: Godot.FoldableContainer, button_group: Godot.FoldableGroup)
+---@field set_folded fun(self: Godot.FoldableContainer, folded: boolean)
+---@field set_language fun(self: Godot.FoldableContainer, language: string)
+---@field set_title fun(self: Godot.FoldableContainer, text: string)
+---@field set_title_alignment fun(self: Godot.FoldableContainer, alignment: integer)
+---@field set_title_position fun(self: Godot.FoldableContainer, title_position: integer)
+---@field set_title_text_direction fun(self: Godot.FoldableContainer, text_direction: integer)
+---@field set_title_text_overrun_behavior fun(self: Godot.FoldableContainer, overrun_behavior: integer)
+---@class Godot.FoldableContainer.__type
+---@field new fun(): Godot.FoldableContainer
+---@field TitlePositionEnum Godot.FoldableContainer.TitlePositionEnum
+---@class Godot.FoldableContainer.TitlePositionEnum
+---@field Top integer
+---@field Bottom integer
+
+---@class Godot.Generic6DofJoint3D : Godot.Joint3D
+---@class Godot.Generic6DofJoint3D.__type
+---@field new fun(): Godot.Generic6DofJoint3D
+---@field Flag Godot.Generic6DofJoint3D.Flag
+---@field Param Godot.Generic6DofJoint3D.Param
+---@class Godot.Generic6DofJoint3D.Flag
+---@field EnableLinearLimit integer
+---@field EnableAngularLimit integer
+---@field EnableAngularSpring integer
+---@field EnableLinearSpring integer
+---@field EnableMotor integer
+---@field EnableLinearMotor integer
+---@field Max integer
+---@class Godot.Generic6DofJoint3D.Param
+---@field LinearLowerLimit integer
+---@field LinearUpperLimit integer
+---@field LinearLimitSoftness integer
+---@field LinearRestitution integer
+---@field LinearDamping integer
+---@field LinearMotorTargetVelocity integer
+---@field LinearMotorForceLimit integer
+---@field LinearSpringStiffness integer
+---@field LinearSpringDamping integer
+---@field LinearSpringEquilibriumPoint integer
+---@field AngularLowerLimit integer
+---@field AngularUpperLimit integer
+---@field AngularLimitSoftness integer
+---@field AngularDamping integer
+---@field AngularRestitution integer
+---@field AngularForceLimit integer
+---@field AngularErp integer
+---@field AngularMotorTargetVelocity integer
+---@field AngularMotorForceLimit integer
+---@field AngularSpringStiffness integer
+---@field AngularSpringDamping integer
+---@field AngularSpringEquilibriumPoint integer
+---@field Max integer
+
+---@class Godot.GeometryInstance3D : Godot.VisualInstance3D
+---@field cast_shadow integer
+---@field custom_aabb Godot.Aabb
+---@field extra_cull_margin number
+---@field gi_lightmap_scale integer
+---@field gi_lightmap_texel_scale number
+---@field gi_mode integer
+---@field ignore_occlusion_culling boolean
+---@field lod_bias number
+---@field material_overlay Godot.BaseMaterial3D,ShaderMaterial
+---@field material_override Godot.BaseMaterial3D,ShaderMaterial
+---@field transparency number
+---@field visibility_range_begin number
+---@field visibility_range_begin_margin number
+---@field visibility_range_end number
+---@field visibility_range_end_margin number
+---@field visibility_range_fade_mode integer
+---@field get_cast_shadows_setting fun(self: Godot.GeometryInstance3D): integer
+---@field get_custom_aabb fun(self: Godot.GeometryInstance3D): Godot.Aabb
+---@field get_extra_cull_margin fun(self: Godot.GeometryInstance3D): number
+---@field get_gi_mode fun(self: Godot.GeometryInstance3D): integer
+---@field get_instance_shader_parameter fun(self: Godot.GeometryInstance3D, name: string)
+---@field get_lightmap_scale fun(self: Godot.GeometryInstance3D): integer
+---@field get_lightmap_texel_scale fun(self: Godot.GeometryInstance3D): number
+---@field get_lod_bias fun(self: Godot.GeometryInstance3D): number
+---@field get_material_overlay fun(self: Godot.GeometryInstance3D): Godot.Material
+---@field get_material_override fun(self: Godot.GeometryInstance3D): Godot.Material
+---@field get_transparency fun(self: Godot.GeometryInstance3D): number
+---@field get_visibility_range_begin fun(self: Godot.GeometryInstance3D): number
+---@field get_visibility_range_begin_margin fun(self: Godot.GeometryInstance3D): number
+---@field get_visibility_range_end fun(self: Godot.GeometryInstance3D): number
+---@field get_visibility_range_end_margin fun(self: Godot.GeometryInstance3D): number
+---@field get_visibility_range_fade_mode fun(self: Godot.GeometryInstance3D): integer
+---@field is_ignoring_occlusion_culling fun(self: Godot.GeometryInstance3D): boolean
+---@field set_cast_shadows_setting fun(self: Godot.GeometryInstance3D, shadow_casting_setting: integer)
+---@field set_custom_aabb fun(self: Godot.GeometryInstance3D, aabb: Godot.Aabb)
+---@field set_extra_cull_margin fun(self: Godot.GeometryInstance3D, margin: number)
+---@field set_gi_mode fun(self: Godot.GeometryInstance3D, mode: integer)
+---@field set_ignore_occlusion_culling fun(self: Godot.GeometryInstance3D, ignore_culling: boolean)
+---@field set_instance_shader_parameter fun(self: Godot.GeometryInstance3D, name: string, value: any)
+---@field set_lightmap_scale fun(self: Godot.GeometryInstance3D, scale: integer)
+---@field set_lightmap_texel_scale fun(self: Godot.GeometryInstance3D, scale: number)
+---@field set_lod_bias fun(self: Godot.GeometryInstance3D, bias: number)
+---@field set_material_overlay fun(self: Godot.GeometryInstance3D, material: Godot.Material)
+---@field set_material_override fun(self: Godot.GeometryInstance3D, material: Godot.Material)
+---@field set_transparency fun(self: Godot.GeometryInstance3D, transparency: number)
+---@field set_visibility_range_begin fun(self: Godot.GeometryInstance3D, distance: number)
+---@field set_visibility_range_begin_margin fun(self: Godot.GeometryInstance3D, distance: number)
+---@field set_visibility_range_end fun(self: Godot.GeometryInstance3D, distance: number)
+---@field set_visibility_range_end_margin fun(self: Godot.GeometryInstance3D, distance: number)
+---@field set_visibility_range_fade_mode fun(self: Godot.GeometryInstance3D, mode: integer)
+---@class Godot.GeometryInstance3D.__type
+---@field new fun(): Godot.GeometryInstance3D
+---@field GIModeEnum Godot.GeometryInstance3D.GIModeEnum
+---@field LightmapScale Godot.GeometryInstance3D.LightmapScale
+---@field ShadowCastingSetting Godot.GeometryInstance3D.ShadowCastingSetting
+---@field VisibilityRangeFadeModeEnum Godot.GeometryInstance3D.VisibilityRangeFadeModeEnum
+---@class Godot.GeometryInstance3D.GIModeEnum
+---@field Disabled integer
+---@field Static integer
+---@field Dynamic integer
+---@class Godot.GeometryInstance3D.LightmapScale
+---@field Scale1X integer
+---@field Scale2X integer
+---@field Scale4X integer
+---@field Scale8X integer
+---@field Max integer
+---@class Godot.GeometryInstance3D.ShadowCastingSetting
+---@field Off integer
+---@field On integer
+---@field DoubleSided integer
+---@field ShadowsOnly integer
+---@class Godot.GeometryInstance3D.VisibilityRangeFadeModeEnum
+---@field Disabled integer
+---@field Self integer
+---@field Dependencies integer
+
+---@class Godot.GodotObject
+---@class Godot.GodotObject.__type
+---@field new fun(): Godot.GodotObject
+---@field NotificationPostinitialize integer
+---@field NotificationPredelete integer
+---@field NotificationExtensionReloaded integer
+---@field ConnectFlags Godot.GodotObject.ConnectFlags
+---@class Godot.GodotObject.ConnectFlags
+---@field Deferred integer
+---@field Persist integer
+---@field OneShot integer
+---@field ReferenceCounted integer
+---@field AppendSourceObject integer
+
+---@class Godot.GpuParticles2D : Godot.Node2D
+---@class Godot.GpuParticles2D.__type
+---@field new fun(): Godot.GpuParticles2D
+---@field DrawOrderEnum Godot.GpuParticles2D.DrawOrderEnum
+---@field EmitFlags Godot.GpuParticles2D.EmitFlags
+---@class Godot.GpuParticles2D.DrawOrderEnum
+---@field Index integer
+---@field Lifetime integer
+---@field ReverseLifetime integer
+---@class Godot.GpuParticles2D.EmitFlags
+---@field Position integer
+---@field RotationScale integer
+---@field Velocity integer
+---@field Color integer
+---@field Custom integer
+
+---@class Godot.GpuParticles3D : Godot.GeometryInstance3D
+---@class Godot.GpuParticles3D.__type
+---@field new fun(): Godot.GpuParticles3D
+---@field MaxDrawPasses integer
+---@field DrawOrderEnum Godot.GpuParticles3D.DrawOrderEnum
+---@field EmitFlags Godot.GpuParticles3D.EmitFlags
+---@field TransformAlignEnum Godot.GpuParticles3D.TransformAlignEnum
+---@class Godot.GpuParticles3D.DrawOrderEnum
+---@field Index integer
+---@field Lifetime integer
+---@field ReverseLifetime integer
+---@field ViewDepth integer
+---@class Godot.GpuParticles3D.EmitFlags
+---@field Position integer
+---@field RotationScale integer
+---@field Velocity integer
+---@field Color integer
+---@field Custom integer
+---@class Godot.GpuParticles3D.TransformAlignEnum
+---@field Disabled integer
+---@field ZBillboard integer
+---@field YToVelocity integer
+---@field ZBillboardYToVelocity integer
+
+---@class Godot.GpuParticlesAttractor3D : Godot.VisualInstance3D
+---@class Godot.GpuParticlesAttractor3D.__type
+---@field new fun(): Godot.GpuParticlesAttractor3D
+
+---@class Godot.GpuParticlesAttractorBox3D : Godot.GpuParticlesAttractor3D
+---@class Godot.GpuParticlesAttractorBox3D.__type
+---@field new fun(): Godot.GpuParticlesAttractorBox3D
+
+---@class Godot.GpuParticlesAttractorSphere3D : Godot.GpuParticlesAttractor3D
+---@class Godot.GpuParticlesAttractorSphere3D.__type
+---@field new fun(): Godot.GpuParticlesAttractorSphere3D
+
+---@class Godot.GpuParticlesAttractorVectorField3D : Godot.GpuParticlesAttractor3D
+---@class Godot.GpuParticlesAttractorVectorField3D.__type
+---@field new fun(): Godot.GpuParticlesAttractorVectorField3D
+
+---@class Godot.GpuParticlesCollision3D : Godot.VisualInstance3D
+---@class Godot.GpuParticlesCollision3D.__type
+---@field new fun(): Godot.GpuParticlesCollision3D
+
+---@class Godot.GpuParticlesCollisionBox3D : Godot.GpuParticlesCollision3D
+---@class Godot.GpuParticlesCollisionBox3D.__type
+---@field new fun(): Godot.GpuParticlesCollisionBox3D
+
+---@class Godot.GpuParticlesCollisionHeightField3D : Godot.GpuParticlesCollision3D
+---@class Godot.GpuParticlesCollisionHeightField3D.__type
+---@field new fun(): Godot.GpuParticlesCollisionHeightField3D
+---@field ResolutionEnum Godot.GpuParticlesCollisionHeightField3D.ResolutionEnum
+---@field UpdateModeEnum Godot.GpuParticlesCollisionHeightField3D.UpdateModeEnum
+---@class Godot.GpuParticlesCollisionHeightField3D.ResolutionEnum
+---@field Resolution256 integer
+---@field Resolution512 integer
+---@field Resolution1024 integer
+---@field Resolution2048 integer
+---@field Resolution4096 integer
+---@field Resolution8192 integer
+---@field Max integer
+---@class Godot.GpuParticlesCollisionHeightField3D.UpdateModeEnum
+---@field WhenMoved integer
+---@field Always integer
+
+---@class Godot.GpuParticlesCollisionSdf3D : Godot.GpuParticlesCollision3D
+---@class Godot.GpuParticlesCollisionSdf3D.__type
+---@field new fun(): Godot.GpuParticlesCollisionSdf3D
+---@field ResolutionEnum Godot.GpuParticlesCollisionSdf3D.ResolutionEnum
+---@class Godot.GpuParticlesCollisionSdf3D.ResolutionEnum
+---@field Resolution16 integer
+---@field Resolution32 integer
+---@field Resolution64 integer
+---@field Resolution128 integer
+---@field Resolution256 integer
+---@field Resolution512 integer
+---@field Max integer
+
+---@class Godot.GpuParticlesCollisionSphere3D : Godot.GpuParticlesCollision3D
+---@class Godot.GpuParticlesCollisionSphere3D.__type
+---@field new fun(): Godot.GpuParticlesCollisionSphere3D
+
+---@class Godot.GraphEdit : Godot.Control
+---@field connection_lines_antialiased boolean
+---@field connection_lines_curvature number
+---@field connection_lines_thickness number
+---@field connections table
+---@field grid_pattern integer
+---@field minimap_enabled boolean
+---@field minimap_opacity number
+---@field minimap_size Godot.Vector2
+---@field panning_scheme integer
+---@field right_disconnects boolean
+---@field scroll_offset Godot.Vector2
+---@field show_arrange_button boolean
+---@field show_grid boolean
+---@field show_grid_buttons boolean
+---@field show_menu boolean
+---@field show_minimap_button boolean
+---@field show_zoom_buttons boolean
+---@field show_zoom_label boolean
+---@field snapping_distance integer
+---@field snapping_enabled boolean
+---@field type_names table
+---@field zoom number
+---@field zoom_max number
+---@field zoom_min number
+---@field zoom_step number
+---@field begin_node_move Godot.Signal
+---@field connection_drag_ended Godot.Signal
+---@field connection_drag_started Godot.Signal
+---@field connection_from_empty Godot.Signal
+---@field connection_request Godot.Signal
+---@field connection_to_empty Godot.Signal
+---@field copy_nodes_request Godot.Signal
+---@field cut_nodes_request Godot.Signal
+---@field delete_nodes_request Godot.Signal
+---@field disconnection_request Godot.Signal
+---@field duplicate_nodes_request Godot.Signal
+---@field end_node_move Godot.Signal
+---@field frame_rect_changed Godot.Signal
+---@field graph_elements_linked_to_frame_request Godot.Signal
+---@field node_deselected Godot.Signal
+---@field node_selected Godot.Signal
+---@field paste_nodes_request Godot.Signal
+---@field popup_request Godot.Signal
+---@field scroll_offset_changed Godot.Signal
+---@field add_valid_connection_type fun(self: Godot.GraphEdit, from_type: integer, to_type: integer)
+---@field add_valid_left_disconnect_type fun(self: Godot.GraphEdit, type: integer)
+---@field add_valid_right_disconnect_type fun(self: Godot.GraphEdit, type: integer)
+---@field arrange_nodes fun(self: Godot.GraphEdit)
+---@field attach_graph_element_to_frame fun(self: Godot.GraphEdit, element: string, frame: string)
+---@field clear_connections fun(self: Godot.GraphEdit)
+---@field connect_node fun(self: Godot.GraphEdit, from_node: string, from_port: integer, to_node: string, to_port: integer, keep_alive: boolean): integer
+---@field detach_graph_element_from_frame fun(self: Godot.GraphEdit, element: string)
+---@field disconnect_node fun(self: Godot.GraphEdit, from_node: string, from_port: integer, to_node: string, to_port: integer)
+---@field force_connection_drag_end fun(self: Godot.GraphEdit)
+---@field get_attached_nodes_of_frame fun(self: Godot.GraphEdit, frame: string): table
+---@field get_closest_connection_at_point fun(self: Godot.GraphEdit, point: Godot.Vector2, max_distance: number): table
+---@field get_connection_count fun(self: Godot.GraphEdit, from_node: string, from_port: integer): integer
+---@field get_connection_line fun(self: Godot.GraphEdit, from_node: Godot.Vector2, to_node: Godot.Vector2): table
+---@field get_connection_lines_curvature fun(self: Godot.GraphEdit): number
+---@field get_connection_lines_thickness fun(self: Godot.GraphEdit): number
+---@field get_connection_list fun(self: Godot.GraphEdit): table
+---@field get_connection_list_from_node fun(self: Godot.GraphEdit, node: string): table
+---@field get_connections_intersecting_with_rect fun(self: Godot.GraphEdit, rect: Godot.Rect2): table
+---@field get_element_frame fun(self: Godot.GraphEdit, element: string): Godot.GraphFrame
+---@field get_grid_pattern fun(self: Godot.GraphEdit): integer
+---@field get_menu_hbox fun(self: Godot.GraphEdit): Godot.HBoxContainer
+---@field get_minimap_opacity fun(self: Godot.GraphEdit): number
+---@field get_minimap_size fun(self: Godot.GraphEdit): Godot.Vector2
+---@field get_panning_scheme fun(self: Godot.GraphEdit): integer
+---@field get_scroll_offset fun(self: Godot.GraphEdit): Godot.Vector2
+---@field get_snapping_distance fun(self: Godot.GraphEdit): integer
+---@field get_type_names fun(self: Godot.GraphEdit): table
+---@field get_zoom fun(self: Godot.GraphEdit): number
+---@field get_zoom_max fun(self: Godot.GraphEdit): number
+---@field get_zoom_min fun(self: Godot.GraphEdit): number
+---@field get_zoom_step fun(self: Godot.GraphEdit): number
+---@field is_connection_lines_antialiased fun(self: Godot.GraphEdit): boolean
+---@field is_minimap_enabled fun(self: Godot.GraphEdit): boolean
+---@field is_node_connected fun(self: Godot.GraphEdit, from_node: string, from_port: integer, to_node: string, to_port: integer): boolean
+---@field is_right_disconnects_enabled fun(self: Godot.GraphEdit): boolean
+---@field is_showing_arrange_button fun(self: Godot.GraphEdit): boolean
+---@field is_showing_grid fun(self: Godot.GraphEdit): boolean
+---@field is_showing_grid_buttons fun(self: Godot.GraphEdit): boolean
+---@field is_showing_menu fun(self: Godot.GraphEdit): boolean
+---@field is_showing_minimap_button fun(self: Godot.GraphEdit): boolean
+---@field is_showing_zoom_buttons fun(self: Godot.GraphEdit): boolean
+---@field is_showing_zoom_label fun(self: Godot.GraphEdit): boolean
+---@field is_snapping_enabled fun(self: Godot.GraphEdit): boolean
+---@field is_valid_connection_type fun(self: Godot.GraphEdit, from_type: integer, to_type: integer): boolean
+---@field remove_valid_connection_type fun(self: Godot.GraphEdit, from_type: integer, to_type: integer)
+---@field remove_valid_left_disconnect_type fun(self: Godot.GraphEdit, type: integer)
+---@field remove_valid_right_disconnect_type fun(self: Godot.GraphEdit, type: integer)
+---@field set_connection_activity fun(self: Godot.GraphEdit, from_node: string, from_port: integer, to_node: string, to_port: integer, amount: number)
+---@field set_connection_lines_antialiased fun(self: Godot.GraphEdit, pixels: boolean)
+---@field set_connection_lines_curvature fun(self: Godot.GraphEdit, curvature: number)
+---@field set_connection_lines_thickness fun(self: Godot.GraphEdit, pixels: number)
+---@field set_connections fun(self: Godot.GraphEdit, connections: table)
+---@field set_grid_pattern fun(self: Godot.GraphEdit, pattern: integer)
+---@field set_minimap_enabled fun(self: Godot.GraphEdit, enable: boolean)
+---@field set_minimap_opacity fun(self: Godot.GraphEdit, opacity: number)
+---@field set_minimap_size fun(self: Godot.GraphEdit, size: Godot.Vector2)
+---@field set_panning_scheme fun(self: Godot.GraphEdit, scheme: integer)
+---@field set_right_disconnects fun(self: Godot.GraphEdit, enable: boolean)
+---@field set_scroll_offset fun(self: Godot.GraphEdit, offset: Godot.Vector2)
+---@field set_selected fun(self: Godot.GraphEdit, node: Godot.Node)
+---@field set_show_arrange_button fun(self: Godot.GraphEdit, hidden: boolean)
+---@field set_show_grid fun(self: Godot.GraphEdit, enable: boolean)
+---@field set_show_grid_buttons fun(self: Godot.GraphEdit, hidden: boolean)
+---@field set_show_menu fun(self: Godot.GraphEdit, hidden: boolean)
+---@field set_show_minimap_button fun(self: Godot.GraphEdit, hidden: boolean)
+---@field set_show_zoom_buttons fun(self: Godot.GraphEdit, hidden: boolean)
+---@field set_show_zoom_label fun(self: Godot.GraphEdit, enable: boolean)
+---@field set_snapping_distance fun(self: Godot.GraphEdit, pixels: integer)
+---@field set_snapping_enabled fun(self: Godot.GraphEdit, enable: boolean)
+---@field set_type_names fun(self: Godot.GraphEdit, type_names: table)
+---@field set_zoom fun(self: Godot.GraphEdit, zoom: number)
+---@field set_zoom_max fun(self: Godot.GraphEdit, zoom_max: number)
+---@field set_zoom_min fun(self: Godot.GraphEdit, zoom_min: number)
+---@field set_zoom_step fun(self: Godot.GraphEdit, zoom_step: number)
+---@class Godot.GraphEdit.__type
+---@field new fun(): Godot.GraphEdit
+---@field GridPatternEnum Godot.GraphEdit.GridPatternEnum
+---@field PanningSchemeEnum Godot.GraphEdit.PanningSchemeEnum
+---@class Godot.GraphEdit.GridPatternEnum
+---@field Lines integer
+---@field Dots integer
+---@class Godot.GraphEdit.PanningSchemeEnum
+---@field Zooms integer
+---@field Pans integer
+
+---@class Godot.GraphElement : Godot.Container
+---@field draggable boolean
+---@field position_offset Godot.Vector2
+---@field resizable boolean
+---@field scaling_menus boolean
+---@field selectable boolean
+---@field selected boolean
+---@field delete_request Godot.Signal
+---@field dragged Godot.Signal
+---@field node_deselected Godot.Signal
+---@field node_selected Godot.Signal
+---@field position_offset_changed Godot.Signal
+---@field raise_request Godot.Signal
+---@field resize_end Godot.Signal
+---@field resize_request Godot.Signal
+---@field get_position_offset fun(self: Godot.GraphElement): Godot.Vector2
+---@field is_draggable fun(self: Godot.GraphElement): boolean
+---@field is_resizable fun(self: Godot.GraphElement): boolean
+---@field is_scaling_menus fun(self: Godot.GraphElement): boolean
+---@field is_selectable fun(self: Godot.GraphElement): boolean
+---@field is_selected fun(self: Godot.GraphElement): boolean
+---@field set_draggable fun(self: Godot.GraphElement, draggable: boolean)
+---@field set_position_offset fun(self: Godot.GraphElement, offset: Godot.Vector2)
+---@field set_resizable fun(self: Godot.GraphElement, resizable: boolean)
+---@field set_scaling_menus fun(self: Godot.GraphElement, scaling_menus: boolean)
+---@field set_selectable fun(self: Godot.GraphElement, selectable: boolean)
+---@field set_selected fun(self: Godot.GraphElement, selected: boolean)
+---@class Godot.GraphElement.__type
+---@field new fun(): Godot.GraphElement
+
+---@class Godot.GraphFrame : Godot.GraphElement
+---@field autoshrink_enabled boolean
+---@field autoshrink_margin integer
+---@field drag_margin integer
+---@field tint_color Godot.Color
+---@field tint_color_enabled boolean
+---@field title string
+---@field autoshrink_changed Godot.Signal
+---@field get_autoshrink_margin fun(self: Godot.GraphFrame): integer
+---@field get_drag_margin fun(self: Godot.GraphFrame): integer
+---@field get_tint_color fun(self: Godot.GraphFrame): Godot.Color
+---@field get_title fun(self: Godot.GraphFrame): string
+---@field get_titlebar_hbox fun(self: Godot.GraphFrame): Godot.HBoxContainer
+---@field is_autoshrink_enabled fun(self: Godot.GraphFrame): boolean
+---@field is_tint_color_enabled fun(self: Godot.GraphFrame): boolean
+---@field set_autoshrink_enabled fun(self: Godot.GraphFrame, shrink: boolean)
+---@field set_autoshrink_margin fun(self: Godot.GraphFrame, autoshrink_margin: integer)
+---@field set_drag_margin fun(self: Godot.GraphFrame, drag_margin: integer)
+---@field set_tint_color fun(self: Godot.GraphFrame, color: Godot.Color)
+---@field set_tint_color_enabled fun(self: Godot.GraphFrame, enable: boolean)
+---@field set_title fun(self: Godot.GraphFrame, title: string)
+---@class Godot.GraphFrame.__type
+---@field new fun(): Godot.GraphFrame
+
+---@class Godot.GraphNode : Godot.GraphElement
+---@field ignore_invalid_connection_type boolean
+---@field slots_focus_mode integer
+---@field title string
+---@field slot_sizes_changed Godot.Signal
+---@field slot_updated Godot.Signal
+---@field clear_all_slots fun(self: Godot.GraphNode)
+---@field clear_slot fun(self: Godot.GraphNode, slot_index: integer)
+---@field get_input_port_color fun(self: Godot.GraphNode, port_idx: integer): Godot.Color
+---@field get_input_port_count fun(self: Godot.GraphNode): integer
+---@field get_input_port_position fun(self: Godot.GraphNode, port_idx: integer): Godot.Vector2
+---@field get_input_port_slot fun(self: Godot.GraphNode, port_idx: integer): integer
+---@field get_input_port_type fun(self: Godot.GraphNode, port_idx: integer): integer
+---@field get_output_port_color fun(self: Godot.GraphNode, port_idx: integer): Godot.Color
+---@field get_output_port_count fun(self: Godot.GraphNode): integer
+---@field get_output_port_position fun(self: Godot.GraphNode, port_idx: integer): Godot.Vector2
+---@field get_output_port_slot fun(self: Godot.GraphNode, port_idx: integer): integer
+---@field get_output_port_type fun(self: Godot.GraphNode, port_idx: integer): integer
+---@field get_slot_color_left fun(self: Godot.GraphNode, slot_index: integer): Godot.Color
+---@field get_slot_color_right fun(self: Godot.GraphNode, slot_index: integer): Godot.Color
+---@field get_slot_custom_icon_left fun(self: Godot.GraphNode, slot_index: integer): Godot.Texture2D
+---@field get_slot_custom_icon_right fun(self: Godot.GraphNode, slot_index: integer): Godot.Texture2D
+---@field get_slot_metadata_left fun(self: Godot.GraphNode, slot_index: integer)
+---@field get_slot_metadata_right fun(self: Godot.GraphNode, slot_index: integer)
+---@field get_slot_type_left fun(self: Godot.GraphNode, slot_index: integer): integer
+---@field get_slot_type_right fun(self: Godot.GraphNode, slot_index: integer): integer
+---@field get_slots_focus_mode fun(self: Godot.GraphNode): integer
+---@field get_title fun(self: Godot.GraphNode): string
+---@field get_titlebar_hbox fun(self: Godot.GraphNode): Godot.HBoxContainer
+---@field is_ignoring_valid_connection_type fun(self: Godot.GraphNode): boolean
+---@field is_slot_draw_stylebox fun(self: Godot.GraphNode, slot_index: integer): boolean
+---@field is_slot_enabled_left fun(self: Godot.GraphNode, slot_index: integer): boolean
+---@field is_slot_enabled_right fun(self: Godot.GraphNode, slot_index: integer): boolean
+---@field set_ignore_invalid_connection_type fun(self: Godot.GraphNode, ignore: boolean)
+---@field set_slot fun(self: Godot.GraphNode, slot_index: integer, enable_left_port: boolean, type_left: integer, color_left: Godot.Color, enable_right_port: boolean, type_right: integer, color_right: Godot.Color, custom_icon_left: Godot.Texture2D, custom_icon_right: Godot.Texture2D, draw_stylebox: boolean)
+---@field set_slot_color_left fun(self: Godot.GraphNode, slot_index: integer, color: Godot.Color)
+---@field set_slot_color_right fun(self: Godot.GraphNode, slot_index: integer, color: Godot.Color)
+---@field set_slot_custom_icon_left fun(self: Godot.GraphNode, slot_index: integer, custom_icon: Godot.Texture2D)
+---@field set_slot_custom_icon_right fun(self: Godot.GraphNode, slot_index: integer, custom_icon: Godot.Texture2D)
+---@field set_slot_draw_stylebox fun(self: Godot.GraphNode, slot_index: integer, enable: boolean)
+---@field set_slot_enabled_left fun(self: Godot.GraphNode, slot_index: integer, enable: boolean)
+---@field set_slot_enabled_right fun(self: Godot.GraphNode, slot_index: integer, enable: boolean)
+---@field set_slot_metadata_left fun(self: Godot.GraphNode, slot_index: integer, value: any)
+---@field set_slot_metadata_right fun(self: Godot.GraphNode, slot_index: integer, value: any)
+---@field set_slot_type_left fun(self: Godot.GraphNode, slot_index: integer, type: integer)
+---@field set_slot_type_right fun(self: Godot.GraphNode, slot_index: integer, type: integer)
+---@field set_slots_focus_mode fun(self: Godot.GraphNode, focus_mode: integer)
+---@field set_title fun(self: Godot.GraphNode, title: string)
+---@class Godot.GraphNode.__type
+---@field new fun(): Godot.GraphNode
+
+---@class Godot.GridContainer : Godot.Container
+---@field columns integer
+---@field get_columns fun(self: Godot.GridContainer): integer
+---@field set_columns fun(self: Godot.GridContainer, columns: integer)
+---@class Godot.GridContainer.__type
+---@field new fun(): Godot.GridContainer
+
+---@class Godot.GridMap : Godot.Node3D
+---@field bake_navigation boolean
+---@field cell_center_x boolean
+---@field cell_center_y boolean
+---@field cell_center_z boolean
+---@field cell_octant_size integer
+---@field cell_scale number
+---@field cell_size Godot.Vector3
+---@field collision_layer integer
+---@field collision_mask integer
+---@field collision_priority number
+---@field mesh_library Godot.MeshLibrary
+---@field physics_material Godot.PhysicsMaterial
+---@field cell_size_changed Godot.Signal
+---@field changed Godot.Signal
+---@field clear fun(self: Godot.GridMap)
+---@field clear_baked_meshes fun(self: Godot.GridMap)
+---@field get_bake_mesh_instance fun(self: Godot.GridMap, idx: integer): Godot.Rid
+---@field get_bake_meshes fun(self: Godot.GridMap): table
+---@field get_basis_with_orthogonal_index fun(self: Godot.GridMap, index: integer): Godot.Basis
+---@field get_cell_item fun(self: Godot.GridMap, position: Godot.Vector3I): integer
+---@field get_cell_item_basis fun(self: Godot.GridMap, position: Godot.Vector3I): Godot.Basis
+---@field get_cell_item_orientation fun(self: Godot.GridMap, position: Godot.Vector3I): integer
+---@field get_cell_scale fun(self: Godot.GridMap): number
+---@field get_cell_size fun(self: Godot.GridMap): Godot.Vector3
+---@field get_center_x fun(self: Godot.GridMap): boolean
+---@field get_center_y fun(self: Godot.GridMap): boolean
+---@field get_center_z fun(self: Godot.GridMap): boolean
+---@field get_collision_layer fun(self: Godot.GridMap): integer
+---@field get_collision_layer_value fun(self: Godot.GridMap, layer_number: integer): boolean
+---@field get_collision_mask fun(self: Godot.GridMap): integer
+---@field get_collision_mask_value fun(self: Godot.GridMap, layer_number: integer): boolean
+---@field get_collision_priority fun(self: Godot.GridMap): number
+---@field get_mesh_library fun(self: Godot.GridMap): Godot.MeshLibrary
+---@field get_meshes fun(self: Godot.GridMap): table
+---@field get_navigation_map fun(self: Godot.GridMap): Godot.Rid
+---@field get_octant_size fun(self: Godot.GridMap): integer
+---@field get_orthogonal_index_from_basis fun(self: Godot.GridMap, basis: Godot.Basis): integer
+---@field get_physics_material fun(self: Godot.GridMap): Godot.PhysicsMaterial
+---@field get_used_cells fun(self: Godot.GridMap): table
+---@field get_used_cells_by_item fun(self: Godot.GridMap, item: integer): table
+---@field is_baking_navigation fun(self: Godot.GridMap): boolean
+---@field local_to_map fun(self: Godot.GridMap, local_position: Godot.Vector3): Godot.Vector3I
+---@field make_baked_meshes fun(self: Godot.GridMap, gen_lightmap_uv: boolean, lightmap_uv_texel_size: number)
+---@field map_to_local fun(self: Godot.GridMap, map_position: Godot.Vector3I): Godot.Vector3
+---@field resource_changed fun(self: Godot.GridMap, resource: Godot.Resource)
+---@field set_bake_navigation fun(self: Godot.GridMap, bake_navigation: boolean)
+---@field set_cell_item fun(self: Godot.GridMap, position: Godot.Vector3I, item: integer, orientation: integer)
+---@field set_cell_scale fun(self: Godot.GridMap, scale: number)
+---@field set_cell_size fun(self: Godot.GridMap, size: Godot.Vector3)
+---@field set_center_x fun(self: Godot.GridMap, enable: boolean)
+---@field set_center_y fun(self: Godot.GridMap, enable: boolean)
+---@field set_center_z fun(self: Godot.GridMap, enable: boolean)
+---@field set_collision_layer fun(self: Godot.GridMap, layer: integer)
+---@field set_collision_layer_value fun(self: Godot.GridMap, layer_number: integer, value: boolean)
+---@field set_collision_mask fun(self: Godot.GridMap, mask: integer)
+---@field set_collision_mask_value fun(self: Godot.GridMap, layer_number: integer, value: boolean)
+---@field set_collision_priority fun(self: Godot.GridMap, priority: number)
+---@field set_mesh_library fun(self: Godot.GridMap, mesh_library: Godot.MeshLibrary)
+---@field set_navigation_map fun(self: Godot.GridMap, navigation_map: Godot.Rid)
+---@field set_octant_size fun(self: Godot.GridMap, size: integer)
+---@field set_physics_material fun(self: Godot.GridMap, material: Godot.PhysicsMaterial)
+---@class Godot.GridMap.__type
+---@field new fun(): Godot.GridMap
+---@field InvalidCellItem integer
+
+---@class Godot.GrooveJoint2D : Godot.Joint2D
+---@field initial_offset number
+---@field length number
+---@field get_initial_offset fun(self: Godot.GrooveJoint2D): number
+---@field get_length fun(self: Godot.GrooveJoint2D): number
+---@field set_initial_offset fun(self: Godot.GrooveJoint2D, offset: number)
+---@field set_length fun(self: Godot.GrooveJoint2D, length: number)
+---@class Godot.GrooveJoint2D.__type
+---@field new fun(): Godot.GrooveJoint2D
+
+---@class Godot.HBoxContainer : Godot.BoxContainer
+---@class Godot.HBoxContainer.__type
+---@field new fun(): Godot.HBoxContainer
+
+---@class Godot.HFlowContainer : Godot.FlowContainer
+---@class Godot.HFlowContainer.__type
+---@field new fun(): Godot.HFlowContainer
+
+---@class Godot.HingeJoint3D : Godot.Joint3D
+---@field get_flag fun(self: Godot.HingeJoint3D, flag: integer): boolean
+---@field get_param fun(self: Godot.HingeJoint3D, param: integer): number
+---@field set_flag fun(self: Godot.HingeJoint3D, flag: integer, enabled: boolean)
+---@field set_param fun(self: Godot.HingeJoint3D, param: integer, value: number)
+---@class Godot.HingeJoint3D.__type
+---@field new fun(): Godot.HingeJoint3D
+---@field Flag Godot.HingeJoint3D.Flag
+---@field Param Godot.HingeJoint3D.Param
+---@class Godot.HingeJoint3D.Flag
+---@field UseLimit integer
+---@field EnableMotor integer
+---@field Max integer
+---@class Godot.HingeJoint3D.Param
+---@field Bias integer
+---@field LimitUpper integer
+---@field LimitLower integer
+---@field LimitBias integer
+---@field LimitSoftness integer
+---@field LimitRelaxation integer
+---@field MotorTargetVelocity integer
+---@field MotorMaxImpulse integer
+---@field Max integer
+
+---@class Godot.HScrollBar : Godot.ScrollBar
+---@class Godot.HScrollBar.__type
+---@field new fun(): Godot.HScrollBar
+
+---@class Godot.HSeparator : Godot.Separator
+---@class Godot.HSeparator.__type
+---@field new fun(): Godot.HSeparator
+
+---@class Godot.HSlider : Godot.Slider
+---@class Godot.HSlider.__type
+---@field new fun(): Godot.HSlider
+
+---@class Godot.HSplitContainer : Godot.SplitContainer
+---@class Godot.HSplitContainer.__type
+---@field new fun(): Godot.HSplitContainer
+
+---@class Godot.HttpRequest : Godot.Node
+---@class Godot.HttpRequest.__type
+---@field new fun(): Godot.HttpRequest
+---@field Result Godot.HttpRequest.Result
+---@class Godot.HttpRequest.Result
+---@field Success integer
+---@field ChunkedBodySizeMismatch integer
+---@field CantConnect integer
+---@field CantResolve integer
+---@field ConnectionError integer
+---@field TlsHandshakeError integer
+---@field NoResponse integer
+---@field BodySizeLimitExceeded integer
+---@field BodyDecompressFailed integer
+---@field RequestFailed integer
+---@field DownloadFileCantOpen integer
+---@field DownloadFileWriteError integer
+---@field RedirectLimitReached integer
+---@field Timeout integer
+
+---@class Godot.IKModifier3D : Godot.SkeletonModifier3D
+---@field mutable_bone_axes boolean
+---@field are_bone_axes_mutable fun(self: Godot.IKModifier3D): boolean
+---@field clear_settings fun(self: Godot.IKModifier3D)
+---@field get_setting_count fun(self: Godot.IKModifier3D): integer
+---@field reset fun(self: Godot.IKModifier3D)
+---@field set_mutable_bone_axes fun(self: Godot.IKModifier3D, enabled: boolean)
+---@field set_setting_count fun(self: Godot.IKModifier3D, count: integer)
+---@class Godot.IKModifier3D.__type
+---@field new fun(): Godot.IKModifier3D
+
+---@class Godot.ImporterMeshInstance3D : Godot.Node3D
+---@field cast_shadow integer
+---@field layer_mask integer
+---@field mesh Godot.ImporterMesh
+---@field skeleton_path string
+---@field skin Godot.Skin
+---@field visibility_range_begin number
+---@field visibility_range_begin_margin number
+---@field visibility_range_end number
+---@field visibility_range_end_margin number
+---@field visibility_range_fade_mode integer
+---@field get_cast_shadows_setting fun(self: Godot.ImporterMeshInstance3D): integer
+---@field get_layer_mask fun(self: Godot.ImporterMeshInstance3D): integer
+---@field get_mesh fun(self: Godot.ImporterMeshInstance3D): Godot.ImporterMesh
+---@field get_skeleton_path fun(self: Godot.ImporterMeshInstance3D): string
+---@field get_skin fun(self: Godot.ImporterMeshInstance3D): Godot.Skin
+---@field get_visibility_range_begin fun(self: Godot.ImporterMeshInstance3D): number
+---@field get_visibility_range_begin_margin fun(self: Godot.ImporterMeshInstance3D): number
+---@field get_visibility_range_end fun(self: Godot.ImporterMeshInstance3D): number
+---@field get_visibility_range_end_margin fun(self: Godot.ImporterMeshInstance3D): number
+---@field get_visibility_range_fade_mode fun(self: Godot.ImporterMeshInstance3D): integer
+---@field set_cast_shadows_setting fun(self: Godot.ImporterMeshInstance3D, shadow_casting_setting: integer)
+---@field set_layer_mask fun(self: Godot.ImporterMeshInstance3D, layer_mask: integer)
+---@field set_mesh fun(self: Godot.ImporterMeshInstance3D, mesh: Godot.ImporterMesh)
+---@field set_skeleton_path fun(self: Godot.ImporterMeshInstance3D, skeleton_path: string)
+---@field set_skin fun(self: Godot.ImporterMeshInstance3D, skin: Godot.Skin)
+---@field set_visibility_range_begin fun(self: Godot.ImporterMeshInstance3D, distance: number)
+---@field set_visibility_range_begin_margin fun(self: Godot.ImporterMeshInstance3D, distance: number)
+---@field set_visibility_range_end fun(self: Godot.ImporterMeshInstance3D, distance: number)
+---@field set_visibility_range_end_margin fun(self: Godot.ImporterMeshInstance3D, distance: number)
+---@field set_visibility_range_fade_mode fun(self: Godot.ImporterMeshInstance3D, mode: integer)
+---@class Godot.ImporterMeshInstance3D.__type
+---@field new fun(): Godot.ImporterMeshInstance3D
+
+---@class Godot.InstancePlaceholder : Godot.Node
+---@field create_instance fun(self: Godot.InstancePlaceholder, replace: boolean, custom_scene: Godot.PackedScene): Godot.Node
+---@field get_instance_path fun(self: Godot.InstancePlaceholder): string
+---@field get_stored_values fun(self: Godot.InstancePlaceholder, with_order: boolean): table
+---@class Godot.InstancePlaceholder.__type
+---@field new fun(): Godot.InstancePlaceholder
+
+---@class Godot.ItemList : Godot.Control
+---@field allow_reselect boolean
+---@field allow_rmb_select boolean
+---@field allow_search boolean
+---@field auto_height boolean
+---@field auto_width boolean
+---@field fixed_column_width integer
+---@field fixed_icon_size Godot.Vector2I
+---@field icon_mode integer
+---@field icon_scale number
+---@field item_count integer
+---@field max_columns integer
+---@field max_text_lines integer
+---@field same_column_width boolean
+---@field scroll_hint_mode integer
+---@field select_mode integer
+---@field text_overrun_behavior integer
+---@field tile_scroll_hint boolean
+---@field wraparound_items boolean
+---@field empty_clicked Godot.Signal
+---@field item_activated Godot.Signal
+---@field item_clicked Godot.Signal
+---@field item_selected Godot.Signal
+---@field multi_selected Godot.Signal
+---@field add_icon_item fun(self: Godot.ItemList, icon: Godot.Texture2D, selectable: boolean): integer
+---@field add_item fun(self: Godot.ItemList, text: string, icon: Godot.Texture2D, selectable: boolean): integer
+---@field clear fun(self: Godot.ItemList)
+---@field deselect fun(self: Godot.ItemList, idx: integer)
+---@field deselect_all fun(self: Godot.ItemList)
+---@field ensure_current_is_visible fun(self: Godot.ItemList)
+---@field force_update_list_size fun(self: Godot.ItemList)
+---@field get_allow_reselect fun(self: Godot.ItemList): boolean
+---@field get_allow_rmb_select fun(self: Godot.ItemList): boolean
+---@field get_allow_search fun(self: Godot.ItemList): boolean
+---@field get_fixed_column_width fun(self: Godot.ItemList): integer
+---@field get_fixed_icon_size fun(self: Godot.ItemList): Godot.Vector2I
+---@field get_h_scroll_bar fun(self: Godot.ItemList): Godot.HScrollBar
+---@field get_icon_mode fun(self: Godot.ItemList): integer
+---@field get_icon_scale fun(self: Godot.ItemList): number
+---@field get_item_at_position fun(self: Godot.ItemList, position: Godot.Vector2, exact: boolean): integer
+---@field get_item_auto_translate_mode fun(self: Godot.ItemList, idx: integer): integer
+---@field get_item_count fun(self: Godot.ItemList): integer
+---@field get_item_custom_bg_color fun(self: Godot.ItemList, idx: integer): Godot.Color
+---@field get_item_custom_fg_color fun(self: Godot.ItemList, idx: integer): Godot.Color
+---@field get_item_icon fun(self: Godot.ItemList, idx: integer): Godot.Texture2D
+---@field get_item_icon_modulate fun(self: Godot.ItemList, idx: integer): Godot.Color
+---@field get_item_icon_region fun(self: Godot.ItemList, idx: integer): Godot.Rect2
+---@field get_item_language fun(self: Godot.ItemList, idx: integer): string
+---@field get_item_metadata fun(self: Godot.ItemList, idx: integer)
+---@field get_item_rect fun(self: Godot.ItemList, idx: integer, expand: boolean): Godot.Rect2
+---@field get_item_text fun(self: Godot.ItemList, idx: integer): string
+---@field get_item_text_direction fun(self: Godot.ItemList, idx: integer): integer
+---@field get_item_tooltip fun(self: Godot.ItemList, idx: integer): string
+---@field get_max_columns fun(self: Godot.ItemList): integer
+---@field get_max_text_lines fun(self: Godot.ItemList): integer
+---@field get_scroll_hint_mode fun(self: Godot.ItemList): integer
+---@field get_select_mode fun(self: Godot.ItemList): integer
+---@field get_selected_items fun(self: Godot.ItemList): table
+---@field get_text_overrun_behavior fun(self: Godot.ItemList): integer
+---@field get_v_scroll_bar fun(self: Godot.ItemList): Godot.VScrollBar
+---@field has_auto_height fun(self: Godot.ItemList): boolean
+---@field has_auto_width fun(self: Godot.ItemList): boolean
+---@field has_wraparound_items fun(self: Godot.ItemList): boolean
+---@field is_anything_selected fun(self: Godot.ItemList): boolean
+---@field is_item_disabled fun(self: Godot.ItemList, idx: integer): boolean
+---@field is_item_icon_transposed fun(self: Godot.ItemList, idx: integer): boolean
+---@field is_item_selectable fun(self: Godot.ItemList, idx: integer): boolean
+---@field is_item_tooltip_enabled fun(self: Godot.ItemList, idx: integer): boolean
+---@field is_same_column_width fun(self: Godot.ItemList): boolean
+---@field is_scroll_hint_tiled fun(self: Godot.ItemList): boolean
+---@field is_selected fun(self: Godot.ItemList, idx: integer): boolean
+---@field move_item fun(self: Godot.ItemList, from_idx: integer, to_idx: integer)
+---@field remove_item fun(self: Godot.ItemList, idx: integer)
+---@field select fun(self: Godot.ItemList, idx: integer, single: boolean)
+---@field set_allow_reselect fun(self: Godot.ItemList, allow: boolean)
+---@field set_allow_rmb_select fun(self: Godot.ItemList, allow: boolean)
+---@field set_allow_search fun(self: Godot.ItemList, allow: boolean)
+---@field set_auto_height fun(self: Godot.ItemList, enable: boolean)
+---@field set_auto_width fun(self: Godot.ItemList, enable: boolean)
+---@field set_fixed_column_width fun(self: Godot.ItemList, width: integer)
+---@field set_fixed_icon_size fun(self: Godot.ItemList, size: Godot.Vector2I)
+---@field set_icon_mode fun(self: Godot.ItemList, mode: integer)
+---@field set_icon_scale fun(self: Godot.ItemList, scale: number)
+---@field set_item_auto_translate_mode fun(self: Godot.ItemList, idx: integer, mode: integer)
+---@field set_item_count fun(self: Godot.ItemList, count: integer)
+---@field set_item_custom_bg_color fun(self: Godot.ItemList, idx: integer, custom_bg_color: Godot.Color)
+---@field set_item_custom_fg_color fun(self: Godot.ItemList, idx: integer, custom_fg_color: Godot.Color)
+---@field set_item_disabled fun(self: Godot.ItemList, idx: integer, disabled: boolean)
+---@field set_item_icon fun(self: Godot.ItemList, idx: integer, icon: Godot.Texture2D)
+---@field set_item_icon_modulate fun(self: Godot.ItemList, idx: integer, modulate: Godot.Color)
+---@field set_item_icon_region fun(self: Godot.ItemList, idx: integer, rect: Godot.Rect2)
+---@field set_item_icon_transposed fun(self: Godot.ItemList, idx: integer, transposed: boolean)
+---@field set_item_language fun(self: Godot.ItemList, idx: integer, language: string)
+---@field set_item_metadata fun(self: Godot.ItemList, idx: integer, metadata: any)
+---@field set_item_selectable fun(self: Godot.ItemList, idx: integer, selectable: boolean)
+---@field set_item_text fun(self: Godot.ItemList, idx: integer, text: string)
+---@field set_item_text_direction fun(self: Godot.ItemList, idx: integer, direction: integer)
+---@field set_item_tooltip fun(self: Godot.ItemList, idx: integer, tooltip: string)
+---@field set_item_tooltip_enabled fun(self: Godot.ItemList, idx: integer, enable: boolean)
+---@field set_max_columns fun(self: Godot.ItemList, amount: integer)
+---@field set_max_text_lines fun(self: Godot.ItemList, lines: integer)
+---@field set_same_column_width fun(self: Godot.ItemList, enable: boolean)
+---@field set_scroll_hint_mode fun(self: Godot.ItemList, scroll_hint_mode: integer)
+---@field set_select_mode fun(self: Godot.ItemList, mode: integer)
+---@field set_text_overrun_behavior fun(self: Godot.ItemList, overrun_behavior: integer)
+---@field set_tile_scroll_hint fun(self: Godot.ItemList, tile_scroll_hint: boolean)
+---@field set_wraparound_items fun(self: Godot.ItemList, enable: boolean)
+---@field sort_items_by_text fun(self: Godot.ItemList)
+---@class Godot.ItemList.__type
+---@field new fun(): Godot.ItemList
+---@field IconModeEnum Godot.ItemList.IconModeEnum
+---@field ScrollHintModeEnum Godot.ItemList.ScrollHintModeEnum
+---@field SelectModeEnum Godot.ItemList.SelectModeEnum
+---@class Godot.ItemList.IconModeEnum
+---@field Top integer
+---@field Left integer
+---@class Godot.ItemList.ScrollHintModeEnum
+---@field Disabled integer
+---@field Both integer
+---@field Top integer
+---@field Bottom integer
+---@class Godot.ItemList.SelectModeEnum
+---@field Single integer
+---@field Multi integer
+---@field Toggle integer
+
+---@class Godot.IterateIK3D : Godot.ChainIK3D
+---@field angular_delta_limit number
+---@field deterministic boolean
+---@field max_iterations integer
+---@field min_distance number
+---@field setting_count integer
+---@field get_angular_delta_limit fun(self: Godot.IterateIK3D): number
+---@field get_joint_limitation fun(self: Godot.IterateIK3D, index: integer, joint: integer): Godot.JointLimitation3D
+---@field get_joint_limitation_right_axis fun(self: Godot.IterateIK3D, index: integer, joint: integer): integer
+---@field get_joint_limitation_right_axis_vector fun(self: Godot.IterateIK3D, index: integer, joint: integer): Godot.Vector3
+---@field get_joint_limitation_rotation_offset fun(self: Godot.IterateIK3D, index: integer, joint: integer): Godot.Quaternion
+---@field get_joint_rotation_axis fun(self: Godot.IterateIK3D, index: integer, joint: integer): integer
+---@field get_joint_rotation_axis_vector fun(self: Godot.IterateIK3D, index: integer, joint: integer): Godot.Vector3
+---@field get_max_iterations fun(self: Godot.IterateIK3D): integer
+---@field get_min_distance fun(self: Godot.IterateIK3D): number
+---@field get_target_node fun(self: Godot.IterateIK3D, index: integer): string
+---@field is_deterministic fun(self: Godot.IterateIK3D): boolean
+---@field set_angular_delta_limit fun(self: Godot.IterateIK3D, angular_delta_limit: number)
+---@field set_deterministic fun(self: Godot.IterateIK3D, deterministic: boolean)
+---@field set_joint_limitation fun(self: Godot.IterateIK3D, index: integer, joint: integer, limitation: Godot.JointLimitation3D)
+---@field set_joint_limitation_right_axis fun(self: Godot.IterateIK3D, index: integer, joint: integer, direction: integer)
+---@field set_joint_limitation_right_axis_vector fun(self: Godot.IterateIK3D, index: integer, joint: integer, vector: Godot.Vector3)
+---@field set_joint_limitation_rotation_offset fun(self: Godot.IterateIK3D, index: integer, joint: integer, offset: Godot.Quaternion)
+---@field set_joint_rotation_axis fun(self: Godot.IterateIK3D, index: integer, joint: integer, axis: integer)
+---@field set_joint_rotation_axis_vector fun(self: Godot.IterateIK3D, index: integer, joint: integer, axis_vector: Godot.Vector3)
+---@field set_max_iterations fun(self: Godot.IterateIK3D, max_iterations: integer)
+---@field set_min_distance fun(self: Godot.IterateIK3D, min_distance: number)
+---@field set_target_node fun(self: Godot.IterateIK3D, index: integer, target_node: string)
+---@class Godot.IterateIK3D.__type
+---@field new fun(): Godot.IterateIK3D
+
+---@class Godot.JacobianIK3D : Godot.IterateIK3D
+---@class Godot.JacobianIK3D.__type
+---@field new fun(): Godot.JacobianIK3D
+
+---@class Godot.Joint2D : Godot.Node2D
+---@field bias number
+---@field disable_collision boolean
+---@field node_a string
+---@field node_b string
+---@field get_bias fun(self: Godot.Joint2D): number
+---@field get_exclude_nodes_from_collision fun(self: Godot.Joint2D): boolean
+---@field get_node_a fun(self: Godot.Joint2D): string
+---@field get_node_b fun(self: Godot.Joint2D): string
+---@field get_rid fun(self: Godot.Joint2D): Godot.Rid
+---@field set_bias fun(self: Godot.Joint2D, bias: number)
+---@field set_exclude_nodes_from_collision fun(self: Godot.Joint2D, enable: boolean)
+---@field set_node_a fun(self: Godot.Joint2D, node: string)
+---@field set_node_b fun(self: Godot.Joint2D, node: string)
+---@class Godot.Joint2D.__type
+---@field new fun(): Godot.Joint2D
+
+---@class Godot.Joint3D : Godot.Node3D
+---@field exclude_nodes_from_collision boolean
+---@field node_a string
+---@field node_b string
+---@field solver_priority integer
+---@field get_exclude_nodes_from_collision fun(self: Godot.Joint3D): boolean
+---@field get_node_a fun(self: Godot.Joint3D): string
+---@field get_node_b fun(self: Godot.Joint3D): string
+---@field get_rid fun(self: Godot.Joint3D): Godot.Rid
+---@field get_solver_priority fun(self: Godot.Joint3D): integer
+---@field set_exclude_nodes_from_collision fun(self: Godot.Joint3D, enable: boolean)
+---@field set_node_a fun(self: Godot.Joint3D, node: string)
+---@field set_node_b fun(self: Godot.Joint3D, node: string)
+---@field set_solver_priority fun(self: Godot.Joint3D, priority: integer)
+---@class Godot.Joint3D.__type
+---@field new fun(): Godot.Joint3D
+
+---@class Godot.Label : Godot.Control
+---@field autowrap_mode integer
+---@field autowrap_trim_flags integer
+---@field clip_text boolean
+---@field ellipsis_char string
+---@field horizontal_alignment integer
+---@field justification_flags integer
+---@field label_settings Godot.LabelSettings
+---@field language string
+---@field lines_skipped integer
+---@field max_lines_visible integer
+---@field paragraph_separator string
+---@field structured_text_bidi_override integer
+---@field structured_text_bidi_override_options table
+---@field tab_stops table
+---@field text string
+---@field text_direction integer
+---@field text_overrun_behavior integer
+---@field uppercase boolean
+---@field vertical_alignment integer
+---@field visible_characters integer
+---@field visible_characters_behavior integer
+---@field visible_ratio number
+---@field get_autowrap_mode fun(self: Godot.Label): integer
+---@field get_autowrap_trim_flags fun(self: Godot.Label): integer
+---@field get_character_bounds fun(self: Godot.Label, pos: integer): Godot.Rect2
+---@field get_ellipsis_char fun(self: Godot.Label): string
+---@field get_horizontal_alignment fun(self: Godot.Label): integer
+---@field get_justification_flags fun(self: Godot.Label): integer
+---@field get_label_settings fun(self: Godot.Label): Godot.LabelSettings
+---@field get_language fun(self: Godot.Label): string
+---@field get_line_count fun(self: Godot.Label): integer
+---@field get_line_height fun(self: Godot.Label, line: integer): integer
+---@field get_lines_skipped fun(self: Godot.Label): integer
+---@field get_max_lines_visible fun(self: Godot.Label): integer
+---@field get_paragraph_separator fun(self: Godot.Label): string
+---@field get_structured_text_bidi_override fun(self: Godot.Label): integer
+---@field get_structured_text_bidi_override_options fun(self: Godot.Label): table
+---@field get_tab_stops fun(self: Godot.Label): table
+---@field get_text fun(self: Godot.Label): string
+---@field get_text_direction fun(self: Godot.Label): integer
+---@field get_text_overrun_behavior fun(self: Godot.Label): integer
+---@field get_total_character_count fun(self: Godot.Label): integer
+---@field get_vertical_alignment fun(self: Godot.Label): integer
+---@field get_visible_characters fun(self: Godot.Label): integer
+---@field get_visible_characters_behavior fun(self: Godot.Label): integer
+---@field get_visible_line_count fun(self: Godot.Label): integer
+---@field get_visible_ratio fun(self: Godot.Label): number
+---@field is_clipping_text fun(self: Godot.Label): boolean
+---@field is_uppercase fun(self: Godot.Label): boolean
+---@field set_autowrap_mode fun(self: Godot.Label, autowrap_mode: integer)
+---@field set_autowrap_trim_flags fun(self: Godot.Label, autowrap_trim_flags: integer)
+---@field set_clip_text fun(self: Godot.Label, enable: boolean)
+---@field set_ellipsis_char fun(self: Godot.Label, char: string)
+---@field set_horizontal_alignment fun(self: Godot.Label, alignment: integer)
+---@field set_justification_flags fun(self: Godot.Label, justification_flags: integer)
+---@field set_label_settings fun(self: Godot.Label, settings: Godot.LabelSettings)
+---@field set_language fun(self: Godot.Label, language: string)
+---@field set_lines_skipped fun(self: Godot.Label, lines_skipped: integer)
+---@field set_max_lines_visible fun(self: Godot.Label, lines_visible: integer)
+---@field set_paragraph_separator fun(self: Godot.Label, paragraph_separator: string)
+---@field set_structured_text_bidi_override fun(self: Godot.Label, parser: integer)
+---@field set_structured_text_bidi_override_options fun(self: Godot.Label, args: table)
+---@field set_tab_stops fun(self: Godot.Label, tab_stops: table)
+---@field set_text fun(self: Godot.Label, text: string)
+---@field set_text_direction fun(self: Godot.Label, direction: integer)
+---@field set_text_overrun_behavior fun(self: Godot.Label, overrun_behavior: integer)
+---@field set_uppercase fun(self: Godot.Label, enable: boolean)
+---@field set_vertical_alignment fun(self: Godot.Label, alignment: integer)
+---@field set_visible_characters fun(self: Godot.Label, amount: integer)
+---@field set_visible_characters_behavior fun(self: Godot.Label, behavior: integer)
+---@field set_visible_ratio fun(self: Godot.Label, ratio: number)
+---@class Godot.Label.__type
+---@field new fun(): Godot.Label
+
+---@class Godot.Label3D : Godot.GeometryInstance3D
+---@field alpha_antialiasing_edge number
+---@field alpha_antialiasing_mode integer
+---@field alpha_cut integer
+---@field alpha_hash_scale number
+---@field alpha_scissor_threshold number
+---@field autowrap_mode integer
+---@field autowrap_trim_flags integer
+---@field billboard integer
+---@field double_sided boolean
+---@field fixed_size boolean
+---@field font Godot.Font
+---@field font_size integer
+---@field horizontal_alignment integer
+---@field justification_flags integer
+---@field language string
+---@field line_spacing number
+---@field modulate Godot.Color
+---@field no_depth_test boolean
+---@field offset Godot.Vector2
+---@field outline_modulate Godot.Color
+---@field outline_render_priority integer
+---@field outline_size integer
+---@field pixel_size number
+---@field render_priority integer
+---@field shaded boolean
+---@field structured_text_bidi_override integer
+---@field structured_text_bidi_override_options table
+---@field text string
+---@field text_direction integer
+---@field texture_filter integer
+---@field uppercase boolean
+---@field vertical_alignment integer
+---@field width number
+---@field generate_triangle_mesh fun(self: Godot.Label3D): Godot.TriangleMesh
+---@field get_alpha_antialiasing fun(self: Godot.Label3D): integer
+---@field get_alpha_antialiasing_edge fun(self: Godot.Label3D): number
+---@field get_alpha_cut_mode fun(self: Godot.Label3D): integer
+---@field get_alpha_hash_scale fun(self: Godot.Label3D): number
+---@field get_alpha_scissor_threshold fun(self: Godot.Label3D): number
+---@field get_autowrap_mode fun(self: Godot.Label3D): integer
+---@field get_autowrap_trim_flags fun(self: Godot.Label3D): integer
+---@field get_billboard_mode fun(self: Godot.Label3D): integer
+---@field get_draw_flag fun(self: Godot.Label3D, flag: integer): boolean
+---@field get_font fun(self: Godot.Label3D): Godot.Font
+---@field get_font_size fun(self: Godot.Label3D): integer
+---@field get_horizontal_alignment fun(self: Godot.Label3D): integer
+---@field get_justification_flags fun(self: Godot.Label3D): integer
+---@field get_language fun(self: Godot.Label3D): string
+---@field get_line_spacing fun(self: Godot.Label3D): number
+---@field get_modulate fun(self: Godot.Label3D): Godot.Color
+---@field get_offset fun(self: Godot.Label3D): Godot.Vector2
+---@field get_outline_modulate fun(self: Godot.Label3D): Godot.Color
+---@field get_outline_render_priority fun(self: Godot.Label3D): integer
+---@field get_outline_size fun(self: Godot.Label3D): integer
+---@field get_pixel_size fun(self: Godot.Label3D): number
+---@field get_render_priority fun(self: Godot.Label3D): integer
+---@field get_structured_text_bidi_override fun(self: Godot.Label3D): integer
+---@field get_structured_text_bidi_override_options fun(self: Godot.Label3D): table
+---@field get_text fun(self: Godot.Label3D): string
+---@field get_text_direction fun(self: Godot.Label3D): integer
+---@field get_texture_filter fun(self: Godot.Label3D): integer
+---@field get_vertical_alignment fun(self: Godot.Label3D): integer
+---@field get_width fun(self: Godot.Label3D): number
+---@field is_uppercase fun(self: Godot.Label3D): boolean
+---@field set_alpha_antialiasing fun(self: Godot.Label3D, alpha_aa: integer)
+---@field set_alpha_antialiasing_edge fun(self: Godot.Label3D, edge: number)
+---@field set_alpha_cut_mode fun(self: Godot.Label3D, mode: integer)
+---@field set_alpha_hash_scale fun(self: Godot.Label3D, threshold: number)
+---@field set_alpha_scissor_threshold fun(self: Godot.Label3D, threshold: number)
+---@field set_autowrap_mode fun(self: Godot.Label3D, autowrap_mode: integer)
+---@field set_autowrap_trim_flags fun(self: Godot.Label3D, autowrap_trim_flags: integer)
+---@field set_billboard_mode fun(self: Godot.Label3D, mode: integer)
+---@field set_draw_flag fun(self: Godot.Label3D, flag: integer, enabled: boolean)
+---@field set_font fun(self: Godot.Label3D, font: Godot.Font)
+---@field set_font_size fun(self: Godot.Label3D, size: integer)
+---@field set_horizontal_alignment fun(self: Godot.Label3D, alignment: integer)
+---@field set_justification_flags fun(self: Godot.Label3D, justification_flags: integer)
+---@field set_language fun(self: Godot.Label3D, language: string)
+---@field set_line_spacing fun(self: Godot.Label3D, line_spacing: number)
+---@field set_modulate fun(self: Godot.Label3D, modulate: Godot.Color)
+---@field set_offset fun(self: Godot.Label3D, offset: Godot.Vector2)
+---@field set_outline_modulate fun(self: Godot.Label3D, modulate: Godot.Color)
+---@field set_outline_render_priority fun(self: Godot.Label3D, priority: integer)
+---@field set_outline_size fun(self: Godot.Label3D, outline_size: integer)
+---@field set_pixel_size fun(self: Godot.Label3D, pixel_size: number)
+---@field set_render_priority fun(self: Godot.Label3D, priority: integer)
+---@field set_structured_text_bidi_override fun(self: Godot.Label3D, parser: integer)
+---@field set_structured_text_bidi_override_options fun(self: Godot.Label3D, args: table)
+---@field set_text fun(self: Godot.Label3D, text: string)
+---@field set_text_direction fun(self: Godot.Label3D, direction: integer)
+---@field set_texture_filter fun(self: Godot.Label3D, mode: integer)
+---@field set_uppercase fun(self: Godot.Label3D, enable: boolean)
+---@field set_vertical_alignment fun(self: Godot.Label3D, alignment: integer)
+---@field set_width fun(self: Godot.Label3D, width: number)
+---@class Godot.Label3D.__type
+---@field new fun(): Godot.Label3D
+---@field AlphaCutMode Godot.Label3D.AlphaCutMode
+---@field DrawFlags Godot.Label3D.DrawFlags
+---@class Godot.Label3D.AlphaCutMode
+---@field Disabled integer
+---@field Discard integer
+---@field OpaquePrepass integer
+---@field Hash integer
+---@class Godot.Label3D.DrawFlags
+---@field Shaded integer
+---@field DoubleSided integer
+---@field DisableDepthTest integer
+---@field FixedSize integer
+---@field Max integer
+
+---@class Godot.Light2D : Godot.Node2D
+---@field blend_mode integer
+---@field color Godot.Color
+---@field editor_only boolean
+---@field enabled boolean
+---@field energy number
+---@field range_item_cull_mask integer
+---@field range_layer_max integer
+---@field range_layer_min integer
+---@field range_z_max integer
+---@field range_z_min integer
+---@field shadow_color Godot.Color
+---@field shadow_enabled boolean
+---@field shadow_filter integer
+---@field shadow_filter_smooth number
+---@field shadow_item_cull_mask integer
+---@field get_blend_mode fun(self: Godot.Light2D): integer
+---@field get_color fun(self: Godot.Light2D): Godot.Color
+---@field get_energy fun(self: Godot.Light2D): number
+---@field get_height fun(self: Godot.Light2D): number
+---@field get_item_cull_mask fun(self: Godot.Light2D): integer
+---@field get_item_shadow_cull_mask fun(self: Godot.Light2D): integer
+---@field get_layer_range_max fun(self: Godot.Light2D): integer
+---@field get_layer_range_min fun(self: Godot.Light2D): integer
+---@field get_shadow_color fun(self: Godot.Light2D): Godot.Color
+---@field get_shadow_filter fun(self: Godot.Light2D): integer
+---@field get_shadow_smooth fun(self: Godot.Light2D): number
+---@field get_z_range_max fun(self: Godot.Light2D): integer
+---@field get_z_range_min fun(self: Godot.Light2D): integer
+---@field is_editor_only fun(self: Godot.Light2D): boolean
+---@field is_enabled fun(self: Godot.Light2D): boolean
+---@field is_shadow_enabled fun(self: Godot.Light2D): boolean
+---@field set_blend_mode fun(self: Godot.Light2D, mode: integer)
+---@field set_color fun(self: Godot.Light2D, color: Godot.Color)
+---@field set_editor_only fun(self: Godot.Light2D, editor_only: boolean)
+---@field set_enabled fun(self: Godot.Light2D, enabled: boolean)
+---@field set_energy fun(self: Godot.Light2D, energy: number)
+---@field set_height fun(self: Godot.Light2D, height: number)
+---@field set_item_cull_mask fun(self: Godot.Light2D, item_cull_mask: integer)
+---@field set_item_shadow_cull_mask fun(self: Godot.Light2D, item_shadow_cull_mask: integer)
+---@field set_layer_range_max fun(self: Godot.Light2D, layer: integer)
+---@field set_layer_range_min fun(self: Godot.Light2D, layer: integer)
+---@field set_shadow_color fun(self: Godot.Light2D, shadow_color: Godot.Color)
+---@field set_shadow_enabled fun(self: Godot.Light2D, enabled: boolean)
+---@field set_shadow_filter fun(self: Godot.Light2D, filter: integer)
+---@field set_shadow_smooth fun(self: Godot.Light2D, smooth: number)
+---@field set_z_range_max fun(self: Godot.Light2D, z: integer)
+---@field set_z_range_min fun(self: Godot.Light2D, z: integer)
+---@class Godot.Light2D.__type
+---@field new fun(): Godot.Light2D
+---@field BlendModeEnum Godot.Light2D.BlendModeEnum
+---@field ShadowFilterEnum Godot.Light2D.ShadowFilterEnum
+---@class Godot.Light2D.BlendModeEnum
+---@field Add integer
+---@field Sub integer
+---@field Mix integer
+---@class Godot.Light2D.ShadowFilterEnum
+---@field None integer
+---@field Pcf5 integer
+---@field Pcf13 integer
+
+---@class Godot.Light3D : Godot.VisualInstance3D
+---@field distance_fade_begin number
+---@field distance_fade_enabled boolean
+---@field distance_fade_length number
+---@field distance_fade_shadow number
+---@field editor_only boolean
+---@field light_angular_distance number
+---@field light_bake_mode integer
+---@field light_color Godot.Color
+---@field light_cull_mask integer
+---@field light_energy number
+---@field light_indirect_energy number
+---@field light_intensity_lumens number
+---@field light_intensity_lux number
+---@field light_negative boolean
+---@field light_projector Godot.Texture2D,-AnimatedTexture,-AtlasTexture,-CameraTexture,-CanvasTexture,-MeshTexture,-Texture2DRD,-ViewportTexture
+---@field light_size number
+---@field light_specular number
+---@field light_temperature number
+---@field light_volumetric_fog_energy number
+---@field shadow_bias number
+---@field shadow_blur number
+---@field shadow_caster_mask integer
+---@field shadow_enabled boolean
+---@field shadow_normal_bias number
+---@field shadow_opacity number
+---@field shadow_reverse_cull_face boolean
+---@field shadow_transmittance_bias number
+---@field get_bake_mode fun(self: Godot.Light3D): integer
+---@field get_color fun(self: Godot.Light3D): Godot.Color
+---@field get_correlated_color fun(self: Godot.Light3D): Godot.Color
+---@field get_cull_mask fun(self: Godot.Light3D): integer
+---@field get_distance_fade_begin fun(self: Godot.Light3D): number
+---@field get_distance_fade_length fun(self: Godot.Light3D): number
+---@field get_distance_fade_shadow fun(self: Godot.Light3D): number
+---@field get_param fun(self: Godot.Light3D, param: integer): number
+---@field get_projector fun(self: Godot.Light3D): Godot.Texture2D
+---@field get_shadow_caster_mask fun(self: Godot.Light3D): integer
+---@field get_shadow_reverse_cull_face fun(self: Godot.Light3D): boolean
+---@field get_temperature fun(self: Godot.Light3D): number
+---@field has_shadow fun(self: Godot.Light3D): boolean
+---@field is_distance_fade_enabled fun(self: Godot.Light3D): boolean
+---@field is_editor_only fun(self: Godot.Light3D): boolean
+---@field is_negative fun(self: Godot.Light3D): boolean
+---@field set_bake_mode fun(self: Godot.Light3D, bake_mode: integer)
+---@field set_color fun(self: Godot.Light3D, color: Godot.Color)
+---@field set_cull_mask fun(self: Godot.Light3D, cull_mask: integer)
+---@field set_distance_fade_begin fun(self: Godot.Light3D, distance: number)
+---@field set_distance_fade_length fun(self: Godot.Light3D, distance: number)
+---@field set_distance_fade_shadow fun(self: Godot.Light3D, distance: number)
+---@field set_editor_only fun(self: Godot.Light3D, editor_only: boolean)
+---@field set_enable_distance_fade fun(self: Godot.Light3D, enable: boolean)
+---@field set_negative fun(self: Godot.Light3D, enabled: boolean)
+---@field set_param fun(self: Godot.Light3D, param: integer, value: number)
+---@field set_projector fun(self: Godot.Light3D, projector: Godot.Texture2D)
+---@field set_shadow fun(self: Godot.Light3D, enabled: boolean)
+---@field set_shadow_caster_mask fun(self: Godot.Light3D, caster_mask: integer)
+---@field set_shadow_reverse_cull_face fun(self: Godot.Light3D, enable: boolean)
+---@field set_temperature fun(self: Godot.Light3D, temperature: number)
+---@class Godot.Light3D.__type
+---@field new fun(): Godot.Light3D
+---@field BakeMode Godot.Light3D.BakeMode
+---@field Param Godot.Light3D.Param
+---@class Godot.Light3D.BakeMode
+---@field Disabled integer
+---@field Static integer
+---@field Dynamic integer
+---@class Godot.Light3D.Param
+---@field Energy integer
+---@field IndirectEnergy integer
+---@field VolumetricFogEnergy integer
+---@field Specular integer
+---@field Range integer
+---@field Size integer
+---@field Attenuation integer
+---@field SpotAngle integer
+---@field SpotAttenuation integer
+---@field ShadowMaxDistance integer
+---@field ShadowSplit1Offset integer
+---@field ShadowSplit2Offset integer
+---@field ShadowSplit3Offset integer
+---@field ShadowFadeStart integer
+---@field ShadowNormalBias integer
+---@field ShadowBias integer
+---@field ShadowPancakeSize integer
+---@field ShadowOpacity integer
+---@field ShadowBlur integer
+---@field TransmittanceBias integer
+---@field Intensity integer
+---@field Max integer
+
+---@class Godot.LightmapGI : Godot.VisualInstance3D
+---@field bias number
+---@field bounce_indirect_energy number
+---@field bounces integer
+---@field camera_attributes Godot.CameraAttributesPractical,CameraAttributesPhysical
+---@field denoiser_range integer
+---@field denoiser_strength number
+---@field directional boolean
+---@field environment_custom_color Godot.Color
+---@field environment_custom_energy number
+---@field environment_custom_sky Godot.Sky
+---@field environment_mode integer
+---@field generate_probes_subdiv integer
+---@field interior boolean
+---@field light_data Godot.LightmapGIData
+---@field max_texture_size integer
+---@field quality integer
+---@field shadowmask_mode integer
+---@field supersampling boolean
+---@field supersampling_factor number
+---@field texel_scale number
+---@field use_denoiser boolean
+---@field use_texture_for_bounces boolean
+---@field get_bake_quality fun(self: Godot.LightmapGI): integer
+---@field get_bias fun(self: Godot.LightmapGI): number
+---@field get_bounce_indirect_energy fun(self: Godot.LightmapGI): number
+---@field get_bounces fun(self: Godot.LightmapGI): integer
+---@field get_camera_attributes fun(self: Godot.LightmapGI): Godot.CameraAttributes
+---@field get_denoiser_range fun(self: Godot.LightmapGI): integer
+---@field get_denoiser_strength fun(self: Godot.LightmapGI): number
+---@field get_environment_custom_color fun(self: Godot.LightmapGI): Godot.Color
+---@field get_environment_custom_energy fun(self: Godot.LightmapGI): number
+---@field get_environment_custom_sky fun(self: Godot.LightmapGI): Godot.Sky
+---@field get_environment_mode fun(self: Godot.LightmapGI): integer
+---@field get_generate_probes fun(self: Godot.LightmapGI): integer
+---@field get_light_data fun(self: Godot.LightmapGI): Godot.LightmapGIData
+---@field get_max_texture_size fun(self: Godot.LightmapGI): integer
+---@field get_shadowmask_mode fun(self: Godot.LightmapGI): integer
+---@field get_supersampling_factor fun(self: Godot.LightmapGI): number
+---@field get_texel_scale fun(self: Godot.LightmapGI): number
+---@field is_directional fun(self: Godot.LightmapGI): boolean
+---@field is_interior fun(self: Godot.LightmapGI): boolean
+---@field is_supersampling_enabled fun(self: Godot.LightmapGI): boolean
+---@field is_using_denoiser fun(self: Godot.LightmapGI): boolean
+---@field is_using_texture_for_bounces fun(self: Godot.LightmapGI): boolean
+---@field set_bake_quality fun(self: Godot.LightmapGI, bake_quality: integer)
+---@field set_bias fun(self: Godot.LightmapGI, bias: number)
+---@field set_bounce_indirect_energy fun(self: Godot.LightmapGI, bounce_indirect_energy: number)
+---@field set_bounces fun(self: Godot.LightmapGI, bounces: integer)
+---@field set_camera_attributes fun(self: Godot.LightmapGI, camera_attributes: Godot.CameraAttributes)
+---@field set_denoiser_range fun(self: Godot.LightmapGI, denoiser_range: integer)
+---@field set_denoiser_strength fun(self: Godot.LightmapGI, denoiser_strength: number)
+---@field set_directional fun(self: Godot.LightmapGI, directional: boolean)
+---@field set_environment_custom_color fun(self: Godot.LightmapGI, color: Godot.Color)
+---@field set_environment_custom_energy fun(self: Godot.LightmapGI, energy: number)
+---@field set_environment_custom_sky fun(self: Godot.LightmapGI, sky: Godot.Sky)
+---@field set_environment_mode fun(self: Godot.LightmapGI, mode: integer)
+---@field set_generate_probes fun(self: Godot.LightmapGI, subdivision: integer)
+---@field set_interior fun(self: Godot.LightmapGI, enable: boolean)
+---@field set_light_data fun(self: Godot.LightmapGI, data: Godot.LightmapGIData)
+---@field set_max_texture_size fun(self: Godot.LightmapGI, max_texture_size: integer)
+---@field set_shadowmask_mode fun(self: Godot.LightmapGI, mode: integer)
+---@field set_supersampling_enabled fun(self: Godot.LightmapGI, enable: boolean)
+---@field set_supersampling_factor fun(self: Godot.LightmapGI, factor: number)
+---@field set_texel_scale fun(self: Godot.LightmapGI, texel_scale: number)
+---@field set_use_denoiser fun(self: Godot.LightmapGI, use_denoiser: boolean)
+---@field set_use_texture_for_bounces fun(self: Godot.LightmapGI, use_texture_for_bounces: boolean)
+---@class Godot.LightmapGI.__type
+---@field new fun(): Godot.LightmapGI
+---@field BakeError Godot.LightmapGI.BakeError
+---@field BakeQuality Godot.LightmapGI.BakeQuality
+---@field EnvironmentModeEnum Godot.LightmapGI.EnvironmentModeEnum
+---@field GenerateProbes Godot.LightmapGI.GenerateProbes
+---@class Godot.LightmapGI.BakeError
+---@field Ok integer
+---@field NoSceneRoot integer
+---@field ForeignData integer
+---@field NoLightmapper integer
+---@field NoSavePath integer
+---@field NoMeshes integer
+---@field MeshesInvalid integer
+---@field CantCreateImage integer
+---@field UserAborted integer
+---@field TextureSizeTooSmall integer
+---@field LightmapTooSmall integer
+---@field AtlasTooSmall integer
+---@class Godot.LightmapGI.BakeQuality
+---@field Low integer
+---@field Medium integer
+---@field High integer
+---@field Ultra integer
+---@class Godot.LightmapGI.EnvironmentModeEnum
+---@field Disabled integer
+---@field Scene integer
+---@field CustomSky integer
+---@field CustomColor integer
+---@class Godot.LightmapGI.GenerateProbes
+---@field Disabled integer
+---@field Subdiv4 integer
+---@field Subdiv8 integer
+---@field Subdiv16 integer
+---@field Subdiv32 integer
+
+---@class Godot.LightmapProbe : Godot.Node3D
+---@class Godot.LightmapProbe.__type
+---@field new fun(): Godot.LightmapProbe
+
+---@class Godot.LightOccluder2D : Godot.Node2D
+---@field occluder Godot.OccluderPolygon2D
+---@field occluder_light_mask integer
+---@field sdf_collision boolean
+---@field get_occluder_light_mask fun(self: Godot.LightOccluder2D): integer
+---@field get_occluder_polygon fun(self: Godot.LightOccluder2D): Godot.OccluderPolygon2D
+---@field is_set_as_sdf_collision fun(self: Godot.LightOccluder2D): boolean
+---@field set_as_sdf_collision fun(self: Godot.LightOccluder2D, enable: boolean)
+---@field set_occluder_light_mask fun(self: Godot.LightOccluder2D, mask: integer)
+---@field set_occluder_polygon fun(self: Godot.LightOccluder2D, polygon: Godot.OccluderPolygon2D)
+---@class Godot.LightOccluder2D.__type
+---@field new fun(): Godot.LightOccluder2D
+
+---@class Godot.LimitAngularVelocityModifier3D : Godot.SkeletonModifier3D
+---@field chain_count integer
+---@field exclude boolean
+---@field joint_count integer
+---@field max_angular_velocity number
+---@field clear_chains fun(self: Godot.LimitAngularVelocityModifier3D)
+---@field get_chain_count fun(self: Godot.LimitAngularVelocityModifier3D): integer
+---@field get_end_bone fun(self: Godot.LimitAngularVelocityModifier3D, index: integer): integer
+---@field get_end_bone_name fun(self: Godot.LimitAngularVelocityModifier3D, index: integer): string
+---@field get_max_angular_velocity fun(self: Godot.LimitAngularVelocityModifier3D): number
+---@field get_root_bone fun(self: Godot.LimitAngularVelocityModifier3D, index: integer): integer
+---@field get_root_bone_name fun(self: Godot.LimitAngularVelocityModifier3D, index: integer): string
+---@field is_exclude fun(self: Godot.LimitAngularVelocityModifier3D): boolean
+---@field reset fun(self: Godot.LimitAngularVelocityModifier3D)
+---@field set_chain_count fun(self: Godot.LimitAngularVelocityModifier3D, count: integer)
+---@field set_end_bone fun(self: Godot.LimitAngularVelocityModifier3D, index: integer, bone: integer)
+---@field set_end_bone_name fun(self: Godot.LimitAngularVelocityModifier3D, index: integer, bone_name: string)
+---@field set_exclude fun(self: Godot.LimitAngularVelocityModifier3D, exclude: boolean)
+---@field set_max_angular_velocity fun(self: Godot.LimitAngularVelocityModifier3D, angular_velocity: number)
+---@field set_root_bone fun(self: Godot.LimitAngularVelocityModifier3D, index: integer, bone: integer)
+---@field set_root_bone_name fun(self: Godot.LimitAngularVelocityModifier3D, index: integer, bone_name: string)
+---@class Godot.LimitAngularVelocityModifier3D.__type
+---@field new fun(): Godot.LimitAngularVelocityModifier3D
+
+---@class Godot.Line2D : Godot.Node2D
+---@field antialiased boolean
+---@field begin_cap_mode integer
+---@field closed boolean
+---@field default_color Godot.Color
+---@field end_cap_mode integer
+---@field gradient Godot.Gradient
+---@field joint_mode integer
+---@field points table
+---@field round_precision integer
+---@field sharp_limit number
+---@field texture Godot.Texture2D
+---@field texture_mode integer
+---@field width number
+---@field width_curve Godot.Curve
+---@field add_point fun(self: Godot.Line2D, position: Godot.Vector2, index: integer)
+---@field clear_points fun(self: Godot.Line2D)
+---@field get_antialiased fun(self: Godot.Line2D): boolean
+---@field get_begin_cap_mode fun(self: Godot.Line2D): integer
+---@field get_curve fun(self: Godot.Line2D): Godot.Curve
+---@field get_default_color fun(self: Godot.Line2D): Godot.Color
+---@field get_end_cap_mode fun(self: Godot.Line2D): integer
+---@field get_gradient fun(self: Godot.Line2D): Godot.Gradient
+---@field get_joint_mode fun(self: Godot.Line2D): integer
+---@field get_point_count fun(self: Godot.Line2D): integer
+---@field get_point_position fun(self: Godot.Line2D, index: integer): Godot.Vector2
+---@field get_points fun(self: Godot.Line2D): table
+---@field get_round_precision fun(self: Godot.Line2D): integer
+---@field get_sharp_limit fun(self: Godot.Line2D): number
+---@field get_texture fun(self: Godot.Line2D): Godot.Texture2D
+---@field get_texture_mode fun(self: Godot.Line2D): integer
+---@field get_width fun(self: Godot.Line2D): number
+---@field is_closed fun(self: Godot.Line2D): boolean
+---@field remove_point fun(self: Godot.Line2D, index: integer)
+---@field set_antialiased fun(self: Godot.Line2D, antialiased: boolean)
+---@field set_begin_cap_mode fun(self: Godot.Line2D, mode: integer)
+---@field set_closed fun(self: Godot.Line2D, closed: boolean)
+---@field set_curve fun(self: Godot.Line2D, curve: Godot.Curve)
+---@field set_default_color fun(self: Godot.Line2D, color: Godot.Color)
+---@field set_end_cap_mode fun(self: Godot.Line2D, mode: integer)
+---@field set_gradient fun(self: Godot.Line2D, color: Godot.Gradient)
+---@field set_joint_mode fun(self: Godot.Line2D, mode: integer)
+---@field set_point_position fun(self: Godot.Line2D, index: integer, position: Godot.Vector2)
+---@field set_points fun(self: Godot.Line2D, points: table)
+---@field set_round_precision fun(self: Godot.Line2D, precision: integer)
+---@field set_sharp_limit fun(self: Godot.Line2D, limit: number)
+---@field set_texture fun(self: Godot.Line2D, texture: Godot.Texture2D)
+---@field set_texture_mode fun(self: Godot.Line2D, mode: integer)
+---@field set_width fun(self: Godot.Line2D, width: number)
+---@class Godot.Line2D.__type
+---@field new fun(): Godot.Line2D
+---@field LineCapMode Godot.Line2D.LineCapMode
+---@field LineJointMode Godot.Line2D.LineJointMode
+---@field LineTextureMode Godot.Line2D.LineTextureMode
+---@class Godot.Line2D.LineCapMode
+---@field None integer
+---@field Box integer
+---@field Round integer
+---@class Godot.Line2D.LineJointMode
+---@field Sharp integer
+---@field Bevel integer
+---@field Round integer
+---@class Godot.Line2D.LineTextureMode
+---@field None integer
+---@field Tile integer
+---@field Stretch integer
+
+---@class Godot.LineEdit : Godot.Control
+---@field alignment integer
+---@field backspace_deletes_composite_character_enabled boolean
+---@field caret_blink boolean
+---@field caret_blink_interval number
+---@field caret_column integer
+---@field caret_force_displayed boolean
+---@field caret_mid_grapheme boolean
+---@field clear_button_enabled boolean
+---@field context_menu_enabled boolean
+---@field deselect_on_focus_loss_enabled boolean
+---@field drag_and_drop_selection_enabled boolean
+---@field draw_control_chars boolean
+---@field editable boolean
+---@field emoji_menu_enabled boolean
+---@field expand_to_text_length boolean
+---@field flat boolean
+---@field icon_expand_mode integer
+---@field keep_editing_on_text_submit boolean
+---@field language string
+---@field max_length integer
+---@field middle_mouse_paste_enabled boolean
+---@field placeholder_text string
+---@field right_icon Godot.Texture2D
+---@field right_icon_scale number
+---@field secret boolean
+---@field secret_character string
+---@field select_all_on_focus boolean
+---@field selecting_enabled boolean
+---@field shortcut_keys_enabled boolean
+---@field structured_text_bidi_override integer
+---@field structured_text_bidi_override_options table
+---@field text string
+---@field text_direction integer
+---@field virtual_keyboard_enabled boolean
+---@field virtual_keyboard_show_on_focus boolean
+---@field virtual_keyboard_type integer
+---@field editing_toggled Godot.Signal
+---@field text_change_rejected Godot.Signal
+---@field text_changed Godot.Signal
+---@field text_submitted Godot.Signal
+---@field apply_ime fun(self: Godot.LineEdit)
+---@field cancel_ime fun(self: Godot.LineEdit)
+---@field clear fun(self: Godot.LineEdit)
+---@field delete_char_at_caret fun(self: Godot.LineEdit)
+---@field delete_text fun(self: Godot.LineEdit, from_column: integer, to_column: integer)
+---@field deselect fun(self: Godot.LineEdit)
+---@field edit fun(self: Godot.LineEdit, hide_focus: boolean)
+---@field get_caret_blink_interval fun(self: Godot.LineEdit): number
+---@field get_caret_column fun(self: Godot.LineEdit): integer
+---@field get_draw_control_chars fun(self: Godot.LineEdit): boolean
+---@field get_horizontal_alignment fun(self: Godot.LineEdit): integer
+---@field get_icon_expand_mode fun(self: Godot.LineEdit): integer
+---@field get_language fun(self: Godot.LineEdit): string
+---@field get_max_length fun(self: Godot.LineEdit): integer
+---@field get_menu fun(self: Godot.LineEdit): Godot.PopupMenu
+---@field get_next_composite_character_column fun(self: Godot.LineEdit, column: integer): integer
+---@field get_placeholder fun(self: Godot.LineEdit): string
+---@field get_previous_composite_character_column fun(self: Godot.LineEdit, column: integer): integer
+---@field get_right_icon fun(self: Godot.LineEdit): Godot.Texture2D
+---@field get_right_icon_scale fun(self: Godot.LineEdit): number
+---@field get_scroll_offset fun(self: Godot.LineEdit): number
+---@field get_secret_character fun(self: Godot.LineEdit): string
+---@field get_selected_text fun(self: Godot.LineEdit): string
+---@field get_selection_from_column fun(self: Godot.LineEdit): integer
+---@field get_selection_to_column fun(self: Godot.LineEdit): integer
+---@field get_structured_text_bidi_override fun(self: Godot.LineEdit): integer
+---@field get_structured_text_bidi_override_options fun(self: Godot.LineEdit): table
+---@field get_text fun(self: Godot.LineEdit): string
+---@field get_text_direction fun(self: Godot.LineEdit): integer
+---@field get_virtual_keyboard_show_on_focus fun(self: Godot.LineEdit): boolean
+---@field get_virtual_keyboard_type fun(self: Godot.LineEdit): integer
+---@field has_ime_text fun(self: Godot.LineEdit): boolean
+---@field has_redo fun(self: Godot.LineEdit): boolean
+---@field has_selection fun(self: Godot.LineEdit): boolean
+---@field has_undo fun(self: Godot.LineEdit): boolean
+---@field insert_text_at_caret fun(self: Godot.LineEdit, text: string)
+---@field is_backspace_deletes_composite_character_enabled fun(self: Godot.LineEdit): boolean
+---@field is_caret_blink_enabled fun(self: Godot.LineEdit): boolean
+---@field is_caret_force_displayed fun(self: Godot.LineEdit): boolean
+---@field is_caret_mid_grapheme_enabled fun(self: Godot.LineEdit): boolean
+---@field is_clear_button_enabled fun(self: Godot.LineEdit): boolean
+---@field is_context_menu_enabled fun(self: Godot.LineEdit): boolean
+---@field is_deselect_on_focus_loss_enabled fun(self: Godot.LineEdit): boolean
+---@field is_drag_and_drop_selection_enabled fun(self: Godot.LineEdit): boolean
+---@field is_editable fun(self: Godot.LineEdit): boolean
+---@field is_editing fun(self: Godot.LineEdit): boolean
+---@field is_editing_kept_on_text_submit fun(self: Godot.LineEdit): boolean
+---@field is_emoji_menu_enabled fun(self: Godot.LineEdit): boolean
+---@field is_expand_to_text_length_enabled fun(self: Godot.LineEdit): boolean
+---@field is_flat fun(self: Godot.LineEdit): boolean
+---@field is_menu_visible fun(self: Godot.LineEdit): boolean
+---@field is_middle_mouse_paste_enabled fun(self: Godot.LineEdit): boolean
+---@field is_secret fun(self: Godot.LineEdit): boolean
+---@field is_select_all_on_focus fun(self: Godot.LineEdit): boolean
+---@field is_selecting_enabled fun(self: Godot.LineEdit): boolean
+---@field is_shortcut_keys_enabled fun(self: Godot.LineEdit): boolean
+---@field is_virtual_keyboard_enabled fun(self: Godot.LineEdit): boolean
+---@field menu_option fun(self: Godot.LineEdit, option: integer)
+---@field select fun(self: Godot.LineEdit, from: integer, to: integer)
+---@field select_all fun(self: Godot.LineEdit)
+---@field set_backspace_deletes_composite_character_enabled fun(self: Godot.LineEdit, enable: boolean)
+---@field set_caret_blink_enabled fun(self: Godot.LineEdit, enabled: boolean)
+---@field set_caret_blink_interval fun(self: Godot.LineEdit, interval: number)
+---@field set_caret_column fun(self: Godot.LineEdit, position: integer)
+---@field set_caret_force_displayed fun(self: Godot.LineEdit, enabled: boolean)
+---@field set_caret_mid_grapheme_enabled fun(self: Godot.LineEdit, enabled: boolean)
+---@field set_clear_button_enabled fun(self: Godot.LineEdit, enable: boolean)
+---@field set_context_menu_enabled fun(self: Godot.LineEdit, enable: boolean)
+---@field set_deselect_on_focus_loss_enabled fun(self: Godot.LineEdit, enable: boolean)
+---@field set_drag_and_drop_selection_enabled fun(self: Godot.LineEdit, enable: boolean)
+---@field set_draw_control_chars fun(self: Godot.LineEdit, enable: boolean)
+---@field set_editable fun(self: Godot.LineEdit, enabled: boolean)
+---@field set_emoji_menu_enabled fun(self: Godot.LineEdit, enable: boolean)
+---@field set_expand_to_text_length_enabled fun(self: Godot.LineEdit, enabled: boolean)
+---@field set_flat fun(self: Godot.LineEdit, enabled: boolean)
+---@field set_horizontal_alignment fun(self: Godot.LineEdit, alignment: integer)
+---@field set_icon_expand_mode fun(self: Godot.LineEdit, mode: integer)
+---@field set_keep_editing_on_text_submit fun(self: Godot.LineEdit, enable: boolean)
+---@field set_language fun(self: Godot.LineEdit, language: string)
+---@field set_max_length fun(self: Godot.LineEdit, chars: integer)
+---@field set_middle_mouse_paste_enabled fun(self: Godot.LineEdit, enable: boolean)
+---@field set_placeholder fun(self: Godot.LineEdit, text: string)
+---@field set_right_icon fun(self: Godot.LineEdit, icon: Godot.Texture2D)
+---@field set_right_icon_scale fun(self: Godot.LineEdit, scale: number)
+---@field set_secret fun(self: Godot.LineEdit, enabled: boolean)
+---@field set_secret_character fun(self: Godot.LineEdit, character: string)
+---@field set_select_all_on_focus fun(self: Godot.LineEdit, enabled: boolean)
+---@field set_selecting_enabled fun(self: Godot.LineEdit, enable: boolean)
+---@field set_shortcut_keys_enabled fun(self: Godot.LineEdit, enable: boolean)
+---@field set_structured_text_bidi_override fun(self: Godot.LineEdit, parser: integer)
+---@field set_structured_text_bidi_override_options fun(self: Godot.LineEdit, args: table)
+---@field set_text fun(self: Godot.LineEdit, text: string)
+---@field set_text_direction fun(self: Godot.LineEdit, direction: integer)
+---@field set_virtual_keyboard_enabled fun(self: Godot.LineEdit, enable: boolean)
+---@field set_virtual_keyboard_show_on_focus fun(self: Godot.LineEdit, show_on_focus: boolean)
+---@field set_virtual_keyboard_type fun(self: Godot.LineEdit, type: integer)
+---@field unedit fun(self: Godot.LineEdit)
+---@class Godot.LineEdit.__type
+---@field new fun(): Godot.LineEdit
+---@field ExpandMode Godot.LineEdit.ExpandMode
+---@field MenuItems Godot.LineEdit.MenuItems
+---@field VirtualKeyboardTypeEnum Godot.LineEdit.VirtualKeyboardTypeEnum
+---@class Godot.LineEdit.ExpandMode
+---@field OriginalSize integer
+---@field FitToText integer
+---@field FitToLineEdit integer
+---@class Godot.LineEdit.MenuItems
+---@field Cut integer
+---@field Copy integer
+---@field Paste integer
+---@field Clear integer
+---@field SelectAll integer
+---@field Undo integer
+---@field Redo integer
+---@field SubmenuTextDir integer
+---@field DirInherited integer
+---@field DirAuto integer
+---@field DirLtr integer
+---@field DirRtl integer
+---@field DisplayUcc integer
+---@field SubmenuInsertUcc integer
+---@field InsertLrm integer
+---@field InsertRlm integer
+---@field InsertLre integer
+---@field InsertRle integer
+---@field InsertLro integer
+---@field InsertRlo integer
+---@field InsertPdf integer
+---@field InsertAlm integer
+---@field InsertLri integer
+---@field InsertRli integer
+---@field InsertFsi integer
+---@field InsertPdi integer
+---@field InsertZwj integer
+---@field InsertZwnj integer
+---@field InsertWj integer
+---@field InsertShy integer
+---@field EmojiAndSymbol integer
+---@field Max integer
+---@class Godot.LineEdit.VirtualKeyboardTypeEnum
+---@field Default integer
+---@field Multiline integer
+---@field Number integer
+---@field NumberDecimal integer
+---@field Phone integer
+---@field EmailAddress integer
+---@field Password integer
+---@field Url integer
+
+---@class Godot.LinkButton : Godot.BaseButton
+---@field ellipsis_char string
+---@field language string
+---@field structured_text_bidi_override integer
+---@field structured_text_bidi_override_options table
+---@field text string
+---@field text_direction integer
+---@field text_overrun_behavior integer
+---@field underline integer
+---@field uri string
+---@field get_ellipsis_char fun(self: Godot.LinkButton): string
+---@field get_language fun(self: Godot.LinkButton): string
+---@field get_structured_text_bidi_override fun(self: Godot.LinkButton): integer
+---@field get_structured_text_bidi_override_options fun(self: Godot.LinkButton): table
+---@field get_text fun(self: Godot.LinkButton): string
+---@field get_text_direction fun(self: Godot.LinkButton): integer
+---@field get_text_overrun_behavior fun(self: Godot.LinkButton): integer
+---@field get_underline_mode fun(self: Godot.LinkButton): integer
+---@field get_uri fun(self: Godot.LinkButton): string
+---@field set_ellipsis_char fun(self: Godot.LinkButton, char: string)
+---@field set_language fun(self: Godot.LinkButton, language: string)
+---@field set_structured_text_bidi_override fun(self: Godot.LinkButton, parser: integer)
+---@field set_structured_text_bidi_override_options fun(self: Godot.LinkButton, args: table)
+---@field set_text fun(self: Godot.LinkButton, text: string)
+---@field set_text_direction fun(self: Godot.LinkButton, direction: integer)
+---@field set_text_overrun_behavior fun(self: Godot.LinkButton, overrun_behavior: integer)
+---@field set_underline_mode fun(self: Godot.LinkButton, underline_mode: integer)
+---@field set_uri fun(self: Godot.LinkButton, uri: string)
+---@class Godot.LinkButton.__type
+---@field new fun(): Godot.LinkButton
+---@field UnderlineMode Godot.LinkButton.UnderlineMode
+---@class Godot.LinkButton.UnderlineMode
+---@field Always integer
+---@field OnHover integer
+---@field Never integer
+
+---@class Godot.LookAtModifier3D : Godot.SkeletonModifier3D
+---@field bone integer
+---@field bone_name string
+---@field duration number
+---@field ease_type integer
+---@field forward_axis integer
+---@field origin_bone integer
+---@field origin_bone_name string
+---@field origin_external_node string
+---@field origin_from integer
+---@field origin_offset Godot.Vector3
+---@field origin_safe_margin number
+---@field primary_damp_threshold number
+---@field primary_limit_angle number
+---@field primary_negative_damp_threshold number
+---@field primary_negative_limit_angle number
+---@field primary_positive_damp_threshold number
+---@field primary_positive_limit_angle number
+---@field primary_rotation_axis integer
+---@field relative boolean
+---@field secondary_damp_threshold number
+---@field secondary_limit_angle number
+---@field secondary_negative_damp_threshold number
+---@field secondary_negative_limit_angle number
+---@field secondary_positive_damp_threshold number
+---@field secondary_positive_limit_angle number
+---@field symmetry_limitation boolean
+---@field target_node string
+---@field transition_type integer
+---@field use_angle_limitation boolean
+---@field use_secondary_rotation boolean
+---@field get_bone fun(self: Godot.LookAtModifier3D): integer
+---@field get_bone_name fun(self: Godot.LookAtModifier3D): string
+---@field get_duration fun(self: Godot.LookAtModifier3D): number
+---@field get_ease_type fun(self: Godot.LookAtModifier3D): integer
+---@field get_forward_axis fun(self: Godot.LookAtModifier3D): integer
+---@field get_interpolation_remaining fun(self: Godot.LookAtModifier3D): number
+---@field get_origin_bone fun(self: Godot.LookAtModifier3D): integer
+---@field get_origin_bone_name fun(self: Godot.LookAtModifier3D): string
+---@field get_origin_external_node fun(self: Godot.LookAtModifier3D): string
+---@field get_origin_from fun(self: Godot.LookAtModifier3D): integer
+---@field get_origin_offset fun(self: Godot.LookAtModifier3D): Godot.Vector3
+---@field get_origin_safe_margin fun(self: Godot.LookAtModifier3D): number
+---@field get_primary_damp_threshold fun(self: Godot.LookAtModifier3D): number
+---@field get_primary_limit_angle fun(self: Godot.LookAtModifier3D): number
+---@field get_primary_negative_damp_threshold fun(self: Godot.LookAtModifier3D): number
+---@field get_primary_negative_limit_angle fun(self: Godot.LookAtModifier3D): number
+---@field get_primary_positive_damp_threshold fun(self: Godot.LookAtModifier3D): number
+---@field get_primary_positive_limit_angle fun(self: Godot.LookAtModifier3D): number
+---@field get_primary_rotation_axis fun(self: Godot.LookAtModifier3D): integer
+---@field get_secondary_damp_threshold fun(self: Godot.LookAtModifier3D): number
+---@field get_secondary_limit_angle fun(self: Godot.LookAtModifier3D): number
+---@field get_secondary_negative_damp_threshold fun(self: Godot.LookAtModifier3D): number
+---@field get_secondary_negative_limit_angle fun(self: Godot.LookAtModifier3D): number
+---@field get_secondary_positive_damp_threshold fun(self: Godot.LookAtModifier3D): number
+---@field get_secondary_positive_limit_angle fun(self: Godot.LookAtModifier3D): number
+---@field get_target_node fun(self: Godot.LookAtModifier3D): string
+---@field get_transition_type fun(self: Godot.LookAtModifier3D): integer
+---@field is_interpolating fun(self: Godot.LookAtModifier3D): boolean
+---@field is_limitation_symmetry fun(self: Godot.LookAtModifier3D): boolean
+---@field is_relative fun(self: Godot.LookAtModifier3D): boolean
+---@field is_target_within_limitation fun(self: Godot.LookAtModifier3D): boolean
+---@field is_using_angle_limitation fun(self: Godot.LookAtModifier3D): boolean
+---@field is_using_secondary_rotation fun(self: Godot.LookAtModifier3D): boolean
+---@field set_bone fun(self: Godot.LookAtModifier3D, bone: integer)
+---@field set_bone_name fun(self: Godot.LookAtModifier3D, bone_name: string)
+---@field set_duration fun(self: Godot.LookAtModifier3D, duration: number)
+---@field set_ease_type fun(self: Godot.LookAtModifier3D, ease_type: integer)
+---@field set_forward_axis fun(self: Godot.LookAtModifier3D, forward_axis: integer)
+---@field set_origin_bone fun(self: Godot.LookAtModifier3D, bone: integer)
+---@field set_origin_bone_name fun(self: Godot.LookAtModifier3D, bone_name: string)
+---@field set_origin_external_node fun(self: Godot.LookAtModifier3D, external_node: string)
+---@field set_origin_from fun(self: Godot.LookAtModifier3D, origin_from: integer)
+---@field set_origin_offset fun(self: Godot.LookAtModifier3D, offset: Godot.Vector3)
+---@field set_origin_safe_margin fun(self: Godot.LookAtModifier3D, margin: number)
+---@field set_primary_damp_threshold fun(self: Godot.LookAtModifier3D, power: number)
+---@field set_primary_limit_angle fun(self: Godot.LookAtModifier3D, angle: number)
+---@field set_primary_negative_damp_threshold fun(self: Godot.LookAtModifier3D, power: number)
+---@field set_primary_negative_limit_angle fun(self: Godot.LookAtModifier3D, angle: number)
+---@field set_primary_positive_damp_threshold fun(self: Godot.LookAtModifier3D, power: number)
+---@field set_primary_positive_limit_angle fun(self: Godot.LookAtModifier3D, angle: number)
+---@field set_primary_rotation_axis fun(self: Godot.LookAtModifier3D, axis: integer)
+---@field set_relative fun(self: Godot.LookAtModifier3D, enabled: boolean)
+---@field set_secondary_damp_threshold fun(self: Godot.LookAtModifier3D, power: number)
+---@field set_secondary_limit_angle fun(self: Godot.LookAtModifier3D, angle: number)
+---@field set_secondary_negative_damp_threshold fun(self: Godot.LookAtModifier3D, power: number)
+---@field set_secondary_negative_limit_angle fun(self: Godot.LookAtModifier3D, angle: number)
+---@field set_secondary_positive_damp_threshold fun(self: Godot.LookAtModifier3D, power: number)
+---@field set_secondary_positive_limit_angle fun(self: Godot.LookAtModifier3D, angle: number)
+---@field set_symmetry_limitation fun(self: Godot.LookAtModifier3D, enabled: boolean)
+---@field set_target_node fun(self: Godot.LookAtModifier3D, target_node: string)
+---@field set_transition_type fun(self: Godot.LookAtModifier3D, transition_type: integer)
+---@field set_use_angle_limitation fun(self: Godot.LookAtModifier3D, enabled: boolean)
+---@field set_use_secondary_rotation fun(self: Godot.LookAtModifier3D, enabled: boolean)
+---@class Godot.LookAtModifier3D.__type
+---@field new fun(): Godot.LookAtModifier3D
+---@field OriginFromEnum Godot.LookAtModifier3D.OriginFromEnum
+---@class Godot.LookAtModifier3D.OriginFromEnum
+---@field Self integer
+---@field SpecificBone integer
+---@field ExternalNode integer
+
+---@class Godot.MarginContainer : Godot.Container
+---@class Godot.MarginContainer.__type
+---@field new fun(): Godot.MarginContainer
+
+---@class Godot.Marker2D : Godot.Node2D
+---@field gizmo_extents number
+---@field get_gizmo_extents fun(self: Godot.Marker2D): number
+---@field set_gizmo_extents fun(self: Godot.Marker2D, extents: number)
+---@class Godot.Marker2D.__type
+---@field new fun(): Godot.Marker2D
+
+---@class Godot.Marker3D : Godot.Node3D
+---@field gizmo_extents number
+---@field get_gizmo_extents fun(self: Godot.Marker3D): number
+---@field set_gizmo_extents fun(self: Godot.Marker3D, extents: number)
+---@class Godot.Marker3D.__type
+---@field new fun(): Godot.Marker3D
+
+---@class Godot.MenuBar : Godot.Control
+---@field flat boolean
+---@field language string
+---@field prefer_global_menu boolean
+---@field start_index integer
+---@field switch_on_hover boolean
+---@field text_direction integer
+---@field get_language fun(self: Godot.MenuBar): string
+---@field get_menu_count fun(self: Godot.MenuBar): integer
+---@field get_menu_popup fun(self: Godot.MenuBar, menu: integer): Godot.PopupMenu
+---@field get_menu_title fun(self: Godot.MenuBar, menu: integer): string
+---@field get_menu_tooltip fun(self: Godot.MenuBar, menu: integer): string
+---@field get_start_index fun(self: Godot.MenuBar): integer
+---@field get_text_direction fun(self: Godot.MenuBar): integer
+---@field is_flat fun(self: Godot.MenuBar): boolean
+---@field is_menu_disabled fun(self: Godot.MenuBar, menu: integer): boolean
+---@field is_menu_hidden fun(self: Godot.MenuBar, menu: integer): boolean
+---@field is_native_menu fun(self: Godot.MenuBar): boolean
+---@field is_prefer_global_menu fun(self: Godot.MenuBar): boolean
+---@field is_switch_on_hover fun(self: Godot.MenuBar): boolean
+---@field set_disable_shortcuts fun(self: Godot.MenuBar, disabled: boolean)
+---@field set_flat fun(self: Godot.MenuBar, enabled: boolean)
+---@field set_language fun(self: Godot.MenuBar, language: string)
+---@field set_menu_disabled fun(self: Godot.MenuBar, menu: integer, disabled: boolean)
+---@field set_menu_hidden fun(self: Godot.MenuBar, menu: integer, hidden: boolean)
+---@field set_menu_title fun(self: Godot.MenuBar, menu: integer, title: string)
+---@field set_menu_tooltip fun(self: Godot.MenuBar, menu: integer, tooltip: string)
+---@field set_prefer_global_menu fun(self: Godot.MenuBar, enabled: boolean)
+---@field set_start_index fun(self: Godot.MenuBar, enabled: integer)
+---@field set_switch_on_hover fun(self: Godot.MenuBar, enable: boolean)
+---@field set_text_direction fun(self: Godot.MenuBar, direction: integer)
+---@class Godot.MenuBar.__type
+---@field new fun(): Godot.MenuBar
+
+---@class Godot.MenuButton : Godot.Button
+---@field item_count integer
+---@field switch_on_hover boolean
+---@field about_to_popup Godot.Signal
+---@field get_item_count fun(self: Godot.MenuButton): integer
+---@field get_popup fun(self: Godot.MenuButton): Godot.PopupMenu
+---@field is_switch_on_hover fun(self: Godot.MenuButton): boolean
+---@field set_disable_shortcuts fun(self: Godot.MenuButton, disabled: boolean)
+---@field set_item_count fun(self: Godot.MenuButton, count: integer)
+---@field set_switch_on_hover fun(self: Godot.MenuButton, enable: boolean)
+---@field show_popup fun(self: Godot.MenuButton)
+---@class Godot.MenuButton.__type
+---@field new fun(): Godot.MenuButton
+
+---@class Godot.MeshInstance2D : Godot.Node2D
+---@field mesh Godot.Mesh
+---@field texture Godot.Texture2D
+---@field texture_changed Godot.Signal
+---@field get_mesh fun(self: Godot.MeshInstance2D): Godot.Mesh
+---@field get_texture fun(self: Godot.MeshInstance2D): Godot.Texture2D
+---@field set_mesh fun(self: Godot.MeshInstance2D, mesh: Godot.Mesh)
+---@field set_texture fun(self: Godot.MeshInstance2D, texture: Godot.Texture2D)
+---@class Godot.MeshInstance2D.__type
+---@field new fun(): Godot.MeshInstance2D
+
+---@class Godot.MeshInstance3D : Godot.GeometryInstance3D
+---@field mesh Godot.Mesh
+---@field skeleton string
+---@field skin Godot.Skin
+---@field bake_mesh_from_current_blend_shape_mix fun(self: Godot.MeshInstance3D, existing: Godot.ArrayMesh): Godot.ArrayMesh
+---@field bake_mesh_from_current_skeleton_pose fun(self: Godot.MeshInstance3D, existing: Godot.ArrayMesh): Godot.ArrayMesh
+---@field create_convex_collision fun(self: Godot.MeshInstance3D, clean: boolean, simplify: boolean)
+---@field create_debug_tangents fun(self: Godot.MeshInstance3D)
+---@field create_multiple_convex_collisions fun(self: Godot.MeshInstance3D, settings: Godot.MeshConvexDecompositionSettings)
+---@field create_trimesh_collision fun(self: Godot.MeshInstance3D)
+---@field find_blend_shape_by_name fun(self: Godot.MeshInstance3D, name: string): integer
+---@field get_active_material fun(self: Godot.MeshInstance3D, surface: integer): Godot.Material
+---@field get_blend_shape_count fun(self: Godot.MeshInstance3D): integer
+---@field get_blend_shape_value fun(self: Godot.MeshInstance3D, blend_shape_idx: integer): number
+---@field get_mesh fun(self: Godot.MeshInstance3D): Godot.Mesh
+---@field get_skeleton_path fun(self: Godot.MeshInstance3D): string
+---@field get_skin fun(self: Godot.MeshInstance3D): Godot.Skin
+---@field get_skin_reference fun(self: Godot.MeshInstance3D): Godot.SkinReference
+---@field get_surface_override_material fun(self: Godot.MeshInstance3D, surface: integer): Godot.Material
+---@field get_surface_override_material_count fun(self: Godot.MeshInstance3D): integer
+---@field set_blend_shape_value fun(self: Godot.MeshInstance3D, blend_shape_idx: integer, value: number)
+---@field set_mesh fun(self: Godot.MeshInstance3D, mesh: Godot.Mesh)
+---@field set_skeleton_path fun(self: Godot.MeshInstance3D, skeleton_path: string)
+---@field set_skin fun(self: Godot.MeshInstance3D, skin: Godot.Skin)
+---@field set_surface_override_material fun(self: Godot.MeshInstance3D, surface: integer, material: Godot.Material)
+---@class Godot.MeshInstance3D.__type
+---@field new fun(): Godot.MeshInstance3D
+
+---@class Godot.MissingNode : Godot.Node
+---@field original_class string
+---@field original_scene string
+---@field recording_properties boolean
+---@field recording_signals boolean
+---@field get_original_class fun(self: Godot.MissingNode): string
+---@field get_original_scene fun(self: Godot.MissingNode): string
+---@field is_recording_properties fun(self: Godot.MissingNode): boolean
+---@field is_recording_signals fun(self: Godot.MissingNode): boolean
+---@field set_original_class fun(self: Godot.MissingNode, name: string)
+---@field set_original_scene fun(self: Godot.MissingNode, name: string)
+---@field set_recording_properties fun(self: Godot.MissingNode, enable: boolean)
+---@field set_recording_signals fun(self: Godot.MissingNode, enable: boolean)
+---@class Godot.MissingNode.__type
+---@field new fun(): Godot.MissingNode
+
+---@class Godot.ModifierBoneTarget3D : Godot.SkeletonModifier3D
+---@field bone integer
+---@field bone_name string
+---@field get_bone fun(self: Godot.ModifierBoneTarget3D): integer
+---@field get_bone_name fun(self: Godot.ModifierBoneTarget3D): string
+---@field set_bone fun(self: Godot.ModifierBoneTarget3D, bone: integer)
+---@field set_bone_name fun(self: Godot.ModifierBoneTarget3D, bone_name: string)
+---@class Godot.ModifierBoneTarget3D.__type
+---@field new fun(): Godot.ModifierBoneTarget3D
+
+---@class Godot.MultiMeshInstance2D : Godot.Node2D
+---@field multimesh Godot.MultiMesh
+---@field texture Godot.Texture2D
+---@field texture_changed Godot.Signal
+---@field get_multimesh fun(self: Godot.MultiMeshInstance2D): Godot.MultiMesh
+---@field get_texture fun(self: Godot.MultiMeshInstance2D): Godot.Texture2D
+---@field set_multimesh fun(self: Godot.MultiMeshInstance2D, multimesh: Godot.MultiMesh)
+---@field set_texture fun(self: Godot.MultiMeshInstance2D, texture: Godot.Texture2D)
+---@class Godot.MultiMeshInstance2D.__type
+---@field new fun(): Godot.MultiMeshInstance2D
+
+---@class Godot.MultiMeshInstance3D : Godot.GeometryInstance3D
+---@field multimesh Godot.MultiMesh
+---@field get_multimesh fun(self: Godot.MultiMeshInstance3D): Godot.MultiMesh
+---@field set_multimesh fun(self: Godot.MultiMeshInstance3D, multimesh: Godot.MultiMesh)
+---@class Godot.MultiMeshInstance3D.__type
+---@field new fun(): Godot.MultiMeshInstance3D
+
+---@class Godot.MultiplayerSpawner : Godot.Node
+---@field _spawnable_scenes table
+---@field spawn_function function
+---@field spawn_limit integer
+---@field spawn_path string
+---@field despawned Godot.Signal
+---@field spawned Godot.Signal
+---@field add_spawnable_scene fun(self: Godot.MultiplayerSpawner, path: string)
+---@field clear_spawnable_scenes fun(self: Godot.MultiplayerSpawner)
+---@field get_spawn_function fun(self: Godot.MultiplayerSpawner): function
+---@field get_spawn_limit fun(self: Godot.MultiplayerSpawner): integer
+---@field get_spawn_path fun(self: Godot.MultiplayerSpawner): string
+---@field get_spawnable_scene fun(self: Godot.MultiplayerSpawner, index: integer): string
+---@field get_spawnable_scene_count fun(self: Godot.MultiplayerSpawner): integer
+---@field set_spawn_function fun(self: Godot.MultiplayerSpawner, spawn_function: function)
+---@field set_spawn_limit fun(self: Godot.MultiplayerSpawner, limit: integer)
+---@field set_spawn_path fun(self: Godot.MultiplayerSpawner, path: string)
+---@field spawn fun(self: Godot.MultiplayerSpawner, data: any): Godot.Node
+---@class Godot.MultiplayerSpawner.__type
+---@field new fun(): Godot.MultiplayerSpawner
+
+---@class Godot.MultiplayerSynchronizer : Godot.Node
+---@field delta_interval number
+---@field public_visibility boolean
+---@field replication_config Godot.SceneReplicationConfig
+---@field replication_interval number
+---@field root_path string
+---@field visibility_update_mode integer
+---@field delta_synchronized Godot.Signal
+---@field synchronized Godot.Signal
+---@field visibility_changed Godot.Signal
+---@field add_visibility_filter fun(self: Godot.MultiplayerSynchronizer, filter: function)
+---@field get_delta_interval fun(self: Godot.MultiplayerSynchronizer): number
+---@field get_replication_config fun(self: Godot.MultiplayerSynchronizer): Godot.SceneReplicationConfig
+---@field get_replication_interval fun(self: Godot.MultiplayerSynchronizer): number
+---@field get_root_path fun(self: Godot.MultiplayerSynchronizer): string
+---@field get_visibility_for fun(self: Godot.MultiplayerSynchronizer, peer: integer): boolean
+---@field get_visibility_update_mode fun(self: Godot.MultiplayerSynchronizer): integer
+---@field is_visibility_public fun(self: Godot.MultiplayerSynchronizer): boolean
+---@field remove_visibility_filter fun(self: Godot.MultiplayerSynchronizer, filter: function)
+---@field set_delta_interval fun(self: Godot.MultiplayerSynchronizer, milliseconds: number)
+---@field set_replication_config fun(self: Godot.MultiplayerSynchronizer, config: Godot.SceneReplicationConfig)
+---@field set_replication_interval fun(self: Godot.MultiplayerSynchronizer, milliseconds: number)
+---@field set_root_path fun(self: Godot.MultiplayerSynchronizer, path: string)
+---@field set_visibility_for fun(self: Godot.MultiplayerSynchronizer, peer: integer, visible: boolean)
+---@field set_visibility_public fun(self: Godot.MultiplayerSynchronizer, visible: boolean)
+---@field set_visibility_update_mode fun(self: Godot.MultiplayerSynchronizer, mode: integer)
+---@field update_visibility fun(self: Godot.MultiplayerSynchronizer, for_peer: integer)
+---@class Godot.MultiplayerSynchronizer.__type
+---@field new fun(): Godot.MultiplayerSynchronizer
+---@field VisibilityUpdateModeEnum Godot.MultiplayerSynchronizer.VisibilityUpdateModeEnum
+---@class Godot.MultiplayerSynchronizer.VisibilityUpdateModeEnum
+---@field Idle integer
+---@field Physics integer
+---@field None integer
+
+---@class Godot.NavigationAgent2D : Godot.Node
+---@field avoidance_enabled boolean
+---@field avoidance_layers integer
+---@field avoidance_mask integer
+---@field avoidance_priority number
+---@field debug_enabled boolean
+---@field debug_path_custom_color Godot.Color
+---@field debug_path_custom_line_width number
+---@field debug_path_custom_point_size number
+---@field debug_use_custom boolean
+---@field max_neighbors integer
+---@field max_speed number
+---@field navigation_layers integer
+---@field neighbor_distance number
+---@field path_desired_distance number
+---@field path_max_distance number
+---@field path_metadata_flags integer
+---@field path_postprocessing integer
+---@field path_return_max_length number
+---@field path_return_max_radius number
+---@field path_search_max_distance number
+---@field path_search_max_polygons integer
+---@field pathfinding_algorithm integer
+---@field radius number
+---@field simplify_epsilon number
+---@field simplify_path boolean
+---@field target_desired_distance number
+---@field target_position Godot.Vector2
+---@field time_horizon_agents number
+---@field time_horizon_obstacles number
+---@field velocity Godot.Vector2
+---@field link_reached Godot.Signal
+---@field navigation_finished Godot.Signal
+---@field path_changed Godot.Signal
+---@field target_reached Godot.Signal
+---@field velocity_computed Godot.Signal
+---@field waypoint_reached Godot.Signal
+---@field distance_to_target fun(self: Godot.NavigationAgent2D): number
+---@field get_avoidance_enabled fun(self: Godot.NavigationAgent2D): boolean
+---@field get_avoidance_layer_value fun(self: Godot.NavigationAgent2D, layer_number: integer): boolean
+---@field get_avoidance_layers fun(self: Godot.NavigationAgent2D): integer
+---@field get_avoidance_mask fun(self: Godot.NavigationAgent2D): integer
+---@field get_avoidance_mask_value fun(self: Godot.NavigationAgent2D, mask_number: integer): boolean
+---@field get_avoidance_priority fun(self: Godot.NavigationAgent2D): number
+---@field get_current_navigation_path fun(self: Godot.NavigationAgent2D): table
+---@field get_current_navigation_path_index fun(self: Godot.NavigationAgent2D): integer
+---@field get_current_navigation_result fun(self: Godot.NavigationAgent2D): Godot.NavigationPathQueryResult2D
+---@field get_debug_enabled fun(self: Godot.NavigationAgent2D): boolean
+---@field get_debug_path_custom_color fun(self: Godot.NavigationAgent2D): Godot.Color
+---@field get_debug_path_custom_line_width fun(self: Godot.NavigationAgent2D): number
+---@field get_debug_path_custom_point_size fun(self: Godot.NavigationAgent2D): number
+---@field get_debug_use_custom fun(self: Godot.NavigationAgent2D): boolean
+---@field get_final_position fun(self: Godot.NavigationAgent2D): Godot.Vector2
+---@field get_max_neighbors fun(self: Godot.NavigationAgent2D): integer
+---@field get_max_speed fun(self: Godot.NavigationAgent2D): number
+---@field get_navigation_layer_value fun(self: Godot.NavigationAgent2D, layer_number: integer): boolean
+---@field get_navigation_layers fun(self: Godot.NavigationAgent2D): integer
+---@field get_navigation_map fun(self: Godot.NavigationAgent2D): Godot.Rid
+---@field get_neighbor_distance fun(self: Godot.NavigationAgent2D): number
+---@field get_next_path_position fun(self: Godot.NavigationAgent2D): Godot.Vector2
+---@field get_path_desired_distance fun(self: Godot.NavigationAgent2D): number
+---@field get_path_length fun(self: Godot.NavigationAgent2D): number
+---@field get_path_max_distance fun(self: Godot.NavigationAgent2D): number
+---@field get_path_metadata_flags fun(self: Godot.NavigationAgent2D): integer
+---@field get_path_postprocessing fun(self: Godot.NavigationAgent2D): integer
+---@field get_path_return_max_length fun(self: Godot.NavigationAgent2D): number
+---@field get_path_return_max_radius fun(self: Godot.NavigationAgent2D): number
+---@field get_path_search_max_distance fun(self: Godot.NavigationAgent2D): number
+---@field get_path_search_max_polygons fun(self: Godot.NavigationAgent2D): integer
+---@field get_pathfinding_algorithm fun(self: Godot.NavigationAgent2D): integer
+---@field get_radius fun(self: Godot.NavigationAgent2D): number
+---@field get_rid fun(self: Godot.NavigationAgent2D): Godot.Rid
+---@field get_simplify_epsilon fun(self: Godot.NavigationAgent2D): number
+---@field get_simplify_path fun(self: Godot.NavigationAgent2D): boolean
+---@field get_target_desired_distance fun(self: Godot.NavigationAgent2D): number
+---@field get_target_position fun(self: Godot.NavigationAgent2D): Godot.Vector2
+---@field get_time_horizon_agents fun(self: Godot.NavigationAgent2D): number
+---@field get_time_horizon_obstacles fun(self: Godot.NavigationAgent2D): number
+---@field get_velocity fun(self: Godot.NavigationAgent2D): Godot.Vector2
+---@field is_navigation_finished fun(self: Godot.NavigationAgent2D): boolean
+---@field is_target_reachable fun(self: Godot.NavigationAgent2D): boolean
+---@field is_target_reached fun(self: Godot.NavigationAgent2D): boolean
+---@field set_avoidance_enabled fun(self: Godot.NavigationAgent2D, enabled: boolean)
+---@field set_avoidance_layer_value fun(self: Godot.NavigationAgent2D, layer_number: integer, value: boolean)
+---@field set_avoidance_layers fun(self: Godot.NavigationAgent2D, layers: integer)
+---@field set_avoidance_mask fun(self: Godot.NavigationAgent2D, mask: integer)
+---@field set_avoidance_mask_value fun(self: Godot.NavigationAgent2D, mask_number: integer, value: boolean)
+---@field set_avoidance_priority fun(self: Godot.NavigationAgent2D, priority: number)
+---@field set_debug_enabled fun(self: Godot.NavigationAgent2D, enabled: boolean)
+---@field set_debug_path_custom_color fun(self: Godot.NavigationAgent2D, color: Godot.Color)
+---@field set_debug_path_custom_line_width fun(self: Godot.NavigationAgent2D, line_width: number)
+---@field set_debug_path_custom_point_size fun(self: Godot.NavigationAgent2D, point_size: number)
+---@field set_debug_use_custom fun(self: Godot.NavigationAgent2D, enabled: boolean)
+---@field set_max_neighbors fun(self: Godot.NavigationAgent2D, max_neighbors: integer)
+---@field set_max_speed fun(self: Godot.NavigationAgent2D, max_speed: number)
+---@field set_navigation_layer_value fun(self: Godot.NavigationAgent2D, layer_number: integer, value: boolean)
+---@field set_navigation_layers fun(self: Godot.NavigationAgent2D, navigation_layers: integer)
+---@field set_navigation_map fun(self: Godot.NavigationAgent2D, navigation_map: Godot.Rid)
+---@field set_neighbor_distance fun(self: Godot.NavigationAgent2D, neighbor_distance: number)
+---@field set_path_desired_distance fun(self: Godot.NavigationAgent2D, desired_distance: number)
+---@field set_path_max_distance fun(self: Godot.NavigationAgent2D, max_speed: number)
+---@field set_path_metadata_flags fun(self: Godot.NavigationAgent2D, flags: integer)
+---@field set_path_postprocessing fun(self: Godot.NavigationAgent2D, path_postprocessing: integer)
+---@field set_path_return_max_length fun(self: Godot.NavigationAgent2D, length: number)
+---@field set_path_return_max_radius fun(self: Godot.NavigationAgent2D, radius: number)
+---@field set_path_search_max_distance fun(self: Godot.NavigationAgent2D, distance: number)
+---@field set_path_search_max_polygons fun(self: Godot.NavigationAgent2D, max_polygons: integer)
+---@field set_pathfinding_algorithm fun(self: Godot.NavigationAgent2D, pathfinding_algorithm: integer)
+---@field set_radius fun(self: Godot.NavigationAgent2D, radius: number)
+---@field set_simplify_epsilon fun(self: Godot.NavigationAgent2D, epsilon: number)
+---@field set_simplify_path fun(self: Godot.NavigationAgent2D, enabled: boolean)
+---@field set_target_desired_distance fun(self: Godot.NavigationAgent2D, desired_distance: number)
+---@field set_target_position fun(self: Godot.NavigationAgent2D, position: Godot.Vector2)
+---@field set_time_horizon_agents fun(self: Godot.NavigationAgent2D, time_horizon: number)
+---@field set_time_horizon_obstacles fun(self: Godot.NavigationAgent2D, time_horizon: number)
+---@field set_velocity fun(self: Godot.NavigationAgent2D, velocity: Godot.Vector2)
+---@field set_velocity_forced fun(self: Godot.NavigationAgent2D, velocity: Godot.Vector2)
+---@class Godot.NavigationAgent2D.__type
+---@field new fun(): Godot.NavigationAgent2D
+
+---@class Godot.NavigationAgent3D : Godot.Node
+---@field avoidance_enabled boolean
+---@field avoidance_layers integer
+---@field avoidance_mask integer
+---@field avoidance_priority number
+---@field debug_enabled boolean
+---@field debug_path_custom_color Godot.Color
+---@field debug_path_custom_point_size number
+---@field debug_use_custom boolean
+---@field height number
+---@field keep_y_velocity boolean
+---@field max_neighbors integer
+---@field max_speed number
+---@field navigation_layers integer
+---@field neighbor_distance number
+---@field path_desired_distance number
+---@field path_height_offset number
+---@field path_max_distance number
+---@field path_metadata_flags integer
+---@field path_postprocessing integer
+---@field path_return_max_length number
+---@field path_return_max_radius number
+---@field path_search_max_distance number
+---@field path_search_max_polygons integer
+---@field pathfinding_algorithm integer
+---@field radius number
+---@field simplify_epsilon number
+---@field simplify_path boolean
+---@field target_desired_distance number
+---@field target_position Godot.Vector3
+---@field time_horizon_agents number
+---@field time_horizon_obstacles number
+---@field use_3d_avoidance boolean
+---@field velocity Godot.Vector3
+---@field link_reached Godot.Signal
+---@field navigation_finished Godot.Signal
+---@field path_changed Godot.Signal
+---@field target_reached Godot.Signal
+---@field velocity_computed Godot.Signal
+---@field waypoint_reached Godot.Signal
+---@field distance_to_target fun(self: Godot.NavigationAgent3D): number
+---@field get_avoidance_enabled fun(self: Godot.NavigationAgent3D): boolean
+---@field get_avoidance_layer_value fun(self: Godot.NavigationAgent3D, layer_number: integer): boolean
+---@field get_avoidance_layers fun(self: Godot.NavigationAgent3D): integer
+---@field get_avoidance_mask fun(self: Godot.NavigationAgent3D): integer
+---@field get_avoidance_mask_value fun(self: Godot.NavigationAgent3D, mask_number: integer): boolean
+---@field get_avoidance_priority fun(self: Godot.NavigationAgent3D): number
+---@field get_current_navigation_path fun(self: Godot.NavigationAgent3D): table
+---@field get_current_navigation_path_index fun(self: Godot.NavigationAgent3D): integer
+---@field get_current_navigation_result fun(self: Godot.NavigationAgent3D): Godot.NavigationPathQueryResult3D
+---@field get_debug_enabled fun(self: Godot.NavigationAgent3D): boolean
+---@field get_debug_path_custom_color fun(self: Godot.NavigationAgent3D): Godot.Color
+---@field get_debug_path_custom_point_size fun(self: Godot.NavigationAgent3D): number
+---@field get_debug_use_custom fun(self: Godot.NavigationAgent3D): boolean
+---@field get_final_position fun(self: Godot.NavigationAgent3D): Godot.Vector3
+---@field get_height fun(self: Godot.NavigationAgent3D): number
+---@field get_keep_y_velocity fun(self: Godot.NavigationAgent3D): boolean
+---@field get_max_neighbors fun(self: Godot.NavigationAgent3D): integer
+---@field get_max_speed fun(self: Godot.NavigationAgent3D): number
+---@field get_navigation_layer_value fun(self: Godot.NavigationAgent3D, layer_number: integer): boolean
+---@field get_navigation_layers fun(self: Godot.NavigationAgent3D): integer
+---@field get_navigation_map fun(self: Godot.NavigationAgent3D): Godot.Rid
+---@field get_neighbor_distance fun(self: Godot.NavigationAgent3D): number
+---@field get_next_path_position fun(self: Godot.NavigationAgent3D): Godot.Vector3
+---@field get_path_desired_distance fun(self: Godot.NavigationAgent3D): number
+---@field get_path_height_offset fun(self: Godot.NavigationAgent3D): number
+---@field get_path_length fun(self: Godot.NavigationAgent3D): number
+---@field get_path_max_distance fun(self: Godot.NavigationAgent3D): number
+---@field get_path_metadata_flags fun(self: Godot.NavigationAgent3D): integer
+---@field get_path_postprocessing fun(self: Godot.NavigationAgent3D): integer
+---@field get_path_return_max_length fun(self: Godot.NavigationAgent3D): number
+---@field get_path_return_max_radius fun(self: Godot.NavigationAgent3D): number
+---@field get_path_search_max_distance fun(self: Godot.NavigationAgent3D): number
+---@field get_path_search_max_polygons fun(self: Godot.NavigationAgent3D): integer
+---@field get_pathfinding_algorithm fun(self: Godot.NavigationAgent3D): integer
+---@field get_radius fun(self: Godot.NavigationAgent3D): number
+---@field get_rid fun(self: Godot.NavigationAgent3D): Godot.Rid
+---@field get_simplify_epsilon fun(self: Godot.NavigationAgent3D): number
+---@field get_simplify_path fun(self: Godot.NavigationAgent3D): boolean
+---@field get_target_desired_distance fun(self: Godot.NavigationAgent3D): number
+---@field get_target_position fun(self: Godot.NavigationAgent3D): Godot.Vector3
+---@field get_time_horizon_agents fun(self: Godot.NavigationAgent3D): number
+---@field get_time_horizon_obstacles fun(self: Godot.NavigationAgent3D): number
+---@field get_use_3d_avoidance fun(self: Godot.NavigationAgent3D): boolean
+---@field get_velocity fun(self: Godot.NavigationAgent3D): Godot.Vector3
+---@field is_navigation_finished fun(self: Godot.NavigationAgent3D): boolean
+---@field is_target_reachable fun(self: Godot.NavigationAgent3D): boolean
+---@field is_target_reached fun(self: Godot.NavigationAgent3D): boolean
+---@field set_avoidance_enabled fun(self: Godot.NavigationAgent3D, enabled: boolean)
+---@field set_avoidance_layer_value fun(self: Godot.NavigationAgent3D, layer_number: integer, value: boolean)
+---@field set_avoidance_layers fun(self: Godot.NavigationAgent3D, layers: integer)
+---@field set_avoidance_mask fun(self: Godot.NavigationAgent3D, mask: integer)
+---@field set_avoidance_mask_value fun(self: Godot.NavigationAgent3D, mask_number: integer, value: boolean)
+---@field set_avoidance_priority fun(self: Godot.NavigationAgent3D, priority: number)
+---@field set_debug_enabled fun(self: Godot.NavigationAgent3D, enabled: boolean)
+---@field set_debug_path_custom_color fun(self: Godot.NavigationAgent3D, color: Godot.Color)
+---@field set_debug_path_custom_point_size fun(self: Godot.NavigationAgent3D, point_size: number)
+---@field set_debug_use_custom fun(self: Godot.NavigationAgent3D, enabled: boolean)
+---@field set_height fun(self: Godot.NavigationAgent3D, height: number)
+---@field set_keep_y_velocity fun(self: Godot.NavigationAgent3D, enabled: boolean)
+---@field set_max_neighbors fun(self: Godot.NavigationAgent3D, max_neighbors: integer)
+---@field set_max_speed fun(self: Godot.NavigationAgent3D, max_speed: number)
+---@field set_navigation_layer_value fun(self: Godot.NavigationAgent3D, layer_number: integer, value: boolean)
+---@field set_navigation_layers fun(self: Godot.NavigationAgent3D, navigation_layers: integer)
+---@field set_navigation_map fun(self: Godot.NavigationAgent3D, navigation_map: Godot.Rid)
+---@field set_neighbor_distance fun(self: Godot.NavigationAgent3D, neighbor_distance: number)
+---@field set_path_desired_distance fun(self: Godot.NavigationAgent3D, desired_distance: number)
+---@field set_path_height_offset fun(self: Godot.NavigationAgent3D, path_height_offset: number)
+---@field set_path_max_distance fun(self: Godot.NavigationAgent3D, max_speed: number)
+---@field set_path_metadata_flags fun(self: Godot.NavigationAgent3D, flags: integer)
+---@field set_path_postprocessing fun(self: Godot.NavigationAgent3D, path_postprocessing: integer)
+---@field set_path_return_max_length fun(self: Godot.NavigationAgent3D, length: number)
+---@field set_path_return_max_radius fun(self: Godot.NavigationAgent3D, radius: number)
+---@field set_path_search_max_distance fun(self: Godot.NavigationAgent3D, distance: number)
+---@field set_path_search_max_polygons fun(self: Godot.NavigationAgent3D, max_polygons: integer)
+---@field set_pathfinding_algorithm fun(self: Godot.NavigationAgent3D, pathfinding_algorithm: integer)
+---@field set_radius fun(self: Godot.NavigationAgent3D, radius: number)
+---@field set_simplify_epsilon fun(self: Godot.NavigationAgent3D, epsilon: number)
+---@field set_simplify_path fun(self: Godot.NavigationAgent3D, enabled: boolean)
+---@field set_target_desired_distance fun(self: Godot.NavigationAgent3D, desired_distance: number)
+---@field set_target_position fun(self: Godot.NavigationAgent3D, position: Godot.Vector3)
+---@field set_time_horizon_agents fun(self: Godot.NavigationAgent3D, time_horizon: number)
+---@field set_time_horizon_obstacles fun(self: Godot.NavigationAgent3D, time_horizon: number)
+---@field set_use_3d_avoidance fun(self: Godot.NavigationAgent3D, enabled: boolean)
+---@field set_velocity fun(self: Godot.NavigationAgent3D, velocity: Godot.Vector3)
+---@field set_velocity_forced fun(self: Godot.NavigationAgent3D, velocity: Godot.Vector3)
+---@class Godot.NavigationAgent3D.__type
+---@field new fun(): Godot.NavigationAgent3D
+
+---@class Godot.NavigationLink2D : Godot.Node2D
+---@field bidirectional boolean
+---@field enabled boolean
+---@field end_position Godot.Vector2
+---@field enter_cost number
+---@field navigation_layers integer
+---@field start_position Godot.Vector2
+---@field travel_cost number
+---@field get_end_position fun(self: Godot.NavigationLink2D): Godot.Vector2
+---@field get_enter_cost fun(self: Godot.NavigationLink2D): number
+---@field get_global_end_position fun(self: Godot.NavigationLink2D): Godot.Vector2
+---@field get_global_start_position fun(self: Godot.NavigationLink2D): Godot.Vector2
+---@field get_navigation_layer_value fun(self: Godot.NavigationLink2D, layer_number: integer): boolean
+---@field get_navigation_layers fun(self: Godot.NavigationLink2D): integer
+---@field get_navigation_map fun(self: Godot.NavigationLink2D): Godot.Rid
+---@field get_rid fun(self: Godot.NavigationLink2D): Godot.Rid
+---@field get_start_position fun(self: Godot.NavigationLink2D): Godot.Vector2
+---@field get_travel_cost fun(self: Godot.NavigationLink2D): number
+---@field is_bidirectional fun(self: Godot.NavigationLink2D): boolean
+---@field is_enabled fun(self: Godot.NavigationLink2D): boolean
+---@field set_bidirectional fun(self: Godot.NavigationLink2D, bidirectional: boolean)
+---@field set_enabled fun(self: Godot.NavigationLink2D, enabled: boolean)
+---@field set_end_position fun(self: Godot.NavigationLink2D, position: Godot.Vector2)
+---@field set_enter_cost fun(self: Godot.NavigationLink2D, enter_cost: number)
+---@field set_global_end_position fun(self: Godot.NavigationLink2D, position: Godot.Vector2)
+---@field set_global_start_position fun(self: Godot.NavigationLink2D, position: Godot.Vector2)
+---@field set_navigation_layer_value fun(self: Godot.NavigationLink2D, layer_number: integer, value: boolean)
+---@field set_navigation_layers fun(self: Godot.NavigationLink2D, navigation_layers: integer)
+---@field set_navigation_map fun(self: Godot.NavigationLink2D, navigation_map: Godot.Rid)
+---@field set_start_position fun(self: Godot.NavigationLink2D, position: Godot.Vector2)
+---@field set_travel_cost fun(self: Godot.NavigationLink2D, travel_cost: number)
+---@class Godot.NavigationLink2D.__type
+---@field new fun(): Godot.NavigationLink2D
+
+---@class Godot.NavigationLink3D : Godot.Node3D
+---@field bidirectional boolean
+---@field enabled boolean
+---@field end_position Godot.Vector3
+---@field enter_cost number
+---@field navigation_layers integer
+---@field start_position Godot.Vector3
+---@field travel_cost number
+---@field get_end_position fun(self: Godot.NavigationLink3D): Godot.Vector3
+---@field get_enter_cost fun(self: Godot.NavigationLink3D): number
+---@field get_global_end_position fun(self: Godot.NavigationLink3D): Godot.Vector3
+---@field get_global_start_position fun(self: Godot.NavigationLink3D): Godot.Vector3
+---@field get_navigation_layer_value fun(self: Godot.NavigationLink3D, layer_number: integer): boolean
+---@field get_navigation_layers fun(self: Godot.NavigationLink3D): integer
+---@field get_navigation_map fun(self: Godot.NavigationLink3D): Godot.Rid
+---@field get_rid fun(self: Godot.NavigationLink3D): Godot.Rid
+---@field get_start_position fun(self: Godot.NavigationLink3D): Godot.Vector3
+---@field get_travel_cost fun(self: Godot.NavigationLink3D): number
+---@field is_bidirectional fun(self: Godot.NavigationLink3D): boolean
+---@field is_enabled fun(self: Godot.NavigationLink3D): boolean
+---@field set_bidirectional fun(self: Godot.NavigationLink3D, bidirectional: boolean)
+---@field set_enabled fun(self: Godot.NavigationLink3D, enabled: boolean)
+---@field set_end_position fun(self: Godot.NavigationLink3D, position: Godot.Vector3)
+---@field set_enter_cost fun(self: Godot.NavigationLink3D, enter_cost: number)
+---@field set_global_end_position fun(self: Godot.NavigationLink3D, position: Godot.Vector3)
+---@field set_global_start_position fun(self: Godot.NavigationLink3D, position: Godot.Vector3)
+---@field set_navigation_layer_value fun(self: Godot.NavigationLink3D, layer_number: integer, value: boolean)
+---@field set_navigation_layers fun(self: Godot.NavigationLink3D, navigation_layers: integer)
+---@field set_navigation_map fun(self: Godot.NavigationLink3D, navigation_map: Godot.Rid)
+---@field set_start_position fun(self: Godot.NavigationLink3D, position: Godot.Vector3)
+---@field set_travel_cost fun(self: Godot.NavigationLink3D, travel_cost: number)
+---@class Godot.NavigationLink3D.__type
+---@field new fun(): Godot.NavigationLink3D
+
+---@class Godot.NavigationObstacle2D : Godot.Node2D
+---@field affect_navigation_mesh boolean
+---@field avoidance_enabled boolean
+---@field avoidance_layers integer
+---@field carve_navigation_mesh boolean
+---@field radius number
+---@field velocity Godot.Vector2
+---@field vertices table
+---@field get_affect_navigation_mesh fun(self: Godot.NavigationObstacle2D): boolean
+---@field get_avoidance_enabled fun(self: Godot.NavigationObstacle2D): boolean
+---@field get_avoidance_layer_value fun(self: Godot.NavigationObstacle2D, layer_number: integer): boolean
+---@field get_avoidance_layers fun(self: Godot.NavigationObstacle2D): integer
+---@field get_carve_navigation_mesh fun(self: Godot.NavigationObstacle2D): boolean
+---@field get_navigation_map fun(self: Godot.NavigationObstacle2D): Godot.Rid
+---@field get_radius fun(self: Godot.NavigationObstacle2D): number
+---@field get_rid fun(self: Godot.NavigationObstacle2D): Godot.Rid
+---@field get_velocity fun(self: Godot.NavigationObstacle2D): Godot.Vector2
+---@field get_vertices fun(self: Godot.NavigationObstacle2D): table
+---@field set_affect_navigation_mesh fun(self: Godot.NavigationObstacle2D, enabled: boolean)
+---@field set_avoidance_enabled fun(self: Godot.NavigationObstacle2D, enabled: boolean)
+---@field set_avoidance_layer_value fun(self: Godot.NavigationObstacle2D, layer_number: integer, value: boolean)
+---@field set_avoidance_layers fun(self: Godot.NavigationObstacle2D, layers: integer)
+---@field set_carve_navigation_mesh fun(self: Godot.NavigationObstacle2D, enabled: boolean)
+---@field set_navigation_map fun(self: Godot.NavigationObstacle2D, navigation_map: Godot.Rid)
+---@field set_radius fun(self: Godot.NavigationObstacle2D, radius: number)
+---@field set_velocity fun(self: Godot.NavigationObstacle2D, velocity: Godot.Vector2)
+---@field set_vertices fun(self: Godot.NavigationObstacle2D, vertices: table)
+---@class Godot.NavigationObstacle2D.__type
+---@field new fun(): Godot.NavigationObstacle2D
+
+---@class Godot.NavigationObstacle3D : Godot.Node3D
+---@field affect_navigation_mesh boolean
+---@field avoidance_enabled boolean
+---@field avoidance_layers integer
+---@field carve_navigation_mesh boolean
+---@field height number
+---@field radius number
+---@field use_3d_avoidance boolean
+---@field velocity Godot.Vector3
+---@field vertices table
+---@field get_affect_navigation_mesh fun(self: Godot.NavigationObstacle3D): boolean
+---@field get_avoidance_enabled fun(self: Godot.NavigationObstacle3D): boolean
+---@field get_avoidance_layer_value fun(self: Godot.NavigationObstacle3D, layer_number: integer): boolean
+---@field get_avoidance_layers fun(self: Godot.NavigationObstacle3D): integer
+---@field get_carve_navigation_mesh fun(self: Godot.NavigationObstacle3D): boolean
+---@field get_height fun(self: Godot.NavigationObstacle3D): number
+---@field get_navigation_map fun(self: Godot.NavigationObstacle3D): Godot.Rid
+---@field get_radius fun(self: Godot.NavigationObstacle3D): number
+---@field get_rid fun(self: Godot.NavigationObstacle3D): Godot.Rid
+---@field get_use_3d_avoidance fun(self: Godot.NavigationObstacle3D): boolean
+---@field get_velocity fun(self: Godot.NavigationObstacle3D): Godot.Vector3
+---@field get_vertices fun(self: Godot.NavigationObstacle3D): table
+---@field set_affect_navigation_mesh fun(self: Godot.NavigationObstacle3D, enabled: boolean)
+---@field set_avoidance_enabled fun(self: Godot.NavigationObstacle3D, enabled: boolean)
+---@field set_avoidance_layer_value fun(self: Godot.NavigationObstacle3D, layer_number: integer, value: boolean)
+---@field set_avoidance_layers fun(self: Godot.NavigationObstacle3D, layers: integer)
+---@field set_carve_navigation_mesh fun(self: Godot.NavigationObstacle3D, enabled: boolean)
+---@field set_height fun(self: Godot.NavigationObstacle3D, height: number)
+---@field set_navigation_map fun(self: Godot.NavigationObstacle3D, navigation_map: Godot.Rid)
+---@field set_radius fun(self: Godot.NavigationObstacle3D, radius: number)
+---@field set_use_3d_avoidance fun(self: Godot.NavigationObstacle3D, enabled: boolean)
+---@field set_velocity fun(self: Godot.NavigationObstacle3D, velocity: Godot.Vector3)
+---@field set_vertices fun(self: Godot.NavigationObstacle3D, vertices: table)
+---@class Godot.NavigationObstacle3D.__type
+---@field new fun(): Godot.NavigationObstacle3D
+
+---@class Godot.NavigationRegion2D : Godot.Node2D
+---@field enabled boolean
+---@field enter_cost number
+---@field navigation_layers integer
+---@field navigation_polygon Godot.NavigationPolygon
+---@field travel_cost number
+---@field use_edge_connections boolean
+---@field bake_finished Godot.Signal
+---@field navigation_polygon_changed Godot.Signal
+---@field bake_navigation_polygon fun(self: Godot.NavigationRegion2D, on_thread: boolean)
+---@field get_bounds fun(self: Godot.NavigationRegion2D): Godot.Rect2
+---@field get_enter_cost fun(self: Godot.NavigationRegion2D): number
+---@field get_navigation_layer_value fun(self: Godot.NavigationRegion2D, layer_number: integer): boolean
+---@field get_navigation_layers fun(self: Godot.NavigationRegion2D): integer
+---@field get_navigation_map fun(self: Godot.NavigationRegion2D): Godot.Rid
+---@field get_navigation_polygon fun(self: Godot.NavigationRegion2D): Godot.NavigationPolygon
+---@field get_region_rid fun(self: Godot.NavigationRegion2D): Godot.Rid
+---@field get_rid fun(self: Godot.NavigationRegion2D): Godot.Rid
+---@field get_travel_cost fun(self: Godot.NavigationRegion2D): number
+---@field get_use_edge_connections fun(self: Godot.NavigationRegion2D): boolean
+---@field is_baking fun(self: Godot.NavigationRegion2D): boolean
+---@field is_enabled fun(self: Godot.NavigationRegion2D): boolean
+---@field set_enabled fun(self: Godot.NavigationRegion2D, enabled: boolean)
+---@field set_enter_cost fun(self: Godot.NavigationRegion2D, enter_cost: number)
+---@field set_navigation_layer_value fun(self: Godot.NavigationRegion2D, layer_number: integer, value: boolean)
+---@field set_navigation_layers fun(self: Godot.NavigationRegion2D, navigation_layers: integer)
+---@field set_navigation_map fun(self: Godot.NavigationRegion2D, navigation_map: Godot.Rid)
+---@field set_navigation_polygon fun(self: Godot.NavigationRegion2D, navigation_polygon: Godot.NavigationPolygon)
+---@field set_travel_cost fun(self: Godot.NavigationRegion2D, travel_cost: number)
+---@field set_use_edge_connections fun(self: Godot.NavigationRegion2D, enabled: boolean)
+---@class Godot.NavigationRegion2D.__type
+---@field new fun(): Godot.NavigationRegion2D
+
+---@class Godot.NavigationRegion3D : Godot.Node3D
+---@field enabled boolean
+---@field enter_cost number
+---@field navigation_layers integer
+---@field navigation_mesh Godot.NavigationMesh
+---@field travel_cost number
+---@field use_edge_connections boolean
+---@field bake_finished Godot.Signal
+---@field navigation_mesh_changed Godot.Signal
+---@field bake_navigation_mesh fun(self: Godot.NavigationRegion3D, on_thread: boolean)
+---@field get_bounds fun(self: Godot.NavigationRegion3D): Godot.Aabb
+---@field get_enter_cost fun(self: Godot.NavigationRegion3D): number
+---@field get_navigation_layer_value fun(self: Godot.NavigationRegion3D, layer_number: integer): boolean
+---@field get_navigation_layers fun(self: Godot.NavigationRegion3D): integer
+---@field get_navigation_map fun(self: Godot.NavigationRegion3D): Godot.Rid
+---@field get_navigation_mesh fun(self: Godot.NavigationRegion3D): Godot.NavigationMesh
+---@field get_region_rid fun(self: Godot.NavigationRegion3D): Godot.Rid
+---@field get_rid fun(self: Godot.NavigationRegion3D): Godot.Rid
+---@field get_travel_cost fun(self: Godot.NavigationRegion3D): number
+---@field get_use_edge_connections fun(self: Godot.NavigationRegion3D): boolean
+---@field is_baking fun(self: Godot.NavigationRegion3D): boolean
+---@field is_enabled fun(self: Godot.NavigationRegion3D): boolean
+---@field set_enabled fun(self: Godot.NavigationRegion3D, enabled: boolean)
+---@field set_enter_cost fun(self: Godot.NavigationRegion3D, enter_cost: number)
+---@field set_navigation_layer_value fun(self: Godot.NavigationRegion3D, layer_number: integer, value: boolean)
+---@field set_navigation_layers fun(self: Godot.NavigationRegion3D, navigation_layers: integer)
+---@field set_navigation_map fun(self: Godot.NavigationRegion3D, navigation_map: Godot.Rid)
+---@field set_navigation_mesh fun(self: Godot.NavigationRegion3D, navigation_mesh: Godot.NavigationMesh)
+---@field set_travel_cost fun(self: Godot.NavigationRegion3D, travel_cost: number)
+---@field set_use_edge_connections fun(self: Godot.NavigationRegion3D, enabled: boolean)
+---@class Godot.NavigationRegion3D.__type
+---@field new fun(): Godot.NavigationRegion3D
+
+---@class Godot.NinePatchRect : Godot.Control
+---@field axis_stretch_horizontal integer
+---@field axis_stretch_vertical integer
+---@field draw_center boolean
+---@field patch_margin_bottom integer
+---@field patch_margin_left integer
+---@field patch_margin_right integer
+---@field patch_margin_top integer
+---@field region_rect Godot.Rect2
+---@field texture Godot.Texture2D
+---@field texture_changed Godot.Signal
+---@field get_h_axis_stretch_mode fun(self: Godot.NinePatchRect): integer
+---@field get_patch_margin fun(self: Godot.NinePatchRect, margin: integer): integer
+---@field get_region_rect fun(self: Godot.NinePatchRect): Godot.Rect2
+---@field get_texture fun(self: Godot.NinePatchRect): Godot.Texture2D
+---@field get_v_axis_stretch_mode fun(self: Godot.NinePatchRect): integer
+---@field is_draw_center_enabled fun(self: Godot.NinePatchRect): boolean
+---@field set_draw_center fun(self: Godot.NinePatchRect, draw_center: boolean)
+---@field set_h_axis_stretch_mode fun(self: Godot.NinePatchRect, mode: integer)
+---@field set_patch_margin fun(self: Godot.NinePatchRect, margin: integer, value: integer)
+---@field set_region_rect fun(self: Godot.NinePatchRect, rect: Godot.Rect2)
+---@field set_texture fun(self: Godot.NinePatchRect, texture: Godot.Texture2D)
+---@field set_v_axis_stretch_mode fun(self: Godot.NinePatchRect, mode: integer)
+---@class Godot.NinePatchRect.__type
+---@field new fun(): Godot.NinePatchRect
+---@field AxisStretchMode Godot.NinePatchRect.AxisStretchMode
+---@class Godot.NinePatchRect.AxisStretchMode
+---@field Stretch integer
+---@field Tile integer
+---@field TileFit integer
+
+---@class Godot.Node : Godot.GodotObject
+---@field auto_translate_mode integer
+---@field editor_description string
+---@field multiplayer Godot.MultiplayerAPI
+---@field name string
+---@field owner Godot.Node
+---@field physics_interpolation_mode integer
+---@field process_mode integer
+---@field process_physics_priority integer
+---@field process_priority integer
+---@field process_thread_group integer
+---@field process_thread_group_order integer
+---@field process_thread_messages integer
+---@field scene_file_path string
+---@field unique_name_in_owner boolean
+---@field child_entered_tree Godot.Signal
+---@field child_exiting_tree Godot.Signal
+---@field child_order_changed Godot.Signal
+---@field editor_description_changed Godot.Signal
+---@field editor_state_changed Godot.Signal
+---@field ready Godot.Signal
+---@field renamed Godot.Signal
+---@field replacing_by Godot.Signal
+---@field tree_entered Godot.Signal
+---@field tree_exited Godot.Signal
+---@field tree_exiting Godot.Signal
+---@field add_child fun(self: Godot.Node, node: Godot.Node, force_readable_name: boolean, internal: integer)
+---@field add_sibling fun(self: Godot.Node, sibling: Godot.Node, force_readable_name: boolean)
+---@field add_to_group fun(self: Godot.Node, group: string, persistent: boolean)
+---@field atr fun(self: Godot.Node, message: string, context: string): string
+---@field atr_n fun(self: Godot.Node, message: string, plural_message: string, n: integer, context: string): string
+---@field call_deferred_thread_group fun(self: Godot.Node, method: string)
+---@field call_thread_safe fun(self: Godot.Node, method: string)
+---@field can_auto_translate fun(self: Godot.Node): boolean
+---@field can_process fun(self: Godot.Node): boolean
+---@field create_tween fun(self: Godot.Node): Godot.Tween
+---@field duplicate fun(self: Godot.Node, flags: integer): Godot.Node
+---@field find_child fun(self: Godot.Node, pattern: string, recursive: boolean, owned: boolean): Godot.Node
+---@field find_children fun(self: Godot.Node, pattern: string, type: string, recursive: boolean, owned: boolean): table
+---@field find_parent fun(self: Godot.Node, pattern: string): Godot.Node
+---@field get_accessibility_element fun(self: Godot.Node): Godot.Rid
+---@field get_auto_translate_mode fun(self: Godot.Node): integer
+---@field get_child fun(self: Godot.Node, idx: integer, include_internal: boolean): Godot.Node
+---@field get_child_count fun(self: Godot.Node, include_internal: boolean): integer
+---@field get_children fun(self: Godot.Node, include_internal: boolean): table
+---@field get_editor_description fun(self: Godot.Node): string
+---@field get_groups fun(self: Godot.Node): table
+---@field get_index fun(self: Godot.Node, include_internal: boolean): integer
+---@field get_last_exclusive_window fun(self: Godot.Node): Godot.Window
+---@field get_multiplayer fun(self: Godot.Node): Godot.MultiplayerAPI
+---@field get_multiplayer_authority fun(self: Godot.Node): integer
+---@field get_name fun(self: Godot.Node): string
+---@field get_node fun(self: Godot.Node, path: string): Godot.Node
+---@field get_node_and_resource fun(self: Godot.Node, path: string): table
+---@field get_node_or_null fun(self: Godot.Node, path: string): Godot.Node
+---@field get_node_rpc_config fun(self: Godot.Node)
+---@field get_owner fun(self: Godot.Node): Godot.Node
+---@field get_parent fun(self: Godot.Node): Godot.Node
+---@field get_path fun(self: Godot.Node): string
+---@field get_path_to fun(self: Godot.Node, node: Godot.Node, use_unique_path: boolean): string
+---@field get_physics_interpolation_mode fun(self: Godot.Node): integer
+---@field get_physics_process_delta_time fun(self: Godot.Node): number
+---@field get_physics_process_priority fun(self: Godot.Node): integer
+---@field get_process_delta_time fun(self: Godot.Node): number
+---@field get_process_mode fun(self: Godot.Node): integer
+---@field get_process_priority fun(self: Godot.Node): integer
+---@field get_process_thread_group fun(self: Godot.Node): integer
+---@field get_process_thread_group_order fun(self: Godot.Node): integer
+---@field get_process_thread_messages fun(self: Godot.Node): integer
+---@field get_scene_file_path fun(self: Godot.Node): string
+---@field get_scene_instance_load_placeholder fun(self: Godot.Node): boolean
+---@field get_tree fun(self: Godot.Node): Godot.SceneTree
+---@field get_tree_string fun(self: Godot.Node): string
+---@field get_tree_string_pretty fun(self: Godot.Node): string
+---@field get_viewport fun(self: Godot.Node): Godot.Viewport
+---@field get_window fun(self: Godot.Node): Godot.Window
+---@field has_node fun(self: Godot.Node, path: string): boolean
+---@field has_node_and_resource fun(self: Godot.Node, path: string): boolean
+---@field is_ancestor_of fun(self: Godot.Node, node: Godot.Node): boolean
+---@field is_displayed_folded fun(self: Godot.Node): boolean
+---@field is_editable_instance fun(self: Godot.Node, node: Godot.Node): boolean
+---@field is_greater_than fun(self: Godot.Node, node: Godot.Node): boolean
+---@field is_in_group fun(self: Godot.Node, group: string): boolean
+---@field is_inside_tree fun(self: Godot.Node): boolean
+---@field is_multiplayer_authority fun(self: Godot.Node): boolean
+---@field is_node_ready fun(self: Godot.Node): boolean
+---@field is_part_of_edited_scene fun(self: Godot.Node): boolean
+---@field is_physics_interpolated fun(self: Godot.Node): boolean
+---@field is_physics_interpolated_and_enabled fun(self: Godot.Node): boolean
+---@field is_physics_processing fun(self: Godot.Node): boolean
+---@field is_physics_processing_internal fun(self: Godot.Node): boolean
+---@field is_processing fun(self: Godot.Node): boolean
+---@field is_processing_input fun(self: Godot.Node): boolean
+---@field is_processing_internal fun(self: Godot.Node): boolean
+---@field is_processing_shortcut_input fun(self: Godot.Node): boolean
+---@field is_processing_unhandled_input fun(self: Godot.Node): boolean
+---@field is_processing_unhandled_key_input fun(self: Godot.Node): boolean
+---@field is_unique_name_in_owner fun(self: Godot.Node): boolean
+---@field move_child fun(self: Godot.Node, child_node: Godot.Node, to_index: integer)
+---@field notify_deferred_thread_group fun(self: Godot.Node, what: integer)
+---@field notify_thread_safe fun(self: Godot.Node, what: integer)
+---@field print_tree fun(self: Godot.Node)
+---@field print_tree_pretty fun(self: Godot.Node)
+---@field propagate_call fun(self: Godot.Node, method: string, args: table, parent_first: boolean)
+---@field propagate_notification fun(self: Godot.Node, what: integer)
+---@field queue_accessibility_update fun(self: Godot.Node)
+---@field queue_free fun(self: Godot.Node)
+---@field remove_child fun(self: Godot.Node, node: Godot.Node)
+---@field remove_from_group fun(self: Godot.Node, group: string)
+---@field reparent fun(self: Godot.Node, new_parent: Godot.Node, keep_global_transform: boolean)
+---@field replace_by fun(self: Godot.Node, node: Godot.Node, keep_groups: boolean)
+---@field request_ready fun(self: Godot.Node)
+---@field reset_physics_interpolation fun(self: Godot.Node)
+---@field rpc fun(self: Godot.Node, method: string): integer
+---@field rpc_config fun(self: Godot.Node, method: string, config: any)
+---@field rpc_id fun(self: Godot.Node, peer_id: integer, method: string): integer
+---@field set_auto_translate_mode fun(self: Godot.Node, mode: integer)
+---@field set_deferred_thread_group fun(self: Godot.Node, property: string, value: any)
+---@field set_display_folded fun(self: Godot.Node, fold: boolean)
+---@field set_editable_instance fun(self: Godot.Node, node: Godot.Node, is_editable: boolean)
+---@field set_editor_description fun(self: Godot.Node, editor_description: string)
+---@field set_multiplayer_authority fun(self: Godot.Node, id: integer, recursive: boolean)
+---@field set_name fun(self: Godot.Node, name: string)
+---@field set_owner fun(self: Godot.Node, owner: Godot.Node)
+---@field set_physics_interpolation_mode fun(self: Godot.Node, mode: integer)
+---@field set_physics_process fun(self: Godot.Node, enable: boolean)
+---@field set_physics_process_internal fun(self: Godot.Node, enable: boolean)
+---@field set_physics_process_priority fun(self: Godot.Node, priority: integer)
+---@field set_process fun(self: Godot.Node, enable: boolean)
+---@field set_process_input fun(self: Godot.Node, enable: boolean)
+---@field set_process_internal fun(self: Godot.Node, enable: boolean)
+---@field set_process_mode fun(self: Godot.Node, mode: integer)
+---@field set_process_priority fun(self: Godot.Node, priority: integer)
+---@field set_process_shortcut_input fun(self: Godot.Node, enable: boolean)
+---@field set_process_thread_group fun(self: Godot.Node, mode: integer)
+---@field set_process_thread_group_order fun(self: Godot.Node, order: integer)
+---@field set_process_thread_messages fun(self: Godot.Node, flags: integer)
+---@field set_process_unhandled_input fun(self: Godot.Node, enable: boolean)
+---@field set_process_unhandled_key_input fun(self: Godot.Node, enable: boolean)
+---@field set_scene_file_path fun(self: Godot.Node, scene_file_path: string)
+---@field set_scene_instance_load_placeholder fun(self: Godot.Node, load_placeholder: boolean)
+---@field set_thread_safe fun(self: Godot.Node, property: string, value: any)
+---@field set_translation_domain_inherited fun(self: Godot.Node)
+---@field set_unique_name_in_owner fun(self: Godot.Node, enable: boolean)
+---@field update_configuration_warnings fun(self: Godot.Node)
+---@class Godot.Node.__type
+---@field new fun(): Godot.Node
+---@field PrintOrphanNodes fun()
+---@field NotificationEnterTree integer
+---@field NotificationExitTree integer
+---@field NotificationMovedInParent integer
+---@field NotificationReady integer
+---@field NotificationPaused integer
+---@field NotificationUnpaused integer
+---@field NotificationPhysicsProcess integer
+---@field NotificationProcess integer
+---@field NotificationParented integer
+---@field NotificationUnparented integer
+---@field NotificationSceneInstantiated integer
+---@field NotificationDragBegin integer
+---@field NotificationDragEnd integer
+---@field NotificationPathRenamed integer
+---@field NotificationChildOrderChanged integer
+---@field NotificationInternalProcess integer
+---@field NotificationInternalPhysicsProcess integer
+---@field NotificationPostEnterTree integer
+---@field NotificationDisabled integer
+---@field NotificationEnabled integer
+---@field NotificationResetPhysicsInterpolation integer
+---@field NotificationEditorPreSave integer
+---@field NotificationEditorPostSave integer
+---@field NotificationWMMouseEnter integer
+---@field NotificationWMMouseExit integer
+---@field NotificationWMWindowFocusIn integer
+---@field NotificationWMWindowFocusOut integer
+---@field NotificationWMCloseRequest integer
+---@field NotificationWMGoBackRequest integer
+---@field NotificationWMSizeChanged integer
+---@field NotificationWMDpiChange integer
+---@field NotificationVpMouseEnter integer
+---@field NotificationVpMouseExit integer
+---@field NotificationWMPositionChanged integer
+---@field NotificationOsMemoryWarning integer
+---@field NotificationTranslationChanged integer
+---@field NotificationWMAbout integer
+---@field NotificationCrash integer
+---@field NotificationOsImeUpdate integer
+---@field NotificationApplicationResumed integer
+---@field NotificationApplicationPaused integer
+---@field NotificationApplicationFocusIn integer
+---@field NotificationApplicationFocusOut integer
+---@field NotificationTextServerChanged integer
+---@field NotificationAccessibilityUpdate integer
+---@field NotificationAccessibilityInvalidate integer
+---@field AutoTranslateModeEnum Godot.Node.AutoTranslateModeEnum
+---@field DuplicateFlags Godot.Node.DuplicateFlags
+---@field InternalMode Godot.Node.InternalMode
+---@field PhysicsInterpolationModeEnum Godot.Node.PhysicsInterpolationModeEnum
+---@field ProcessModeEnum Godot.Node.ProcessModeEnum
+---@field ProcessThreadGroupEnum Godot.Node.ProcessThreadGroupEnum
+---@field ProcessThreadMessagesEnum Godot.Node.ProcessThreadMessagesEnum
+---@class Godot.Node.AutoTranslateModeEnum
+---@field Inherit integer
+---@field Always integer
+---@field Disabled integer
+---@class Godot.Node.DuplicateFlags
+---@field Signals integer
+---@field Groups integer
+---@field Scripts integer
+---@field UseInstantiation integer
+---@field Default integer
+---@field InternalState integer
+---@class Godot.Node.InternalMode
+---@field Disabled integer
+---@field Front integer
+---@field Back integer
+---@class Godot.Node.PhysicsInterpolationModeEnum
+---@field Inherit integer
+---@field On integer
+---@field Off integer
+---@class Godot.Node.ProcessModeEnum
+---@field Inherit integer
+---@field Pausable integer
+---@field WhenPaused integer
+---@field Always integer
+---@field Disabled integer
+---@class Godot.Node.ProcessThreadGroupEnum
+---@field Inherit integer
+---@field MainThread integer
+---@field SubThread integer
+---@class Godot.Node.ProcessThreadMessagesEnum
+---@field Messages integer
+---@field MessagesPhysics integer
+---@field MessagesAll integer
+
+---@class Godot.Node2D : Godot.CanvasItem
+---@field global_position Godot.Vector2
+---@field global_rotation number
+---@field global_rotation_degrees number
+---@field global_scale Godot.Vector2
+---@field global_skew number
+---@field global_transform Godot.Transform2D
+---@field position Godot.Vector2
+---@field rotation number
+---@field rotation_degrees number
+---@field scale Godot.Vector2
+---@field skew number
+---@field transform Godot.Transform2D
+---@field apply_scale fun(self: Godot.Node2D, ratio: Godot.Vector2)
+---@field get_angle_to fun(self: Godot.Node2D, point: Godot.Vector2): number
+---@field get_global_position fun(self: Godot.Node2D): Godot.Vector2
+---@field get_global_rotation fun(self: Godot.Node2D): number
+---@field get_global_rotation_degrees fun(self: Godot.Node2D): number
+---@field get_global_scale fun(self: Godot.Node2D): Godot.Vector2
+---@field get_global_skew fun(self: Godot.Node2D): number
+---@field get_position fun(self: Godot.Node2D): Godot.Vector2
+---@field get_relative_transform_to_parent fun(self: Godot.Node2D, parent: Godot.Node): Godot.Transform2D
+---@field get_rotation fun(self: Godot.Node2D): number
+---@field get_rotation_degrees fun(self: Godot.Node2D): number
+---@field get_scale fun(self: Godot.Node2D): Godot.Vector2
+---@field get_skew fun(self: Godot.Node2D): number
+---@field global_translate fun(self: Godot.Node2D, offset: Godot.Vector2)
+---@field look_at fun(self: Godot.Node2D, point: Godot.Vector2)
+---@field move_local_x fun(self: Godot.Node2D, delta: number, scaled: boolean)
+---@field move_local_y fun(self: Godot.Node2D, delta: number, scaled: boolean)
+---@field rotate fun(self: Godot.Node2D, radians: number)
+---@field set_global_position fun(self: Godot.Node2D, position: Godot.Vector2)
+---@field set_global_rotation fun(self: Godot.Node2D, radians: number)
+---@field set_global_rotation_degrees fun(self: Godot.Node2D, degrees: number)
+---@field set_global_scale fun(self: Godot.Node2D, scale: Godot.Vector2)
+---@field set_global_skew fun(self: Godot.Node2D, radians: number)
+---@field set_global_transform fun(self: Godot.Node2D, xform: Godot.Transform2D)
+---@field set_position fun(self: Godot.Node2D, position: Godot.Vector2)
+---@field set_rotation fun(self: Godot.Node2D, radians: number)
+---@field set_rotation_degrees fun(self: Godot.Node2D, degrees: number)
+---@field set_scale fun(self: Godot.Node2D, scale: Godot.Vector2)
+---@field set_skew fun(self: Godot.Node2D, radians: number)
+---@field set_transform fun(self: Godot.Node2D, xform: Godot.Transform2D)
+---@field to_global fun(self: Godot.Node2D, local_point: Godot.Vector2): Godot.Vector2
+---@field to_local fun(self: Godot.Node2D, global_point: Godot.Vector2): Godot.Vector2
+---@field translate fun(self: Godot.Node2D, offset: Godot.Vector2)
+---@class Godot.Node2D.__type
+---@field new fun(): Godot.Node2D
+
+---@class Godot.Node3D : Godot.Node
+---@field basis Godot.Basis
+---@field global_basis Godot.Basis
+---@field global_position Godot.Vector3
+---@field global_rotation Godot.Vector3
+---@field global_rotation_degrees Godot.Vector3
+---@field global_transform Godot.Transform3D
+---@field position Godot.Vector3
+---@field quaternion Godot.Quaternion
+---@field rotation Godot.Vector3
+---@field rotation_degrees Godot.Vector3
+---@field rotation_edit_mode integer
+---@field rotation_order integer
+---@field scale Godot.Vector3
+---@field top_level boolean
+---@field transform Godot.Transform3D
+---@field visibility_parent string
+---@field visible boolean
+---@field visibility_changed Godot.Signal
+---@field add_gizmo fun(self: Godot.Node3D, gizmo: Godot.Node3DGizmo)
+---@field clear_gizmos fun(self: Godot.Node3D)
+---@field clear_subgizmo_selection fun(self: Godot.Node3D)
+---@field force_update_transform fun(self: Godot.Node3D)
+---@field get_basis fun(self: Godot.Node3D): Godot.Basis
+---@field get_gizmos fun(self: Godot.Node3D): table
+---@field get_global_basis fun(self: Godot.Node3D): Godot.Basis
+---@field get_global_position fun(self: Godot.Node3D): Godot.Vector3
+---@field get_global_rotation fun(self: Godot.Node3D): Godot.Vector3
+---@field get_global_rotation_degrees fun(self: Godot.Node3D): Godot.Vector3
+---@field get_global_transform fun(self: Godot.Node3D): Godot.Transform3D
+---@field get_global_transform_interpolated fun(self: Godot.Node3D): Godot.Transform3D
+---@field get_parent_node_3d fun(self: Godot.Node3D): Godot.Node3D
+---@field get_position fun(self: Godot.Node3D): Godot.Vector3
+---@field get_quaternion fun(self: Godot.Node3D): Godot.Quaternion
+---@field get_rotation fun(self: Godot.Node3D): Godot.Vector3
+---@field get_rotation_degrees fun(self: Godot.Node3D): Godot.Vector3
+---@field get_rotation_edit_mode fun(self: Godot.Node3D): integer
+---@field get_rotation_order fun(self: Godot.Node3D): integer
+---@field get_scale fun(self: Godot.Node3D): Godot.Vector3
+---@field get_transform fun(self: Godot.Node3D): Godot.Transform3D
+---@field get_visibility_parent fun(self: Godot.Node3D): string
+---@field get_world_3d fun(self: Godot.Node3D): Godot.World3D
+---@field global_rotate fun(self: Godot.Node3D, axis: Godot.Vector3, angle: number)
+---@field global_scale fun(self: Godot.Node3D, scale: Godot.Vector3)
+---@field global_translate fun(self: Godot.Node3D, offset: Godot.Vector3)
+---@field hide fun(self: Godot.Node3D)
+---@field is_local_transform_notification_enabled fun(self: Godot.Node3D): boolean
+---@field is_scale_disabled fun(self: Godot.Node3D): boolean
+---@field is_set_as_top_level fun(self: Godot.Node3D): boolean
+---@field is_transform_notification_enabled fun(self: Godot.Node3D): boolean
+---@field is_visible fun(self: Godot.Node3D): boolean
+---@field is_visible_in_tree fun(self: Godot.Node3D): boolean
+---@field look_at fun(self: Godot.Node3D, target: Godot.Vector3, up: Godot.Vector3, use_model_front: boolean)
+---@field look_at_from_position fun(self: Godot.Node3D, position: Godot.Vector3, target: Godot.Vector3, up: Godot.Vector3, use_model_front: boolean)
+---@field orthonormalize fun(self: Godot.Node3D)
+---@field rotate fun(self: Godot.Node3D, axis: Godot.Vector3, angle: number)
+---@field rotate_object_local fun(self: Godot.Node3D, axis: Godot.Vector3, angle: number)
+---@field rotate_x fun(self: Godot.Node3D, angle: number)
+---@field rotate_y fun(self: Godot.Node3D, angle: number)
+---@field rotate_z fun(self: Godot.Node3D, angle: number)
+---@field scale_object_local fun(self: Godot.Node3D, scale: Godot.Vector3)
+---@field set_as_top_level fun(self: Godot.Node3D, enable: boolean)
+---@field set_basis fun(self: Godot.Node3D, basis: Godot.Basis)
+---@field set_disable_scale fun(self: Godot.Node3D, disable: boolean)
+---@field set_global_basis fun(self: Godot.Node3D, basis: Godot.Basis)
+---@field set_global_position fun(self: Godot.Node3D, position: Godot.Vector3)
+---@field set_global_rotation fun(self: Godot.Node3D, euler_radians: Godot.Vector3)
+---@field set_global_rotation_degrees fun(self: Godot.Node3D, euler_degrees: Godot.Vector3)
+---@field set_global_transform fun(self: Godot.Node3D, global: Godot.Transform3D)
+---@field set_identity fun(self: Godot.Node3D)
+---@field set_ignore_transform_notification fun(self: Godot.Node3D, enabled: boolean)
+---@field set_notify_local_transform fun(self: Godot.Node3D, enable: boolean)
+---@field set_notify_transform fun(self: Godot.Node3D, enable: boolean)
+---@field set_position fun(self: Godot.Node3D, position: Godot.Vector3)
+---@field set_quaternion fun(self: Godot.Node3D, quaternion: Godot.Quaternion)
+---@field set_rotation fun(self: Godot.Node3D, euler_radians: Godot.Vector3)
+---@field set_rotation_degrees fun(self: Godot.Node3D, euler_degrees: Godot.Vector3)
+---@field set_rotation_edit_mode fun(self: Godot.Node3D, edit_mode: integer)
+---@field set_rotation_order fun(self: Godot.Node3D, order: integer)
+---@field set_scale fun(self: Godot.Node3D, scale: Godot.Vector3)
+---@field set_subgizmo_selection fun(self: Godot.Node3D, gizmo: Godot.Node3DGizmo, id: integer, transform: Godot.Transform3D)
+---@field set_transform fun(self: Godot.Node3D, _local: Godot.Transform3D)
+---@field set_visibility_parent fun(self: Godot.Node3D, path: string)
+---@field set_visible fun(self: Godot.Node3D, visible: boolean)
+---@field show fun(self: Godot.Node3D)
+---@field to_global fun(self: Godot.Node3D, local_point: Godot.Vector3): Godot.Vector3
+---@field to_local fun(self: Godot.Node3D, global_point: Godot.Vector3): Godot.Vector3
+---@field translate fun(self: Godot.Node3D, offset: Godot.Vector3)
+---@field translate_object_local fun(self: Godot.Node3D, offset: Godot.Vector3)
+---@field update_gizmos fun(self: Godot.Node3D)
+---@class Godot.Node3D.__type
+---@field new fun(): Godot.Node3D
+---@field NotificationTransformChanged integer
+---@field NotificationEnterWorld integer
+---@field NotificationExitWorld integer
+---@field NotificationVisibilityChanged integer
+---@field NotificationLocalTransformChanged integer
+---@field RotationEditModeEnum Godot.Node3D.RotationEditModeEnum
+---@class Godot.Node3D.RotationEditModeEnum
+---@field Euler integer
+---@field Quaternion integer
+---@field Basis integer
+
+---@class Godot.OccluderInstance3D : Godot.VisualInstance3D
+---@field bake_mask integer
+---@field bake_simplification_distance number
+---@field occluder Godot.Occluder3D
+---@field get_bake_mask fun(self: Godot.OccluderInstance3D): integer
+---@field get_bake_mask_value fun(self: Godot.OccluderInstance3D, layer_number: integer): boolean
+---@field get_bake_simplification_distance fun(self: Godot.OccluderInstance3D): number
+---@field get_occluder fun(self: Godot.OccluderInstance3D): Godot.Occluder3D
+---@field set_bake_mask fun(self: Godot.OccluderInstance3D, mask: integer)
+---@field set_bake_mask_value fun(self: Godot.OccluderInstance3D, layer_number: integer, value: boolean)
+---@field set_bake_simplification_distance fun(self: Godot.OccluderInstance3D, simplification_distance: number)
+---@field set_occluder fun(self: Godot.OccluderInstance3D, occluder: Godot.Occluder3D)
+---@class Godot.OccluderInstance3D.__type
+---@field new fun(): Godot.OccluderInstance3D
+
+---@class Godot.OmniLight3D : Godot.Light3D
+---@field omni_attenuation number
+---@field omni_range number
+---@field omni_shadow_mode integer
+---@field get_shadow_mode fun(self: Godot.OmniLight3D): integer
+---@field set_shadow_mode fun(self: Godot.OmniLight3D, mode: integer)
+---@class Godot.OmniLight3D.__type
+---@field new fun(): Godot.OmniLight3D
+---@field ShadowMode Godot.OmniLight3D.ShadowMode
+---@class Godot.OmniLight3D.ShadowMode
+---@field DualParaboloid integer
+---@field Cube integer
+
+---@class Godot.OpenXRCompositionLayer : Godot.Node3D
+---@field alpha_blend boolean
+---@field android_surface_size Godot.Vector2I
+---@field enable_hole_punch boolean
+---@field layer_viewport Godot.Object
+---@field protected_content boolean
+---@field sort_order integer
+---@field swapchain_state_alpha_swizzle integer
+---@field swapchain_state_blue_swizzle integer
+---@field swapchain_state_border_color Godot.Color
+---@field swapchain_state_green_swizzle integer
+---@field swapchain_state_horizontal_wrap integer
+---@field swapchain_state_mag_filter integer
+---@field swapchain_state_max_anisotropy number
+---@field swapchain_state_min_filter integer
+---@field swapchain_state_mipmap_mode integer
+---@field swapchain_state_red_swizzle integer
+---@field swapchain_state_vertical_wrap integer
+---@field use_android_surface boolean
+---@field get_alpha_blend fun(self: Godot.OpenXRCompositionLayer): boolean
+---@field get_alpha_swizzle fun(self: Godot.OpenXRCompositionLayer): integer
+---@field get_android_surface fun(self: Godot.OpenXRCompositionLayer): Godot.JavaObject
+---@field get_android_surface_size fun(self: Godot.OpenXRCompositionLayer): Godot.Vector2I
+---@field get_blue_swizzle fun(self: Godot.OpenXRCompositionLayer): integer
+---@field get_border_color fun(self: Godot.OpenXRCompositionLayer): Godot.Color
+---@field get_enable_hole_punch fun(self: Godot.OpenXRCompositionLayer): boolean
+---@field get_green_swizzle fun(self: Godot.OpenXRCompositionLayer): integer
+---@field get_horizontal_wrap fun(self: Godot.OpenXRCompositionLayer): integer
+---@field get_layer_viewport fun(self: Godot.OpenXRCompositionLayer): Godot.SubViewport
+---@field get_mag_filter fun(self: Godot.OpenXRCompositionLayer): integer
+---@field get_max_anisotropy fun(self: Godot.OpenXRCompositionLayer): number
+---@field get_min_filter fun(self: Godot.OpenXRCompositionLayer): integer
+---@field get_mipmap_mode fun(self: Godot.OpenXRCompositionLayer): integer
+---@field get_red_swizzle fun(self: Godot.OpenXRCompositionLayer): integer
+---@field get_sort_order fun(self: Godot.OpenXRCompositionLayer): integer
+---@field get_use_android_surface fun(self: Godot.OpenXRCompositionLayer): boolean
+---@field get_vertical_wrap fun(self: Godot.OpenXRCompositionLayer): integer
+---@field intersects_ray fun(self: Godot.OpenXRCompositionLayer, origin: Godot.Vector3, direction: Godot.Vector3): Godot.Vector2
+---@field is_natively_supported fun(self: Godot.OpenXRCompositionLayer): boolean
+---@field is_protected_content fun(self: Godot.OpenXRCompositionLayer): boolean
+---@field set_alpha_blend fun(self: Godot.OpenXRCompositionLayer, enabled: boolean)
+---@field set_alpha_swizzle fun(self: Godot.OpenXRCompositionLayer, mode: integer)
+---@field set_android_surface_size fun(self: Godot.OpenXRCompositionLayer, size: Godot.Vector2I)
+---@field set_blue_swizzle fun(self: Godot.OpenXRCompositionLayer, mode: integer)
+---@field set_border_color fun(self: Godot.OpenXRCompositionLayer, color: Godot.Color)
+---@field set_enable_hole_punch fun(self: Godot.OpenXRCompositionLayer, enable: boolean)
+---@field set_green_swizzle fun(self: Godot.OpenXRCompositionLayer, mode: integer)
+---@field set_horizontal_wrap fun(self: Godot.OpenXRCompositionLayer, mode: integer)
+---@field set_layer_viewport fun(self: Godot.OpenXRCompositionLayer, viewport: Godot.SubViewport)
+---@field set_mag_filter fun(self: Godot.OpenXRCompositionLayer, mode: integer)
+---@field set_max_anisotropy fun(self: Godot.OpenXRCompositionLayer, value: number)
+---@field set_min_filter fun(self: Godot.OpenXRCompositionLayer, mode: integer)
+---@field set_mipmap_mode fun(self: Godot.OpenXRCompositionLayer, mode: integer)
+---@field set_protected_content fun(self: Godot.OpenXRCompositionLayer, protected_content: boolean)
+---@field set_red_swizzle fun(self: Godot.OpenXRCompositionLayer, mode: integer)
+---@field set_sort_order fun(self: Godot.OpenXRCompositionLayer, order: integer)
+---@field set_use_android_surface fun(self: Godot.OpenXRCompositionLayer, enable: boolean)
+---@field set_vertical_wrap fun(self: Godot.OpenXRCompositionLayer, mode: integer)
+---@class Godot.OpenXRCompositionLayer.__type
+---@field new fun(): Godot.OpenXRCompositionLayer
+---@field Filter Godot.OpenXRCompositionLayer.Filter
+---@field MipmapMode Godot.OpenXRCompositionLayer.MipmapMode
+---@field Swizzle Godot.OpenXRCompositionLayer.Swizzle
+---@field Wrap Godot.OpenXRCompositionLayer.Wrap
+---@class Godot.OpenXRCompositionLayer.Filter
+---@field Nearest integer
+---@field Linear integer
+---@field Cubic integer
+---@class Godot.OpenXRCompositionLayer.MipmapMode
+---@field Disabled integer
+---@field Nearest integer
+---@field Linear integer
+---@class Godot.OpenXRCompositionLayer.Swizzle
+---@field Red integer
+---@field Green integer
+---@field Blue integer
+---@field Alpha integer
+---@field Zero integer
+---@field One integer
+---@class Godot.OpenXRCompositionLayer.Wrap
+---@field ClampToBorder integer
+---@field ClampToEdge integer
+---@field Repeat integer
+---@field MirroredRepeat integer
+---@field MirrorClampToEdge integer
+
+---@class Godot.OpenXRCompositionLayerCylinder : Godot.OpenXRCompositionLayer
+---@field aspect_ratio number
+---@field central_angle number
+---@field fallback_segments integer
+---@field radius number
+---@field get_aspect_ratio fun(self: Godot.OpenXRCompositionLayerCylinder): number
+---@field get_central_angle fun(self: Godot.OpenXRCompositionLayerCylinder): number
+---@field get_fallback_segments fun(self: Godot.OpenXRCompositionLayerCylinder): integer
+---@field get_radius fun(self: Godot.OpenXRCompositionLayerCylinder): number
+---@field set_aspect_ratio fun(self: Godot.OpenXRCompositionLayerCylinder, aspect_ratio: number)
+---@field set_central_angle fun(self: Godot.OpenXRCompositionLayerCylinder, angle: number)
+---@field set_fallback_segments fun(self: Godot.OpenXRCompositionLayerCylinder, segments: integer)
+---@field set_radius fun(self: Godot.OpenXRCompositionLayerCylinder, radius: number)
+---@class Godot.OpenXRCompositionLayerCylinder.__type
+---@field new fun(): Godot.OpenXRCompositionLayerCylinder
+
+---@class Godot.OpenXRCompositionLayerEquirect : Godot.OpenXRCompositionLayer
+---@field central_horizontal_angle number
+---@field fallback_segments integer
+---@field lower_vertical_angle number
+---@field radius number
+---@field upper_vertical_angle number
+---@field get_central_horizontal_angle fun(self: Godot.OpenXRCompositionLayerEquirect): number
+---@field get_fallback_segments fun(self: Godot.OpenXRCompositionLayerEquirect): integer
+---@field get_lower_vertical_angle fun(self: Godot.OpenXRCompositionLayerEquirect): number
+---@field get_radius fun(self: Godot.OpenXRCompositionLayerEquirect): number
+---@field get_upper_vertical_angle fun(self: Godot.OpenXRCompositionLayerEquirect): number
+---@field set_central_horizontal_angle fun(self: Godot.OpenXRCompositionLayerEquirect, angle: number)
+---@field set_fallback_segments fun(self: Godot.OpenXRCompositionLayerEquirect, segments: integer)
+---@field set_lower_vertical_angle fun(self: Godot.OpenXRCompositionLayerEquirect, angle: number)
+---@field set_radius fun(self: Godot.OpenXRCompositionLayerEquirect, radius: number)
+---@field set_upper_vertical_angle fun(self: Godot.OpenXRCompositionLayerEquirect, angle: number)
+---@class Godot.OpenXRCompositionLayerEquirect.__type
+---@field new fun(): Godot.OpenXRCompositionLayerEquirect
+
+---@class Godot.OpenXRCompositionLayerQuad : Godot.OpenXRCompositionLayer
+---@field quad_size Godot.Vector2
+---@field get_quad_size fun(self: Godot.OpenXRCompositionLayerQuad): Godot.Vector2
+---@field set_quad_size fun(self: Godot.OpenXRCompositionLayerQuad, size: Godot.Vector2)
+---@class Godot.OpenXRCompositionLayerQuad.__type
+---@field new fun(): Godot.OpenXRCompositionLayerQuad
+
+---@class Godot.OpenXRHand : Godot.Node3D
+---@field bone_update integer
+---@field hand integer
+---@field hand_skeleton string
+---@field motion_range integer
+---@field skeleton_rig integer
+---@field get_bone_update fun(self: Godot.OpenXRHand): integer
+---@field get_hand fun(self: Godot.OpenXRHand): integer
+---@field get_hand_skeleton fun(self: Godot.OpenXRHand): string
+---@field get_motion_range fun(self: Godot.OpenXRHand): integer
+---@field get_skeleton_rig fun(self: Godot.OpenXRHand): integer
+---@field set_bone_update fun(self: Godot.OpenXRHand, bone_update: integer)
+---@field set_hand fun(self: Godot.OpenXRHand, hand: integer)
+---@field set_hand_skeleton fun(self: Godot.OpenXRHand, hand_skeleton: string)
+---@field set_motion_range fun(self: Godot.OpenXRHand, motion_range: integer)
+---@field set_skeleton_rig fun(self: Godot.OpenXRHand, skeleton_rig: integer)
+---@class Godot.OpenXRHand.__type
+---@field new fun(): Godot.OpenXRHand
+---@field BoneUpdateEnum Godot.OpenXRHand.BoneUpdateEnum
+---@field Hands Godot.OpenXRHand.Hands
+---@field MotionRangeEnum Godot.OpenXRHand.MotionRangeEnum
+---@field SkeletonRigEnum Godot.OpenXRHand.SkeletonRigEnum
+---@class Godot.OpenXRHand.BoneUpdateEnum
+---@field Full integer
+---@field RotationOnly integer
+---@field Max integer
+---@class Godot.OpenXRHand.Hands
+---@field Left integer
+---@field Right integer
+---@field Max integer
+---@class Godot.OpenXRHand.MotionRangeEnum
+---@field Unobstructed integer
+---@field ConformToController integer
+---@field Max integer
+---@class Godot.OpenXRHand.SkeletonRigEnum
+---@field Openxr integer
+---@field Humanoid integer
+---@field Max integer
+
+---@class Godot.OpenXRRenderModel : Godot.Node3D
+---@field render_model Godot.Rid
+---@field render_model_top_level_path_changed Godot.Signal
+---@field get_render_model fun(self: Godot.OpenXRRenderModel): Godot.Rid
+---@field get_top_level_path fun(self: Godot.OpenXRRenderModel): string
+---@field set_render_model fun(self: Godot.OpenXRRenderModel, render_model: Godot.Rid)
+---@class Godot.OpenXRRenderModel.__type
+---@field new fun(): Godot.OpenXRRenderModel
+
+---@class Godot.OpenXRRenderModelManager : Godot.Node3D
+---@field make_local_to_pose string
+---@field tracker integer
+---@field render_model_added Godot.Signal
+---@field render_model_removed Godot.Signal
+---@field get_make_local_to_pose fun(self: Godot.OpenXRRenderModelManager): string
+---@field get_tracker fun(self: Godot.OpenXRRenderModelManager): integer
+---@field set_make_local_to_pose fun(self: Godot.OpenXRRenderModelManager, make_local_to_pose: string)
+---@field set_tracker fun(self: Godot.OpenXRRenderModelManager, tracker: integer)
+---@class Godot.OpenXRRenderModelManager.__type
+---@field new fun(): Godot.OpenXRRenderModelManager
+---@field RenderModelTracker Godot.OpenXRRenderModelManager.RenderModelTracker
+---@class Godot.OpenXRRenderModelManager.RenderModelTracker
+---@field Any integer
+---@field NoneSet integer
+---@field LeftHand integer
+---@field RightHand integer
+
+---@class Godot.OpenXRVisibilityMask : Godot.VisualInstance3D
+---@class Godot.OpenXRVisibilityMask.__type
+---@field new fun(): Godot.OpenXRVisibilityMask
+
+---@class Godot.OptionButton : Godot.Button
+---@field allow_reselect boolean
+---@field fit_to_longest_item boolean
+---@field item_count integer
+---@field selected integer
+---@field item_focused Godot.Signal
+---@field item_selected Godot.Signal
+---@field add_icon_item fun(self: Godot.OptionButton, texture: Godot.Texture2D, label: string, id: integer)
+---@field add_item fun(self: Godot.OptionButton, label: string, id: integer)
+---@field add_separator fun(self: Godot.OptionButton, text: string)
+---@field clear fun(self: Godot.OptionButton)
+---@field get_allow_reselect fun(self: Godot.OptionButton): boolean
+---@field get_item_auto_translate_mode fun(self: Godot.OptionButton, idx: integer): integer
+---@field get_item_count fun(self: Godot.OptionButton): integer
+---@field get_item_icon fun(self: Godot.OptionButton, idx: integer): Godot.Texture2D
+---@field get_item_id fun(self: Godot.OptionButton, idx: integer): integer
+---@field get_item_index fun(self: Godot.OptionButton, id: integer): integer
+---@field get_item_metadata fun(self: Godot.OptionButton, idx: integer)
+---@field get_item_text fun(self: Godot.OptionButton, idx: integer): string
+---@field get_item_tooltip fun(self: Godot.OptionButton, idx: integer): string
+---@field get_popup fun(self: Godot.OptionButton): Godot.PopupMenu
+---@field get_selectable_item fun(self: Godot.OptionButton, from_last: boolean): integer
+---@field get_selected fun(self: Godot.OptionButton): integer
+---@field get_selected_id fun(self: Godot.OptionButton): integer
+---@field get_selected_metadata fun(self: Godot.OptionButton)
+---@field has_selectable_items fun(self: Godot.OptionButton): boolean
+---@field is_fit_to_longest_item fun(self: Godot.OptionButton): boolean
+---@field is_item_disabled fun(self: Godot.OptionButton, idx: integer): boolean
+---@field is_item_separator fun(self: Godot.OptionButton, idx: integer): boolean
+---@field remove_item fun(self: Godot.OptionButton, idx: integer)
+---@field select fun(self: Godot.OptionButton, idx: integer)
+---@field set_allow_reselect fun(self: Godot.OptionButton, allow: boolean)
+---@field set_disable_shortcuts fun(self: Godot.OptionButton, disabled: boolean)
+---@field set_fit_to_longest_item fun(self: Godot.OptionButton, fit: boolean)
+---@field set_item_auto_translate_mode fun(self: Godot.OptionButton, idx: integer, mode: integer)
+---@field set_item_count fun(self: Godot.OptionButton, count: integer)
+---@field set_item_disabled fun(self: Godot.OptionButton, idx: integer, disabled: boolean)
+---@field set_item_icon fun(self: Godot.OptionButton, idx: integer, texture: Godot.Texture2D)
+---@field set_item_id fun(self: Godot.OptionButton, idx: integer, id: integer)
+---@field set_item_metadata fun(self: Godot.OptionButton, idx: integer, metadata: any)
+---@field set_item_text fun(self: Godot.OptionButton, idx: integer, text: string)
+---@field set_item_tooltip fun(self: Godot.OptionButton, idx: integer, tooltip: string)
+---@field show_popup fun(self: Godot.OptionButton)
+---@class Godot.OptionButton.__type
+---@field new fun(): Godot.OptionButton
+
+---@class Godot.Panel : Godot.Control
+---@class Godot.Panel.__type
+---@field new fun(): Godot.Panel
+
+---@class Godot.PanelContainer : Godot.Container
+---@class Godot.PanelContainer.__type
+---@field new fun(): Godot.PanelContainer
+
+---@class Godot.Parallax2D : Godot.Node2D
+---@field autoscroll Godot.Vector2
+---@field follow_viewport boolean
+---@field ignore_camera_scroll boolean
+---@field limit_begin Godot.Vector2
+---@field limit_end Godot.Vector2
+---@field repeat_size Godot.Vector2
+---@field repeat_times integer
+---@field screen_offset Godot.Vector2
+---@field scroll_offset Godot.Vector2
+---@field scroll_scale Godot.Vector2
+---@field get_autoscroll fun(self: Godot.Parallax2D): Godot.Vector2
+---@field get_follow_viewport fun(self: Godot.Parallax2D): boolean
+---@field get_limit_begin fun(self: Godot.Parallax2D): Godot.Vector2
+---@field get_limit_end fun(self: Godot.Parallax2D): Godot.Vector2
+---@field get_repeat_size fun(self: Godot.Parallax2D): Godot.Vector2
+---@field get_repeat_times fun(self: Godot.Parallax2D): integer
+---@field get_screen_offset fun(self: Godot.Parallax2D): Godot.Vector2
+---@field get_scroll_offset fun(self: Godot.Parallax2D): Godot.Vector2
+---@field get_scroll_scale fun(self: Godot.Parallax2D): Godot.Vector2
+---@field is_ignore_camera_scroll fun(self: Godot.Parallax2D): boolean
+---@field set_autoscroll fun(self: Godot.Parallax2D, autoscroll: Godot.Vector2)
+---@field set_follow_viewport fun(self: Godot.Parallax2D, follow: boolean)
+---@field set_ignore_camera_scroll fun(self: Godot.Parallax2D, ignore: boolean)
+---@field set_limit_begin fun(self: Godot.Parallax2D, offset: Godot.Vector2)
+---@field set_limit_end fun(self: Godot.Parallax2D, offset: Godot.Vector2)
+---@field set_repeat_size fun(self: Godot.Parallax2D, repeat_size: Godot.Vector2)
+---@field set_repeat_times fun(self: Godot.Parallax2D, repeat_times: integer)
+---@field set_screen_offset fun(self: Godot.Parallax2D, offset: Godot.Vector2)
+---@field set_scroll_offset fun(self: Godot.Parallax2D, offset: Godot.Vector2)
+---@field set_scroll_scale fun(self: Godot.Parallax2D, scale: Godot.Vector2)
+---@class Godot.Parallax2D.__type
+---@field new fun(): Godot.Parallax2D
+
+---@class Godot.ParallaxBackground : Godot.CanvasLayer
+---@field scroll_base_offset Godot.Vector2
+---@field scroll_base_scale Godot.Vector2
+---@field scroll_ignore_camera_zoom boolean
+---@field scroll_limit_begin Godot.Vector2
+---@field scroll_limit_end Godot.Vector2
+---@field scroll_offset Godot.Vector2
+---@field get_limit_begin fun(self: Godot.ParallaxBackground): Godot.Vector2
+---@field get_limit_end fun(self: Godot.ParallaxBackground): Godot.Vector2
+---@field get_scroll_base_offset fun(self: Godot.ParallaxBackground): Godot.Vector2
+---@field get_scroll_base_scale fun(self: Godot.ParallaxBackground): Godot.Vector2
+---@field get_scroll_offset fun(self: Godot.ParallaxBackground): Godot.Vector2
+---@field is_ignore_camera_zoom fun(self: Godot.ParallaxBackground): boolean
+---@field set_ignore_camera_zoom fun(self: Godot.ParallaxBackground, ignore: boolean)
+---@field set_limit_begin fun(self: Godot.ParallaxBackground, offset: Godot.Vector2)
+---@field set_limit_end fun(self: Godot.ParallaxBackground, offset: Godot.Vector2)
+---@field set_scroll_base_offset fun(self: Godot.ParallaxBackground, offset: Godot.Vector2)
+---@field set_scroll_base_scale fun(self: Godot.ParallaxBackground, scale: Godot.Vector2)
+---@field set_scroll_offset fun(self: Godot.ParallaxBackground, offset: Godot.Vector2)
+---@class Godot.ParallaxBackground.__type
+---@field new fun(): Godot.ParallaxBackground
+
+---@class Godot.ParallaxLayer : Godot.Node2D
+---@field motion_mirroring Godot.Vector2
+---@field motion_offset Godot.Vector2
+---@field motion_scale Godot.Vector2
+---@field get_mirroring fun(self: Godot.ParallaxLayer): Godot.Vector2
+---@field get_motion_offset fun(self: Godot.ParallaxLayer): Godot.Vector2
+---@field get_motion_scale fun(self: Godot.ParallaxLayer): Godot.Vector2
+---@field set_mirroring fun(self: Godot.ParallaxLayer, mirror: Godot.Vector2)
+---@field set_motion_offset fun(self: Godot.ParallaxLayer, offset: Godot.Vector2)
+---@field set_motion_scale fun(self: Godot.ParallaxLayer, scale: Godot.Vector2)
+---@class Godot.ParallaxLayer.__type
+---@field new fun(): Godot.ParallaxLayer
+
+---@class Godot.Path2D : Godot.Node2D
+---@field curve Godot.Curve2D
+---@field get_curve fun(self: Godot.Path2D): Godot.Curve2D
+---@field set_curve fun(self: Godot.Path2D, curve: Godot.Curve2D)
+---@class Godot.Path2D.__type
+---@field new fun(): Godot.Path2D
+
+---@class Godot.Path3D : Godot.Node3D
+---@field curve Godot.Curve3D
+---@field debug_custom_color Godot.Color
+---@field curve_changed Godot.Signal
+---@field debug_color_changed Godot.Signal
+---@field get_curve fun(self: Godot.Path3D): Godot.Curve3D
+---@field get_debug_custom_color fun(self: Godot.Path3D): Godot.Color
+---@field set_curve fun(self: Godot.Path3D, curve: Godot.Curve3D)
+---@field set_debug_custom_color fun(self: Godot.Path3D, debug_custom_color: Godot.Color)
+---@class Godot.Path3D.__type
+---@field new fun(): Godot.Path3D
+
+---@class Godot.PathFollow2D : Godot.Node2D
+---@field cubic_interp boolean
+---@field h_offset number
+---@field loop boolean
+---@field progress number
+---@field progress_ratio number
+---@field rotates boolean
+---@field v_offset number
+---@field get_cubic_interpolation fun(self: Godot.PathFollow2D): boolean
+---@field get_h_offset fun(self: Godot.PathFollow2D): number
+---@field get_progress fun(self: Godot.PathFollow2D): number
+---@field get_progress_ratio fun(self: Godot.PathFollow2D): number
+---@field get_v_offset fun(self: Godot.PathFollow2D): number
+---@field has_loop fun(self: Godot.PathFollow2D): boolean
+---@field is_rotating fun(self: Godot.PathFollow2D): boolean
+---@field set_cubic_interpolation fun(self: Godot.PathFollow2D, enabled: boolean)
+---@field set_h_offset fun(self: Godot.PathFollow2D, h_offset: number)
+---@field set_loop fun(self: Godot.PathFollow2D, loop: boolean)
+---@field set_progress fun(self: Godot.PathFollow2D, progress: number)
+---@field set_progress_ratio fun(self: Godot.PathFollow2D, ratio: number)
+---@field set_rotates fun(self: Godot.PathFollow2D, enabled: boolean)
+---@field set_v_offset fun(self: Godot.PathFollow2D, v_offset: number)
+---@class Godot.PathFollow2D.__type
+---@field new fun(): Godot.PathFollow2D
+
+---@class Godot.PathFollow3D : Godot.Node3D
+---@field cubic_interp boolean
+---@field h_offset number
+---@field loop boolean
+---@field progress number
+---@field progress_ratio number
+---@field rotation_mode integer
+---@field tilt_enabled boolean
+---@field use_model_front boolean
+---@field v_offset number
+---@field get_cubic_interpolation fun(self: Godot.PathFollow3D): boolean
+---@field get_h_offset fun(self: Godot.PathFollow3D): number
+---@field get_progress fun(self: Godot.PathFollow3D): number
+---@field get_progress_ratio fun(self: Godot.PathFollow3D): number
+---@field get_rotation_mode fun(self: Godot.PathFollow3D): integer
+---@field get_v_offset fun(self: Godot.PathFollow3D): number
+---@field has_loop fun(self: Godot.PathFollow3D): boolean
+---@field is_tilt_enabled fun(self: Godot.PathFollow3D): boolean
+---@field is_using_model_front fun(self: Godot.PathFollow3D): boolean
+---@field set_cubic_interpolation fun(self: Godot.PathFollow3D, enabled: boolean)
+---@field set_h_offset fun(self: Godot.PathFollow3D, h_offset: number)
+---@field set_loop fun(self: Godot.PathFollow3D, loop: boolean)
+---@field set_progress fun(self: Godot.PathFollow3D, progress: number)
+---@field set_progress_ratio fun(self: Godot.PathFollow3D, ratio: number)
+---@field set_rotation_mode fun(self: Godot.PathFollow3D, rotation_mode: integer)
+---@field set_tilt_enabled fun(self: Godot.PathFollow3D, enabled: boolean)
+---@field set_use_model_front fun(self: Godot.PathFollow3D, enabled: boolean)
+---@field set_v_offset fun(self: Godot.PathFollow3D, v_offset: number)
+---@class Godot.PathFollow3D.__type
+---@field new fun(): Godot.PathFollow3D
+---@field CorrectPosture fun(transform: Godot.Transform3D, rotationMode: integer): Godot.Transform3D
+---@field RotationModeEnum Godot.PathFollow3D.RotationModeEnum
+---@class Godot.PathFollow3D.RotationModeEnum
+---@field None integer
+---@field Y integer
+---@field Xy integer
+---@field Xyz integer
+---@field Oriented integer
+
+---@class Godot.PhysicalBone2D : Godot.RigidBody2D
+---@field auto_configure_joint boolean
+---@field bone2d_index integer
+---@field bone2d_nodepath string
+---@field follow_bone_when_simulating boolean
+---@field simulate_physics boolean
+---@field get_auto_configure_joint fun(self: Godot.PhysicalBone2D): boolean
+---@field get_bone2d_index fun(self: Godot.PhysicalBone2D): integer
+---@field get_bone2d_nodepath fun(self: Godot.PhysicalBone2D): string
+---@field get_follow_bone_when_simulating fun(self: Godot.PhysicalBone2D): boolean
+---@field get_joint fun(self: Godot.PhysicalBone2D): Godot.Joint2D
+---@field get_simulate_physics fun(self: Godot.PhysicalBone2D): boolean
+---@field is_simulating_physics fun(self: Godot.PhysicalBone2D): boolean
+---@field set_auto_configure_joint fun(self: Godot.PhysicalBone2D, auto_configure_joint: boolean)
+---@field set_bone2d_index fun(self: Godot.PhysicalBone2D, bone_index: integer)
+---@field set_bone2d_nodepath fun(self: Godot.PhysicalBone2D, nodepath: string)
+---@field set_follow_bone_when_simulating fun(self: Godot.PhysicalBone2D, follow_bone: boolean)
+---@field set_simulate_physics fun(self: Godot.PhysicalBone2D, simulate_physics: boolean)
+---@class Godot.PhysicalBone2D.__type
+---@field new fun(): Godot.PhysicalBone2D
+
+---@class Godot.PhysicalBone3D : Godot.PhysicsBody3D
+---@field angular_damp number
+---@field angular_damp_mode integer
+---@field angular_velocity Godot.Vector3
+---@field body_offset Godot.Transform3D
+---@field bounce number
+---@field can_sleep boolean
+---@field custom_integrator boolean
+---@field friction number
+---@field gravity_scale number
+---@field joint_offset Godot.Transform3D
+---@field joint_rotation Godot.Vector3
+---@field joint_type integer
+---@field linear_damp number
+---@field linear_damp_mode integer
+---@field linear_velocity Godot.Vector3
+---@field mass number
+---@field apply_central_impulse fun(self: Godot.PhysicalBone3D, impulse: Godot.Vector3)
+---@field apply_impulse fun(self: Godot.PhysicalBone3D, impulse: Godot.Vector3, position: Godot.Vector3)
+---@field get_angular_damp fun(self: Godot.PhysicalBone3D): number
+---@field get_angular_damp_mode fun(self: Godot.PhysicalBone3D): integer
+---@field get_angular_velocity fun(self: Godot.PhysicalBone3D): Godot.Vector3
+---@field get_body_offset fun(self: Godot.PhysicalBone3D): Godot.Transform3D
+---@field get_bone_id fun(self: Godot.PhysicalBone3D): integer
+---@field get_bounce fun(self: Godot.PhysicalBone3D): number
+---@field get_friction fun(self: Godot.PhysicalBone3D): number
+---@field get_gravity_scale fun(self: Godot.PhysicalBone3D): number
+---@field get_joint_offset fun(self: Godot.PhysicalBone3D): Godot.Transform3D
+---@field get_joint_rotation fun(self: Godot.PhysicalBone3D): Godot.Vector3
+---@field get_joint_type fun(self: Godot.PhysicalBone3D): integer
+---@field get_linear_damp fun(self: Godot.PhysicalBone3D): number
+---@field get_linear_damp_mode fun(self: Godot.PhysicalBone3D): integer
+---@field get_linear_velocity fun(self: Godot.PhysicalBone3D): Godot.Vector3
+---@field get_mass fun(self: Godot.PhysicalBone3D): number
+---@field get_simulate_physics fun(self: Godot.PhysicalBone3D): boolean
+---@field is_able_to_sleep fun(self: Godot.PhysicalBone3D): boolean
+---@field is_simulating_physics fun(self: Godot.PhysicalBone3D): boolean
+---@field is_using_custom_integrator fun(self: Godot.PhysicalBone3D): boolean
+---@field set_angular_damp fun(self: Godot.PhysicalBone3D, angular_damp: number)
+---@field set_angular_damp_mode fun(self: Godot.PhysicalBone3D, angular_damp_mode: integer)
+---@field set_angular_velocity fun(self: Godot.PhysicalBone3D, angular_velocity: Godot.Vector3)
+---@field set_body_offset fun(self: Godot.PhysicalBone3D, offset: Godot.Transform3D)
+---@field set_bounce fun(self: Godot.PhysicalBone3D, bounce: number)
+---@field set_can_sleep fun(self: Godot.PhysicalBone3D, able_to_sleep: boolean)
+---@field set_friction fun(self: Godot.PhysicalBone3D, friction: number)
+---@field set_gravity_scale fun(self: Godot.PhysicalBone3D, gravity_scale: number)
+---@field set_joint_offset fun(self: Godot.PhysicalBone3D, offset: Godot.Transform3D)
+---@field set_joint_rotation fun(self: Godot.PhysicalBone3D, euler: Godot.Vector3)
+---@field set_joint_type fun(self: Godot.PhysicalBone3D, joint_type: integer)
+---@field set_linear_damp fun(self: Godot.PhysicalBone3D, linear_damp: number)
+---@field set_linear_damp_mode fun(self: Godot.PhysicalBone3D, linear_damp_mode: integer)
+---@field set_linear_velocity fun(self: Godot.PhysicalBone3D, linear_velocity: Godot.Vector3)
+---@field set_mass fun(self: Godot.PhysicalBone3D, mass: number)
+---@field set_use_custom_integrator fun(self: Godot.PhysicalBone3D, enable: boolean)
+---@class Godot.PhysicalBone3D.__type
+---@field new fun(): Godot.PhysicalBone3D
+---@field DampMode Godot.PhysicalBone3D.DampMode
+---@field JointTypeEnum Godot.PhysicalBone3D.JointTypeEnum
+---@class Godot.PhysicalBone3D.DampMode
+---@field Combine integer
+---@field Replace integer
+---@class Godot.PhysicalBone3D.JointTypeEnum
+---@field None integer
+---@field Pin integer
+---@field Cone integer
+---@field Hinge integer
+---@field Slider integer
+---@field Type6Dof integer
+
+---@class Godot.PhysicalBoneSimulator3D : Godot.SkeletonModifier3D
+---@field is_simulating_physics fun(self: Godot.PhysicalBoneSimulator3D): boolean
+---@field physical_bones_add_collision_exception fun(self: Godot.PhysicalBoneSimulator3D, exception: Godot.Rid)
+---@field physical_bones_remove_collision_exception fun(self: Godot.PhysicalBoneSimulator3D, exception: Godot.Rid)
+---@field physical_bones_start_simulation fun(self: Godot.PhysicalBoneSimulator3D, bones: table)
+---@field physical_bones_stop_simulation fun(self: Godot.PhysicalBoneSimulator3D)
+---@class Godot.PhysicalBoneSimulator3D.__type
+---@field new fun(): Godot.PhysicalBoneSimulator3D
+
+---@class Godot.PhysicsBody2D : Godot.CollisionObject2D
+---@field add_collision_exception_with fun(self: Godot.PhysicsBody2D, body: Godot.Node)
+---@field get_collision_exceptions fun(self: Godot.PhysicsBody2D): table
+---@field get_gravity fun(self: Godot.PhysicsBody2D): Godot.Vector2
+---@field move_and_collide fun(self: Godot.PhysicsBody2D, motion: Godot.Vector2, test_only: boolean, safe_margin: number, recovery_as_collision: boolean): Godot.KinematicCollision2D
+---@field remove_collision_exception_with fun(self: Godot.PhysicsBody2D, body: Godot.Node)
+---@field test_move fun(self: Godot.PhysicsBody2D, from: Godot.Transform2D, motion: Godot.Vector2, collision: Godot.KinematicCollision2D, safe_margin: number, recovery_as_collision: boolean): boolean
+---@class Godot.PhysicsBody2D.__type
+---@field new fun(): Godot.PhysicsBody2D
+
+---@class Godot.PhysicsBody3D : Godot.CollisionObject3D
+---@field axis_lock_angular_x boolean
+---@field axis_lock_angular_y boolean
+---@field axis_lock_angular_z boolean
+---@field axis_lock_linear_x boolean
+---@field axis_lock_linear_y boolean
+---@field axis_lock_linear_z boolean
+---@field add_collision_exception_with fun(self: Godot.PhysicsBody3D, body: Godot.Node)
+---@field get_axis_lock fun(self: Godot.PhysicsBody3D, axis: integer): boolean
+---@field get_collision_exceptions fun(self: Godot.PhysicsBody3D): table
+---@field get_gravity fun(self: Godot.PhysicsBody3D): Godot.Vector3
+---@field move_and_collide fun(self: Godot.PhysicsBody3D, motion: Godot.Vector3, test_only: boolean, safe_margin: number, recovery_as_collision: boolean, max_collisions: integer): Godot.KinematicCollision3D
+---@field remove_collision_exception_with fun(self: Godot.PhysicsBody3D, body: Godot.Node)
+---@field set_axis_lock fun(self: Godot.PhysicsBody3D, axis: integer, lock: boolean)
+---@field test_move fun(self: Godot.PhysicsBody3D, from: Godot.Transform3D, motion: Godot.Vector3, collision: Godot.KinematicCollision3D, safe_margin: number, recovery_as_collision: boolean, max_collisions: integer): boolean
+---@class Godot.PhysicsBody3D.__type
+---@field new fun(): Godot.PhysicsBody3D
+
+---@class Godot.PinJoint2D : Godot.Joint2D
+---@field angular_limit_enabled boolean
+---@field angular_limit_lower number
+---@field angular_limit_upper number
+---@field motor_enabled boolean
+---@field motor_target_velocity number
+---@field softness number
+---@field get_angular_limit_lower fun(self: Godot.PinJoint2D): number
+---@field get_angular_limit_upper fun(self: Godot.PinJoint2D): number
+---@field get_motor_target_velocity fun(self: Godot.PinJoint2D): number
+---@field get_softness fun(self: Godot.PinJoint2D): number
+---@field is_angular_limit_enabled fun(self: Godot.PinJoint2D): boolean
+---@field is_motor_enabled fun(self: Godot.PinJoint2D): boolean
+---@field set_angular_limit_enabled fun(self: Godot.PinJoint2D, enabled: boolean)
+---@field set_angular_limit_lower fun(self: Godot.PinJoint2D, angular_limit_lower: number)
+---@field set_angular_limit_upper fun(self: Godot.PinJoint2D, angular_limit_upper: number)
+---@field set_motor_enabled fun(self: Godot.PinJoint2D, enabled: boolean)
+---@field set_motor_target_velocity fun(self: Godot.PinJoint2D, motor_target_velocity: number)
+---@field set_softness fun(self: Godot.PinJoint2D, softness: number)
+---@class Godot.PinJoint2D.__type
+---@field new fun(): Godot.PinJoint2D
+
+---@class Godot.PinJoint3D : Godot.Joint3D
+---@field get_param fun(self: Godot.PinJoint3D, param: integer): number
+---@field set_param fun(self: Godot.PinJoint3D, param: integer, value: number)
+---@class Godot.PinJoint3D.__type
+---@field new fun(): Godot.PinJoint3D
+---@field Param Godot.PinJoint3D.Param
+---@class Godot.PinJoint3D.Param
+---@field Bias integer
+---@field Damping integer
+---@field ImpulseClamp integer
+
+---@class Godot.PointLight2D : Godot.Light2D
+---@field height number
+---@field offset Godot.Vector2
+---@field texture Godot.Texture2D,-AnimatedTexture,-AtlasTexture,-CameraTexture,-CanvasTexture,-MeshTexture,-Texture2DRD,-ViewportTexture
+---@field texture_scale number
+---@field get_texture fun(self: Godot.PointLight2D): Godot.Texture2D
+---@field get_texture_offset fun(self: Godot.PointLight2D): Godot.Vector2
+---@field get_texture_scale fun(self: Godot.PointLight2D): number
+---@field set_texture fun(self: Godot.PointLight2D, texture: Godot.Texture2D)
+---@field set_texture_offset fun(self: Godot.PointLight2D, texture_offset: Godot.Vector2)
+---@field set_texture_scale fun(self: Godot.PointLight2D, texture_scale: number)
+---@class Godot.PointLight2D.__type
+---@field new fun(): Godot.PointLight2D
+
+---@class Godot.Polygon2D : Godot.Node2D
+---@field antialiased boolean
+---@field bones table
+---@field color Godot.Color
+---@field internal_vertex_count integer
+---@field invert_border number
+---@field invert_enabled boolean
+---@field offset Godot.Vector2
+---@field polygon table
+---@field polygons table
+---@field skeleton string
+---@field texture Godot.Texture2D
+---@field texture_offset Godot.Vector2
+---@field texture_rotation number
+---@field texture_scale Godot.Vector2
+---@field uv table
+---@field vertex_colors table
+---@field add_bone fun(self: Godot.Polygon2D, path: string, weights: table)
+---@field clear_bones fun(self: Godot.Polygon2D)
+---@field erase_bone fun(self: Godot.Polygon2D, index: integer)
+---@field get_antialiased fun(self: Godot.Polygon2D): boolean
+---@field get_bone_count fun(self: Godot.Polygon2D): integer
+---@field get_bone_path fun(self: Godot.Polygon2D, index: integer): string
+---@field get_bone_weights fun(self: Godot.Polygon2D, index: integer): table
+---@field get_color fun(self: Godot.Polygon2D): Godot.Color
+---@field get_internal_vertex_count fun(self: Godot.Polygon2D): integer
+---@field get_invert_border fun(self: Godot.Polygon2D): number
+---@field get_invert_enabled fun(self: Godot.Polygon2D): boolean
+---@field get_offset fun(self: Godot.Polygon2D): Godot.Vector2
+---@field get_polygon fun(self: Godot.Polygon2D): table
+---@field get_polygons fun(self: Godot.Polygon2D): table
+---@field get_skeleton fun(self: Godot.Polygon2D): string
+---@field get_texture fun(self: Godot.Polygon2D): Godot.Texture2D
+---@field get_texture_offset fun(self: Godot.Polygon2D): Godot.Vector2
+---@field get_texture_rotation fun(self: Godot.Polygon2D): number
+---@field get_texture_scale fun(self: Godot.Polygon2D): Godot.Vector2
+---@field get_uv fun(self: Godot.Polygon2D): table
+---@field get_vertex_colors fun(self: Godot.Polygon2D): table
+---@field set_antialiased fun(self: Godot.Polygon2D, antialiased: boolean)
+---@field set_bone_path fun(self: Godot.Polygon2D, index: integer, path: string)
+---@field set_bone_weights fun(self: Godot.Polygon2D, index: integer, weights: table)
+---@field set_color fun(self: Godot.Polygon2D, color: Godot.Color)
+---@field set_internal_vertex_count fun(self: Godot.Polygon2D, internal_vertex_count: integer)
+---@field set_invert_border fun(self: Godot.Polygon2D, invert_border: number)
+---@field set_invert_enabled fun(self: Godot.Polygon2D, invert: boolean)
+---@field set_offset fun(self: Godot.Polygon2D, offset: Godot.Vector2)
+---@field set_polygon fun(self: Godot.Polygon2D, polygon: table)
+---@field set_polygons fun(self: Godot.Polygon2D, polygons: table)
+---@field set_skeleton fun(self: Godot.Polygon2D, skeleton: string)
+---@field set_texture fun(self: Godot.Polygon2D, texture: Godot.Texture2D)
+---@field set_texture_offset fun(self: Godot.Polygon2D, texture_offset: Godot.Vector2)
+---@field set_texture_rotation fun(self: Godot.Polygon2D, texture_rotation: number)
+---@field set_texture_scale fun(self: Godot.Polygon2D, texture_scale: Godot.Vector2)
+---@field set_uv fun(self: Godot.Polygon2D, uv: table)
+---@field set_vertex_colors fun(self: Godot.Polygon2D, vertex_colors: table)
+---@class Godot.Polygon2D.__type
+---@field new fun(): Godot.Polygon2D
+
+---@class Godot.Popup : Godot.Window
+---@field popup_hide Godot.Signal
+---@class Godot.Popup.__type
+---@field new fun(): Godot.Popup
+
+---@class Godot.PopupMenu : Godot.Popup
+---@field allow_search boolean
+---@field hide_on_checkable_item_selection boolean
+---@field hide_on_item_selection boolean
+---@field hide_on_state_item_selection boolean
+---@field item_count integer
+---@field prefer_native_menu boolean
+---@field shrink_height boolean
+---@field shrink_width boolean
+---@field submenu_popup_delay number
+---@field system_menu_id integer
+---@field id_focused Godot.Signal
+---@field id_pressed Godot.Signal
+---@field index_pressed Godot.Signal
+---@field menu_changed Godot.Signal
+---@field activate_item_by_event fun(self: Godot.PopupMenu, event: Godot.InputEvent, for_global_only: boolean): boolean
+---@field add_check_item fun(self: Godot.PopupMenu, label: string, id: integer, accel: integer)
+---@field add_check_shortcut fun(self: Godot.PopupMenu, shortcut: Godot.Shortcut, id: integer, global: boolean)
+---@field add_icon_check_item fun(self: Godot.PopupMenu, texture: Godot.Texture2D, label: string, id: integer, accel: integer)
+---@field add_icon_check_shortcut fun(self: Godot.PopupMenu, texture: Godot.Texture2D, shortcut: Godot.Shortcut, id: integer, global: boolean)
+---@field add_icon_item fun(self: Godot.PopupMenu, texture: Godot.Texture2D, label: string, id: integer, accel: integer)
+---@field add_icon_radio_check_item fun(self: Godot.PopupMenu, texture: Godot.Texture2D, label: string, id: integer, accel: integer)
+---@field add_icon_radio_check_shortcut fun(self: Godot.PopupMenu, texture: Godot.Texture2D, shortcut: Godot.Shortcut, id: integer, global: boolean)
+---@field add_icon_shortcut fun(self: Godot.PopupMenu, texture: Godot.Texture2D, shortcut: Godot.Shortcut, id: integer, global: boolean, allow_echo: boolean)
+---@field add_item fun(self: Godot.PopupMenu, label: string, id: integer, accel: integer)
+---@field add_multistate_item fun(self: Godot.PopupMenu, label: string, max_states: integer, default_state: integer, id: integer, accel: integer)
+---@field add_radio_check_item fun(self: Godot.PopupMenu, label: string, id: integer, accel: integer)
+---@field add_radio_check_shortcut fun(self: Godot.PopupMenu, shortcut: Godot.Shortcut, id: integer, global: boolean)
+---@field add_separator fun(self: Godot.PopupMenu, label: string, id: integer)
+---@field add_shortcut fun(self: Godot.PopupMenu, shortcut: Godot.Shortcut, id: integer, global: boolean, allow_echo: boolean)
+---@field add_submenu_item fun(self: Godot.PopupMenu, label: string, submenu: string, id: integer)
+---@field add_submenu_node_item fun(self: Godot.PopupMenu, label: string, submenu: Godot.PopupMenu, id: integer)
+---@field clear fun(self: Godot.PopupMenu, free_submenus: boolean)
+---@field get_allow_search fun(self: Godot.PopupMenu): boolean
+---@field get_focused_item fun(self: Godot.PopupMenu): integer
+---@field get_item_accelerator fun(self: Godot.PopupMenu, index: integer): integer
+---@field get_item_auto_translate_mode fun(self: Godot.PopupMenu, index: integer): integer
+---@field get_item_count fun(self: Godot.PopupMenu): integer
+---@field get_item_icon fun(self: Godot.PopupMenu, index: integer): Godot.Texture2D
+---@field get_item_icon_max_width fun(self: Godot.PopupMenu, index: integer): integer
+---@field get_item_icon_modulate fun(self: Godot.PopupMenu, index: integer): Godot.Color
+---@field get_item_id fun(self: Godot.PopupMenu, index: integer): integer
+---@field get_item_indent fun(self: Godot.PopupMenu, index: integer): integer
+---@field get_item_index fun(self: Godot.PopupMenu, id: integer): integer
+---@field get_item_language fun(self: Godot.PopupMenu, index: integer): string
+---@field get_item_metadata fun(self: Godot.PopupMenu, index: integer)
+---@field get_item_multistate fun(self: Godot.PopupMenu, index: integer): integer
+---@field get_item_multistate_max fun(self: Godot.PopupMenu, index: integer): integer
+---@field get_item_shortcut fun(self: Godot.PopupMenu, index: integer): Godot.Shortcut
+---@field get_item_submenu fun(self: Godot.PopupMenu, index: integer): string
+---@field get_item_submenu_node fun(self: Godot.PopupMenu, index: integer): Godot.PopupMenu
+---@field get_item_text fun(self: Godot.PopupMenu, index: integer): string
+---@field get_item_text_direction fun(self: Godot.PopupMenu, index: integer): integer
+---@field get_item_tooltip fun(self: Godot.PopupMenu, index: integer): string
+---@field get_shrink_height fun(self: Godot.PopupMenu): boolean
+---@field get_shrink_width fun(self: Godot.PopupMenu): boolean
+---@field get_submenu_popup_delay fun(self: Godot.PopupMenu): number
+---@field get_system_menu fun(self: Godot.PopupMenu): integer
+---@field is_hide_on_checkable_item_selection fun(self: Godot.PopupMenu): boolean
+---@field is_hide_on_item_selection fun(self: Godot.PopupMenu): boolean
+---@field is_hide_on_state_item_selection fun(self: Godot.PopupMenu): boolean
+---@field is_item_checkable fun(self: Godot.PopupMenu, index: integer): boolean
+---@field is_item_checked fun(self: Godot.PopupMenu, index: integer): boolean
+---@field is_item_disabled fun(self: Godot.PopupMenu, index: integer): boolean
+---@field is_item_radio_checkable fun(self: Godot.PopupMenu, index: integer): boolean
+---@field is_item_separator fun(self: Godot.PopupMenu, index: integer): boolean
+---@field is_item_shortcut_disabled fun(self: Godot.PopupMenu, index: integer): boolean
+---@field is_native_menu fun(self: Godot.PopupMenu): boolean
+---@field is_prefer_native_menu fun(self: Godot.PopupMenu): boolean
+---@field is_system_menu fun(self: Godot.PopupMenu): boolean
+---@field remove_item fun(self: Godot.PopupMenu, index: integer)
+---@field scroll_to_item fun(self: Godot.PopupMenu, index: integer)
+---@field set_allow_search fun(self: Godot.PopupMenu, allow: boolean)
+---@field set_focused_item fun(self: Godot.PopupMenu, index: integer)
+---@field set_hide_on_checkable_item_selection fun(self: Godot.PopupMenu, enable: boolean)
+---@field set_hide_on_item_selection fun(self: Godot.PopupMenu, enable: boolean)
+---@field set_hide_on_state_item_selection fun(self: Godot.PopupMenu, enable: boolean)
+---@field set_item_accelerator fun(self: Godot.PopupMenu, index: integer, accel: integer)
+---@field set_item_as_checkable fun(self: Godot.PopupMenu, index: integer, enable: boolean)
+---@field set_item_as_radio_checkable fun(self: Godot.PopupMenu, index: integer, enable: boolean)
+---@field set_item_as_separator fun(self: Godot.PopupMenu, index: integer, enable: boolean)
+---@field set_item_auto_translate_mode fun(self: Godot.PopupMenu, index: integer, mode: integer)
+---@field set_item_checked fun(self: Godot.PopupMenu, index: integer, checked: boolean)
+---@field set_item_count fun(self: Godot.PopupMenu, count: integer)
+---@field set_item_disabled fun(self: Godot.PopupMenu, index: integer, disabled: boolean)
+---@field set_item_icon fun(self: Godot.PopupMenu, index: integer, icon: Godot.Texture2D)
+---@field set_item_icon_max_width fun(self: Godot.PopupMenu, index: integer, width: integer)
+---@field set_item_icon_modulate fun(self: Godot.PopupMenu, index: integer, modulate: Godot.Color)
+---@field set_item_id fun(self: Godot.PopupMenu, index: integer, id: integer)
+---@field set_item_indent fun(self: Godot.PopupMenu, index: integer, indent: integer)
+---@field set_item_language fun(self: Godot.PopupMenu, index: integer, language: string)
+---@field set_item_metadata fun(self: Godot.PopupMenu, index: integer, metadata: any)
+---@field set_item_multistate fun(self: Godot.PopupMenu, index: integer, state: integer)
+---@field set_item_multistate_max fun(self: Godot.PopupMenu, index: integer, max_states: integer)
+---@field set_item_shortcut fun(self: Godot.PopupMenu, index: integer, shortcut: Godot.Shortcut, global: boolean)
+---@field set_item_shortcut_disabled fun(self: Godot.PopupMenu, index: integer, disabled: boolean)
+---@field set_item_submenu fun(self: Godot.PopupMenu, index: integer, submenu: string)
+---@field set_item_submenu_node fun(self: Godot.PopupMenu, index: integer, submenu: Godot.PopupMenu)
+---@field set_item_text fun(self: Godot.PopupMenu, index: integer, text: string)
+---@field set_item_text_direction fun(self: Godot.PopupMenu, index: integer, direction: integer)
+---@field set_item_tooltip fun(self: Godot.PopupMenu, index: integer, tooltip: string)
+---@field set_prefer_native_menu fun(self: Godot.PopupMenu, enabled: boolean)
+---@field set_shrink_height fun(self: Godot.PopupMenu, shrink: boolean)
+---@field set_shrink_width fun(self: Godot.PopupMenu, shrink: boolean)
+---@field set_submenu_popup_delay fun(self: Godot.PopupMenu, seconds: number)
+---@field set_system_menu fun(self: Godot.PopupMenu, system_menu_id: integer)
+---@field toggle_item_checked fun(self: Godot.PopupMenu, index: integer)
+---@field toggle_item_multistate fun(self: Godot.PopupMenu, index: integer)
+---@class Godot.PopupMenu.__type
+---@field new fun(): Godot.PopupMenu
+
+---@class Godot.PopupPanel : Godot.Popup
+---@class Godot.PopupPanel.__type
+---@field new fun(): Godot.PopupPanel
+
+---@class Godot.ProgressBar : Godot.Range
+---@field editor_preview_indeterminate boolean
+---@field fill_mode integer
+---@field indeterminate boolean
+---@field show_percentage boolean
+---@field get_fill_mode fun(self: Godot.ProgressBar): integer
+---@field is_editor_preview_indeterminate_enabled fun(self: Godot.ProgressBar): boolean
+---@field is_indeterminate fun(self: Godot.ProgressBar): boolean
+---@field is_percentage_shown fun(self: Godot.ProgressBar): boolean
+---@field set_editor_preview_indeterminate fun(self: Godot.ProgressBar, preview_indeterminate: boolean)
+---@field set_fill_mode fun(self: Godot.ProgressBar, mode: integer)
+---@field set_indeterminate fun(self: Godot.ProgressBar, indeterminate: boolean)
+---@field set_show_percentage fun(self: Godot.ProgressBar, visible: boolean)
+---@class Godot.ProgressBar.__type
+---@field new fun(): Godot.ProgressBar
+---@field FillModeEnum Godot.ProgressBar.FillModeEnum
+---@class Godot.ProgressBar.FillModeEnum
+---@field BeginToEnd integer
+---@field EndToBegin integer
+---@field TopToBottom integer
+---@field BottomToTop integer
+
+---@class Godot.Range : Godot.Control
+---@field allow_greater boolean
+---@field allow_lesser boolean
+---@field exp_edit boolean
+---@field max_value number
+---@field min_value number
+---@field page number
+---@field ratio number
+---@field rounded boolean
+---@field step number
+---@field value number
+---@field changed Godot.Signal
+---@field value_changed Godot.Signal
+---@field get_as_ratio fun(self: Godot.Range): number
+---@field get_max fun(self: Godot.Range): number
+---@field get_min fun(self: Godot.Range): number
+---@field get_page fun(self: Godot.Range): number
+---@field get_step fun(self: Godot.Range): number
+---@field get_value fun(self: Godot.Range): number
+---@field is_greater_allowed fun(self: Godot.Range): boolean
+---@field is_lesser_allowed fun(self: Godot.Range): boolean
+---@field is_ratio_exp fun(self: Godot.Range): boolean
+---@field is_using_rounded_values fun(self: Godot.Range): boolean
+---@field set_allow_greater fun(self: Godot.Range, allow: boolean)
+---@field set_allow_lesser fun(self: Godot.Range, allow: boolean)
+---@field set_as_ratio fun(self: Godot.Range, value: number)
+---@field set_exp_ratio fun(self: Godot.Range, enabled: boolean)
+---@field set_max fun(self: Godot.Range, maximum: number)
+---@field set_min fun(self: Godot.Range, minimum: number)
+---@field set_page fun(self: Godot.Range, pagesize: number)
+---@field set_step fun(self: Godot.Range, step: number)
+---@field set_use_rounded_values fun(self: Godot.Range, enabled: boolean)
+---@field set_value fun(self: Godot.Range, value: number)
+---@field set_value_no_signal fun(self: Godot.Range, value: number)
+---@field share fun(self: Godot.Range, with: Godot.Node)
+---@field unshare fun(self: Godot.Range)
+---@class Godot.Range.__type
+---@field new fun(): Godot.Range
+
+---@class Godot.RayCast2D : Godot.Node2D
+---@field collide_with_areas boolean
+---@field collide_with_bodies boolean
+---@field collision_mask integer
+---@field enabled boolean
+---@field exclude_parent boolean
+---@field hit_from_inside boolean
+---@field target_position Godot.Vector2
+---@field add_exception fun(self: Godot.RayCast2D, node: Godot.CollisionObject2D)
+---@field add_exception_rid fun(self: Godot.RayCast2D, rid: Godot.Rid)
+---@field clear_exceptions fun(self: Godot.RayCast2D)
+---@field force_raycast_update fun(self: Godot.RayCast2D)
+---@field get_collider fun(self: Godot.RayCast2D): Godot.Object
+---@field get_collider_rid fun(self: Godot.RayCast2D): Godot.Rid
+---@field get_collider_shape fun(self: Godot.RayCast2D): integer
+---@field get_collision_mask fun(self: Godot.RayCast2D): integer
+---@field get_collision_mask_value fun(self: Godot.RayCast2D, layer_number: integer): boolean
+---@field get_collision_normal fun(self: Godot.RayCast2D): Godot.Vector2
+---@field get_collision_point fun(self: Godot.RayCast2D): Godot.Vector2
+---@field get_exclude_parent_body fun(self: Godot.RayCast2D): boolean
+---@field get_target_position fun(self: Godot.RayCast2D): Godot.Vector2
+---@field is_collide_with_areas_enabled fun(self: Godot.RayCast2D): boolean
+---@field is_collide_with_bodies_enabled fun(self: Godot.RayCast2D): boolean
+---@field is_colliding fun(self: Godot.RayCast2D): boolean
+---@field is_enabled fun(self: Godot.RayCast2D): boolean
+---@field is_hit_from_inside_enabled fun(self: Godot.RayCast2D): boolean
+---@field remove_exception fun(self: Godot.RayCast2D, node: Godot.CollisionObject2D)
+---@field remove_exception_rid fun(self: Godot.RayCast2D, rid: Godot.Rid)
+---@field set_collide_with_areas fun(self: Godot.RayCast2D, enable: boolean)
+---@field set_collide_with_bodies fun(self: Godot.RayCast2D, enable: boolean)
+---@field set_collision_mask fun(self: Godot.RayCast2D, mask: integer)
+---@field set_collision_mask_value fun(self: Godot.RayCast2D, layer_number: integer, value: boolean)
+---@field set_enabled fun(self: Godot.RayCast2D, enabled: boolean)
+---@field set_exclude_parent_body fun(self: Godot.RayCast2D, mask: boolean)
+---@field set_hit_from_inside fun(self: Godot.RayCast2D, enable: boolean)
+---@field set_target_position fun(self: Godot.RayCast2D, local_point: Godot.Vector2)
+---@class Godot.RayCast2D.__type
+---@field new fun(): Godot.RayCast2D
+
+---@class Godot.RayCast3D : Godot.Node3D
+---@field collide_with_areas boolean
+---@field collide_with_bodies boolean
+---@field collision_mask integer
+---@field debug_shape_custom_color Godot.Color
+---@field debug_shape_thickness integer
+---@field enabled boolean
+---@field exclude_parent boolean
+---@field hit_back_faces boolean
+---@field hit_from_inside boolean
+---@field target_position Godot.Vector3
+---@field add_exception fun(self: Godot.RayCast3D, node: Godot.CollisionObject3D)
+---@field add_exception_rid fun(self: Godot.RayCast3D, rid: Godot.Rid)
+---@field clear_exceptions fun(self: Godot.RayCast3D)
+---@field force_raycast_update fun(self: Godot.RayCast3D)
+---@field get_collider fun(self: Godot.RayCast3D): Godot.Object
+---@field get_collider_rid fun(self: Godot.RayCast3D): Godot.Rid
+---@field get_collider_shape fun(self: Godot.RayCast3D): integer
+---@field get_collision_face_index fun(self: Godot.RayCast3D): integer
+---@field get_collision_mask fun(self: Godot.RayCast3D): integer
+---@field get_collision_mask_value fun(self: Godot.RayCast3D, layer_number: integer): boolean
+---@field get_collision_normal fun(self: Godot.RayCast3D): Godot.Vector3
+---@field get_collision_point fun(self: Godot.RayCast3D): Godot.Vector3
+---@field get_debug_shape_custom_color fun(self: Godot.RayCast3D): Godot.Color
+---@field get_debug_shape_thickness fun(self: Godot.RayCast3D): integer
+---@field get_exclude_parent_body fun(self: Godot.RayCast3D): boolean
+---@field get_target_position fun(self: Godot.RayCast3D): Godot.Vector3
+---@field is_collide_with_areas_enabled fun(self: Godot.RayCast3D): boolean
+---@field is_collide_with_bodies_enabled fun(self: Godot.RayCast3D): boolean
+---@field is_colliding fun(self: Godot.RayCast3D): boolean
+---@field is_enabled fun(self: Godot.RayCast3D): boolean
+---@field is_hit_back_faces_enabled fun(self: Godot.RayCast3D): boolean
+---@field is_hit_from_inside_enabled fun(self: Godot.RayCast3D): boolean
+---@field remove_exception fun(self: Godot.RayCast3D, node: Godot.CollisionObject3D)
+---@field remove_exception_rid fun(self: Godot.RayCast3D, rid: Godot.Rid)
+---@field set_collide_with_areas fun(self: Godot.RayCast3D, enable: boolean)
+---@field set_collide_with_bodies fun(self: Godot.RayCast3D, enable: boolean)
+---@field set_collision_mask fun(self: Godot.RayCast3D, mask: integer)
+---@field set_collision_mask_value fun(self: Godot.RayCast3D, layer_number: integer, value: boolean)
+---@field set_debug_shape_custom_color fun(self: Godot.RayCast3D, debug_shape_custom_color: Godot.Color)
+---@field set_debug_shape_thickness fun(self: Godot.RayCast3D, debug_shape_thickness: integer)
+---@field set_enabled fun(self: Godot.RayCast3D, enabled: boolean)
+---@field set_exclude_parent_body fun(self: Godot.RayCast3D, mask: boolean)
+---@field set_hit_back_faces fun(self: Godot.RayCast3D, enable: boolean)
+---@field set_hit_from_inside fun(self: Godot.RayCast3D, enable: boolean)
+---@field set_target_position fun(self: Godot.RayCast3D, local_point: Godot.Vector3)
+---@class Godot.RayCast3D.__type
+---@field new fun(): Godot.RayCast3D
+
+---@class Godot.RefCounted : Godot.GodotObject
+---@field get_reference_count fun(self: Godot.RefCounted): integer
+---@field init_ref fun(self: Godot.RefCounted): boolean
+---@field reference fun(self: Godot.RefCounted): boolean
+---@field unreference fun(self: Godot.RefCounted): boolean
+---@class Godot.RefCounted.__type
+---@field new fun(): Godot.RefCounted
+
+---@class Godot.ReferenceRect : Godot.Control
+---@field border_color Godot.Color
+---@field border_width number
+---@field editor_only boolean
+---@field get_border_color fun(self: Godot.ReferenceRect): Godot.Color
+---@field get_border_width fun(self: Godot.ReferenceRect): number
+---@field get_editor_only fun(self: Godot.ReferenceRect): boolean
+---@field set_border_color fun(self: Godot.ReferenceRect, color: Godot.Color)
+---@field set_border_width fun(self: Godot.ReferenceRect, width: number)
+---@field set_editor_only fun(self: Godot.ReferenceRect, enabled: boolean)
+---@class Godot.ReferenceRect.__type
+---@field new fun(): Godot.ReferenceRect
+
+---@class Godot.ReflectionProbe : Godot.VisualInstance3D
+---@field ambient_color Godot.Color
+---@field ambient_color_energy number
+---@field ambient_mode integer
+---@field blend_distance number
+---@field box_projection boolean
+---@field cull_mask integer
+---@field enable_shadows boolean
+---@field intensity number
+---@field interior boolean
+---@field max_distance number
+---@field mesh_lod_threshold number
+---@field origin_offset Godot.Vector3
+---@field reflection_mask integer
+---@field size Godot.Vector3
+---@field update_mode integer
+---@field are_shadows_enabled fun(self: Godot.ReflectionProbe): boolean
+---@field get_ambient_color fun(self: Godot.ReflectionProbe): Godot.Color
+---@field get_ambient_color_energy fun(self: Godot.ReflectionProbe): number
+---@field get_ambient_mode fun(self: Godot.ReflectionProbe): integer
+---@field get_blend_distance fun(self: Godot.ReflectionProbe): number
+---@field get_cull_mask fun(self: Godot.ReflectionProbe): integer
+---@field get_intensity fun(self: Godot.ReflectionProbe): number
+---@field get_max_distance fun(self: Godot.ReflectionProbe): number
+---@field get_mesh_lod_threshold fun(self: Godot.ReflectionProbe): number
+---@field get_origin_offset fun(self: Godot.ReflectionProbe): Godot.Vector3
+---@field get_reflection_mask fun(self: Godot.ReflectionProbe): integer
+---@field get_size fun(self: Godot.ReflectionProbe): Godot.Vector3
+---@field get_update_mode fun(self: Godot.ReflectionProbe): integer
+---@field is_box_projection_enabled fun(self: Godot.ReflectionProbe): boolean
+---@field is_set_as_interior fun(self: Godot.ReflectionProbe): boolean
+---@field set_ambient_color fun(self: Godot.ReflectionProbe, ambient: Godot.Color)
+---@field set_ambient_color_energy fun(self: Godot.ReflectionProbe, ambient_energy: number)
+---@field set_ambient_mode fun(self: Godot.ReflectionProbe, ambient: integer)
+---@field set_as_interior fun(self: Godot.ReflectionProbe, enable: boolean)
+---@field set_blend_distance fun(self: Godot.ReflectionProbe, blend_distance: number)
+---@field set_cull_mask fun(self: Godot.ReflectionProbe, layers: integer)
+---@field set_enable_box_projection fun(self: Godot.ReflectionProbe, enable: boolean)
+---@field set_enable_shadows fun(self: Godot.ReflectionProbe, enable: boolean)
+---@field set_intensity fun(self: Godot.ReflectionProbe, intensity: number)
+---@field set_max_distance fun(self: Godot.ReflectionProbe, max_distance: number)
+---@field set_mesh_lod_threshold fun(self: Godot.ReflectionProbe, ratio: number)
+---@field set_origin_offset fun(self: Godot.ReflectionProbe, origin_offset: Godot.Vector3)
+---@field set_reflection_mask fun(self: Godot.ReflectionProbe, layers: integer)
+---@field set_size fun(self: Godot.ReflectionProbe, size: Godot.Vector3)
+---@field set_update_mode fun(self: Godot.ReflectionProbe, mode: integer)
+---@class Godot.ReflectionProbe.__type
+---@field new fun(): Godot.ReflectionProbe
+---@field AmbientModeEnum Godot.ReflectionProbe.AmbientModeEnum
+---@field UpdateModeEnum Godot.ReflectionProbe.UpdateModeEnum
+---@class Godot.ReflectionProbe.AmbientModeEnum
+---@field Disabled integer
+---@field Environment integer
+---@field Color integer
+---@class Godot.ReflectionProbe.UpdateModeEnum
+---@field Once integer
+---@field Always integer
+
+---@class Godot.RemoteTransform2D : Godot.Node2D
+---@field remote_path string
+---@field update_position boolean
+---@field update_rotation boolean
+---@field update_scale boolean
+---@field use_global_coordinates boolean
+---@field force_update_cache fun(self: Godot.RemoteTransform2D)
+---@field get_remote_node fun(self: Godot.RemoteTransform2D): string
+---@field get_update_position fun(self: Godot.RemoteTransform2D): boolean
+---@field get_update_rotation fun(self: Godot.RemoteTransform2D): boolean
+---@field get_update_scale fun(self: Godot.RemoteTransform2D): boolean
+---@field get_use_global_coordinates fun(self: Godot.RemoteTransform2D): boolean
+---@field set_remote_node fun(self: Godot.RemoteTransform2D, path: string)
+---@field set_update_position fun(self: Godot.RemoteTransform2D, update_remote_position: boolean)
+---@field set_update_rotation fun(self: Godot.RemoteTransform2D, update_remote_rotation: boolean)
+---@field set_update_scale fun(self: Godot.RemoteTransform2D, update_remote_scale: boolean)
+---@field set_use_global_coordinates fun(self: Godot.RemoteTransform2D, use_global_coordinates: boolean)
+---@class Godot.RemoteTransform2D.__type
+---@field new fun(): Godot.RemoteTransform2D
+
+---@class Godot.RemoteTransform3D : Godot.Node3D
+---@field remote_path string
+---@field update_position boolean
+---@field update_rotation boolean
+---@field update_scale boolean
+---@field use_global_coordinates boolean
+---@field force_update_cache fun(self: Godot.RemoteTransform3D)
+---@field get_remote_node fun(self: Godot.RemoteTransform3D): string
+---@field get_update_position fun(self: Godot.RemoteTransform3D): boolean
+---@field get_update_rotation fun(self: Godot.RemoteTransform3D): boolean
+---@field get_update_scale fun(self: Godot.RemoteTransform3D): boolean
+---@field get_use_global_coordinates fun(self: Godot.RemoteTransform3D): boolean
+---@field set_remote_node fun(self: Godot.RemoteTransform3D, path: string)
+---@field set_update_position fun(self: Godot.RemoteTransform3D, update_remote_position: boolean)
+---@field set_update_rotation fun(self: Godot.RemoteTransform3D, update_remote_rotation: boolean)
+---@field set_update_scale fun(self: Godot.RemoteTransform3D, update_remote_scale: boolean)
+---@field set_use_global_coordinates fun(self: Godot.RemoteTransform3D, use_global_coordinates: boolean)
+---@class Godot.RemoteTransform3D.__type
+---@field new fun(): Godot.RemoteTransform3D
+
+---@class Godot.Resource : Godot.RefCounted
+---@field resource_local_to_scene boolean
+---@field resource_name string
+---@field resource_path string
+---@field resource_scene_unique_id string
+---@field changed Godot.Signal
+---@field setup_local_to_scene_requested Godot.Signal
+---@field duplicate fun(self: Godot.Resource, deep: boolean): Godot.Resource
+---@field duplicate_deep fun(self: Godot.Resource, deep_subresources_mode: integer): Godot.Resource
+---@field emit_changed fun(self: Godot.Resource)
+---@field get_id_for_path fun(self: Godot.Resource, path: string): string
+---@field get_local_scene fun(self: Godot.Resource): Godot.Node
+---@field get_name fun(self: Godot.Resource): string
+---@field get_path fun(self: Godot.Resource): string
+---@field get_rid fun(self: Godot.Resource): Godot.Rid
+---@field get_scene_unique_id fun(self: Godot.Resource): string
+---@field is_built_in fun(self: Godot.Resource): boolean
+---@field is_local_to_scene fun(self: Godot.Resource): boolean
+---@field reset_state fun(self: Godot.Resource)
+---@field set_id_for_path fun(self: Godot.Resource, path: string, id: string)
+---@field set_local_to_scene fun(self: Godot.Resource, enable: boolean)
+---@field set_name fun(self: Godot.Resource, name: string)
+---@field set_path fun(self: Godot.Resource, path: string)
+---@field set_path_cache fun(self: Godot.Resource, path: string)
+---@field set_scene_unique_id fun(self: Godot.Resource, id: string)
+---@field setup_local_to_scene fun(self: Godot.Resource)
+---@field take_over_path fun(self: Godot.Resource, path: string)
+---@class Godot.Resource.__type
+---@field new fun(): Godot.Resource
+---@field GenerateSceneUniqueId fun(): string
+---@field DeepDuplicateMode Godot.Resource.DeepDuplicateMode
+---@class Godot.Resource.DeepDuplicateMode
+---@field None integer
+---@field Internal integer
+---@field All integer
+
+---@class Godot.ResourcePreloader : Godot.Node
+---@field resources table
+---@field add_resource fun(self: Godot.ResourcePreloader, name: string, resource: Godot.Resource)
+---@field get_resource fun(self: Godot.ResourcePreloader, name: string): Godot.Resource
+---@field get_resource_list fun(self: Godot.ResourcePreloader): table
+---@field has_resource fun(self: Godot.ResourcePreloader, name: string): boolean
+---@field remove_resource fun(self: Godot.ResourcePreloader, name: string)
+---@field rename_resource fun(self: Godot.ResourcePreloader, name: string, newname: string)
+---@class Godot.ResourcePreloader.__type
+---@field new fun(): Godot.ResourcePreloader
+
+---@class Godot.RetargetModifier3D : Godot.SkeletonModifier3D
+---@field enable integer
+---@field profile Godot.SkeletonProfile
+---@field use_global_pose boolean
+---@field get_enable_flags fun(self: Godot.RetargetModifier3D): integer
+---@field get_profile fun(self: Godot.RetargetModifier3D): Godot.SkeletonProfile
+---@field is_position_enabled fun(self: Godot.RetargetModifier3D): boolean
+---@field is_rotation_enabled fun(self: Godot.RetargetModifier3D): boolean
+---@field is_scale_enabled fun(self: Godot.RetargetModifier3D): boolean
+---@field is_using_global_pose fun(self: Godot.RetargetModifier3D): boolean
+---@field set_enable_flags fun(self: Godot.RetargetModifier3D, enable_flags: integer)
+---@field set_position_enabled fun(self: Godot.RetargetModifier3D, enabled: boolean)
+---@field set_profile fun(self: Godot.RetargetModifier3D, profile: Godot.SkeletonProfile)
+---@field set_rotation_enabled fun(self: Godot.RetargetModifier3D, enabled: boolean)
+---@field set_scale_enabled fun(self: Godot.RetargetModifier3D, enabled: boolean)
+---@field set_use_global_pose fun(self: Godot.RetargetModifier3D, use_global_pose: boolean)
+---@class Godot.RetargetModifier3D.__type
+---@field new fun(): Godot.RetargetModifier3D
+---@field TransformFlag Godot.RetargetModifier3D.TransformFlag
+---@class Godot.RetargetModifier3D.TransformFlag
+---@field Position integer
+---@field Rotation integer
+---@field Scale integer
+---@field All integer
+
+---@class Godot.RichTextLabel : Godot.Control
+---@field autowrap_mode integer
+---@field autowrap_trim_flags integer
+---@field bbcode_enabled boolean
+---@field context_menu_enabled boolean
+---@field custom_effects table
+---@field deselect_on_focus_loss_enabled boolean
+---@field drag_and_drop_selection_enabled boolean
+---@field fit_content boolean
+---@field hint_underlined boolean
+---@field horizontal_alignment integer
+---@field justification_flags integer
+---@field language string
+---@field meta_underlined boolean
+---@field progress_bar_delay integer
+---@field scroll_active boolean
+---@field scroll_following boolean
+---@field scroll_following_visible_characters boolean
+---@field selection_enabled boolean
+---@field shortcut_keys_enabled boolean
+---@field structured_text_bidi_override integer
+---@field structured_text_bidi_override_options table
+---@field tab_size integer
+---@field tab_stops table
+---@field text string
+---@field text_direction integer
+---@field threaded boolean
+---@field vertical_alignment integer
+---@field visible_characters integer
+---@field visible_characters_behavior integer
+---@field visible_ratio number
+---@field finished Godot.Signal
+---@field meta_clicked Godot.Signal
+---@field meta_hover_ended Godot.Signal
+---@field meta_hover_started Godot.Signal
+---@field add_hr fun(self: Godot.RichTextLabel, width: integer, height: integer, color: Godot.Color, alignment: integer, width_in_percent: boolean, height_in_percent: boolean)
+---@field add_image fun(self: Godot.RichTextLabel, image: Godot.Texture2D, width: integer, height: integer, color: Godot.Color, inline_align: integer, region: Godot.Rect2, key: any, pad: boolean, tooltip: string, width_in_percent: boolean, height_in_percent: boolean, alt_text: string)
+---@field add_text fun(self: Godot.RichTextLabel, text: string)
+---@field append_text fun(self: Godot.RichTextLabel, bbcode: string)
+---@field clear fun(self: Godot.RichTextLabel)
+---@field deselect fun(self: Godot.RichTextLabel)
+---@field get_autowrap_mode fun(self: Godot.RichTextLabel): integer
+---@field get_autowrap_trim_flags fun(self: Godot.RichTextLabel): integer
+---@field get_character_line fun(self: Godot.RichTextLabel, character: integer): integer
+---@field get_character_paragraph fun(self: Godot.RichTextLabel, character: integer): integer
+---@field get_content_height fun(self: Godot.RichTextLabel): integer
+---@field get_content_width fun(self: Godot.RichTextLabel): integer
+---@field get_effects fun(self: Godot.RichTextLabel): table
+---@field get_horizontal_alignment fun(self: Godot.RichTextLabel): integer
+---@field get_justification_flags fun(self: Godot.RichTextLabel): integer
+---@field get_language fun(self: Godot.RichTextLabel): string
+---@field get_line_count fun(self: Godot.RichTextLabel): integer
+---@field get_line_height fun(self: Godot.RichTextLabel, line: integer): integer
+---@field get_line_offset fun(self: Godot.RichTextLabel, line: integer): number
+---@field get_line_range fun(self: Godot.RichTextLabel, line: integer): Godot.Vector2I
+---@field get_line_width fun(self: Godot.RichTextLabel, line: integer): integer
+---@field get_menu fun(self: Godot.RichTextLabel): Godot.PopupMenu
+---@field get_paragraph_count fun(self: Godot.RichTextLabel): integer
+---@field get_paragraph_offset fun(self: Godot.RichTextLabel, paragraph: integer): number
+---@field get_parsed_text fun(self: Godot.RichTextLabel): string
+---@field get_progress_bar_delay fun(self: Godot.RichTextLabel): integer
+---@field get_selected_text fun(self: Godot.RichTextLabel): string
+---@field get_selection_from fun(self: Godot.RichTextLabel): integer
+---@field get_selection_line_offset fun(self: Godot.RichTextLabel): number
+---@field get_selection_to fun(self: Godot.RichTextLabel): integer
+---@field get_structured_text_bidi_override fun(self: Godot.RichTextLabel): integer
+---@field get_structured_text_bidi_override_options fun(self: Godot.RichTextLabel): table
+---@field get_tab_size fun(self: Godot.RichTextLabel): integer
+---@field get_tab_stops fun(self: Godot.RichTextLabel): table
+---@field get_text fun(self: Godot.RichTextLabel): string
+---@field get_text_direction fun(self: Godot.RichTextLabel): integer
+---@field get_total_character_count fun(self: Godot.RichTextLabel): integer
+---@field get_v_scroll_bar fun(self: Godot.RichTextLabel): Godot.VScrollBar
+---@field get_vertical_alignment fun(self: Godot.RichTextLabel): integer
+---@field get_visible_characters fun(self: Godot.RichTextLabel): integer
+---@field get_visible_characters_behavior fun(self: Godot.RichTextLabel): integer
+---@field get_visible_content_rect fun(self: Godot.RichTextLabel): Godot.Rect2I
+---@field get_visible_line_count fun(self: Godot.RichTextLabel): integer
+---@field get_visible_paragraph_count fun(self: Godot.RichTextLabel): integer
+---@field get_visible_ratio fun(self: Godot.RichTextLabel): number
+---@field install_effect fun(self: Godot.RichTextLabel, effect: any)
+---@field invalidate_paragraph fun(self: Godot.RichTextLabel, paragraph: integer): boolean
+---@field is_context_menu_enabled fun(self: Godot.RichTextLabel): boolean
+---@field is_deselect_on_focus_loss_enabled fun(self: Godot.RichTextLabel): boolean
+---@field is_drag_and_drop_selection_enabled fun(self: Godot.RichTextLabel): boolean
+---@field is_finished fun(self: Godot.RichTextLabel): boolean
+---@field is_fit_content_enabled fun(self: Godot.RichTextLabel): boolean
+---@field is_hint_underlined fun(self: Godot.RichTextLabel): boolean
+---@field is_menu_visible fun(self: Godot.RichTextLabel): boolean
+---@field is_meta_underlined fun(self: Godot.RichTextLabel): boolean
+---@field is_ready fun(self: Godot.RichTextLabel): boolean
+---@field is_scroll_active fun(self: Godot.RichTextLabel): boolean
+---@field is_scroll_following fun(self: Godot.RichTextLabel): boolean
+---@field is_scroll_following_visible_characters fun(self: Godot.RichTextLabel): boolean
+---@field is_selection_enabled fun(self: Godot.RichTextLabel): boolean
+---@field is_shortcut_keys_enabled fun(self: Godot.RichTextLabel): boolean
+---@field is_threaded fun(self: Godot.RichTextLabel): boolean
+---@field is_using_bbcode fun(self: Godot.RichTextLabel): boolean
+---@field menu_option fun(self: Godot.RichTextLabel, option: integer)
+---@field newline fun(self: Godot.RichTextLabel)
+---@field parse_bbcode fun(self: Godot.RichTextLabel, bbcode: string)
+---@field parse_expressions_for_values fun(self: Godot.RichTextLabel, expressions: table): table
+---@field pop fun(self: Godot.RichTextLabel)
+---@field pop_all fun(self: Godot.RichTextLabel)
+---@field pop_context fun(self: Godot.RichTextLabel)
+---@field push_bgcolor fun(self: Godot.RichTextLabel, bgcolor: Godot.Color)
+---@field push_bold fun(self: Godot.RichTextLabel)
+---@field push_bold_italics fun(self: Godot.RichTextLabel)
+---@field push_cell fun(self: Godot.RichTextLabel)
+---@field push_color fun(self: Godot.RichTextLabel, color: Godot.Color)
+---@field push_context fun(self: Godot.RichTextLabel)
+---@field push_customfx fun(self: Godot.RichTextLabel, effect: Godot.RichTextEffect, env: table)
+---@field push_dropcap fun(self: Godot.RichTextLabel, string: string, font: Godot.Font, size: integer, dropcap_margins: Godot.Rect2, color: Godot.Color, outline_size: integer, outline_color: Godot.Color)
+---@field push_fgcolor fun(self: Godot.RichTextLabel, fgcolor: Godot.Color)
+---@field push_font fun(self: Godot.RichTextLabel, font: Godot.Font, font_size: integer)
+---@field push_font_size fun(self: Godot.RichTextLabel, font_size: integer)
+---@field push_hint fun(self: Godot.RichTextLabel, description: string)
+---@field push_indent fun(self: Godot.RichTextLabel, level: integer)
+---@field push_italics fun(self: Godot.RichTextLabel)
+---@field push_language fun(self: Godot.RichTextLabel, language: string)
+---@field push_list fun(self: Godot.RichTextLabel, level: integer, type: integer, capitalize: boolean, bullet: string)
+---@field push_meta fun(self: Godot.RichTextLabel, data: any, underline_mode: integer, tooltip: string)
+---@field push_mono fun(self: Godot.RichTextLabel)
+---@field push_normal fun(self: Godot.RichTextLabel)
+---@field push_outline_color fun(self: Godot.RichTextLabel, color: Godot.Color)
+---@field push_outline_size fun(self: Godot.RichTextLabel, outline_size: integer)
+---@field push_paragraph fun(self: Godot.RichTextLabel, alignment: integer, base_direction: integer, language: string, st_parser: integer, justification_flags: integer, tab_stops: table)
+---@field push_strikethrough fun(self: Godot.RichTextLabel, color: Godot.Color)
+---@field push_table fun(self: Godot.RichTextLabel, columns: integer, inline_align: integer, align_to_row: integer, name: string)
+---@field push_underline fun(self: Godot.RichTextLabel, color: Godot.Color)
+---@field reload_effects fun(self: Godot.RichTextLabel)
+---@field remove_paragraph fun(self: Godot.RichTextLabel, paragraph: integer, no_invalidate: boolean): boolean
+---@field scroll_to_line fun(self: Godot.RichTextLabel, line: integer)
+---@field scroll_to_paragraph fun(self: Godot.RichTextLabel, paragraph: integer)
+---@field scroll_to_selection fun(self: Godot.RichTextLabel)
+---@field select_all fun(self: Godot.RichTextLabel)
+---@field set_autowrap_mode fun(self: Godot.RichTextLabel, autowrap_mode: integer)
+---@field set_autowrap_trim_flags fun(self: Godot.RichTextLabel, autowrap_trim_flags: integer)
+---@field set_cell_border_color fun(self: Godot.RichTextLabel, color: Godot.Color)
+---@field set_cell_padding fun(self: Godot.RichTextLabel, padding: Godot.Rect2)
+---@field set_cell_row_background_color fun(self: Godot.RichTextLabel, odd_row_bg: Godot.Color, even_row_bg: Godot.Color)
+---@field set_cell_size_override fun(self: Godot.RichTextLabel, min_size: Godot.Vector2, max_size: Godot.Vector2)
+---@field set_context_menu_enabled fun(self: Godot.RichTextLabel, enabled: boolean)
+---@field set_deselect_on_focus_loss_enabled fun(self: Godot.RichTextLabel, enable: boolean)
+---@field set_drag_and_drop_selection_enabled fun(self: Godot.RichTextLabel, enable: boolean)
+---@field set_effects fun(self: Godot.RichTextLabel, effects: table)
+---@field set_fit_content fun(self: Godot.RichTextLabel, enabled: boolean)
+---@field set_hint_underline fun(self: Godot.RichTextLabel, enable: boolean)
+---@field set_horizontal_alignment fun(self: Godot.RichTextLabel, alignment: integer)
+---@field set_justification_flags fun(self: Godot.RichTextLabel, justification_flags: integer)
+---@field set_language fun(self: Godot.RichTextLabel, language: string)
+---@field set_meta_underline fun(self: Godot.RichTextLabel, enable: boolean)
+---@field set_progress_bar_delay fun(self: Godot.RichTextLabel, delay_ms: integer)
+---@field set_scroll_active fun(self: Godot.RichTextLabel, active: boolean)
+---@field set_scroll_follow fun(self: Godot.RichTextLabel, follow: boolean)
+---@field set_scroll_follow_visible_characters fun(self: Godot.RichTextLabel, follow: boolean)
+---@field set_selection_enabled fun(self: Godot.RichTextLabel, enabled: boolean)
+---@field set_shortcut_keys_enabled fun(self: Godot.RichTextLabel, enabled: boolean)
+---@field set_structured_text_bidi_override fun(self: Godot.RichTextLabel, parser: integer)
+---@field set_structured_text_bidi_override_options fun(self: Godot.RichTextLabel, args: table)
+---@field set_tab_size fun(self: Godot.RichTextLabel, spaces: integer)
+---@field set_tab_stops fun(self: Godot.RichTextLabel, tab_stops: table)
+---@field set_table_column_expand fun(self: Godot.RichTextLabel, column: integer, expand: boolean, ratio: integer, shrink: boolean)
+---@field set_table_column_name fun(self: Godot.RichTextLabel, column: integer, name: string)
+---@field set_text fun(self: Godot.RichTextLabel, text: string)
+---@field set_text_direction fun(self: Godot.RichTextLabel, direction: integer)
+---@field set_threaded fun(self: Godot.RichTextLabel, threaded: boolean)
+---@field set_use_bbcode fun(self: Godot.RichTextLabel, enable: boolean)
+---@field set_vertical_alignment fun(self: Godot.RichTextLabel, alignment: integer)
+---@field set_visible_characters fun(self: Godot.RichTextLabel, amount: integer)
+---@field set_visible_characters_behavior fun(self: Godot.RichTextLabel, behavior: integer)
+---@field set_visible_ratio fun(self: Godot.RichTextLabel, ratio: number)
+---@field update_image fun(self: Godot.RichTextLabel, key: any, mask: integer, image: Godot.Texture2D, width: integer, height: integer, color: Godot.Color, inline_align: integer, region: Godot.Rect2, pad: boolean, tooltip: string, width_in_percent: boolean, height_in_percent: boolean)
+---@class Godot.RichTextLabel.__type
+---@field new fun(): Godot.RichTextLabel
+---@field ImageUpdateMask Godot.RichTextLabel.ImageUpdateMask
+---@field ListType Godot.RichTextLabel.ListType
+---@field MenuItems Godot.RichTextLabel.MenuItems
+---@field MetaUnderline Godot.RichTextLabel.MetaUnderline
+---@class Godot.RichTextLabel.ImageUpdateMask
+---@field Texture integer
+---@field Size integer
+---@field Color integer
+---@field Alignment integer
+---@field Region integer
+---@field Pad integer
+---@field Tooltip integer
+---@field WidthInPercent integer
+---@class Godot.RichTextLabel.ListType
+---@field Numbers integer
+---@field Letters integer
+---@field Roman integer
+---@field Dots integer
+---@class Godot.RichTextLabel.MenuItems
+---@field Copy integer
+---@field SelectAll integer
+---@field Max integer
+---@class Godot.RichTextLabel.MetaUnderline
+---@field Never integer
+---@field Always integer
+---@field OnHover integer
+
+---@class Godot.RigidBody2D : Godot.PhysicsBody2D
+---@field angular_damp number
+---@field angular_damp_mode integer
+---@field angular_velocity number
+---@field can_sleep boolean
+---@field center_of_mass Godot.Vector2
+---@field center_of_mass_mode integer
+---@field constant_force Godot.Vector2
+---@field constant_torque number
+---@field contact_monitor boolean
+---@field continuous_cd integer
+---@field custom_integrator boolean
+---@field freeze boolean
+---@field freeze_mode integer
+---@field gravity_scale number
+---@field inertia number
+---@field linear_damp number
+---@field linear_damp_mode integer
+---@field linear_velocity Godot.Vector2
+---@field lock_rotation boolean
+---@field mass number
+---@field max_contacts_reported integer
+---@field physics_material_override Godot.PhysicsMaterial
+---@field sleeping boolean
+---@field body_entered Godot.Signal
+---@field body_exited Godot.Signal
+---@field body_shape_entered Godot.Signal
+---@field body_shape_exited Godot.Signal
+---@field sleeping_state_changed Godot.Signal
+---@field add_constant_central_force fun(self: Godot.RigidBody2D, force: Godot.Vector2)
+---@field add_constant_force fun(self: Godot.RigidBody2D, force: Godot.Vector2, position: Godot.Vector2)
+---@field add_constant_torque fun(self: Godot.RigidBody2D, torque: number)
+---@field apply_central_force fun(self: Godot.RigidBody2D, force: Godot.Vector2)
+---@field apply_central_impulse fun(self: Godot.RigidBody2D, impulse: Godot.Vector2)
+---@field apply_force fun(self: Godot.RigidBody2D, force: Godot.Vector2, position: Godot.Vector2)
+---@field apply_impulse fun(self: Godot.RigidBody2D, impulse: Godot.Vector2, position: Godot.Vector2)
+---@field apply_torque fun(self: Godot.RigidBody2D, torque: number)
+---@field apply_torque_impulse fun(self: Godot.RigidBody2D, torque: number)
+---@field get_angular_damp fun(self: Godot.RigidBody2D): number
+---@field get_angular_damp_mode fun(self: Godot.RigidBody2D): integer
+---@field get_angular_velocity fun(self: Godot.RigidBody2D): number
+---@field get_center_of_mass fun(self: Godot.RigidBody2D): Godot.Vector2
+---@field get_center_of_mass_mode fun(self: Godot.RigidBody2D): integer
+---@field get_colliding_bodies fun(self: Godot.RigidBody2D): table
+---@field get_constant_force fun(self: Godot.RigidBody2D): Godot.Vector2
+---@field get_constant_torque fun(self: Godot.RigidBody2D): number
+---@field get_contact_count fun(self: Godot.RigidBody2D): integer
+---@field get_continuous_collision_detection_mode fun(self: Godot.RigidBody2D): integer
+---@field get_freeze_mode fun(self: Godot.RigidBody2D): integer
+---@field get_gravity_scale fun(self: Godot.RigidBody2D): number
+---@field get_inertia fun(self: Godot.RigidBody2D): number
+---@field get_linear_damp fun(self: Godot.RigidBody2D): number
+---@field get_linear_damp_mode fun(self: Godot.RigidBody2D): integer
+---@field get_linear_velocity fun(self: Godot.RigidBody2D): Godot.Vector2
+---@field get_mass fun(self: Godot.RigidBody2D): number
+---@field get_max_contacts_reported fun(self: Godot.RigidBody2D): integer
+---@field get_physics_material_override fun(self: Godot.RigidBody2D): Godot.PhysicsMaterial
+---@field is_able_to_sleep fun(self: Godot.RigidBody2D): boolean
+---@field is_contact_monitor_enabled fun(self: Godot.RigidBody2D): boolean
+---@field is_freeze_enabled fun(self: Godot.RigidBody2D): boolean
+---@field is_lock_rotation_enabled fun(self: Godot.RigidBody2D): boolean
+---@field is_sleeping fun(self: Godot.RigidBody2D): boolean
+---@field is_using_custom_integrator fun(self: Godot.RigidBody2D): boolean
+---@field set_angular_damp fun(self: Godot.RigidBody2D, angular_damp: number)
+---@field set_angular_damp_mode fun(self: Godot.RigidBody2D, angular_damp_mode: integer)
+---@field set_angular_velocity fun(self: Godot.RigidBody2D, angular_velocity: number)
+---@field set_axis_velocity fun(self: Godot.RigidBody2D, axis_velocity: Godot.Vector2)
+---@field set_can_sleep fun(self: Godot.RigidBody2D, able_to_sleep: boolean)
+---@field set_center_of_mass fun(self: Godot.RigidBody2D, center_of_mass: Godot.Vector2)
+---@field set_center_of_mass_mode fun(self: Godot.RigidBody2D, mode: integer)
+---@field set_constant_force fun(self: Godot.RigidBody2D, force: Godot.Vector2)
+---@field set_constant_torque fun(self: Godot.RigidBody2D, torque: number)
+---@field set_contact_monitor fun(self: Godot.RigidBody2D, enabled: boolean)
+---@field set_continuous_collision_detection_mode fun(self: Godot.RigidBody2D, mode: integer)
+---@field set_freeze_enabled fun(self: Godot.RigidBody2D, freeze_mode: boolean)
+---@field set_freeze_mode fun(self: Godot.RigidBody2D, freeze_mode: integer)
+---@field set_gravity_scale fun(self: Godot.RigidBody2D, gravity_scale: number)
+---@field set_inertia fun(self: Godot.RigidBody2D, inertia: number)
+---@field set_linear_damp fun(self: Godot.RigidBody2D, linear_damp: number)
+---@field set_linear_damp_mode fun(self: Godot.RigidBody2D, linear_damp_mode: integer)
+---@field set_linear_velocity fun(self: Godot.RigidBody2D, linear_velocity: Godot.Vector2)
+---@field set_lock_rotation_enabled fun(self: Godot.RigidBody2D, lock_rotation: boolean)
+---@field set_mass fun(self: Godot.RigidBody2D, mass: number)
+---@field set_max_contacts_reported fun(self: Godot.RigidBody2D, amount: integer)
+---@field set_physics_material_override fun(self: Godot.RigidBody2D, physics_material_override: Godot.PhysicsMaterial)
+---@field set_sleeping fun(self: Godot.RigidBody2D, sleeping: boolean)
+---@field set_use_custom_integrator fun(self: Godot.RigidBody2D, enable: boolean)
+---@class Godot.RigidBody2D.__type
+---@field new fun(): Godot.RigidBody2D
+---@field CcdMode Godot.RigidBody2D.CcdMode
+---@field CenterOfMassModeEnum Godot.RigidBody2D.CenterOfMassModeEnum
+---@field DampMode Godot.RigidBody2D.DampMode
+---@field FreezeModeEnum Godot.RigidBody2D.FreezeModeEnum
+---@class Godot.RigidBody2D.CcdMode
+---@field Disabled integer
+---@field CastRay integer
+---@field CastShape integer
+---@class Godot.RigidBody2D.CenterOfMassModeEnum
+---@field Auto integer
+---@field Custom integer
+---@class Godot.RigidBody2D.DampMode
+---@field Combine integer
+---@field Replace integer
+---@class Godot.RigidBody2D.FreezeModeEnum
+---@field Static integer
+---@field Kinematic integer
+
+---@class Godot.RigidBody3D : Godot.PhysicsBody3D
+---@field angular_damp number
+---@field angular_damp_mode integer
+---@field angular_velocity Godot.Vector3
+---@field can_sleep boolean
+---@field center_of_mass Godot.Vector3
+---@field center_of_mass_mode integer
+---@field constant_force Godot.Vector3
+---@field constant_torque Godot.Vector3
+---@field contact_monitor boolean
+---@field continuous_cd boolean
+---@field custom_integrator boolean
+---@field freeze boolean
+---@field freeze_mode integer
+---@field gravity_scale number
+---@field inertia Godot.Vector3
+---@field linear_damp number
+---@field linear_damp_mode integer
+---@field linear_velocity Godot.Vector3
+---@field lock_rotation boolean
+---@field mass number
+---@field max_contacts_reported integer
+---@field physics_material_override Godot.PhysicsMaterial
+---@field sleeping boolean
+---@field body_entered Godot.Signal
+---@field body_exited Godot.Signal
+---@field body_shape_entered Godot.Signal
+---@field body_shape_exited Godot.Signal
+---@field sleeping_state_changed Godot.Signal
+---@field add_constant_central_force fun(self: Godot.RigidBody3D, force: Godot.Vector3)
+---@field add_constant_force fun(self: Godot.RigidBody3D, force: Godot.Vector3, position: Godot.Vector3)
+---@field add_constant_torque fun(self: Godot.RigidBody3D, torque: Godot.Vector3)
+---@field apply_central_force fun(self: Godot.RigidBody3D, force: Godot.Vector3)
+---@field apply_central_impulse fun(self: Godot.RigidBody3D, impulse: Godot.Vector3)
+---@field apply_force fun(self: Godot.RigidBody3D, force: Godot.Vector3, position: Godot.Vector3)
+---@field apply_impulse fun(self: Godot.RigidBody3D, impulse: Godot.Vector3, position: Godot.Vector3)
+---@field apply_torque fun(self: Godot.RigidBody3D, torque: Godot.Vector3)
+---@field apply_torque_impulse fun(self: Godot.RigidBody3D, impulse: Godot.Vector3)
+---@field get_angular_damp fun(self: Godot.RigidBody3D): number
+---@field get_angular_damp_mode fun(self: Godot.RigidBody3D): integer
+---@field get_angular_velocity fun(self: Godot.RigidBody3D): Godot.Vector3
+---@field get_center_of_mass fun(self: Godot.RigidBody3D): Godot.Vector3
+---@field get_center_of_mass_mode fun(self: Godot.RigidBody3D): integer
+---@field get_colliding_bodies fun(self: Godot.RigidBody3D): table
+---@field get_constant_force fun(self: Godot.RigidBody3D): Godot.Vector3
+---@field get_constant_torque fun(self: Godot.RigidBody3D): Godot.Vector3
+---@field get_contact_count fun(self: Godot.RigidBody3D): integer
+---@field get_freeze_mode fun(self: Godot.RigidBody3D): integer
+---@field get_gravity_scale fun(self: Godot.RigidBody3D): number
+---@field get_inertia fun(self: Godot.RigidBody3D): Godot.Vector3
+---@field get_inverse_inertia_tensor fun(self: Godot.RigidBody3D): Godot.Basis
+---@field get_linear_damp fun(self: Godot.RigidBody3D): number
+---@field get_linear_damp_mode fun(self: Godot.RigidBody3D): integer
+---@field get_linear_velocity fun(self: Godot.RigidBody3D): Godot.Vector3
+---@field get_mass fun(self: Godot.RigidBody3D): number
+---@field get_max_contacts_reported fun(self: Godot.RigidBody3D): integer
+---@field get_physics_material_override fun(self: Godot.RigidBody3D): Godot.PhysicsMaterial
+---@field is_able_to_sleep fun(self: Godot.RigidBody3D): boolean
+---@field is_contact_monitor_enabled fun(self: Godot.RigidBody3D): boolean
+---@field is_freeze_enabled fun(self: Godot.RigidBody3D): boolean
+---@field is_lock_rotation_enabled fun(self: Godot.RigidBody3D): boolean
+---@field is_sleeping fun(self: Godot.RigidBody3D): boolean
+---@field is_using_continuous_collision_detection fun(self: Godot.RigidBody3D): boolean
+---@field is_using_custom_integrator fun(self: Godot.RigidBody3D): boolean
+---@field set_angular_damp fun(self: Godot.RigidBody3D, angular_damp: number)
+---@field set_angular_damp_mode fun(self: Godot.RigidBody3D, angular_damp_mode: integer)
+---@field set_angular_velocity fun(self: Godot.RigidBody3D, angular_velocity: Godot.Vector3)
+---@field set_axis_velocity fun(self: Godot.RigidBody3D, axis_velocity: Godot.Vector3)
+---@field set_can_sleep fun(self: Godot.RigidBody3D, able_to_sleep: boolean)
+---@field set_center_of_mass fun(self: Godot.RigidBody3D, center_of_mass: Godot.Vector3)
+---@field set_center_of_mass_mode fun(self: Godot.RigidBody3D, mode: integer)
+---@field set_constant_force fun(self: Godot.RigidBody3D, force: Godot.Vector3)
+---@field set_constant_torque fun(self: Godot.RigidBody3D, torque: Godot.Vector3)
+---@field set_contact_monitor fun(self: Godot.RigidBody3D, enabled: boolean)
+---@field set_freeze_enabled fun(self: Godot.RigidBody3D, freeze_mode: boolean)
+---@field set_freeze_mode fun(self: Godot.RigidBody3D, freeze_mode: integer)
+---@field set_gravity_scale fun(self: Godot.RigidBody3D, gravity_scale: number)
+---@field set_inertia fun(self: Godot.RigidBody3D, inertia: Godot.Vector3)
+---@field set_linear_damp fun(self: Godot.RigidBody3D, linear_damp: number)
+---@field set_linear_damp_mode fun(self: Godot.RigidBody3D, linear_damp_mode: integer)
+---@field set_linear_velocity fun(self: Godot.RigidBody3D, linear_velocity: Godot.Vector3)
+---@field set_lock_rotation_enabled fun(self: Godot.RigidBody3D, lock_rotation: boolean)
+---@field set_mass fun(self: Godot.RigidBody3D, mass: number)
+---@field set_max_contacts_reported fun(self: Godot.RigidBody3D, amount: integer)
+---@field set_physics_material_override fun(self: Godot.RigidBody3D, physics_material_override: Godot.PhysicsMaterial)
+---@field set_sleeping fun(self: Godot.RigidBody3D, sleeping: boolean)
+---@field set_use_continuous_collision_detection fun(self: Godot.RigidBody3D, enable: boolean)
+---@field set_use_custom_integrator fun(self: Godot.RigidBody3D, enable: boolean)
+---@class Godot.RigidBody3D.__type
+---@field new fun(): Godot.RigidBody3D
+---@field CenterOfMassModeEnum Godot.RigidBody3D.CenterOfMassModeEnum
+---@field DampMode Godot.RigidBody3D.DampMode
+---@field FreezeModeEnum Godot.RigidBody3D.FreezeModeEnum
+---@class Godot.RigidBody3D.CenterOfMassModeEnum
+---@field Auto integer
+---@field Custom integer
+---@class Godot.RigidBody3D.DampMode
+---@field Combine integer
+---@field Replace integer
+---@class Godot.RigidBody3D.FreezeModeEnum
+---@field Static integer
+---@field Kinematic integer
+
+---@class Godot.RootMotionView : Godot.VisualInstance3D
+---@field animation_path string
+---@field cell_size number
+---@field color Godot.Color
+---@field radius number
+---@field zero_y boolean
+---@field get_animation_path fun(self: Godot.RootMotionView): string
+---@field get_cell_size fun(self: Godot.RootMotionView): number
+---@field get_color fun(self: Godot.RootMotionView): Godot.Color
+---@field get_radius fun(self: Godot.RootMotionView): number
+---@field get_zero_y fun(self: Godot.RootMotionView): boolean
+---@field set_animation_path fun(self: Godot.RootMotionView, path: string)
+---@field set_cell_size fun(self: Godot.RootMotionView, size: number)
+---@field set_color fun(self: Godot.RootMotionView, color: Godot.Color)
+---@field set_radius fun(self: Godot.RootMotionView, size: number)
+---@field set_zero_y fun(self: Godot.RootMotionView, enable: boolean)
+---@class Godot.RootMotionView.__type
+---@field new fun(): Godot.RootMotionView
+
+---@class Godot.ScrollBar : Godot.Range
+---@field custom_step number
+---@field scrolling Godot.Signal
+---@field get_custom_step fun(self: Godot.ScrollBar): number
+---@field set_custom_step fun(self: Godot.ScrollBar, step: number)
+---@class Godot.ScrollBar.__type
+---@field new fun(): Godot.ScrollBar
+
+---@class Godot.ScrollContainer : Godot.Container
+---@field draw_focus_border boolean
+---@field follow_focus boolean
+---@field horizontal_scroll_mode integer
+---@field scroll_deadzone integer
+---@field scroll_hint_mode integer
+---@field scroll_horizontal integer
+---@field scroll_horizontal_custom_step number
+---@field scroll_vertical integer
+---@field scroll_vertical_custom_step number
+---@field tile_scroll_hint boolean
+---@field vertical_scroll_mode integer
+---@field scroll_ended Godot.Signal
+---@field scroll_started Godot.Signal
+---@field ensure_control_visible fun(self: Godot.ScrollContainer, control: Godot.Control)
+---@field get_deadzone fun(self: Godot.ScrollContainer): integer
+---@field get_draw_focus_border fun(self: Godot.ScrollContainer): boolean
+---@field get_h_scroll fun(self: Godot.ScrollContainer): integer
+---@field get_h_scroll_bar fun(self: Godot.ScrollContainer): Godot.HScrollBar
+---@field get_horizontal_custom_step fun(self: Godot.ScrollContainer): number
+---@field get_horizontal_scroll_mode fun(self: Godot.ScrollContainer): integer
+---@field get_scroll_hint_mode fun(self: Godot.ScrollContainer): integer
+---@field get_v_scroll fun(self: Godot.ScrollContainer): integer
+---@field get_v_scroll_bar fun(self: Godot.ScrollContainer): Godot.VScrollBar
+---@field get_vertical_custom_step fun(self: Godot.ScrollContainer): number
+---@field get_vertical_scroll_mode fun(self: Godot.ScrollContainer): integer
+---@field is_following_focus fun(self: Godot.ScrollContainer): boolean
+---@field is_scroll_hint_tiled fun(self: Godot.ScrollContainer): boolean
+---@field set_deadzone fun(self: Godot.ScrollContainer, deadzone: integer)
+---@field set_draw_focus_border fun(self: Godot.ScrollContainer, draw: boolean)
+---@field set_follow_focus fun(self: Godot.ScrollContainer, enabled: boolean)
+---@field set_h_scroll fun(self: Godot.ScrollContainer, value: integer)
+---@field set_horizontal_custom_step fun(self: Godot.ScrollContainer, value: number)
+---@field set_horizontal_scroll_mode fun(self: Godot.ScrollContainer, enable: integer)
+---@field set_scroll_hint_mode fun(self: Godot.ScrollContainer, scroll_hint_mode: integer)
+---@field set_tile_scroll_hint fun(self: Godot.ScrollContainer, tile_scroll_hint: boolean)
+---@field set_v_scroll fun(self: Godot.ScrollContainer, value: integer)
+---@field set_vertical_custom_step fun(self: Godot.ScrollContainer, value: number)
+---@field set_vertical_scroll_mode fun(self: Godot.ScrollContainer, enable: integer)
+---@class Godot.ScrollContainer.__type
+---@field new fun(): Godot.ScrollContainer
+---@field ScrollHintModeEnum Godot.ScrollContainer.ScrollHintModeEnum
+---@field ScrollMode Godot.ScrollContainer.ScrollMode
+---@class Godot.ScrollContainer.ScrollHintModeEnum
+---@field Disabled integer
+---@field All integer
+---@field TopAndLeft integer
+---@field BottomAndRight integer
+---@class Godot.ScrollContainer.ScrollMode
+---@field Disabled integer
+---@field Auto integer
+---@field ShowAlways integer
+---@field ShowNever integer
+---@field Reserve integer
+
+---@class Godot.Separator : Godot.Control
+---@class Godot.Separator.__type
+---@field new fun(): Godot.Separator
+
+---@class Godot.ShaderGlobalsOverride : Godot.Node
+---@class Godot.ShaderGlobalsOverride.__type
+---@field new fun(): Godot.ShaderGlobalsOverride
+
+---@class Godot.ShapeCast2D : Godot.Node2D
+---@field collide_with_areas boolean
+---@field collide_with_bodies boolean
+---@field collision_mask integer
+---@field collision_result table
+---@field enabled boolean
+---@field exclude_parent boolean
+---@field margin number
+---@field max_results integer
+---@field shape Godot.Shape2D
+---@field target_position Godot.Vector2
+---@field add_exception fun(self: Godot.ShapeCast2D, node: Godot.CollisionObject2D)
+---@field add_exception_rid fun(self: Godot.ShapeCast2D, rid: Godot.Rid)
+---@field clear_exceptions fun(self: Godot.ShapeCast2D)
+---@field force_shapecast_update fun(self: Godot.ShapeCast2D)
+---@field get_closest_collision_safe_fraction fun(self: Godot.ShapeCast2D): number
+---@field get_closest_collision_unsafe_fraction fun(self: Godot.ShapeCast2D): number
+---@field get_collider fun(self: Godot.ShapeCast2D, index: integer): Godot.Object
+---@field get_collider_rid fun(self: Godot.ShapeCast2D, index: integer): Godot.Rid
+---@field get_collider_shape fun(self: Godot.ShapeCast2D, index: integer): integer
+---@field get_collision_count fun(self: Godot.ShapeCast2D): integer
+---@field get_collision_mask fun(self: Godot.ShapeCast2D): integer
+---@field get_collision_mask_value fun(self: Godot.ShapeCast2D, layer_number: integer): boolean
+---@field get_collision_normal fun(self: Godot.ShapeCast2D, index: integer): Godot.Vector2
+---@field get_collision_point fun(self: Godot.ShapeCast2D, index: integer): Godot.Vector2
+---@field get_collision_result fun(self: Godot.ShapeCast2D): table
+---@field get_exclude_parent_body fun(self: Godot.ShapeCast2D): boolean
+---@field get_margin fun(self: Godot.ShapeCast2D): number
+---@field get_max_results fun(self: Godot.ShapeCast2D): integer
+---@field get_shape fun(self: Godot.ShapeCast2D): Godot.Shape2D
+---@field get_target_position fun(self: Godot.ShapeCast2D): Godot.Vector2
+---@field is_collide_with_areas_enabled fun(self: Godot.ShapeCast2D): boolean
+---@field is_collide_with_bodies_enabled fun(self: Godot.ShapeCast2D): boolean
+---@field is_colliding fun(self: Godot.ShapeCast2D): boolean
+---@field is_enabled fun(self: Godot.ShapeCast2D): boolean
+---@field remove_exception fun(self: Godot.ShapeCast2D, node: Godot.CollisionObject2D)
+---@field remove_exception_rid fun(self: Godot.ShapeCast2D, rid: Godot.Rid)
+---@field set_collide_with_areas fun(self: Godot.ShapeCast2D, enable: boolean)
+---@field set_collide_with_bodies fun(self: Godot.ShapeCast2D, enable: boolean)
+---@field set_collision_mask fun(self: Godot.ShapeCast2D, mask: integer)
+---@field set_collision_mask_value fun(self: Godot.ShapeCast2D, layer_number: integer, value: boolean)
+---@field set_enabled fun(self: Godot.ShapeCast2D, enabled: boolean)
+---@field set_exclude_parent_body fun(self: Godot.ShapeCast2D, mask: boolean)
+---@field set_margin fun(self: Godot.ShapeCast2D, margin: number)
+---@field set_max_results fun(self: Godot.ShapeCast2D, max_results: integer)
+---@field set_shape fun(self: Godot.ShapeCast2D, shape: Godot.Shape2D)
+---@field set_target_position fun(self: Godot.ShapeCast2D, local_point: Godot.Vector2)
+---@class Godot.ShapeCast2D.__type
+---@field new fun(): Godot.ShapeCast2D
+
+---@class Godot.ShapeCast3D : Godot.Node3D
+---@field collide_with_areas boolean
+---@field collide_with_bodies boolean
+---@field collision_mask integer
+---@field collision_result table
+---@field debug_shape_custom_color Godot.Color
+---@field enabled boolean
+---@field exclude_parent boolean
+---@field margin number
+---@field max_results integer
+---@field shape Godot.Shape3D
+---@field target_position Godot.Vector3
+---@field add_exception fun(self: Godot.ShapeCast3D, node: Godot.CollisionObject3D)
+---@field add_exception_rid fun(self: Godot.ShapeCast3D, rid: Godot.Rid)
+---@field clear_exceptions fun(self: Godot.ShapeCast3D)
+---@field force_shapecast_update fun(self: Godot.ShapeCast3D)
+---@field get_closest_collision_safe_fraction fun(self: Godot.ShapeCast3D): number
+---@field get_closest_collision_unsafe_fraction fun(self: Godot.ShapeCast3D): number
+---@field get_collider fun(self: Godot.ShapeCast3D, index: integer): Godot.Object
+---@field get_collider_rid fun(self: Godot.ShapeCast3D, index: integer): Godot.Rid
+---@field get_collider_shape fun(self: Godot.ShapeCast3D, index: integer): integer
+---@field get_collision_count fun(self: Godot.ShapeCast3D): integer
+---@field get_collision_mask fun(self: Godot.ShapeCast3D): integer
+---@field get_collision_mask_value fun(self: Godot.ShapeCast3D, layer_number: integer): boolean
+---@field get_collision_normal fun(self: Godot.ShapeCast3D, index: integer): Godot.Vector3
+---@field get_collision_point fun(self: Godot.ShapeCast3D, index: integer): Godot.Vector3
+---@field get_collision_result fun(self: Godot.ShapeCast3D): table
+---@field get_debug_shape_custom_color fun(self: Godot.ShapeCast3D): Godot.Color
+---@field get_exclude_parent_body fun(self: Godot.ShapeCast3D): boolean
+---@field get_margin fun(self: Godot.ShapeCast3D): number
+---@field get_max_results fun(self: Godot.ShapeCast3D): integer
+---@field get_shape fun(self: Godot.ShapeCast3D): Godot.Shape3D
+---@field get_target_position fun(self: Godot.ShapeCast3D): Godot.Vector3
+---@field is_collide_with_areas_enabled fun(self: Godot.ShapeCast3D): boolean
+---@field is_collide_with_bodies_enabled fun(self: Godot.ShapeCast3D): boolean
+---@field is_colliding fun(self: Godot.ShapeCast3D): boolean
+---@field is_enabled fun(self: Godot.ShapeCast3D): boolean
+---@field remove_exception fun(self: Godot.ShapeCast3D, node: Godot.CollisionObject3D)
+---@field remove_exception_rid fun(self: Godot.ShapeCast3D, rid: Godot.Rid)
+---@field resource_changed fun(self: Godot.ShapeCast3D, resource: Godot.Resource)
+---@field set_collide_with_areas fun(self: Godot.ShapeCast3D, enable: boolean)
+---@field set_collide_with_bodies fun(self: Godot.ShapeCast3D, enable: boolean)
+---@field set_collision_mask fun(self: Godot.ShapeCast3D, mask: integer)
+---@field set_collision_mask_value fun(self: Godot.ShapeCast3D, layer_number: integer, value: boolean)
+---@field set_debug_shape_custom_color fun(self: Godot.ShapeCast3D, debug_shape_custom_color: Godot.Color)
+---@field set_enabled fun(self: Godot.ShapeCast3D, enabled: boolean)
+---@field set_exclude_parent_body fun(self: Godot.ShapeCast3D, mask: boolean)
+---@field set_margin fun(self: Godot.ShapeCast3D, margin: number)
+---@field set_max_results fun(self: Godot.ShapeCast3D, max_results: integer)
+---@field set_shape fun(self: Godot.ShapeCast3D, shape: Godot.Shape3D)
+---@field set_target_position fun(self: Godot.ShapeCast3D, local_point: Godot.Vector3)
+---@class Godot.ShapeCast3D.__type
+---@field new fun(): Godot.ShapeCast3D
+
+---@class Godot.Skeleton2D : Godot.Node2D
+---@field bone_setup_changed Godot.Signal
+---@field execute_modifications fun(self: Godot.Skeleton2D, delta: number, execution_mode: integer)
+---@field get_bone fun(self: Godot.Skeleton2D, idx: integer): Godot.Bone2D
+---@field get_bone_count fun(self: Godot.Skeleton2D): integer
+---@field get_bone_local_pose_override fun(self: Godot.Skeleton2D, bone_idx: integer): Godot.Transform2D
+---@field get_modification_stack fun(self: Godot.Skeleton2D): Godot.SkeletonModificationStack2D
+---@field get_skeleton fun(self: Godot.Skeleton2D): Godot.Rid
+---@field set_bone_local_pose_override fun(self: Godot.Skeleton2D, bone_idx: integer, override_pose: Godot.Transform2D, strength: number, persistent: boolean)
+---@field set_modification_stack fun(self: Godot.Skeleton2D, modification_stack: Godot.SkeletonModificationStack2D)
+---@class Godot.Skeleton2D.__type
+---@field new fun(): Godot.Skeleton2D
+
+---@class Godot.Skeleton3D : Godot.Node3D
+---@field animate_physical_bones boolean
+---@field modifier_callback_mode_process integer
+---@field motion_scale number
+---@field show_rest_only boolean
+---@field bone_enabled_changed Godot.Signal
+---@field bone_list_changed Godot.Signal
+---@field pose_updated Godot.Signal
+---@field rest_updated Godot.Signal
+---@field show_rest_only_changed Godot.Signal
+---@field skeleton_updated Godot.Signal
+---@field add_bone fun(self: Godot.Skeleton3D, name: string): integer
+---@field advance fun(self: Godot.Skeleton3D, delta: number)
+---@field clear_bones fun(self: Godot.Skeleton3D)
+---@field clear_bones_global_pose_override fun(self: Godot.Skeleton3D)
+---@field create_skin_from_rest_transforms fun(self: Godot.Skeleton3D): Godot.Skin
+---@field find_bone fun(self: Godot.Skeleton3D, name: string): integer
+---@field force_update_all_bone_transforms fun(self: Godot.Skeleton3D)
+---@field force_update_bone_child_transform fun(self: Godot.Skeleton3D, bone_idx: integer)
+---@field get_animate_physical_bones fun(self: Godot.Skeleton3D): boolean
+---@field get_bone_children fun(self: Godot.Skeleton3D, bone_idx: integer): table
+---@field get_bone_count fun(self: Godot.Skeleton3D): integer
+---@field get_bone_global_pose fun(self: Godot.Skeleton3D, bone_idx: integer): Godot.Transform3D
+---@field get_bone_global_pose_no_override fun(self: Godot.Skeleton3D, bone_idx: integer): Godot.Transform3D
+---@field get_bone_global_pose_override fun(self: Godot.Skeleton3D, bone_idx: integer): Godot.Transform3D
+---@field get_bone_global_rest fun(self: Godot.Skeleton3D, bone_idx: integer): Godot.Transform3D
+---@field get_bone_meta fun(self: Godot.Skeleton3D, bone_idx: integer, key: string)
+---@field get_bone_meta_list fun(self: Godot.Skeleton3D, bone_idx: integer): table
+---@field get_bone_name fun(self: Godot.Skeleton3D, bone_idx: integer): string
+---@field get_bone_parent fun(self: Godot.Skeleton3D, bone_idx: integer): integer
+---@field get_bone_pose fun(self: Godot.Skeleton3D, bone_idx: integer): Godot.Transform3D
+---@field get_bone_pose_position fun(self: Godot.Skeleton3D, bone_idx: integer): Godot.Vector3
+---@field get_bone_pose_rotation fun(self: Godot.Skeleton3D, bone_idx: integer): Godot.Quaternion
+---@field get_bone_pose_scale fun(self: Godot.Skeleton3D, bone_idx: integer): Godot.Vector3
+---@field get_bone_rest fun(self: Godot.Skeleton3D, bone_idx: integer): Godot.Transform3D
+---@field get_concatenated_bone_names fun(self: Godot.Skeleton3D): string
+---@field get_modifier_callback_mode_process fun(self: Godot.Skeleton3D): integer
+---@field get_motion_scale fun(self: Godot.Skeleton3D): number
+---@field get_parentless_bones fun(self: Godot.Skeleton3D): table
+---@field get_version fun(self: Godot.Skeleton3D): integer
+---@field has_bone_meta fun(self: Godot.Skeleton3D, bone_idx: integer, key: string): boolean
+---@field is_bone_enabled fun(self: Godot.Skeleton3D, bone_idx: integer): boolean
+---@field is_show_rest_only fun(self: Godot.Skeleton3D): boolean
+---@field localize_rests fun(self: Godot.Skeleton3D)
+---@field physical_bones_add_collision_exception fun(self: Godot.Skeleton3D, exception: Godot.Rid)
+---@field physical_bones_remove_collision_exception fun(self: Godot.Skeleton3D, exception: Godot.Rid)
+---@field physical_bones_start_simulation fun(self: Godot.Skeleton3D, bones: table)
+---@field physical_bones_stop_simulation fun(self: Godot.Skeleton3D)
+---@field register_skin fun(self: Godot.Skeleton3D, skin: Godot.Skin): Godot.SkinReference
+---@field reset_bone_pose fun(self: Godot.Skeleton3D, bone_idx: integer)
+---@field reset_bone_poses fun(self: Godot.Skeleton3D)
+---@field set_animate_physical_bones fun(self: Godot.Skeleton3D, enabled: boolean)
+---@field set_bone_enabled fun(self: Godot.Skeleton3D, bone_idx: integer, enabled: boolean)
+---@field set_bone_global_pose fun(self: Godot.Skeleton3D, bone_idx: integer, pose: Godot.Transform3D)
+---@field set_bone_global_pose_override fun(self: Godot.Skeleton3D, bone_idx: integer, pose: Godot.Transform3D, amount: number, persistent: boolean)
+---@field set_bone_meta fun(self: Godot.Skeleton3D, bone_idx: integer, key: string, value: any)
+---@field set_bone_name fun(self: Godot.Skeleton3D, bone_idx: integer, name: string)
+---@field set_bone_parent fun(self: Godot.Skeleton3D, bone_idx: integer, parent_idx: integer)
+---@field set_bone_pose fun(self: Godot.Skeleton3D, bone_idx: integer, pose: Godot.Transform3D)
+---@field set_bone_pose_position fun(self: Godot.Skeleton3D, bone_idx: integer, position: Godot.Vector3)
+---@field set_bone_pose_rotation fun(self: Godot.Skeleton3D, bone_idx: integer, rotation: Godot.Quaternion)
+---@field set_bone_pose_scale fun(self: Godot.Skeleton3D, bone_idx: integer, scale: Godot.Vector3)
+---@field set_bone_rest fun(self: Godot.Skeleton3D, bone_idx: integer, rest: Godot.Transform3D)
+---@field set_modifier_callback_mode_process fun(self: Godot.Skeleton3D, mode: integer)
+---@field set_motion_scale fun(self: Godot.Skeleton3D, motion_scale: number)
+---@field set_show_rest_only fun(self: Godot.Skeleton3D, enabled: boolean)
+---@field unparent_bone_and_rest fun(self: Godot.Skeleton3D, bone_idx: integer)
+---@class Godot.Skeleton3D.__type
+---@field new fun(): Godot.Skeleton3D
+---@field NotificationUpdateSkeleton integer
+---@field ModifierCallbackModeProcessEnum Godot.Skeleton3D.ModifierCallbackModeProcessEnum
+---@class Godot.Skeleton3D.ModifierCallbackModeProcessEnum
+---@field Physics integer
+---@field Idle integer
+---@field Manual integer
+
+---@class Godot.SkeletonIK3D : Godot.SkeletonModifier3D
+---@field interpolation number
+---@field magnet Godot.Vector3
+---@field max_iterations integer
+---@field min_distance number
+---@field override_tip_basis boolean
+---@field root_bone string
+---@field target Godot.Transform3D
+---@field target_node string
+---@field tip_bone string
+---@field use_magnet boolean
+---@field get_interpolation fun(self: Godot.SkeletonIK3D): number
+---@field get_magnet_position fun(self: Godot.SkeletonIK3D): Godot.Vector3
+---@field get_max_iterations fun(self: Godot.SkeletonIK3D): integer
+---@field get_min_distance fun(self: Godot.SkeletonIK3D): number
+---@field get_parent_skeleton fun(self: Godot.SkeletonIK3D): Godot.Skeleton3D
+---@field get_root_bone fun(self: Godot.SkeletonIK3D): string
+---@field get_target_node fun(self: Godot.SkeletonIK3D): string
+---@field get_target_transform fun(self: Godot.SkeletonIK3D): Godot.Transform3D
+---@field get_tip_bone fun(self: Godot.SkeletonIK3D): string
+---@field is_override_tip_basis fun(self: Godot.SkeletonIK3D): boolean
+---@field is_running fun(self: Godot.SkeletonIK3D): boolean
+---@field is_using_magnet fun(self: Godot.SkeletonIK3D): boolean
+---@field set_interpolation fun(self: Godot.SkeletonIK3D, interpolation: number)
+---@field set_magnet_position fun(self: Godot.SkeletonIK3D, local_position: Godot.Vector3)
+---@field set_max_iterations fun(self: Godot.SkeletonIK3D, iterations: integer)
+---@field set_min_distance fun(self: Godot.SkeletonIK3D, min_distance: number)
+---@field set_override_tip_basis fun(self: Godot.SkeletonIK3D, override: boolean)
+---@field set_root_bone fun(self: Godot.SkeletonIK3D, root_bone: string)
+---@field set_target_node fun(self: Godot.SkeletonIK3D, node: string)
+---@field set_target_transform fun(self: Godot.SkeletonIK3D, target: Godot.Transform3D)
+---@field set_tip_bone fun(self: Godot.SkeletonIK3D, tip_bone: string)
+---@field set_use_magnet fun(self: Godot.SkeletonIK3D, use: boolean)
+---@field start fun(self: Godot.SkeletonIK3D, one_time: boolean)
+---@field stop fun(self: Godot.SkeletonIK3D)
+---@class Godot.SkeletonIK3D.__type
+---@field new fun(): Godot.SkeletonIK3D
+
+---@class Godot.SkeletonModifier3D : Godot.Node3D
+---@field active boolean
+---@field influence number
+---@field modification_processed Godot.Signal
+---@field get_influence fun(self: Godot.SkeletonModifier3D): number
+---@field get_skeleton fun(self: Godot.SkeletonModifier3D): Godot.Skeleton3D
+---@field is_active fun(self: Godot.SkeletonModifier3D): boolean
+---@field set_active fun(self: Godot.SkeletonModifier3D, active: boolean)
+---@field set_influence fun(self: Godot.SkeletonModifier3D, influence: number)
+---@class Godot.SkeletonModifier3D.__type
+---@field new fun(): Godot.SkeletonModifier3D
+---@field BoneAxis Godot.SkeletonModifier3D.BoneAxis
+---@field BoneDirection Godot.SkeletonModifier3D.BoneDirection
+---@field RotationAxis Godot.SkeletonModifier3D.RotationAxis
+---@field SecondaryDirection Godot.SkeletonModifier3D.SecondaryDirection
+---@class Godot.SkeletonModifier3D.BoneAxis
+---@field PlusX integer
+---@field MinusX integer
+---@field PlusY integer
+---@field MinusY integer
+---@field PlusZ integer
+---@field MinusZ integer
+---@class Godot.SkeletonModifier3D.BoneDirection
+---@field PlusX integer
+---@field MinusX integer
+---@field PlusY integer
+---@field MinusY integer
+---@field PlusZ integer
+---@field MinusZ integer
+---@field FromParent integer
+---@class Godot.SkeletonModifier3D.RotationAxis
+---@field X integer
+---@field Y integer
+---@field Z integer
+---@field All integer
+---@field Custom integer
+---@class Godot.SkeletonModifier3D.SecondaryDirection
+---@field None integer
+---@field PlusX integer
+---@field MinusX integer
+---@field PlusY integer
+---@field MinusY integer
+---@field PlusZ integer
+---@field MinusZ integer
+---@field Custom integer
+
+---@class Godot.Slider : Godot.Range
+---@field editable boolean
+---@field scrollable boolean
+---@field tick_count integer
+---@field ticks_on_borders boolean
+---@field ticks_position integer
+---@field drag_ended Godot.Signal
+---@field drag_started Godot.Signal
+---@field get_ticks fun(self: Godot.Slider): integer
+---@field get_ticks_on_borders fun(self: Godot.Slider): boolean
+---@field get_ticks_position fun(self: Godot.Slider): integer
+---@field is_editable fun(self: Godot.Slider): boolean
+---@field is_scrollable fun(self: Godot.Slider): boolean
+---@field set_editable fun(self: Godot.Slider, editable: boolean)
+---@field set_scrollable fun(self: Godot.Slider, scrollable: boolean)
+---@field set_ticks fun(self: Godot.Slider, count: integer)
+---@field set_ticks_on_borders fun(self: Godot.Slider, ticks_on_border: boolean)
+---@field set_ticks_position fun(self: Godot.Slider, ticks_on_border: integer)
+---@class Godot.Slider.__type
+---@field new fun(): Godot.Slider
+---@field TickPosition Godot.Slider.TickPosition
+---@class Godot.Slider.TickPosition
+---@field BottomRight integer
+---@field TopLeft integer
+---@field Both integer
+---@field Center integer
+
+---@class Godot.SliderJoint3D : Godot.Joint3D
+---@field get_param fun(self: Godot.SliderJoint3D, param: integer): number
+---@field set_param fun(self: Godot.SliderJoint3D, param: integer, value: number)
+---@class Godot.SliderJoint3D.__type
+---@field new fun(): Godot.SliderJoint3D
+---@field Param Godot.SliderJoint3D.Param
+---@class Godot.SliderJoint3D.Param
+---@field LinearLimitUpper integer
+---@field LinearLimitLower integer
+---@field LinearLimitSoftness integer
+---@field LinearLimitRestitution integer
+---@field LinearLimitDamping integer
+---@field LinearMotionSoftness integer
+---@field LinearMotionRestitution integer
+---@field LinearMotionDamping integer
+---@field LinearOrthogonalSoftness integer
+---@field LinearOrthogonalRestitution integer
+---@field LinearOrthogonalDamping integer
+---@field AngularLimitUpper integer
+---@field AngularLimitLower integer
+---@field AngularLimitSoftness integer
+---@field AngularLimitRestitution integer
+---@field AngularLimitDamping integer
+---@field AngularMotionSoftness integer
+---@field AngularMotionRestitution integer
+---@field AngularMotionDamping integer
+---@field AngularOrthogonalSoftness integer
+---@field AngularOrthogonalRestitution integer
+---@field AngularOrthogonalDamping integer
+---@field Max integer
+
+---@class Godot.SoftBody3D : Godot.MeshInstance3D
+---@field collision_layer integer
+---@field collision_mask integer
+---@field damping_coefficient number
+---@field disable_mode integer
+---@field drag_coefficient number
+---@field linear_stiffness number
+---@field parent_collision_ignore string
+---@field pressure_coefficient number
+---@field ray_pickable boolean
+---@field shrinking_factor number
+---@field simulation_precision integer
+---@field total_mass number
+---@field add_collision_exception_with fun(self: Godot.SoftBody3D, body: Godot.Node)
+---@field apply_central_force fun(self: Godot.SoftBody3D, force: Godot.Vector3)
+---@field apply_central_impulse fun(self: Godot.SoftBody3D, impulse: Godot.Vector3)
+---@field apply_force fun(self: Godot.SoftBody3D, point_index: integer, force: Godot.Vector3)
+---@field apply_impulse fun(self: Godot.SoftBody3D, point_index: integer, impulse: Godot.Vector3)
+---@field get_collision_exceptions fun(self: Godot.SoftBody3D): table
+---@field get_collision_layer fun(self: Godot.SoftBody3D): integer
+---@field get_collision_layer_value fun(self: Godot.SoftBody3D, layer_number: integer): boolean
+---@field get_collision_mask fun(self: Godot.SoftBody3D): integer
+---@field get_collision_mask_value fun(self: Godot.SoftBody3D, layer_number: integer): boolean
+---@field get_damping_coefficient fun(self: Godot.SoftBody3D): number
+---@field get_disable_mode fun(self: Godot.SoftBody3D): integer
+---@field get_drag_coefficient fun(self: Godot.SoftBody3D): number
+---@field get_linear_stiffness fun(self: Godot.SoftBody3D): number
+---@field get_parent_collision_ignore fun(self: Godot.SoftBody3D): string
+---@field get_physics_rid fun(self: Godot.SoftBody3D): Godot.Rid
+---@field get_point_transform fun(self: Godot.SoftBody3D, point_index: integer): Godot.Vector3
+---@field get_pressure_coefficient fun(self: Godot.SoftBody3D): number
+---@field get_shrinking_factor fun(self: Godot.SoftBody3D): number
+---@field get_simulation_precision fun(self: Godot.SoftBody3D): integer
+---@field get_total_mass fun(self: Godot.SoftBody3D): number
+---@field is_point_pinned fun(self: Godot.SoftBody3D, point_index: integer): boolean
+---@field is_ray_pickable fun(self: Godot.SoftBody3D): boolean
+---@field remove_collision_exception_with fun(self: Godot.SoftBody3D, body: Godot.Node)
+---@field set_collision_layer fun(self: Godot.SoftBody3D, collision_layer: integer)
+---@field set_collision_layer_value fun(self: Godot.SoftBody3D, layer_number: integer, value: boolean)
+---@field set_collision_mask fun(self: Godot.SoftBody3D, collision_mask: integer)
+---@field set_collision_mask_value fun(self: Godot.SoftBody3D, layer_number: integer, value: boolean)
+---@field set_damping_coefficient fun(self: Godot.SoftBody3D, damping_coefficient: number)
+---@field set_disable_mode fun(self: Godot.SoftBody3D, mode: integer)
+---@field set_drag_coefficient fun(self: Godot.SoftBody3D, drag_coefficient: number)
+---@field set_linear_stiffness fun(self: Godot.SoftBody3D, linear_stiffness: number)
+---@field set_parent_collision_ignore fun(self: Godot.SoftBody3D, parent_collision_ignore: string)
+---@field set_point_pinned fun(self: Godot.SoftBody3D, point_index: integer, pinned: boolean, attachment_path: string, insert_at: integer)
+---@field set_pressure_coefficient fun(self: Godot.SoftBody3D, pressure_coefficient: number)
+---@field set_ray_pickable fun(self: Godot.SoftBody3D, ray_pickable: boolean)
+---@field set_shrinking_factor fun(self: Godot.SoftBody3D, shrinking_factor: number)
+---@field set_simulation_precision fun(self: Godot.SoftBody3D, simulation_precision: integer)
+---@field set_total_mass fun(self: Godot.SoftBody3D, mass: number)
+---@class Godot.SoftBody3D.__type
+---@field new fun(): Godot.SoftBody3D
+---@field DisableModeEnum Godot.SoftBody3D.DisableModeEnum
+---@class Godot.SoftBody3D.DisableModeEnum
+---@field Remove integer
+---@field KeepActive integer
+
+---@class Godot.SpinBox : Godot.Range
+---@field alignment integer
+---@field custom_arrow_round boolean
+---@field custom_arrow_step number
+---@field editable boolean
+---@field prefix string
+---@field select_all_on_focus boolean
+---@field suffix string
+---@field update_on_text_changed boolean
+---@field apply fun(self: Godot.SpinBox)
+---@field get_custom_arrow_step fun(self: Godot.SpinBox): number
+---@field get_horizontal_alignment fun(self: Godot.SpinBox): integer
+---@field get_line_edit fun(self: Godot.SpinBox): Godot.LineEdit
+---@field get_prefix fun(self: Godot.SpinBox): string
+---@field get_suffix fun(self: Godot.SpinBox): string
+---@field get_update_on_text_changed fun(self: Godot.SpinBox): boolean
+---@field is_custom_arrow_rounding fun(self: Godot.SpinBox): boolean
+---@field is_editable fun(self: Godot.SpinBox): boolean
+---@field is_select_all_on_focus fun(self: Godot.SpinBox): boolean
+---@field set_custom_arrow_round fun(self: Godot.SpinBox, round: boolean)
+---@field set_custom_arrow_step fun(self: Godot.SpinBox, arrow_step: number)
+---@field set_editable fun(self: Godot.SpinBox, enabled: boolean)
+---@field set_horizontal_alignment fun(self: Godot.SpinBox, alignment: integer)
+---@field set_prefix fun(self: Godot.SpinBox, prefix: string)
+---@field set_select_all_on_focus fun(self: Godot.SpinBox, enabled: boolean)
+---@field set_suffix fun(self: Godot.SpinBox, suffix: string)
+---@field set_update_on_text_changed fun(self: Godot.SpinBox, enabled: boolean)
+---@class Godot.SpinBox.__type
+---@field new fun(): Godot.SpinBox
+
+---@class Godot.SplineIK3D : Godot.ChainIK3D
+---@field setting_count integer
+---@field get_path_3d fun(self: Godot.SplineIK3D, index: integer): string
+---@field get_tilt_fade_in fun(self: Godot.SplineIK3D, index: integer): integer
+---@field get_tilt_fade_out fun(self: Godot.SplineIK3D, index: integer): integer
+---@field is_tilt_enabled fun(self: Godot.SplineIK3D, index: integer): boolean
+---@field set_path_3d fun(self: Godot.SplineIK3D, index: integer, path_3d: string)
+---@field set_tilt_enabled fun(self: Godot.SplineIK3D, index: integer, enabled: boolean)
+---@field set_tilt_fade_in fun(self: Godot.SplineIK3D, index: integer, size: integer)
+---@field set_tilt_fade_out fun(self: Godot.SplineIK3D, index: integer, size: integer)
+---@class Godot.SplineIK3D.__type
+---@field new fun(): Godot.SplineIK3D
+
+---@class Godot.SplitContainer : Godot.Container
+---@field collapsed boolean
+---@field drag_area_highlight_in_editor boolean
+---@field drag_area_margin_begin integer
+---@field drag_area_margin_end integer
+---@field drag_area_offset integer
+---@field dragger_visibility integer
+---@field dragging_enabled boolean
+---@field split_offset integer
+---@field split_offsets table
+---@field touch_dragger_enabled boolean
+---@field vertical boolean
+---@field drag_ended Godot.Signal
+---@field drag_started Godot.Signal
+---@field dragged Godot.Signal
+---@field clamp_split_offset fun(self: Godot.SplitContainer, priority_index: integer)
+---@field get_drag_area_control fun(self: Godot.SplitContainer): Godot.Control
+---@field get_drag_area_controls fun(self: Godot.SplitContainer): table
+---@field get_drag_area_margin_begin fun(self: Godot.SplitContainer): integer
+---@field get_drag_area_margin_end fun(self: Godot.SplitContainer): integer
+---@field get_drag_area_offset fun(self: Godot.SplitContainer): integer
+---@field get_dragger_visibility fun(self: Godot.SplitContainer): integer
+---@field get_split_offset fun(self: Godot.SplitContainer): integer
+---@field get_split_offsets fun(self: Godot.SplitContainer): table
+---@field is_collapsed fun(self: Godot.SplitContainer): boolean
+---@field is_drag_area_highlight_in_editor_enabled fun(self: Godot.SplitContainer): boolean
+---@field is_dragging_enabled fun(self: Godot.SplitContainer): boolean
+---@field is_touch_dragger_enabled fun(self: Godot.SplitContainer): boolean
+---@field is_vertical fun(self: Godot.SplitContainer): boolean
+---@field set_collapsed fun(self: Godot.SplitContainer, collapsed: boolean)
+---@field set_drag_area_highlight_in_editor fun(self: Godot.SplitContainer, drag_area_highlight_in_editor: boolean)
+---@field set_drag_area_margin_begin fun(self: Godot.SplitContainer, margin: integer)
+---@field set_drag_area_margin_end fun(self: Godot.SplitContainer, margin: integer)
+---@field set_drag_area_offset fun(self: Godot.SplitContainer, offset: integer)
+---@field set_dragger_visibility fun(self: Godot.SplitContainer, mode: integer)
+---@field set_dragging_enabled fun(self: Godot.SplitContainer, dragging_enabled: boolean)
+---@field set_split_offset fun(self: Godot.SplitContainer, offset: integer)
+---@field set_split_offsets fun(self: Godot.SplitContainer, offsets: table)
+---@field set_touch_dragger_enabled fun(self: Godot.SplitContainer, enabled: boolean)
+---@field set_vertical fun(self: Godot.SplitContainer, vertical: boolean)
+---@class Godot.SplitContainer.__type
+---@field new fun(): Godot.SplitContainer
+---@field DraggerVisibilityEnum Godot.SplitContainer.DraggerVisibilityEnum
+---@class Godot.SplitContainer.DraggerVisibilityEnum
+---@field Visible integer
+---@field Hidden integer
+---@field HiddenCollapsed integer
+
+---@class Godot.SpotLight3D : Godot.Light3D
+---@field spot_angle number
+---@field spot_angle_attenuation number
+---@field spot_attenuation number
+---@field spot_range number
+---@class Godot.SpotLight3D.__type
+---@field new fun(): Godot.SpotLight3D
+
+---@class Godot.SpringArm3D : Godot.Node3D
+---@field collision_mask integer
+---@field margin number
+---@field shape Godot.Shape3D
+---@field spring_length number
+---@field add_excluded_object fun(self: Godot.SpringArm3D, RID: Godot.Rid)
+---@field clear_excluded_objects fun(self: Godot.SpringArm3D)
+---@field get_collision_mask fun(self: Godot.SpringArm3D): integer
+---@field get_hit_length fun(self: Godot.SpringArm3D): number
+---@field get_length fun(self: Godot.SpringArm3D): number
+---@field get_margin fun(self: Godot.SpringArm3D): number
+---@field get_shape fun(self: Godot.SpringArm3D): Godot.Shape3D
+---@field remove_excluded_object fun(self: Godot.SpringArm3D, RID: Godot.Rid): boolean
+---@field set_collision_mask fun(self: Godot.SpringArm3D, mask: integer)
+---@field set_length fun(self: Godot.SpringArm3D, length: number)
+---@field set_margin fun(self: Godot.SpringArm3D, margin: number)
+---@field set_shape fun(self: Godot.SpringArm3D, shape: Godot.Shape3D)
+---@class Godot.SpringArm3D.__type
+---@field new fun(): Godot.SpringArm3D
+
+---@class Godot.SpringBoneCollision3D : Godot.Node3D
+---@field bone integer
+---@field bone_name string
+---@field position_offset Godot.Vector3
+---@field rotation_offset Godot.Quaternion
+---@field get_bone fun(self: Godot.SpringBoneCollision3D): integer
+---@field get_bone_name fun(self: Godot.SpringBoneCollision3D): string
+---@field get_position_offset fun(self: Godot.SpringBoneCollision3D): Godot.Vector3
+---@field get_rotation_offset fun(self: Godot.SpringBoneCollision3D): Godot.Quaternion
+---@field get_skeleton fun(self: Godot.SpringBoneCollision3D): Godot.Skeleton3D
+---@field set_bone fun(self: Godot.SpringBoneCollision3D, bone: integer)
+---@field set_bone_name fun(self: Godot.SpringBoneCollision3D, bone_name: string)
+---@field set_position_offset fun(self: Godot.SpringBoneCollision3D, offset: Godot.Vector3)
+---@field set_rotation_offset fun(self: Godot.SpringBoneCollision3D, offset: Godot.Quaternion)
+---@class Godot.SpringBoneCollision3D.__type
+---@field new fun(): Godot.SpringBoneCollision3D
+
+---@class Godot.SpringBoneCollisionCapsule3D : Godot.SpringBoneCollision3D
+---@field height number
+---@field inside boolean
+---@field mid_height number
+---@field radius number
+---@field get_height fun(self: Godot.SpringBoneCollisionCapsule3D): number
+---@field get_mid_height fun(self: Godot.SpringBoneCollisionCapsule3D): number
+---@field get_radius fun(self: Godot.SpringBoneCollisionCapsule3D): number
+---@field is_inside fun(self: Godot.SpringBoneCollisionCapsule3D): boolean
+---@field set_height fun(self: Godot.SpringBoneCollisionCapsule3D, height: number)
+---@field set_inside fun(self: Godot.SpringBoneCollisionCapsule3D, enabled: boolean)
+---@field set_mid_height fun(self: Godot.SpringBoneCollisionCapsule3D, mid_height: number)
+---@field set_radius fun(self: Godot.SpringBoneCollisionCapsule3D, radius: number)
+---@class Godot.SpringBoneCollisionCapsule3D.__type
+---@field new fun(): Godot.SpringBoneCollisionCapsule3D
+
+---@class Godot.SpringBoneCollisionPlane3D : Godot.SpringBoneCollision3D
+---@class Godot.SpringBoneCollisionPlane3D.__type
+---@field new fun(): Godot.SpringBoneCollisionPlane3D
+
+---@class Godot.SpringBoneCollisionSphere3D : Godot.SpringBoneCollision3D
+---@field inside boolean
+---@field radius number
+---@field get_radius fun(self: Godot.SpringBoneCollisionSphere3D): number
+---@field is_inside fun(self: Godot.SpringBoneCollisionSphere3D): boolean
+---@field set_inside fun(self: Godot.SpringBoneCollisionSphere3D, enabled: boolean)
+---@field set_radius fun(self: Godot.SpringBoneCollisionSphere3D, radius: number)
+---@class Godot.SpringBoneCollisionSphere3D.__type
+---@field new fun(): Godot.SpringBoneCollisionSphere3D
+
+---@class Godot.SpringBoneSimulator3D : Godot.SkeletonModifier3D
+---@field external_force Godot.Vector3
+---@field mutable_bone_axes boolean
+---@field setting_count integer
+---@field are_all_child_collisions_enabled fun(self: Godot.SpringBoneSimulator3D, index: integer): boolean
+---@field are_bone_axes_mutable fun(self: Godot.SpringBoneSimulator3D): boolean
+---@field clear_collisions fun(self: Godot.SpringBoneSimulator3D, index: integer)
+---@field clear_exclude_collisions fun(self: Godot.SpringBoneSimulator3D, index: integer)
+---@field clear_settings fun(self: Godot.SpringBoneSimulator3D)
+---@field get_center_bone fun(self: Godot.SpringBoneSimulator3D, index: integer): integer
+---@field get_center_bone_name fun(self: Godot.SpringBoneSimulator3D, index: integer): string
+---@field get_center_from fun(self: Godot.SpringBoneSimulator3D, index: integer): integer
+---@field get_center_node fun(self: Godot.SpringBoneSimulator3D, index: integer): string
+---@field get_collision_count fun(self: Godot.SpringBoneSimulator3D, index: integer): integer
+---@field get_collision_path fun(self: Godot.SpringBoneSimulator3D, index: integer, collision: integer): string
+---@field get_drag fun(self: Godot.SpringBoneSimulator3D, index: integer): number
+---@field get_drag_damping_curve fun(self: Godot.SpringBoneSimulator3D, index: integer): Godot.Curve
+---@field get_end_bone fun(self: Godot.SpringBoneSimulator3D, index: integer): integer
+---@field get_end_bone_direction fun(self: Godot.SpringBoneSimulator3D, index: integer): integer
+---@field get_end_bone_length fun(self: Godot.SpringBoneSimulator3D, index: integer): number
+---@field get_end_bone_name fun(self: Godot.SpringBoneSimulator3D, index: integer): string
+---@field get_exclude_collision_count fun(self: Godot.SpringBoneSimulator3D, index: integer): integer
+---@field get_exclude_collision_path fun(self: Godot.SpringBoneSimulator3D, index: integer, collision: integer): string
+---@field get_external_force fun(self: Godot.SpringBoneSimulator3D): Godot.Vector3
+---@field get_gravity fun(self: Godot.SpringBoneSimulator3D, index: integer): number
+---@field get_gravity_damping_curve fun(self: Godot.SpringBoneSimulator3D, index: integer): Godot.Curve
+---@field get_gravity_direction fun(self: Godot.SpringBoneSimulator3D, index: integer): Godot.Vector3
+---@field get_joint_bone fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer): integer
+---@field get_joint_bone_name fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer): string
+---@field get_joint_count fun(self: Godot.SpringBoneSimulator3D, index: integer): integer
+---@field get_joint_drag fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer): number
+---@field get_joint_gravity fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer): number
+---@field get_joint_gravity_direction fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer): Godot.Vector3
+---@field get_joint_radius fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer): number
+---@field get_joint_rotation_axis fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer): integer
+---@field get_joint_rotation_axis_vector fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer): Godot.Vector3
+---@field get_joint_stiffness fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer): number
+---@field get_radius fun(self: Godot.SpringBoneSimulator3D, index: integer): number
+---@field get_radius_damping_curve fun(self: Godot.SpringBoneSimulator3D, index: integer): Godot.Curve
+---@field get_root_bone fun(self: Godot.SpringBoneSimulator3D, index: integer): integer
+---@field get_root_bone_name fun(self: Godot.SpringBoneSimulator3D, index: integer): string
+---@field get_rotation_axis fun(self: Godot.SpringBoneSimulator3D, index: integer): integer
+---@field get_rotation_axis_vector fun(self: Godot.SpringBoneSimulator3D, index: integer): Godot.Vector3
+---@field get_setting_count fun(self: Godot.SpringBoneSimulator3D): integer
+---@field get_stiffness fun(self: Godot.SpringBoneSimulator3D, index: integer): number
+---@field get_stiffness_damping_curve fun(self: Godot.SpringBoneSimulator3D, index: integer): Godot.Curve
+---@field is_config_individual fun(self: Godot.SpringBoneSimulator3D, index: integer): boolean
+---@field is_end_bone_extended fun(self: Godot.SpringBoneSimulator3D, index: integer): boolean
+---@field reset fun(self: Godot.SpringBoneSimulator3D)
+---@field set_center_bone fun(self: Godot.SpringBoneSimulator3D, index: integer, bone: integer)
+---@field set_center_bone_name fun(self: Godot.SpringBoneSimulator3D, index: integer, bone_name: string)
+---@field set_center_from fun(self: Godot.SpringBoneSimulator3D, index: integer, center_from: integer)
+---@field set_center_node fun(self: Godot.SpringBoneSimulator3D, index: integer, node_path: string)
+---@field set_collision_count fun(self: Godot.SpringBoneSimulator3D, index: integer, count: integer)
+---@field set_collision_path fun(self: Godot.SpringBoneSimulator3D, index: integer, collision: integer, node_path: string)
+---@field set_drag fun(self: Godot.SpringBoneSimulator3D, index: integer, drag: number)
+---@field set_drag_damping_curve fun(self: Godot.SpringBoneSimulator3D, index: integer, curve: Godot.Curve)
+---@field set_enable_all_child_collisions fun(self: Godot.SpringBoneSimulator3D, index: integer, enabled: boolean)
+---@field set_end_bone fun(self: Godot.SpringBoneSimulator3D, index: integer, bone: integer)
+---@field set_end_bone_direction fun(self: Godot.SpringBoneSimulator3D, index: integer, bone_direction: integer)
+---@field set_end_bone_length fun(self: Godot.SpringBoneSimulator3D, index: integer, length: number)
+---@field set_end_bone_name fun(self: Godot.SpringBoneSimulator3D, index: integer, bone_name: string)
+---@field set_exclude_collision_count fun(self: Godot.SpringBoneSimulator3D, index: integer, count: integer)
+---@field set_exclude_collision_path fun(self: Godot.SpringBoneSimulator3D, index: integer, collision: integer, node_path: string)
+---@field set_extend_end_bone fun(self: Godot.SpringBoneSimulator3D, index: integer, enabled: boolean)
+---@field set_external_force fun(self: Godot.SpringBoneSimulator3D, force: Godot.Vector3)
+---@field set_gravity fun(self: Godot.SpringBoneSimulator3D, index: integer, gravity: number)
+---@field set_gravity_damping_curve fun(self: Godot.SpringBoneSimulator3D, index: integer, curve: Godot.Curve)
+---@field set_gravity_direction fun(self: Godot.SpringBoneSimulator3D, index: integer, gravity_direction: Godot.Vector3)
+---@field set_individual_config fun(self: Godot.SpringBoneSimulator3D, index: integer, enabled: boolean)
+---@field set_joint_drag fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer, drag: number)
+---@field set_joint_gravity fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer, gravity: number)
+---@field set_joint_gravity_direction fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer, gravity_direction: Godot.Vector3)
+---@field set_joint_radius fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer, radius: number)
+---@field set_joint_rotation_axis fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer, axis: integer)
+---@field set_joint_rotation_axis_vector fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer, vector: Godot.Vector3)
+---@field set_joint_stiffness fun(self: Godot.SpringBoneSimulator3D, index: integer, joint: integer, stiffness: number)
+---@field set_mutable_bone_axes fun(self: Godot.SpringBoneSimulator3D, enabled: boolean)
+---@field set_radius fun(self: Godot.SpringBoneSimulator3D, index: integer, radius: number)
+---@field set_radius_damping_curve fun(self: Godot.SpringBoneSimulator3D, index: integer, curve: Godot.Curve)
+---@field set_root_bone fun(self: Godot.SpringBoneSimulator3D, index: integer, bone: integer)
+---@field set_root_bone_name fun(self: Godot.SpringBoneSimulator3D, index: integer, bone_name: string)
+---@field set_rotation_axis fun(self: Godot.SpringBoneSimulator3D, index: integer, axis: integer)
+---@field set_rotation_axis_vector fun(self: Godot.SpringBoneSimulator3D, index: integer, vector: Godot.Vector3)
+---@field set_setting_count fun(self: Godot.SpringBoneSimulator3D, count: integer)
+---@field set_stiffness fun(self: Godot.SpringBoneSimulator3D, index: integer, stiffness: number)
+---@field set_stiffness_damping_curve fun(self: Godot.SpringBoneSimulator3D, index: integer, curve: Godot.Curve)
+---@class Godot.SpringBoneSimulator3D.__type
+---@field new fun(): Godot.SpringBoneSimulator3D
+---@field CenterFrom Godot.SpringBoneSimulator3D.CenterFrom
+---@class Godot.SpringBoneSimulator3D.CenterFrom
+---@field WorldOrigin integer
+---@field Node integer
+---@field Bone integer
+
+---@class Godot.Sprite2D : Godot.Node2D
+---@field centered boolean
+---@field flip_h boolean
+---@field flip_v boolean
+---@field frame integer
+---@field frame_coords Godot.Vector2I
+---@field hframes integer
+---@field offset Godot.Vector2
+---@field region_enabled boolean
+---@field region_filter_clip_enabled boolean
+---@field region_rect Godot.Rect2
+---@field texture Godot.Texture2D
+---@field vframes integer
+---@field frame_changed Godot.Signal
+---@field texture_changed Godot.Signal
+---@field get_frame fun(self: Godot.Sprite2D): integer
+---@field get_frame_coords fun(self: Godot.Sprite2D): Godot.Vector2I
+---@field get_hframes fun(self: Godot.Sprite2D): integer
+---@field get_offset fun(self: Godot.Sprite2D): Godot.Vector2
+---@field get_rect fun(self: Godot.Sprite2D): Godot.Rect2
+---@field get_region_rect fun(self: Godot.Sprite2D): Godot.Rect2
+---@field get_texture fun(self: Godot.Sprite2D): Godot.Texture2D
+---@field get_vframes fun(self: Godot.Sprite2D): integer
+---@field is_centered fun(self: Godot.Sprite2D): boolean
+---@field is_flipped_h fun(self: Godot.Sprite2D): boolean
+---@field is_flipped_v fun(self: Godot.Sprite2D): boolean
+---@field is_pixel_opaque fun(self: Godot.Sprite2D, pos: Godot.Vector2): boolean
+---@field is_region_enabled fun(self: Godot.Sprite2D): boolean
+---@field is_region_filter_clip_enabled fun(self: Godot.Sprite2D): boolean
+---@field set_centered fun(self: Godot.Sprite2D, centered: boolean)
+---@field set_flip_h fun(self: Godot.Sprite2D, flip_h: boolean)
+---@field set_flip_v fun(self: Godot.Sprite2D, flip_v: boolean)
+---@field set_frame fun(self: Godot.Sprite2D, frame: integer)
+---@field set_frame_coords fun(self: Godot.Sprite2D, coords: Godot.Vector2I)
+---@field set_hframes fun(self: Godot.Sprite2D, hframes: integer)
+---@field set_offset fun(self: Godot.Sprite2D, offset: Godot.Vector2)
+---@field set_region_enabled fun(self: Godot.Sprite2D, enabled: boolean)
+---@field set_region_filter_clip_enabled fun(self: Godot.Sprite2D, enabled: boolean)
+---@field set_region_rect fun(self: Godot.Sprite2D, rect: Godot.Rect2)
+---@field set_texture fun(self: Godot.Sprite2D, texture: Godot.Texture2D)
+---@field set_vframes fun(self: Godot.Sprite2D, vframes: integer)
+---@class Godot.Sprite2D.__type
+---@field new fun(): Godot.Sprite2D
+
+---@class Godot.Sprite3D : Godot.SpriteBase3D
+---@field frame integer
+---@field frame_coords Godot.Vector2I
+---@field hframes integer
+---@field region_enabled boolean
+---@field region_rect Godot.Rect2
+---@field texture Godot.Texture2D
+---@field vframes integer
+---@field frame_changed Godot.Signal
+---@field texture_changed Godot.Signal
+---@field get_frame fun(self: Godot.Sprite3D): integer
+---@field get_frame_coords fun(self: Godot.Sprite3D): Godot.Vector2I
+---@field get_hframes fun(self: Godot.Sprite3D): integer
+---@field get_region_rect fun(self: Godot.Sprite3D): Godot.Rect2
+---@field get_texture fun(self: Godot.Sprite3D): Godot.Texture2D
+---@field get_vframes fun(self: Godot.Sprite3D): integer
+---@field is_region_enabled fun(self: Godot.Sprite3D): boolean
+---@field set_frame fun(self: Godot.Sprite3D, frame: integer)
+---@field set_frame_coords fun(self: Godot.Sprite3D, coords: Godot.Vector2I)
+---@field set_hframes fun(self: Godot.Sprite3D, hframes: integer)
+---@field set_region_enabled fun(self: Godot.Sprite3D, enabled: boolean)
+---@field set_region_rect fun(self: Godot.Sprite3D, rect: Godot.Rect2)
+---@field set_texture fun(self: Godot.Sprite3D, texture: Godot.Texture2D)
+---@field set_vframes fun(self: Godot.Sprite3D, vframes: integer)
+---@class Godot.Sprite3D.__type
+---@field new fun(): Godot.Sprite3D
+
+---@class Godot.SpriteBase3D : Godot.GeometryInstance3D
+---@field alpha_antialiasing_edge number
+---@field alpha_antialiasing_mode integer
+---@field alpha_cut integer
+---@field alpha_hash_scale number
+---@field alpha_scissor_threshold number
+---@field axis integer
+---@field billboard integer
+---@field centered boolean
+---@field double_sided boolean
+---@field fixed_size boolean
+---@field flip_h boolean
+---@field flip_v boolean
+---@field modulate Godot.Color
+---@field no_depth_test boolean
+---@field offset Godot.Vector2
+---@field pixel_size number
+---@field render_priority integer
+---@field shaded boolean
+---@field texture_filter integer
+---@field transparent boolean
+---@field generate_triangle_mesh fun(self: Godot.SpriteBase3D): Godot.TriangleMesh
+---@field get_alpha_antialiasing fun(self: Godot.SpriteBase3D): integer
+---@field get_alpha_antialiasing_edge fun(self: Godot.SpriteBase3D): number
+---@field get_alpha_cut_mode fun(self: Godot.SpriteBase3D): integer
+---@field get_alpha_hash_scale fun(self: Godot.SpriteBase3D): number
+---@field get_alpha_scissor_threshold fun(self: Godot.SpriteBase3D): number
+---@field get_axis fun(self: Godot.SpriteBase3D): integer
+---@field get_billboard_mode fun(self: Godot.SpriteBase3D): integer
+---@field get_draw_flag fun(self: Godot.SpriteBase3D, flag: integer): boolean
+---@field get_item_rect fun(self: Godot.SpriteBase3D): Godot.Rect2
+---@field get_modulate fun(self: Godot.SpriteBase3D): Godot.Color
+---@field get_offset fun(self: Godot.SpriteBase3D): Godot.Vector2
+---@field get_pixel_size fun(self: Godot.SpriteBase3D): number
+---@field get_render_priority fun(self: Godot.SpriteBase3D): integer
+---@field get_texture_filter fun(self: Godot.SpriteBase3D): integer
+---@field is_centered fun(self: Godot.SpriteBase3D): boolean
+---@field is_flipped_h fun(self: Godot.SpriteBase3D): boolean
+---@field is_flipped_v fun(self: Godot.SpriteBase3D): boolean
+---@field set_alpha_antialiasing fun(self: Godot.SpriteBase3D, alpha_aa: integer)
+---@field set_alpha_antialiasing_edge fun(self: Godot.SpriteBase3D, edge: number)
+---@field set_alpha_cut_mode fun(self: Godot.SpriteBase3D, mode: integer)
+---@field set_alpha_hash_scale fun(self: Godot.SpriteBase3D, threshold: number)
+---@field set_alpha_scissor_threshold fun(self: Godot.SpriteBase3D, threshold: number)
+---@field set_axis fun(self: Godot.SpriteBase3D, axis: integer)
+---@field set_billboard_mode fun(self: Godot.SpriteBase3D, mode: integer)
+---@field set_centered fun(self: Godot.SpriteBase3D, centered: boolean)
+---@field set_draw_flag fun(self: Godot.SpriteBase3D, flag: integer, enabled: boolean)
+---@field set_flip_h fun(self: Godot.SpriteBase3D, flip_h: boolean)
+---@field set_flip_v fun(self: Godot.SpriteBase3D, flip_v: boolean)
+---@field set_modulate fun(self: Godot.SpriteBase3D, modulate: Godot.Color)
+---@field set_offset fun(self: Godot.SpriteBase3D, offset: Godot.Vector2)
+---@field set_pixel_size fun(self: Godot.SpriteBase3D, pixel_size: number)
+---@field set_render_priority fun(self: Godot.SpriteBase3D, priority: integer)
+---@field set_texture_filter fun(self: Godot.SpriteBase3D, mode: integer)
+---@class Godot.SpriteBase3D.__type
+---@field new fun(): Godot.SpriteBase3D
+---@field AlphaCutMode Godot.SpriteBase3D.AlphaCutMode
+---@field DrawFlags Godot.SpriteBase3D.DrawFlags
+---@class Godot.SpriteBase3D.AlphaCutMode
+---@field Disabled integer
+---@field Discard integer
+---@field OpaquePrepass integer
+---@field Hash integer
+---@class Godot.SpriteBase3D.DrawFlags
+---@field Transparent integer
+---@field Shaded integer
+---@field DoubleSided integer
+---@field DisableDepthTest integer
+---@field FixedSize integer
+---@field Max integer
+
+---@class Godot.StaticBody2D : Godot.PhysicsBody2D
+---@field constant_angular_velocity number
+---@field constant_linear_velocity Godot.Vector2
+---@field physics_material_override Godot.PhysicsMaterial
+---@field get_constant_angular_velocity fun(self: Godot.StaticBody2D): number
+---@field get_constant_linear_velocity fun(self: Godot.StaticBody2D): Godot.Vector2
+---@field get_physics_material_override fun(self: Godot.StaticBody2D): Godot.PhysicsMaterial
+---@field set_constant_angular_velocity fun(self: Godot.StaticBody2D, vel: number)
+---@field set_constant_linear_velocity fun(self: Godot.StaticBody2D, vel: Godot.Vector2)
+---@field set_physics_material_override fun(self: Godot.StaticBody2D, physics_material_override: Godot.PhysicsMaterial)
+---@class Godot.StaticBody2D.__type
+---@field new fun(): Godot.StaticBody2D
+
+---@class Godot.StaticBody3D : Godot.PhysicsBody3D
+---@field constant_angular_velocity Godot.Vector3
+---@field constant_linear_velocity Godot.Vector3
+---@field physics_material_override Godot.PhysicsMaterial
+---@field get_constant_angular_velocity fun(self: Godot.StaticBody3D): Godot.Vector3
+---@field get_constant_linear_velocity fun(self: Godot.StaticBody3D): Godot.Vector3
+---@field get_physics_material_override fun(self: Godot.StaticBody3D): Godot.PhysicsMaterial
+---@field set_constant_angular_velocity fun(self: Godot.StaticBody3D, vel: Godot.Vector3)
+---@field set_constant_linear_velocity fun(self: Godot.StaticBody3D, vel: Godot.Vector3)
+---@field set_physics_material_override fun(self: Godot.StaticBody3D, physics_material_override: Godot.PhysicsMaterial)
+---@class Godot.StaticBody3D.__type
+---@field new fun(): Godot.StaticBody3D
+
+---@class Godot.StatusIndicator : Godot.Node
+---@field icon Godot.Texture2D
+---@field menu string
+---@field tooltip string
+---@field visible boolean
+---@field pressed Godot.Signal
+---@field get_icon fun(self: Godot.StatusIndicator): Godot.Texture2D
+---@field get_menu fun(self: Godot.StatusIndicator): string
+---@field get_rect fun(self: Godot.StatusIndicator): Godot.Rect2
+---@field get_tooltip fun(self: Godot.StatusIndicator): string
+---@field is_visible fun(self: Godot.StatusIndicator): boolean
+---@field set_icon fun(self: Godot.StatusIndicator, texture: Godot.Texture2D)
+---@field set_menu fun(self: Godot.StatusIndicator, menu: string)
+---@field set_tooltip fun(self: Godot.StatusIndicator, tooltip: string)
+---@field set_visible fun(self: Godot.StatusIndicator, visible: boolean)
+---@class Godot.StatusIndicator.__type
+---@field new fun(): Godot.StatusIndicator
+
+---@class Godot.SubViewport : Godot.Viewport
+---@field render_target_clear_mode integer
+---@field render_target_update_mode integer
+---@field size Godot.Vector2I
+---@field size_2d_override Godot.Vector2I
+---@field size_2d_override_stretch boolean
+---@field get_clear_mode fun(self: Godot.SubViewport): integer
+---@field get_size fun(self: Godot.SubViewport): Godot.Vector2I
+---@field get_size_2d_override fun(self: Godot.SubViewport): Godot.Vector2I
+---@field get_update_mode fun(self: Godot.SubViewport): integer
+---@field is_size_2d_override_stretch_enabled fun(self: Godot.SubViewport): boolean
+---@field set_clear_mode fun(self: Godot.SubViewport, mode: integer)
+---@field set_size fun(self: Godot.SubViewport, size: Godot.Vector2I)
+---@field set_size_2d_override fun(self: Godot.SubViewport, size: Godot.Vector2I)
+---@field set_size_2d_override_stretch fun(self: Godot.SubViewport, enable: boolean)
+---@field set_update_mode fun(self: Godot.SubViewport, mode: integer)
+---@class Godot.SubViewport.__type
+---@field new fun(): Godot.SubViewport
+---@field ClearMode Godot.SubViewport.ClearMode
+---@field UpdateMode Godot.SubViewport.UpdateMode
+---@class Godot.SubViewport.ClearMode
+---@field Always integer
+---@field Never integer
+---@field Once integer
+---@class Godot.SubViewport.UpdateMode
+---@field Disabled integer
+---@field Once integer
+---@field WhenVisible integer
+---@field WhenParentVisible integer
+---@field Always integer
+
+---@class Godot.SubViewportContainer : Godot.Container
+---@field mouse_target boolean
+---@field stretch boolean
+---@field stretch_shrink integer
+---@field get_stretch_shrink fun(self: Godot.SubViewportContainer): integer
+---@field is_mouse_target_enabled fun(self: Godot.SubViewportContainer): boolean
+---@field is_stretch_enabled fun(self: Godot.SubViewportContainer): boolean
+---@field set_mouse_target fun(self: Godot.SubViewportContainer, amount: boolean)
+---@field set_stretch fun(self: Godot.SubViewportContainer, enable: boolean)
+---@field set_stretch_shrink fun(self: Godot.SubViewportContainer, amount: integer)
+---@class Godot.SubViewportContainer.__type
+---@field new fun(): Godot.SubViewportContainer
+
+---@class Godot.TabBar : Godot.Control
+---@field clip_tabs boolean
+---@field close_with_middle_mouse boolean
+---@field current_tab integer
+---@field deselect_enabled boolean
+---@field drag_to_rearrange_enabled boolean
+---@field max_tab_width integer
+---@field scroll_to_selected boolean
+---@field scrolling_enabled boolean
+---@field select_with_rmb boolean
+---@field switch_on_drag_hover boolean
+---@field tab_alignment integer
+---@field tab_close_display_policy integer
+---@field tab_count integer
+---@field tabs_rearrange_group integer
+---@field active_tab_rearranged Godot.Signal
+---@field tab_button_pressed Godot.Signal
+---@field tab_changed Godot.Signal
+---@field tab_clicked Godot.Signal
+---@field tab_close_pressed Godot.Signal
+---@field tab_hovered Godot.Signal
+---@field tab_rmb_clicked Godot.Signal
+---@field tab_selected Godot.Signal
+---@field add_tab fun(self: Godot.TabBar, title: string, icon: Godot.Texture2D)
+---@field clear_tabs fun(self: Godot.TabBar)
+---@field ensure_tab_visible fun(self: Godot.TabBar, idx: integer)
+---@field get_clip_tabs fun(self: Godot.TabBar): boolean
+---@field get_close_with_middle_mouse fun(self: Godot.TabBar): boolean
+---@field get_current_tab fun(self: Godot.TabBar): integer
+---@field get_deselect_enabled fun(self: Godot.TabBar): boolean
+---@field get_drag_to_rearrange_enabled fun(self: Godot.TabBar): boolean
+---@field get_max_tab_width fun(self: Godot.TabBar): integer
+---@field get_offset_buttons_visible fun(self: Godot.TabBar): boolean
+---@field get_previous_tab fun(self: Godot.TabBar): integer
+---@field get_scroll_to_selected fun(self: Godot.TabBar): boolean
+---@field get_scrolling_enabled fun(self: Godot.TabBar): boolean
+---@field get_select_with_rmb fun(self: Godot.TabBar): boolean
+---@field get_switch_on_drag_hover fun(self: Godot.TabBar): boolean
+---@field get_tab_alignment fun(self: Godot.TabBar): integer
+---@field get_tab_button_icon fun(self: Godot.TabBar, tab_idx: integer): Godot.Texture2D
+---@field get_tab_close_display_policy fun(self: Godot.TabBar): integer
+---@field get_tab_count fun(self: Godot.TabBar): integer
+---@field get_tab_icon fun(self: Godot.TabBar, tab_idx: integer): Godot.Texture2D
+---@field get_tab_icon_max_width fun(self: Godot.TabBar, tab_idx: integer): integer
+---@field get_tab_idx_at_point fun(self: Godot.TabBar, point: Godot.Vector2): integer
+---@field get_tab_language fun(self: Godot.TabBar, tab_idx: integer): string
+---@field get_tab_metadata fun(self: Godot.TabBar, tab_idx: integer)
+---@field get_tab_offset fun(self: Godot.TabBar): integer
+---@field get_tab_rect fun(self: Godot.TabBar, tab_idx: integer): Godot.Rect2
+---@field get_tab_text_direction fun(self: Godot.TabBar, tab_idx: integer): integer
+---@field get_tab_title fun(self: Godot.TabBar, tab_idx: integer): string
+---@field get_tab_tooltip fun(self: Godot.TabBar, tab_idx: integer): string
+---@field get_tabs_rearrange_group fun(self: Godot.TabBar): integer
+---@field is_tab_disabled fun(self: Godot.TabBar, tab_idx: integer): boolean
+---@field is_tab_hidden fun(self: Godot.TabBar, tab_idx: integer): boolean
+---@field move_tab fun(self: Godot.TabBar, from: integer, to: integer)
+---@field remove_tab fun(self: Godot.TabBar, tab_idx: integer)
+---@field select_next_available fun(self: Godot.TabBar): boolean
+---@field select_previous_available fun(self: Godot.TabBar): boolean
+---@field set_clip_tabs fun(self: Godot.TabBar, clip_tabs: boolean)
+---@field set_close_with_middle_mouse fun(self: Godot.TabBar, enabled: boolean)
+---@field set_current_tab fun(self: Godot.TabBar, tab_idx: integer)
+---@field set_deselect_enabled fun(self: Godot.TabBar, enabled: boolean)
+---@field set_drag_to_rearrange_enabled fun(self: Godot.TabBar, enabled: boolean)
+---@field set_max_tab_width fun(self: Godot.TabBar, width: integer)
+---@field set_scroll_to_selected fun(self: Godot.TabBar, enabled: boolean)
+---@field set_scrolling_enabled fun(self: Godot.TabBar, enabled: boolean)
+---@field set_select_with_rmb fun(self: Godot.TabBar, enabled: boolean)
+---@field set_switch_on_drag_hover fun(self: Godot.TabBar, enabled: boolean)
+---@field set_tab_alignment fun(self: Godot.TabBar, alignment: integer)
+---@field set_tab_button_icon fun(self: Godot.TabBar, tab_idx: integer, icon: Godot.Texture2D)
+---@field set_tab_close_display_policy fun(self: Godot.TabBar, policy: integer)
+---@field set_tab_count fun(self: Godot.TabBar, count: integer)
+---@field set_tab_disabled fun(self: Godot.TabBar, tab_idx: integer, disabled: boolean)
+---@field set_tab_hidden fun(self: Godot.TabBar, tab_idx: integer, hidden: boolean)
+---@field set_tab_icon fun(self: Godot.TabBar, tab_idx: integer, icon: Godot.Texture2D)
+---@field set_tab_icon_max_width fun(self: Godot.TabBar, tab_idx: integer, width: integer)
+---@field set_tab_language fun(self: Godot.TabBar, tab_idx: integer, language: string)
+---@field set_tab_metadata fun(self: Godot.TabBar, tab_idx: integer, metadata: any)
+---@field set_tab_text_direction fun(self: Godot.TabBar, tab_idx: integer, direction: integer)
+---@field set_tab_title fun(self: Godot.TabBar, tab_idx: integer, title: string)
+---@field set_tab_tooltip fun(self: Godot.TabBar, tab_idx: integer, tooltip: string)
+---@field set_tabs_rearrange_group fun(self: Godot.TabBar, group_id: integer)
+---@class Godot.TabBar.__type
+---@field new fun(): Godot.TabBar
+---@field AlignmentMode Godot.TabBar.AlignmentMode
+---@field CloseButtonDisplayPolicy Godot.TabBar.CloseButtonDisplayPolicy
+---@class Godot.TabBar.AlignmentMode
+---@field Left integer
+---@field Center integer
+---@field Right integer
+---@field Max integer
+---@class Godot.TabBar.CloseButtonDisplayPolicy
+---@field ShowNever integer
+---@field ShowActiveOnly integer
+---@field ShowAlways integer
+---@field Max integer
+
+---@class Godot.TabContainer : Godot.Container
+---@field all_tabs_in_front boolean
+---@field clip_tabs boolean
+---@field current_tab integer
+---@field deselect_enabled boolean
+---@field drag_to_rearrange_enabled boolean
+---@field switch_on_drag_hover boolean
+---@field tab_alignment integer
+---@field tab_focus_mode integer
+---@field tabs_position integer
+---@field tabs_rearrange_group integer
+---@field tabs_visible boolean
+---@field use_hidden_tabs_for_min_size boolean
+---@field active_tab_rearranged Godot.Signal
+---@field pre_popup_pressed Godot.Signal
+---@field tab_button_pressed Godot.Signal
+---@field tab_changed Godot.Signal
+---@field tab_clicked Godot.Signal
+---@field tab_hovered Godot.Signal
+---@field tab_selected Godot.Signal
+---@field are_tabs_visible fun(self: Godot.TabContainer): boolean
+---@field get_clip_tabs fun(self: Godot.TabContainer): boolean
+---@field get_current_tab fun(self: Godot.TabContainer): integer
+---@field get_current_tab_control fun(self: Godot.TabContainer): Godot.Control
+---@field get_deselect_enabled fun(self: Godot.TabContainer): boolean
+---@field get_drag_to_rearrange_enabled fun(self: Godot.TabContainer): boolean
+---@field get_popup fun(self: Godot.TabContainer): Godot.Popup
+---@field get_previous_tab fun(self: Godot.TabContainer): integer
+---@field get_switch_on_drag_hover fun(self: Godot.TabContainer): boolean
+---@field get_tab_alignment fun(self: Godot.TabContainer): integer
+---@field get_tab_bar fun(self: Godot.TabContainer): Godot.TabBar
+---@field get_tab_button_icon fun(self: Godot.TabContainer, tab_idx: integer): Godot.Texture2D
+---@field get_tab_control fun(self: Godot.TabContainer, tab_idx: integer): Godot.Control
+---@field get_tab_count fun(self: Godot.TabContainer): integer
+---@field get_tab_focus_mode fun(self: Godot.TabContainer): integer
+---@field get_tab_icon fun(self: Godot.TabContainer, tab_idx: integer): Godot.Texture2D
+---@field get_tab_icon_max_width fun(self: Godot.TabContainer, tab_idx: integer): integer
+---@field get_tab_idx_at_point fun(self: Godot.TabContainer, point: Godot.Vector2): integer
+---@field get_tab_idx_from_control fun(self: Godot.TabContainer, control: Godot.Control): integer
+---@field get_tab_metadata fun(self: Godot.TabContainer, tab_idx: integer)
+---@field get_tab_title fun(self: Godot.TabContainer, tab_idx: integer): string
+---@field get_tab_tooltip fun(self: Godot.TabContainer, tab_idx: integer): string
+---@field get_tabs_position fun(self: Godot.TabContainer): integer
+---@field get_tabs_rearrange_group fun(self: Godot.TabContainer): integer
+---@field get_use_hidden_tabs_for_min_size fun(self: Godot.TabContainer): boolean
+---@field is_all_tabs_in_front fun(self: Godot.TabContainer): boolean
+---@field is_tab_disabled fun(self: Godot.TabContainer, tab_idx: integer): boolean
+---@field is_tab_hidden fun(self: Godot.TabContainer, tab_idx: integer): boolean
+---@field select_next_available fun(self: Godot.TabContainer): boolean
+---@field select_previous_available fun(self: Godot.TabContainer): boolean
+---@field set_all_tabs_in_front fun(self: Godot.TabContainer, is_front: boolean)
+---@field set_clip_tabs fun(self: Godot.TabContainer, clip_tabs: boolean)
+---@field set_current_tab fun(self: Godot.TabContainer, tab_idx: integer)
+---@field set_deselect_enabled fun(self: Godot.TabContainer, enabled: boolean)
+---@field set_drag_to_rearrange_enabled fun(self: Godot.TabContainer, enabled: boolean)
+---@field set_popup fun(self: Godot.TabContainer, popup: Godot.Node)
+---@field set_switch_on_drag_hover fun(self: Godot.TabContainer, enabled: boolean)
+---@field set_tab_alignment fun(self: Godot.TabContainer, alignment: integer)
+---@field set_tab_button_icon fun(self: Godot.TabContainer, tab_idx: integer, icon: Godot.Texture2D)
+---@field set_tab_disabled fun(self: Godot.TabContainer, tab_idx: integer, disabled: boolean)
+---@field set_tab_focus_mode fun(self: Godot.TabContainer, focus_mode: integer)
+---@field set_tab_hidden fun(self: Godot.TabContainer, tab_idx: integer, hidden: boolean)
+---@field set_tab_icon fun(self: Godot.TabContainer, tab_idx: integer, icon: Godot.Texture2D)
+---@field set_tab_icon_max_width fun(self: Godot.TabContainer, tab_idx: integer, width: integer)
+---@field set_tab_metadata fun(self: Godot.TabContainer, tab_idx: integer, metadata: any)
+---@field set_tab_title fun(self: Godot.TabContainer, tab_idx: integer, title: string)
+---@field set_tab_tooltip fun(self: Godot.TabContainer, tab_idx: integer, tooltip: string)
+---@field set_tabs_position fun(self: Godot.TabContainer, tabs_position: integer)
+---@field set_tabs_rearrange_group fun(self: Godot.TabContainer, group_id: integer)
+---@field set_tabs_visible fun(self: Godot.TabContainer, visible: boolean)
+---@field set_use_hidden_tabs_for_min_size fun(self: Godot.TabContainer, enabled: boolean)
+---@class Godot.TabContainer.__type
+---@field new fun(): Godot.TabContainer
+---@field TabPosition Godot.TabContainer.TabPosition
+---@class Godot.TabContainer.TabPosition
+---@field Top integer
+---@field Bottom integer
+---@field Max integer
+
+---@class Godot.TextEdit : Godot.Control
+---@field autowrap_mode integer
+---@field backspace_deletes_composite_character_enabled boolean
+---@field caret_blink boolean
+---@field caret_blink_interval number
+---@field caret_draw_when_editable_disabled boolean
+---@field caret_mid_grapheme boolean
+---@field caret_move_on_right_click boolean
+---@field caret_multiple boolean
+---@field caret_type integer
+---@field context_menu_enabled boolean
+---@field custom_word_separators string
+---@field deselect_on_focus_loss_enabled boolean
+---@field drag_and_drop_selection_enabled boolean
+---@field draw_control_chars boolean
+---@field draw_spaces boolean
+---@field draw_tabs boolean
+---@field editable boolean
+---@field emoji_menu_enabled boolean
+---@field empty_selection_clipboard_enabled boolean
+---@field highlight_all_occurrences boolean
+---@field highlight_current_line boolean
+---@field indent_wrapped_lines boolean
+---@field language string
+---@field middle_mouse_paste_enabled boolean
+---@field minimap_draw boolean
+---@field minimap_width integer
+---@field placeholder_text string
+---@field scroll_fit_content_height boolean
+---@field scroll_fit_content_width boolean
+---@field scroll_horizontal integer
+---@field scroll_past_end_of_file boolean
+---@field scroll_smooth boolean
+---@field scroll_v_scroll_speed number
+---@field scroll_vertical number
+---@field selecting_enabled boolean
+---@field shortcut_keys_enabled boolean
+---@field structured_text_bidi_override integer
+---@field structured_text_bidi_override_options table
+---@field syntax_highlighter Godot.SyntaxHighlighter
+---@field tab_input_mode boolean
+---@field text string
+---@field text_direction integer
+---@field use_custom_word_separators boolean
+---@field use_default_word_separators boolean
+---@field virtual_keyboard_enabled boolean
+---@field virtual_keyboard_show_on_focus boolean
+---@field wrap_mode integer
+---@field caret_changed Godot.Signal
+---@field gutter_added Godot.Signal
+---@field gutter_clicked Godot.Signal
+---@field gutter_removed Godot.Signal
+---@field lines_edited_from Godot.Signal
+---@field text_changed Godot.Signal
+---@field text_set Godot.Signal
+---@field add_caret fun(self: Godot.TextEdit, line: integer, column: integer): integer
+---@field add_caret_at_carets fun(self: Godot.TextEdit, below: boolean)
+---@field add_gutter fun(self: Godot.TextEdit, at: integer)
+---@field add_selection_for_next_occurrence fun(self: Godot.TextEdit)
+---@field adjust_carets_after_edit fun(self: Godot.TextEdit, caret: integer, from_line: integer, from_col: integer, to_line: integer, to_col: integer)
+---@field adjust_viewport_to_caret fun(self: Godot.TextEdit, caret_index: integer)
+---@field apply_ime fun(self: Godot.TextEdit)
+---@field backspace fun(self: Godot.TextEdit, caret_index: integer)
+---@field begin_complex_operation fun(self: Godot.TextEdit)
+---@field begin_multicaret_edit fun(self: Godot.TextEdit)
+---@field cancel_ime fun(self: Godot.TextEdit)
+---@field center_viewport_to_caret fun(self: Godot.TextEdit, caret_index: integer)
+---@field clear fun(self: Godot.TextEdit)
+---@field clear_undo_history fun(self: Godot.TextEdit)
+---@field collapse_carets fun(self: Godot.TextEdit, from_line: integer, from_column: integer, to_line: integer, to_column: integer, inclusive: boolean)
+---@field copy fun(self: Godot.TextEdit, caret_index: integer)
+---@field cut fun(self: Godot.TextEdit, caret_index: integer)
+---@field delete_selection fun(self: Godot.TextEdit, caret_index: integer)
+---@field deselect fun(self: Godot.TextEdit, caret_index: integer)
+---@field end_action fun(self: Godot.TextEdit)
+---@field end_complex_operation fun(self: Godot.TextEdit)
+---@field end_multicaret_edit fun(self: Godot.TextEdit)
+---@field get_autowrap_mode fun(self: Godot.TextEdit): integer
+---@field get_caret_blink_interval fun(self: Godot.TextEdit): number
+---@field get_caret_column fun(self: Godot.TextEdit, caret_index: integer): integer
+---@field get_caret_count fun(self: Godot.TextEdit): integer
+---@field get_caret_draw_pos fun(self: Godot.TextEdit, caret_index: integer): Godot.Vector2
+---@field get_caret_index_edit_order fun(self: Godot.TextEdit): table
+---@field get_caret_line fun(self: Godot.TextEdit, caret_index: integer): integer
+---@field get_caret_type fun(self: Godot.TextEdit): integer
+---@field get_caret_wrap_index fun(self: Godot.TextEdit, caret_index: integer): integer
+---@field get_custom_word_separators fun(self: Godot.TextEdit): string
+---@field get_draw_control_chars fun(self: Godot.TextEdit): boolean
+---@field get_first_non_whitespace_column fun(self: Godot.TextEdit, line: integer): integer
+---@field get_first_visible_line fun(self: Godot.TextEdit): integer
+---@field get_gutter_count fun(self: Godot.TextEdit): integer
+---@field get_gutter_name fun(self: Godot.TextEdit, gutter: integer): string
+---@field get_gutter_type fun(self: Godot.TextEdit, gutter: integer): integer
+---@field get_gutter_width fun(self: Godot.TextEdit, gutter: integer): integer
+---@field get_h_scroll fun(self: Godot.TextEdit): integer
+---@field get_h_scroll_bar fun(self: Godot.TextEdit): Godot.HScrollBar
+---@field get_indent_level fun(self: Godot.TextEdit, line: integer): integer
+---@field get_language fun(self: Godot.TextEdit): string
+---@field get_last_full_visible_line fun(self: Godot.TextEdit): integer
+---@field get_last_full_visible_line_wrap_index fun(self: Godot.TextEdit): integer
+---@field get_last_unhidden_line fun(self: Godot.TextEdit): integer
+---@field get_line fun(self: Godot.TextEdit, line: integer): string
+---@field get_line_background_color fun(self: Godot.TextEdit, line: integer): Godot.Color
+---@field get_line_column_at_pos fun(self: Godot.TextEdit, position: Godot.Vector2I, clamp_line: boolean, clamp_column: boolean): Godot.Vector2I
+---@field get_line_count fun(self: Godot.TextEdit): integer
+---@field get_line_gutter_icon fun(self: Godot.TextEdit, line: integer, gutter: integer): Godot.Texture2D
+---@field get_line_gutter_item_color fun(self: Godot.TextEdit, line: integer, gutter: integer): Godot.Color
+---@field get_line_gutter_metadata fun(self: Godot.TextEdit, line: integer, gutter: integer)
+---@field get_line_gutter_text fun(self: Godot.TextEdit, line: integer, gutter: integer): string
+---@field get_line_height fun(self: Godot.TextEdit): integer
+---@field get_line_ranges_from_carets fun(self: Godot.TextEdit, only_selections: boolean, merge_adjacent: boolean): table
+---@field get_line_width fun(self: Godot.TextEdit, line: integer, wrap_index: integer): integer
+---@field get_line_with_ime fun(self: Godot.TextEdit, line: integer): string
+---@field get_line_wrap_count fun(self: Godot.TextEdit, line: integer): integer
+---@field get_line_wrap_index_at_column fun(self: Godot.TextEdit, line: integer, column: integer): integer
+---@field get_line_wrapped_text fun(self: Godot.TextEdit, line: integer): table
+---@field get_line_wrapping_mode fun(self: Godot.TextEdit): integer
+---@field get_local_mouse_pos fun(self: Godot.TextEdit): Godot.Vector2
+---@field get_menu fun(self: Godot.TextEdit): Godot.PopupMenu
+---@field get_minimap_line_at_pos fun(self: Godot.TextEdit, position: Godot.Vector2I): integer
+---@field get_minimap_visible_lines fun(self: Godot.TextEdit): integer
+---@field get_minimap_width fun(self: Godot.TextEdit): integer
+---@field get_next_composite_character_column fun(self: Godot.TextEdit, line: integer, column: integer): integer
+---@field get_next_visible_line_index_offset_from fun(self: Godot.TextEdit, line: integer, wrap_index: integer, visible_amount: integer): Godot.Vector2I
+---@field get_next_visible_line_offset_from fun(self: Godot.TextEdit, line: integer, visible_amount: integer): integer
+---@field get_placeholder fun(self: Godot.TextEdit): string
+---@field get_pos_at_line_column fun(self: Godot.TextEdit, line: integer, column: integer): Godot.Vector2I
+---@field get_previous_composite_character_column fun(self: Godot.TextEdit, line: integer, column: integer): integer
+---@field get_rect_at_line_column fun(self: Godot.TextEdit, line: integer, column: integer): Godot.Rect2I
+---@field get_saved_version fun(self: Godot.TextEdit): integer
+---@field get_scroll_pos_for_line fun(self: Godot.TextEdit, line: integer, wrap_index: integer): number
+---@field get_selected_text fun(self: Godot.TextEdit, caret_index: integer): string
+---@field get_selection_at_line_column fun(self: Godot.TextEdit, line: integer, column: integer, include_edges: boolean, only_selections: boolean): integer
+---@field get_selection_column fun(self: Godot.TextEdit, caret_index: integer): integer
+---@field get_selection_from_column fun(self: Godot.TextEdit, caret_index: integer): integer
+---@field get_selection_from_line fun(self: Godot.TextEdit, caret_index: integer): integer
+---@field get_selection_line fun(self: Godot.TextEdit, caret_index: integer): integer
+---@field get_selection_mode fun(self: Godot.TextEdit): integer
+---@field get_selection_origin_column fun(self: Godot.TextEdit, caret_index: integer): integer
+---@field get_selection_origin_line fun(self: Godot.TextEdit, caret_index: integer): integer
+---@field get_selection_to_column fun(self: Godot.TextEdit, caret_index: integer): integer
+---@field get_selection_to_line fun(self: Godot.TextEdit, caret_index: integer): integer
+---@field get_sorted_carets fun(self: Godot.TextEdit, include_ignored_carets: boolean): table
+---@field get_structured_text_bidi_override fun(self: Godot.TextEdit): integer
+---@field get_structured_text_bidi_override_options fun(self: Godot.TextEdit): table
+---@field get_syntax_highlighter fun(self: Godot.TextEdit): Godot.SyntaxHighlighter
+---@field get_tab_input_mode fun(self: Godot.TextEdit): boolean
+---@field get_tab_size fun(self: Godot.TextEdit): integer
+---@field get_text fun(self: Godot.TextEdit): string
+---@field get_text_direction fun(self: Godot.TextEdit): integer
+---@field get_total_gutter_width fun(self: Godot.TextEdit): integer
+---@field get_total_visible_line_count fun(self: Godot.TextEdit): integer
+---@field get_v_scroll fun(self: Godot.TextEdit): number
+---@field get_v_scroll_bar fun(self: Godot.TextEdit): Godot.VScrollBar
+---@field get_v_scroll_speed fun(self: Godot.TextEdit): number
+---@field get_version fun(self: Godot.TextEdit): integer
+---@field get_virtual_keyboard_show_on_focus fun(self: Godot.TextEdit): boolean
+---@field get_visible_line_count fun(self: Godot.TextEdit): integer
+---@field get_visible_line_count_in_range fun(self: Godot.TextEdit, from_line: integer, to_line: integer): integer
+---@field get_word_at_pos fun(self: Godot.TextEdit, position: Godot.Vector2): string
+---@field get_word_under_caret fun(self: Godot.TextEdit, caret_index: integer): string
+---@field has_ime_text fun(self: Godot.TextEdit): boolean
+---@field has_redo fun(self: Godot.TextEdit): boolean
+---@field has_selection fun(self: Godot.TextEdit, caret_index: integer): boolean
+---@field has_undo fun(self: Godot.TextEdit): boolean
+---@field insert_line_at fun(self: Godot.TextEdit, line: integer, text: string)
+---@field insert_text fun(self: Godot.TextEdit, text: string, line: integer, column: integer, before_selection_begin: boolean, before_selection_end: boolean)
+---@field insert_text_at_caret fun(self: Godot.TextEdit, text: string, caret_index: integer)
+---@field is_backspace_deletes_composite_character_enabled fun(self: Godot.TextEdit): boolean
+---@field is_caret_after_selection_origin fun(self: Godot.TextEdit, caret_index: integer): boolean
+---@field is_caret_blink_enabled fun(self: Godot.TextEdit): boolean
+---@field is_caret_mid_grapheme_enabled fun(self: Godot.TextEdit): boolean
+---@field is_caret_visible fun(self: Godot.TextEdit, caret_index: integer): boolean
+---@field is_context_menu_enabled fun(self: Godot.TextEdit): boolean
+---@field is_custom_word_separators_enabled fun(self: Godot.TextEdit): boolean
+---@field is_default_word_separators_enabled fun(self: Godot.TextEdit): boolean
+---@field is_deselect_on_focus_loss_enabled fun(self: Godot.TextEdit): boolean
+---@field is_drag_and_drop_selection_enabled fun(self: Godot.TextEdit): boolean
+---@field is_dragging_cursor fun(self: Godot.TextEdit): boolean
+---@field is_drawing_caret_when_editable_disabled fun(self: Godot.TextEdit): boolean
+---@field is_drawing_minimap fun(self: Godot.TextEdit): boolean
+---@field is_drawing_spaces fun(self: Godot.TextEdit): boolean
+---@field is_drawing_tabs fun(self: Godot.TextEdit): boolean
+---@field is_editable fun(self: Godot.TextEdit): boolean
+---@field is_emoji_menu_enabled fun(self: Godot.TextEdit): boolean
+---@field is_empty_selection_clipboard_enabled fun(self: Godot.TextEdit): boolean
+---@field is_fit_content_height_enabled fun(self: Godot.TextEdit): boolean
+---@field is_fit_content_width_enabled fun(self: Godot.TextEdit): boolean
+---@field is_gutter_clickable fun(self: Godot.TextEdit, gutter: integer): boolean
+---@field is_gutter_drawn fun(self: Godot.TextEdit, gutter: integer): boolean
+---@field is_gutter_overwritable fun(self: Godot.TextEdit, gutter: integer): boolean
+---@field is_highlight_all_occurrences_enabled fun(self: Godot.TextEdit): boolean
+---@field is_highlight_current_line_enabled fun(self: Godot.TextEdit): boolean
+---@field is_in_mulitcaret_edit fun(self: Godot.TextEdit): boolean
+---@field is_indent_wrapped_lines fun(self: Godot.TextEdit): boolean
+---@field is_line_gutter_clickable fun(self: Godot.TextEdit, line: integer, gutter: integer): boolean
+---@field is_line_wrapped fun(self: Godot.TextEdit, line: integer): boolean
+---@field is_menu_visible fun(self: Godot.TextEdit): boolean
+---@field is_middle_mouse_paste_enabled fun(self: Godot.TextEdit): boolean
+---@field is_mouse_over_selection fun(self: Godot.TextEdit, edges: boolean, caret_index: integer): boolean
+---@field is_move_caret_on_right_click_enabled fun(self: Godot.TextEdit): boolean
+---@field is_multiple_carets_enabled fun(self: Godot.TextEdit): boolean
+---@field is_overtype_mode_enabled fun(self: Godot.TextEdit): boolean
+---@field is_scroll_past_end_of_file_enabled fun(self: Godot.TextEdit): boolean
+---@field is_selecting_enabled fun(self: Godot.TextEdit): boolean
+---@field is_shortcut_keys_enabled fun(self: Godot.TextEdit): boolean
+---@field is_smooth_scroll_enabled fun(self: Godot.TextEdit): boolean
+---@field is_virtual_keyboard_enabled fun(self: Godot.TextEdit): boolean
+---@field menu_option fun(self: Godot.TextEdit, option: integer)
+---@field merge_gutters fun(self: Godot.TextEdit, from_line: integer, to_line: integer)
+---@field merge_overlapping_carets fun(self: Godot.TextEdit)
+---@field multicaret_edit_ignore_caret fun(self: Godot.TextEdit, caret_index: integer): boolean
+---@field paste fun(self: Godot.TextEdit, caret_index: integer)
+---@field paste_primary_clipboard fun(self: Godot.TextEdit, caret_index: integer)
+---@field redo fun(self: Godot.TextEdit)
+---@field remove_caret fun(self: Godot.TextEdit, caret: integer)
+---@field remove_gutter fun(self: Godot.TextEdit, gutter: integer)
+---@field remove_line_at fun(self: Godot.TextEdit, line: integer, move_carets_down: boolean)
+---@field remove_secondary_carets fun(self: Godot.TextEdit)
+---@field remove_text fun(self: Godot.TextEdit, from_line: integer, from_column: integer, to_line: integer, to_column: integer)
+---@field search fun(self: Godot.TextEdit, text: string, flags: integer, from_line: integer, from_column: integer): Godot.Vector2I
+---@field select fun(self: Godot.TextEdit, origin_line: integer, origin_column: integer, caret_line: integer, caret_column: integer, caret_index: integer)
+---@field select_all fun(self: Godot.TextEdit)
+---@field select_word_under_caret fun(self: Godot.TextEdit, caret_index: integer)
+---@field set_autowrap_mode fun(self: Godot.TextEdit, autowrap_mode: integer)
+---@field set_backspace_deletes_composite_character_enabled fun(self: Godot.TextEdit, enable: boolean)
+---@field set_caret_blink_enabled fun(self: Godot.TextEdit, enable: boolean)
+---@field set_caret_blink_interval fun(self: Godot.TextEdit, interval: number)
+---@field set_caret_column fun(self: Godot.TextEdit, column: integer, adjust_viewport: boolean, caret_index: integer)
+---@field set_caret_line fun(self: Godot.TextEdit, line: integer, adjust_viewport: boolean, can_be_hidden: boolean, wrap_index: integer, caret_index: integer)
+---@field set_caret_mid_grapheme_enabled fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_caret_type fun(self: Godot.TextEdit, type: integer)
+---@field set_context_menu_enabled fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_custom_word_separators fun(self: Godot.TextEdit, custom_word_separators: string)
+---@field set_deselect_on_focus_loss_enabled fun(self: Godot.TextEdit, enable: boolean)
+---@field set_drag_and_drop_selection_enabled fun(self: Godot.TextEdit, enable: boolean)
+---@field set_draw_caret_when_editable_disabled fun(self: Godot.TextEdit, enable: boolean)
+---@field set_draw_control_chars fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_draw_minimap fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_draw_spaces fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_draw_tabs fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_editable fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_emoji_menu_enabled fun(self: Godot.TextEdit, enable: boolean)
+---@field set_empty_selection_clipboard_enabled fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_fit_content_height_enabled fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_fit_content_width_enabled fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_gutter_clickable fun(self: Godot.TextEdit, gutter: integer, clickable: boolean)
+---@field set_gutter_custom_draw fun(self: Godot.TextEdit, column: integer, draw_callback: function)
+---@field set_gutter_draw fun(self: Godot.TextEdit, gutter: integer, draw: boolean)
+---@field set_gutter_name fun(self: Godot.TextEdit, gutter: integer, name: string)
+---@field set_gutter_overwritable fun(self: Godot.TextEdit, gutter: integer, overwritable: boolean)
+---@field set_gutter_type fun(self: Godot.TextEdit, gutter: integer, type: integer)
+---@field set_gutter_width fun(self: Godot.TextEdit, gutter: integer, width: integer)
+---@field set_h_scroll fun(self: Godot.TextEdit, value: integer)
+---@field set_highlight_all_occurrences fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_highlight_current_line fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_indent_wrapped_lines fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_language fun(self: Godot.TextEdit, language: string)
+---@field set_line fun(self: Godot.TextEdit, line: integer, new_text: string)
+---@field set_line_as_center_visible fun(self: Godot.TextEdit, line: integer, wrap_index: integer)
+---@field set_line_as_first_visible fun(self: Godot.TextEdit, line: integer, wrap_index: integer)
+---@field set_line_as_last_visible fun(self: Godot.TextEdit, line: integer, wrap_index: integer)
+---@field set_line_background_color fun(self: Godot.TextEdit, line: integer, color: Godot.Color)
+---@field set_line_gutter_clickable fun(self: Godot.TextEdit, line: integer, gutter: integer, clickable: boolean)
+---@field set_line_gutter_icon fun(self: Godot.TextEdit, line: integer, gutter: integer, icon: Godot.Texture2D)
+---@field set_line_gutter_item_color fun(self: Godot.TextEdit, line: integer, gutter: integer, color: Godot.Color)
+---@field set_line_gutter_metadata fun(self: Godot.TextEdit, line: integer, gutter: integer, metadata: any)
+---@field set_line_gutter_text fun(self: Godot.TextEdit, line: integer, gutter: integer, text: string)
+---@field set_line_wrapping_mode fun(self: Godot.TextEdit, mode: integer)
+---@field set_middle_mouse_paste_enabled fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_minimap_width fun(self: Godot.TextEdit, width: integer)
+---@field set_move_caret_on_right_click_enabled fun(self: Godot.TextEdit, enable: boolean)
+---@field set_multiple_carets_enabled fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_overtype_mode_enabled fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_placeholder fun(self: Godot.TextEdit, text: string)
+---@field set_scroll_past_end_of_file_enabled fun(self: Godot.TextEdit, enable: boolean)
+---@field set_search_flags fun(self: Godot.TextEdit, flags: integer)
+---@field set_search_text fun(self: Godot.TextEdit, search_text: string)
+---@field set_selecting_enabled fun(self: Godot.TextEdit, enable: boolean)
+---@field set_selection_mode fun(self: Godot.TextEdit, mode: integer)
+---@field set_selection_origin_column fun(self: Godot.TextEdit, column: integer, caret_index: integer)
+---@field set_selection_origin_line fun(self: Godot.TextEdit, line: integer, can_be_hidden: boolean, wrap_index: integer, caret_index: integer)
+---@field set_shortcut_keys_enabled fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_smooth_scroll_enabled fun(self: Godot.TextEdit, enable: boolean)
+---@field set_structured_text_bidi_override fun(self: Godot.TextEdit, parser: integer)
+---@field set_structured_text_bidi_override_options fun(self: Godot.TextEdit, args: table)
+---@field set_syntax_highlighter fun(self: Godot.TextEdit, syntax_highlighter: Godot.SyntaxHighlighter)
+---@field set_tab_input_mode fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_tab_size fun(self: Godot.TextEdit, size: integer)
+---@field set_text fun(self: Godot.TextEdit, text: string)
+---@field set_text_direction fun(self: Godot.TextEdit, direction: integer)
+---@field set_tooltip_request_func fun(self: Godot.TextEdit, callback: function)
+---@field set_use_custom_word_separators fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_use_default_word_separators fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_v_scroll fun(self: Godot.TextEdit, value: number)
+---@field set_v_scroll_speed fun(self: Godot.TextEdit, speed: number)
+---@field set_virtual_keyboard_enabled fun(self: Godot.TextEdit, enabled: boolean)
+---@field set_virtual_keyboard_show_on_focus fun(self: Godot.TextEdit, show_on_focus: boolean)
+---@field skip_selection_for_next_occurrence fun(self: Godot.TextEdit)
+---@field start_action fun(self: Godot.TextEdit, action: integer)
+---@field swap_lines fun(self: Godot.TextEdit, from_line: integer, to_line: integer)
+---@field tag_saved_version fun(self: Godot.TextEdit)
+---@field undo fun(self: Godot.TextEdit)
+---@class Godot.TextEdit.__type
+---@field new fun(): Godot.TextEdit
+---@field CaretTypeEnum Godot.TextEdit.CaretTypeEnum
+---@field EditAction Godot.TextEdit.EditAction
+---@field GutterType Godot.TextEdit.GutterType
+---@field LineWrappingMode Godot.TextEdit.LineWrappingMode
+---@field MenuItems Godot.TextEdit.MenuItems
+---@field SearchFlags Godot.TextEdit.SearchFlags
+---@field SelectionMode Godot.TextEdit.SelectionMode
+---@class Godot.TextEdit.CaretTypeEnum
+---@field Line integer
+---@field Block integer
+---@class Godot.TextEdit.EditAction
+---@field None integer
+---@field Typing integer
+---@field Backspace integer
+---@field Delete integer
+---@class Godot.TextEdit.GutterType
+---@field String integer
+---@field Icon integer
+---@field Custom integer
+---@class Godot.TextEdit.LineWrappingMode
+---@field None integer
+---@field Boundary integer
+---@class Godot.TextEdit.MenuItems
+---@field Cut integer
+---@field Copy integer
+---@field Paste integer
+---@field Clear integer
+---@field SelectAll integer
+---@field Undo integer
+---@field Redo integer
+---@field SubmenuTextDir integer
+---@field DirInherited integer
+---@field DirAuto integer
+---@field DirLtr integer
+---@field DirRtl integer
+---@field DisplayUcc integer
+---@field SubmenuInsertUcc integer
+---@field InsertLrm integer
+---@field InsertRlm integer
+---@field InsertLre integer
+---@field InsertRle integer
+---@field InsertLro integer
+---@field InsertRlo integer
+---@field InsertPdf integer
+---@field InsertAlm integer
+---@field InsertLri integer
+---@field InsertRli integer
+---@field InsertFsi integer
+---@field InsertPdi integer
+---@field InsertZwj integer
+---@field InsertZwnj integer
+---@field InsertWj integer
+---@field InsertShy integer
+---@field EmojiAndSymbol integer
+---@field Max integer
+---@class Godot.TextEdit.SearchFlags
+---@field MatchCase integer
+---@field WholeWords integer
+---@field Backwards integer
+---@class Godot.TextEdit.SelectionMode
+---@field None integer
+---@field Shift integer
+---@field Pointer integer
+---@field Word integer
+---@field Line integer
+
+---@class Godot.TextureButton : Godot.BaseButton
+---@field flip_h boolean
+---@field flip_v boolean
+---@field ignore_texture_size boolean
+---@field stretch_mode integer
+---@field texture_click_mask Godot.BitMap
+---@field texture_disabled Godot.Texture2D
+---@field texture_focused Godot.Texture2D
+---@field texture_hover Godot.Texture2D
+---@field texture_normal Godot.Texture2D
+---@field texture_pressed Godot.Texture2D
+---@field get_click_mask fun(self: Godot.TextureButton): Godot.BitMap
+---@field get_ignore_texture_size fun(self: Godot.TextureButton): boolean
+---@field get_stretch_mode fun(self: Godot.TextureButton): integer
+---@field get_texture_disabled fun(self: Godot.TextureButton): Godot.Texture2D
+---@field get_texture_focused fun(self: Godot.TextureButton): Godot.Texture2D
+---@field get_texture_hover fun(self: Godot.TextureButton): Godot.Texture2D
+---@field get_texture_normal fun(self: Godot.TextureButton): Godot.Texture2D
+---@field get_texture_pressed fun(self: Godot.TextureButton): Godot.Texture2D
+---@field is_flipped_h fun(self: Godot.TextureButton): boolean
+---@field is_flipped_v fun(self: Godot.TextureButton): boolean
+---@field set_click_mask fun(self: Godot.TextureButton, mask: Godot.BitMap)
+---@field set_flip_h fun(self: Godot.TextureButton, enable: boolean)
+---@field set_flip_v fun(self: Godot.TextureButton, enable: boolean)
+---@field set_ignore_texture_size fun(self: Godot.TextureButton, ignore: boolean)
+---@field set_stretch_mode fun(self: Godot.TextureButton, mode: integer)
+---@field set_texture_disabled fun(self: Godot.TextureButton, texture: Godot.Texture2D)
+---@field set_texture_focused fun(self: Godot.TextureButton, texture: Godot.Texture2D)
+---@field set_texture_hover fun(self: Godot.TextureButton, texture: Godot.Texture2D)
+---@field set_texture_normal fun(self: Godot.TextureButton, texture: Godot.Texture2D)
+---@field set_texture_pressed fun(self: Godot.TextureButton, texture: Godot.Texture2D)
+---@class Godot.TextureButton.__type
+---@field new fun(): Godot.TextureButton
+---@field StretchModeEnum Godot.TextureButton.StretchModeEnum
+---@class Godot.TextureButton.StretchModeEnum
+---@field Scale integer
+---@field Tile integer
+---@field Keep integer
+---@field KeepCentered integer
+---@field KeepAspect integer
+---@field KeepAspectCentered integer
+---@field KeepAspectCovered integer
+
+---@class Godot.TextureProgressBar : Godot.Range
+---@field fill_mode integer
+---@field nine_patch_stretch boolean
+---@field radial_center_offset Godot.Vector2
+---@field radial_fill_degrees number
+---@field radial_initial_angle number
+---@field stretch_margin_bottom integer
+---@field stretch_margin_left integer
+---@field stretch_margin_right integer
+---@field stretch_margin_top integer
+---@field texture_over Godot.Texture2D
+---@field texture_progress Godot.Texture2D
+---@field texture_progress_offset Godot.Vector2
+---@field texture_under Godot.Texture2D
+---@field tint_over Godot.Color
+---@field tint_progress Godot.Color
+---@field tint_under Godot.Color
+---@field get_fill_degrees fun(self: Godot.TextureProgressBar): number
+---@field get_fill_mode fun(self: Godot.TextureProgressBar): integer
+---@field get_nine_patch_stretch fun(self: Godot.TextureProgressBar): boolean
+---@field get_over_texture fun(self: Godot.TextureProgressBar): Godot.Texture2D
+---@field get_progress_texture fun(self: Godot.TextureProgressBar): Godot.Texture2D
+---@field get_radial_center_offset fun(self: Godot.TextureProgressBar): Godot.Vector2
+---@field get_radial_initial_angle fun(self: Godot.TextureProgressBar): number
+---@field get_stretch_margin fun(self: Godot.TextureProgressBar, margin: integer): integer
+---@field get_texture_progress_offset fun(self: Godot.TextureProgressBar): Godot.Vector2
+---@field get_tint_over fun(self: Godot.TextureProgressBar): Godot.Color
+---@field get_tint_progress fun(self: Godot.TextureProgressBar): Godot.Color
+---@field get_tint_under fun(self: Godot.TextureProgressBar): Godot.Color
+---@field get_under_texture fun(self: Godot.TextureProgressBar): Godot.Texture2D
+---@field set_fill_degrees fun(self: Godot.TextureProgressBar, mode: number)
+---@field set_fill_mode fun(self: Godot.TextureProgressBar, mode: integer)
+---@field set_nine_patch_stretch fun(self: Godot.TextureProgressBar, stretch: boolean)
+---@field set_over_texture fun(self: Godot.TextureProgressBar, tex: Godot.Texture2D)
+---@field set_progress_texture fun(self: Godot.TextureProgressBar, tex: Godot.Texture2D)
+---@field set_radial_center_offset fun(self: Godot.TextureProgressBar, mode: Godot.Vector2)
+---@field set_radial_initial_angle fun(self: Godot.TextureProgressBar, mode: number)
+---@field set_stretch_margin fun(self: Godot.TextureProgressBar, margin: integer, value: integer)
+---@field set_texture_progress_offset fun(self: Godot.TextureProgressBar, offset: Godot.Vector2)
+---@field set_tint_over fun(self: Godot.TextureProgressBar, tint: Godot.Color)
+---@field set_tint_progress fun(self: Godot.TextureProgressBar, tint: Godot.Color)
+---@field set_tint_under fun(self: Godot.TextureProgressBar, tint: Godot.Color)
+---@field set_under_texture fun(self: Godot.TextureProgressBar, tex: Godot.Texture2D)
+---@class Godot.TextureProgressBar.__type
+---@field new fun(): Godot.TextureProgressBar
+---@field FillModeEnum Godot.TextureProgressBar.FillModeEnum
+---@class Godot.TextureProgressBar.FillModeEnum
+---@field LeftToRight integer
+---@field RightToLeft integer
+---@field TopToBottom integer
+---@field BottomToTop integer
+---@field Clockwise integer
+---@field CounterClockwise integer
+---@field BilinearLeftAndRight integer
+---@field BilinearTopAndBottom integer
+---@field ClockwiseAndCounterClockwise integer
+
+---@class Godot.TextureRect : Godot.Control
+---@field expand_mode integer
+---@field flip_h boolean
+---@field flip_v boolean
+---@field stretch_mode integer
+---@field texture Godot.Texture2D
+---@field get_expand_mode fun(self: Godot.TextureRect): integer
+---@field get_stretch_mode fun(self: Godot.TextureRect): integer
+---@field get_texture fun(self: Godot.TextureRect): Godot.Texture2D
+---@field is_flipped_h fun(self: Godot.TextureRect): boolean
+---@field is_flipped_v fun(self: Godot.TextureRect): boolean
+---@field set_expand_mode fun(self: Godot.TextureRect, expand_mode: integer)
+---@field set_flip_h fun(self: Godot.TextureRect, enable: boolean)
+---@field set_flip_v fun(self: Godot.TextureRect, enable: boolean)
+---@field set_stretch_mode fun(self: Godot.TextureRect, stretch_mode: integer)
+---@field set_texture fun(self: Godot.TextureRect, texture: Godot.Texture2D)
+---@class Godot.TextureRect.__type
+---@field new fun(): Godot.TextureRect
+---@field ExpandModeEnum Godot.TextureRect.ExpandModeEnum
+---@field StretchModeEnum Godot.TextureRect.StretchModeEnum
+---@class Godot.TextureRect.ExpandModeEnum
+---@field KeepSize integer
+---@field IgnoreSize integer
+---@field FitWidth integer
+---@field FitWidthProportional integer
+---@field FitHeight integer
+---@field FitHeightProportional integer
+---@class Godot.TextureRect.StretchModeEnum
+---@field Scale integer
+---@field Tile integer
+---@field Keep integer
+---@field KeepCentered integer
+---@field KeepAspect integer
+---@field KeepAspectCentered integer
+---@field KeepAspectCovered integer
+
+---@class Godot.TileMap : Godot.Node2D
+---@field collision_animatable boolean
+---@field collision_visibility_mode integer
+---@field navigation_visibility_mode integer
+---@field rendering_quadrant_size integer
+---@field tile_set Godot.TileSet
+---@field changed Godot.Signal
+---@field add_layer fun(self: Godot.TileMap, to_position: integer)
+---@field clear fun(self: Godot.TileMap)
+---@field clear_layer fun(self: Godot.TileMap, layer: integer)
+---@field erase_cell fun(self: Godot.TileMap, layer: integer, coords: Godot.Vector2I)
+---@field fix_invalid_tiles fun(self: Godot.TileMap)
+---@field force_update fun(self: Godot.TileMap, layer: integer)
+---@field get_cell_alternative_tile fun(self: Godot.TileMap, layer: integer, coords: Godot.Vector2I, use_proxies: boolean): integer
+---@field get_cell_atlas_coords fun(self: Godot.TileMap, layer: integer, coords: Godot.Vector2I, use_proxies: boolean): Godot.Vector2I
+---@field get_cell_source_id fun(self: Godot.TileMap, layer: integer, coords: Godot.Vector2I, use_proxies: boolean): integer
+---@field get_cell_tile_data fun(self: Godot.TileMap, layer: integer, coords: Godot.Vector2I, use_proxies: boolean): Godot.TileData
+---@field get_collision_visibility_mode fun(self: Godot.TileMap): integer
+---@field get_coords_for_body_rid fun(self: Godot.TileMap, body: Godot.Rid): Godot.Vector2I
+---@field get_layer_for_body_rid fun(self: Godot.TileMap, body: Godot.Rid): integer
+---@field get_layer_modulate fun(self: Godot.TileMap, layer: integer): Godot.Color
+---@field get_layer_name fun(self: Godot.TileMap, layer: integer): string
+---@field get_layer_navigation_map fun(self: Godot.TileMap, layer: integer): Godot.Rid
+---@field get_layer_y_sort_origin fun(self: Godot.TileMap, layer: integer): integer
+---@field get_layer_z_index fun(self: Godot.TileMap, layer: integer): integer
+---@field get_layers_count fun(self: Godot.TileMap): integer
+---@field get_navigation_map fun(self: Godot.TileMap, layer: integer): Godot.Rid
+---@field get_navigation_visibility_mode fun(self: Godot.TileMap): integer
+---@field get_neighbor_cell fun(self: Godot.TileMap, coords: Godot.Vector2I, neighbor: integer): Godot.Vector2I
+---@field get_pattern fun(self: Godot.TileMap, layer: integer, coords_array: table): Godot.TileMapPattern
+---@field get_rendering_quadrant_size fun(self: Godot.TileMap): integer
+---@field get_surrounding_cells fun(self: Godot.TileMap, coords: Godot.Vector2I): table
+---@field get_tileset fun(self: Godot.TileMap): Godot.TileSet
+---@field get_used_cells fun(self: Godot.TileMap, layer: integer): table
+---@field get_used_cells_by_id fun(self: Godot.TileMap, layer: integer, source_id: integer, atlas_coords: Godot.Vector2I, alternative_tile: integer): table
+---@field get_used_rect fun(self: Godot.TileMap): Godot.Rect2I
+---@field is_cell_flipped_h fun(self: Godot.TileMap, layer: integer, coords: Godot.Vector2I, use_proxies: boolean): boolean
+---@field is_cell_flipped_v fun(self: Godot.TileMap, layer: integer, coords: Godot.Vector2I, use_proxies: boolean): boolean
+---@field is_cell_transposed fun(self: Godot.TileMap, layer: integer, coords: Godot.Vector2I, use_proxies: boolean): boolean
+---@field is_collision_animatable fun(self: Godot.TileMap): boolean
+---@field is_layer_enabled fun(self: Godot.TileMap, layer: integer): boolean
+---@field is_layer_navigation_enabled fun(self: Godot.TileMap, layer: integer): boolean
+---@field is_layer_y_sort_enabled fun(self: Godot.TileMap, layer: integer): boolean
+---@field local_to_map fun(self: Godot.TileMap, local_position: Godot.Vector2): Godot.Vector2I
+---@field map_pattern fun(self: Godot.TileMap, position_in_tilemap: Godot.Vector2I, coords_in_pattern: Godot.Vector2I, pattern: Godot.TileMapPattern): Godot.Vector2I
+---@field map_to_local fun(self: Godot.TileMap, map_position: Godot.Vector2I): Godot.Vector2
+---@field move_layer fun(self: Godot.TileMap, layer: integer, to_position: integer)
+---@field notify_runtime_tile_data_update fun(self: Godot.TileMap, layer: integer)
+---@field remove_layer fun(self: Godot.TileMap, layer: integer)
+---@field set_cell fun(self: Godot.TileMap, layer: integer, coords: Godot.Vector2I, source_id: integer, atlas_coords: Godot.Vector2I, alternative_tile: integer)
+---@field set_cells_terrain_connect fun(self: Godot.TileMap, layer: integer, cells: table, terrain_set: integer, terrain: integer, ignore_empty_terrains: boolean)
+---@field set_cells_terrain_path fun(self: Godot.TileMap, layer: integer, path: table, terrain_set: integer, terrain: integer, ignore_empty_terrains: boolean)
+---@field set_collision_animatable fun(self: Godot.TileMap, enabled: boolean)
+---@field set_collision_visibility_mode fun(self: Godot.TileMap, collision_visibility_mode: integer)
+---@field set_layer_enabled fun(self: Godot.TileMap, layer: integer, enabled: boolean)
+---@field set_layer_modulate fun(self: Godot.TileMap, layer: integer, modulate: Godot.Color)
+---@field set_layer_name fun(self: Godot.TileMap, layer: integer, name: string)
+---@field set_layer_navigation_enabled fun(self: Godot.TileMap, layer: integer, enabled: boolean)
+---@field set_layer_navigation_map fun(self: Godot.TileMap, layer: integer, map: Godot.Rid)
+---@field set_layer_y_sort_enabled fun(self: Godot.TileMap, layer: integer, y_sort_enabled: boolean)
+---@field set_layer_y_sort_origin fun(self: Godot.TileMap, layer: integer, y_sort_origin: integer)
+---@field set_layer_z_index fun(self: Godot.TileMap, layer: integer, z_index: integer)
+---@field set_navigation_map fun(self: Godot.TileMap, layer: integer, map: Godot.Rid)
+---@field set_navigation_visibility_mode fun(self: Godot.TileMap, navigation_visibility_mode: integer)
+---@field set_pattern fun(self: Godot.TileMap, layer: integer, position: Godot.Vector2I, pattern: Godot.TileMapPattern)
+---@field set_rendering_quadrant_size fun(self: Godot.TileMap, size: integer)
+---@field set_tileset fun(self: Godot.TileMap, tileset: Godot.TileSet)
+---@field update_internals fun(self: Godot.TileMap)
+---@class Godot.TileMap.__type
+---@field new fun(): Godot.TileMap
+---@field VisibilityMode Godot.TileMap.VisibilityMode
+---@class Godot.TileMap.VisibilityMode
+---@field Default integer
+---@field ForceShow integer
+---@field ForceHide integer
+
+---@class Godot.TileMapLayer : Godot.Node2D
+---@field collision_enabled boolean
+---@field collision_visibility_mode integer
+---@field enabled boolean
+---@field navigation_enabled boolean
+---@field navigation_visibility_mode integer
+---@field occlusion_enabled boolean
+---@field physics_quadrant_size integer
+---@field rendering_quadrant_size integer
+---@field tile_map_data table
+---@field tile_set Godot.TileSet
+---@field use_kinematic_bodies boolean
+---@field x_draw_order_reversed boolean
+---@field y_sort_origin integer
+---@field changed Godot.Signal
+---@field clear fun(self: Godot.TileMapLayer)
+---@field erase_cell fun(self: Godot.TileMapLayer, coords: Godot.Vector2I)
+---@field fix_invalid_tiles fun(self: Godot.TileMapLayer)
+---@field get_cell_alternative_tile fun(self: Godot.TileMapLayer, coords: Godot.Vector2I): integer
+---@field get_cell_atlas_coords fun(self: Godot.TileMapLayer, coords: Godot.Vector2I): Godot.Vector2I
+---@field get_cell_source_id fun(self: Godot.TileMapLayer, coords: Godot.Vector2I): integer
+---@field get_cell_tile_data fun(self: Godot.TileMapLayer, coords: Godot.Vector2I): Godot.TileData
+---@field get_collision_visibility_mode fun(self: Godot.TileMapLayer): integer
+---@field get_coords_for_body_rid fun(self: Godot.TileMapLayer, body: Godot.Rid): Godot.Vector2I
+---@field get_navigation_map fun(self: Godot.TileMapLayer): Godot.Rid
+---@field get_navigation_visibility_mode fun(self: Godot.TileMapLayer): integer
+---@field get_neighbor_cell fun(self: Godot.TileMapLayer, coords: Godot.Vector2I, neighbor: integer): Godot.Vector2I
+---@field get_pattern fun(self: Godot.TileMapLayer, coords_array: table): Godot.TileMapPattern
+---@field get_physics_quadrant_size fun(self: Godot.TileMapLayer): integer
+---@field get_rendering_quadrant_size fun(self: Godot.TileMapLayer): integer
+---@field get_surrounding_cells fun(self: Godot.TileMapLayer, coords: Godot.Vector2I): table
+---@field get_tile_map_data_as_array fun(self: Godot.TileMapLayer): table
+---@field get_tile_set fun(self: Godot.TileMapLayer): Godot.TileSet
+---@field get_used_cells fun(self: Godot.TileMapLayer): table
+---@field get_used_cells_by_id fun(self: Godot.TileMapLayer, source_id: integer, atlas_coords: Godot.Vector2I, alternative_tile: integer): table
+---@field get_used_rect fun(self: Godot.TileMapLayer): Godot.Rect2I
+---@field get_y_sort_origin fun(self: Godot.TileMapLayer): integer
+---@field has_body_rid fun(self: Godot.TileMapLayer, body: Godot.Rid): boolean
+---@field is_cell_flipped_h fun(self: Godot.TileMapLayer, coords: Godot.Vector2I): boolean
+---@field is_cell_flipped_v fun(self: Godot.TileMapLayer, coords: Godot.Vector2I): boolean
+---@field is_cell_transposed fun(self: Godot.TileMapLayer, coords: Godot.Vector2I): boolean
+---@field is_collision_enabled fun(self: Godot.TileMapLayer): boolean
+---@field is_enabled fun(self: Godot.TileMapLayer): boolean
+---@field is_navigation_enabled fun(self: Godot.TileMapLayer): boolean
+---@field is_occlusion_enabled fun(self: Godot.TileMapLayer): boolean
+---@field is_using_kinematic_bodies fun(self: Godot.TileMapLayer): boolean
+---@field is_x_draw_order_reversed fun(self: Godot.TileMapLayer): boolean
+---@field local_to_map fun(self: Godot.TileMapLayer, local_position: Godot.Vector2): Godot.Vector2I
+---@field map_pattern fun(self: Godot.TileMapLayer, position_in_tilemap: Godot.Vector2I, coords_in_pattern: Godot.Vector2I, pattern: Godot.TileMapPattern): Godot.Vector2I
+---@field map_to_local fun(self: Godot.TileMapLayer, map_position: Godot.Vector2I): Godot.Vector2
+---@field notify_runtime_tile_data_update fun(self: Godot.TileMapLayer)
+---@field set_cell fun(self: Godot.TileMapLayer, coords: Godot.Vector2I, source_id: integer, atlas_coords: Godot.Vector2I, alternative_tile: integer)
+---@field set_cells_terrain_connect fun(self: Godot.TileMapLayer, cells: table, terrain_set: integer, terrain: integer, ignore_empty_terrains: boolean)
+---@field set_cells_terrain_path fun(self: Godot.TileMapLayer, path: table, terrain_set: integer, terrain: integer, ignore_empty_terrains: boolean)
+---@field set_collision_enabled fun(self: Godot.TileMapLayer, enabled: boolean)
+---@field set_collision_visibility_mode fun(self: Godot.TileMapLayer, visibility_mode: integer)
+---@field set_enabled fun(self: Godot.TileMapLayer, enabled: boolean)
+---@field set_navigation_enabled fun(self: Godot.TileMapLayer, enabled: boolean)
+---@field set_navigation_map fun(self: Godot.TileMapLayer, map: Godot.Rid)
+---@field set_navigation_visibility_mode fun(self: Godot.TileMapLayer, show_navigation: integer)
+---@field set_occlusion_enabled fun(self: Godot.TileMapLayer, enabled: boolean)
+---@field set_pattern fun(self: Godot.TileMapLayer, position: Godot.Vector2I, pattern: Godot.TileMapPattern)
+---@field set_physics_quadrant_size fun(self: Godot.TileMapLayer, size: integer)
+---@field set_rendering_quadrant_size fun(self: Godot.TileMapLayer, size: integer)
+---@field set_tile_map_data_from_array fun(self: Godot.TileMapLayer, tile_map_layer_data: table)
+---@field set_tile_set fun(self: Godot.TileMapLayer, tile_set: Godot.TileSet)
+---@field set_use_kinematic_bodies fun(self: Godot.TileMapLayer, use_kinematic_bodies: boolean)
+---@field set_x_draw_order_reversed fun(self: Godot.TileMapLayer, x_draw_order_reversed: boolean)
+---@field set_y_sort_origin fun(self: Godot.TileMapLayer, y_sort_origin: integer)
+---@field update_internals fun(self: Godot.TileMapLayer)
+---@class Godot.TileMapLayer.__type
+---@field new fun(): Godot.TileMapLayer
+---@field DebugVisibilityMode Godot.TileMapLayer.DebugVisibilityMode
+---@class Godot.TileMapLayer.DebugVisibilityMode
+---@field Default integer
+---@field ForceShow integer
+---@field ForceHide integer
+
+---@class Godot.Timer : Godot.Node
+---@field autostart boolean
+---@field ignore_time_scale boolean
+---@field one_shot boolean
+---@field paused boolean
+---@field process_callback integer
+---@field time_left number
+---@field wait_time number
+---@field timeout Godot.Signal
+---@field get_time_left fun(self: Godot.Timer): number
+---@field get_timer_process_callback fun(self: Godot.Timer): integer
+---@field get_wait_time fun(self: Godot.Timer): number
+---@field has_autostart fun(self: Godot.Timer): boolean
+---@field is_ignoring_time_scale fun(self: Godot.Timer): boolean
+---@field is_one_shot fun(self: Godot.Timer): boolean
+---@field is_paused fun(self: Godot.Timer): boolean
+---@field is_stopped fun(self: Godot.Timer): boolean
+---@field set_autostart fun(self: Godot.Timer, enable: boolean)
+---@field set_ignore_time_scale fun(self: Godot.Timer, ignore: boolean)
+---@field set_one_shot fun(self: Godot.Timer, enable: boolean)
+---@field set_paused fun(self: Godot.Timer, paused: boolean)
+---@field set_timer_process_callback fun(self: Godot.Timer, callback: integer)
+---@field set_wait_time fun(self: Godot.Timer, time_sec: number)
+---@field start fun(self: Godot.Timer, time_sec: number)
+---@field stop fun(self: Godot.Timer)
+---@class Godot.Timer.__type
+---@field new fun(): Godot.Timer
+---@field TimerProcessCallback Godot.Timer.TimerProcessCallback
+---@class Godot.Timer.TimerProcessCallback
+---@field Physics integer
+---@field Idle integer
+
+---@class Godot.TouchScreenButton : Godot.Node2D
+---@field action string
+---@field bitmask Godot.BitMap
+---@field passby_press boolean
+---@field shape Godot.Shape2D
+---@field shape_centered boolean
+---@field shape_visible boolean
+---@field texture_normal Godot.Texture2D
+---@field texture_pressed Godot.Texture2D
+---@field visibility_mode integer
+---@field pressed Godot.Signal
+---@field released Godot.Signal
+---@field get_action fun(self: Godot.TouchScreenButton): string
+---@field get_bitmask fun(self: Godot.TouchScreenButton): Godot.BitMap
+---@field get_shape fun(self: Godot.TouchScreenButton): Godot.Shape2D
+---@field get_texture_normal fun(self: Godot.TouchScreenButton): Godot.Texture2D
+---@field get_texture_pressed fun(self: Godot.TouchScreenButton): Godot.Texture2D
+---@field get_visibility_mode fun(self: Godot.TouchScreenButton): integer
+---@field is_passby_press_enabled fun(self: Godot.TouchScreenButton): boolean
+---@field is_pressed fun(self: Godot.TouchScreenButton): boolean
+---@field is_shape_centered fun(self: Godot.TouchScreenButton): boolean
+---@field is_shape_visible fun(self: Godot.TouchScreenButton): boolean
+---@field set_action fun(self: Godot.TouchScreenButton, action: string)
+---@field set_bitmask fun(self: Godot.TouchScreenButton, bitmask: Godot.BitMap)
+---@field set_passby_press fun(self: Godot.TouchScreenButton, enabled: boolean)
+---@field set_shape fun(self: Godot.TouchScreenButton, shape: Godot.Shape2D)
+---@field set_shape_centered fun(self: Godot.TouchScreenButton, bool: boolean)
+---@field set_shape_visible fun(self: Godot.TouchScreenButton, bool: boolean)
+---@field set_texture_normal fun(self: Godot.TouchScreenButton, texture: Godot.Texture2D)
+---@field set_texture_pressed fun(self: Godot.TouchScreenButton, texture: Godot.Texture2D)
+---@field set_visibility_mode fun(self: Godot.TouchScreenButton, mode: integer)
+---@class Godot.TouchScreenButton.__type
+---@field new fun(): Godot.TouchScreenButton
+---@field VisibilityModeEnum Godot.TouchScreenButton.VisibilityModeEnum
+---@class Godot.TouchScreenButton.VisibilityModeEnum
+---@field Always integer
+---@field TouchscreenOnly integer
+
+---@class Godot.Tree : Godot.Control
+---@field allow_reselect boolean
+---@field allow_rmb_select boolean
+---@field allow_search boolean
+---@field auto_tooltip boolean
+---@field column_titles_visible boolean
+---@field columns integer
+---@field drop_mode_flags integer
+---@field enable_drag_unfolding boolean
+---@field enable_recursive_folding boolean
+---@field hide_folding boolean
+---@field hide_root boolean
+---@field scroll_hint_mode integer
+---@field scroll_horizontal_enabled boolean
+---@field scroll_vertical_enabled boolean
+---@field select_mode integer
+---@field tile_scroll_hint boolean
+---@field button_clicked Godot.Signal
+---@field cell_selected Godot.Signal
+---@field check_propagated_to_item Godot.Signal
+---@field column_title_clicked Godot.Signal
+---@field custom_item_clicked Godot.Signal
+---@field custom_popup_edited Godot.Signal
+---@field empty_clicked Godot.Signal
+---@field item_activated Godot.Signal
+---@field item_collapsed Godot.Signal
+---@field item_edited Godot.Signal
+---@field item_icon_double_clicked Godot.Signal
+---@field item_mouse_selected Godot.Signal
+---@field item_selected Godot.Signal
+---@field multi_selected Godot.Signal
+---@field nothing_selected Godot.Signal
+---@field are_column_titles_visible fun(self: Godot.Tree): boolean
+---@field clear fun(self: Godot.Tree)
+---@field create_item fun(self: Godot.Tree, parent: Godot.TreeItem, index: integer): Godot.TreeItem
+---@field deselect_all fun(self: Godot.Tree)
+---@field edit_selected fun(self: Godot.Tree, force_edit: boolean): boolean
+---@field ensure_cursor_is_visible fun(self: Godot.Tree)
+---@field get_allow_reselect fun(self: Godot.Tree): boolean
+---@field get_allow_rmb_select fun(self: Godot.Tree): boolean
+---@field get_allow_search fun(self: Godot.Tree): boolean
+---@field get_button_id_at_position fun(self: Godot.Tree, position: Godot.Vector2): integer
+---@field get_column_at_position fun(self: Godot.Tree, position: Godot.Vector2): integer
+---@field get_column_expand_ratio fun(self: Godot.Tree, column: integer): integer
+---@field get_column_title fun(self: Godot.Tree, column: integer): string
+---@field get_column_title_alignment fun(self: Godot.Tree, column: integer): integer
+---@field get_column_title_direction fun(self: Godot.Tree, column: integer): integer
+---@field get_column_title_language fun(self: Godot.Tree, column: integer): string
+---@field get_column_title_tooltip_text fun(self: Godot.Tree, column: integer): string
+---@field get_column_width fun(self: Godot.Tree, column: integer): integer
+---@field get_columns fun(self: Godot.Tree): integer
+---@field get_custom_popup_rect fun(self: Godot.Tree): Godot.Rect2
+---@field get_drop_mode_flags fun(self: Godot.Tree): integer
+---@field get_drop_section_at_position fun(self: Godot.Tree, position: Godot.Vector2): integer
+---@field get_edited fun(self: Godot.Tree): Godot.TreeItem
+---@field get_edited_column fun(self: Godot.Tree): integer
+---@field get_item_area_rect fun(self: Godot.Tree, item: Godot.TreeItem, column: integer, button_index: integer): Godot.Rect2
+---@field get_item_at_position fun(self: Godot.Tree, position: Godot.Vector2): Godot.TreeItem
+---@field get_next_selected fun(self: Godot.Tree, from: Godot.TreeItem): Godot.TreeItem
+---@field get_pressed_button fun(self: Godot.Tree): integer
+---@field get_root fun(self: Godot.Tree): Godot.TreeItem
+---@field get_scroll fun(self: Godot.Tree): Godot.Vector2
+---@field get_scroll_hint_mode fun(self: Godot.Tree): integer
+---@field get_select_mode fun(self: Godot.Tree): integer
+---@field get_selected fun(self: Godot.Tree): Godot.TreeItem
+---@field get_selected_column fun(self: Godot.Tree): integer
+---@field is_auto_tooltip_enabled fun(self: Godot.Tree): boolean
+---@field is_column_clipping_content fun(self: Godot.Tree, column: integer): boolean
+---@field is_column_expanding fun(self: Godot.Tree, column: integer): boolean
+---@field is_drag_unfolding_enabled fun(self: Godot.Tree): boolean
+---@field is_folding_hidden fun(self: Godot.Tree): boolean
+---@field is_h_scroll_enabled fun(self: Godot.Tree): boolean
+---@field is_recursive_folding_enabled fun(self: Godot.Tree): boolean
+---@field is_root_hidden fun(self: Godot.Tree): boolean
+---@field is_scroll_hint_tiled fun(self: Godot.Tree): boolean
+---@field is_v_scroll_enabled fun(self: Godot.Tree): boolean
+---@field scroll_to_item fun(self: Godot.Tree, item: Godot.TreeItem, center_on_item: boolean)
+---@field set_allow_reselect fun(self: Godot.Tree, allow: boolean)
+---@field set_allow_rmb_select fun(self: Godot.Tree, allow: boolean)
+---@field set_allow_search fun(self: Godot.Tree, allow: boolean)
+---@field set_auto_tooltip fun(self: Godot.Tree, enable: boolean)
+---@field set_column_clip_content fun(self: Godot.Tree, column: integer, enable: boolean)
+---@field set_column_custom_minimum_width fun(self: Godot.Tree, column: integer, min_width: integer)
+---@field set_column_expand fun(self: Godot.Tree, column: integer, expand: boolean)
+---@field set_column_expand_ratio fun(self: Godot.Tree, column: integer, ratio: integer)
+---@field set_column_title fun(self: Godot.Tree, column: integer, title: string)
+---@field set_column_title_alignment fun(self: Godot.Tree, column: integer, title_alignment: integer)
+---@field set_column_title_direction fun(self: Godot.Tree, column: integer, direction: integer)
+---@field set_column_title_language fun(self: Godot.Tree, column: integer, language: string)
+---@field set_column_title_tooltip_text fun(self: Godot.Tree, column: integer, tooltip_text: string)
+---@field set_column_titles_visible fun(self: Godot.Tree, visible: boolean)
+---@field set_columns fun(self: Godot.Tree, amount: integer)
+---@field set_drop_mode_flags fun(self: Godot.Tree, flags: integer)
+---@field set_enable_drag_unfolding fun(self: Godot.Tree, enable: boolean)
+---@field set_enable_recursive_folding fun(self: Godot.Tree, enable: boolean)
+---@field set_h_scroll_enabled fun(self: Godot.Tree, h_scroll: boolean)
+---@field set_hide_folding fun(self: Godot.Tree, hide: boolean)
+---@field set_hide_root fun(self: Godot.Tree, enable: boolean)
+---@field set_scroll_hint_mode fun(self: Godot.Tree, scroll_hint_mode: integer)
+---@field set_select_mode fun(self: Godot.Tree, mode: integer)
+---@field set_selected fun(self: Godot.Tree, item: Godot.TreeItem, column: integer)
+---@field set_tile_scroll_hint fun(self: Godot.Tree, tile_scroll_hint: boolean)
+---@field set_v_scroll_enabled fun(self: Godot.Tree, h_scroll: boolean)
+---@class Godot.Tree.__type
+---@field new fun(): Godot.Tree
+---@field DropModeFlagsEnum Godot.Tree.DropModeFlagsEnum
+---@field ScrollHintModeEnum Godot.Tree.ScrollHintModeEnum
+---@field SelectModeEnum Godot.Tree.SelectModeEnum
+---@class Godot.Tree.DropModeFlagsEnum
+---@field Disabled integer
+---@field OnItem integer
+---@field Inbetween integer
+---@class Godot.Tree.ScrollHintModeEnum
+---@field Disabled integer
+---@field Both integer
+---@field Top integer
+---@field Bottom integer
+---@class Godot.Tree.SelectModeEnum
+---@field Single integer
+---@field Row integer
+---@field Multi integer
+
+---@class Godot.TwoBoneIK3D : Godot.IKModifier3D
+---@field setting_count integer
+---@field get_end_bone fun(self: Godot.TwoBoneIK3D, index: integer): integer
+---@field get_end_bone_direction fun(self: Godot.TwoBoneIK3D, index: integer): integer
+---@field get_end_bone_length fun(self: Godot.TwoBoneIK3D, index: integer): number
+---@field get_end_bone_name fun(self: Godot.TwoBoneIK3D, index: integer): string
+---@field get_middle_bone fun(self: Godot.TwoBoneIK3D, index: integer): integer
+---@field get_middle_bone_name fun(self: Godot.TwoBoneIK3D, index: integer): string
+---@field get_pole_direction fun(self: Godot.TwoBoneIK3D, index: integer): integer
+---@field get_pole_direction_vector fun(self: Godot.TwoBoneIK3D, index: integer): Godot.Vector3
+---@field get_pole_node fun(self: Godot.TwoBoneIK3D, index: integer): string
+---@field get_root_bone fun(self: Godot.TwoBoneIK3D, index: integer): integer
+---@field get_root_bone_name fun(self: Godot.TwoBoneIK3D, index: integer): string
+---@field get_target_node fun(self: Godot.TwoBoneIK3D, index: integer): string
+---@field is_end_bone_extended fun(self: Godot.TwoBoneIK3D, index: integer): boolean
+---@field is_using_virtual_end fun(self: Godot.TwoBoneIK3D, index: integer): boolean
+---@field set_end_bone fun(self: Godot.TwoBoneIK3D, index: integer, bone: integer)
+---@field set_end_bone_direction fun(self: Godot.TwoBoneIK3D, index: integer, bone_direction: integer)
+---@field set_end_bone_length fun(self: Godot.TwoBoneIK3D, index: integer, length: number)
+---@field set_end_bone_name fun(self: Godot.TwoBoneIK3D, index: integer, bone_name: string)
+---@field set_extend_end_bone fun(self: Godot.TwoBoneIK3D, index: integer, enabled: boolean)
+---@field set_middle_bone fun(self: Godot.TwoBoneIK3D, index: integer, bone: integer)
+---@field set_middle_bone_name fun(self: Godot.TwoBoneIK3D, index: integer, bone_name: string)
+---@field set_pole_direction fun(self: Godot.TwoBoneIK3D, index: integer, direction: integer)
+---@field set_pole_direction_vector fun(self: Godot.TwoBoneIK3D, index: integer, vector: Godot.Vector3)
+---@field set_pole_node fun(self: Godot.TwoBoneIK3D, index: integer, pole_node: string)
+---@field set_root_bone fun(self: Godot.TwoBoneIK3D, index: integer, bone: integer)
+---@field set_root_bone_name fun(self: Godot.TwoBoneIK3D, index: integer, bone_name: string)
+---@field set_target_node fun(self: Godot.TwoBoneIK3D, index: integer, target_node: string)
+---@field set_use_virtual_end fun(self: Godot.TwoBoneIK3D, index: integer, enabled: boolean)
+---@class Godot.TwoBoneIK3D.__type
+---@field new fun(): Godot.TwoBoneIK3D
+
+---@class Godot.VBoxContainer : Godot.BoxContainer
+---@class Godot.VBoxContainer.__type
+---@field new fun(): Godot.VBoxContainer
+
+---@class Godot.VehicleBody3D : Godot.RigidBody3D
+---@field brake number
+---@field engine_force number
+---@field steering number
+---@field get_brake fun(self: Godot.VehicleBody3D): number
+---@field get_engine_force fun(self: Godot.VehicleBody3D): number
+---@field get_steering fun(self: Godot.VehicleBody3D): number
+---@field set_brake fun(self: Godot.VehicleBody3D, brake: number)
+---@field set_engine_force fun(self: Godot.VehicleBody3D, engine_force: number)
+---@field set_steering fun(self: Godot.VehicleBody3D, steering: number)
+---@class Godot.VehicleBody3D.__type
+---@field new fun(): Godot.VehicleBody3D
+
+---@class Godot.VehicleWheel3D : Godot.Node3D
+---@field brake number
+---@field damping_compression number
+---@field damping_relaxation number
+---@field engine_force number
+---@field steering number
+---@field suspension_max_force number
+---@field suspension_stiffness number
+---@field suspension_travel number
+---@field use_as_steering boolean
+---@field use_as_traction boolean
+---@field wheel_friction_slip number
+---@field wheel_radius number
+---@field wheel_rest_length number
+---@field wheel_roll_influence number
+---@field get_brake fun(self: Godot.VehicleWheel3D): number
+---@field get_contact_body fun(self: Godot.VehicleWheel3D): Godot.Node3D
+---@field get_contact_normal fun(self: Godot.VehicleWheel3D): Godot.Vector3
+---@field get_contact_point fun(self: Godot.VehicleWheel3D): Godot.Vector3
+---@field get_damping_compression fun(self: Godot.VehicleWheel3D): number
+---@field get_damping_relaxation fun(self: Godot.VehicleWheel3D): number
+---@field get_engine_force fun(self: Godot.VehicleWheel3D): number
+---@field get_friction_slip fun(self: Godot.VehicleWheel3D): number
+---@field get_radius fun(self: Godot.VehicleWheel3D): number
+---@field get_roll_influence fun(self: Godot.VehicleWheel3D): number
+---@field get_rpm fun(self: Godot.VehicleWheel3D): number
+---@field get_skidinfo fun(self: Godot.VehicleWheel3D): number
+---@field get_steering fun(self: Godot.VehicleWheel3D): number
+---@field get_suspension_max_force fun(self: Godot.VehicleWheel3D): number
+---@field get_suspension_rest_length fun(self: Godot.VehicleWheel3D): number
+---@field get_suspension_stiffness fun(self: Godot.VehicleWheel3D): number
+---@field get_suspension_travel fun(self: Godot.VehicleWheel3D): number
+---@field is_in_contact fun(self: Godot.VehicleWheel3D): boolean
+---@field is_used_as_steering fun(self: Godot.VehicleWheel3D): boolean
+---@field is_used_as_traction fun(self: Godot.VehicleWheel3D): boolean
+---@field set_brake fun(self: Godot.VehicleWheel3D, brake: number)
+---@field set_damping_compression fun(self: Godot.VehicleWheel3D, length: number)
+---@field set_damping_relaxation fun(self: Godot.VehicleWheel3D, length: number)
+---@field set_engine_force fun(self: Godot.VehicleWheel3D, engine_force: number)
+---@field set_friction_slip fun(self: Godot.VehicleWheel3D, length: number)
+---@field set_radius fun(self: Godot.VehicleWheel3D, length: number)
+---@field set_roll_influence fun(self: Godot.VehicleWheel3D, roll_influence: number)
+---@field set_steering fun(self: Godot.VehicleWheel3D, steering: number)
+---@field set_suspension_max_force fun(self: Godot.VehicleWheel3D, length: number)
+---@field set_suspension_rest_length fun(self: Godot.VehicleWheel3D, length: number)
+---@field set_suspension_stiffness fun(self: Godot.VehicleWheel3D, length: number)
+---@field set_suspension_travel fun(self: Godot.VehicleWheel3D, length: number)
+---@field set_use_as_steering fun(self: Godot.VehicleWheel3D, enable: boolean)
+---@field set_use_as_traction fun(self: Godot.VehicleWheel3D, enable: boolean)
+---@class Godot.VehicleWheel3D.__type
+---@field new fun(): Godot.VehicleWheel3D
+
+---@class Godot.VFlowContainer : Godot.FlowContainer
+---@class Godot.VFlowContainer.__type
+---@field new fun(): Godot.VFlowContainer
+
+---@class Godot.VideoStreamPlayer : Godot.Control
+---@field audio_track integer
+---@field autoplay boolean
+---@field buffering_msec integer
+---@field bus string
+---@field expand boolean
+---@field loop boolean
+---@field paused boolean
+---@field speed_scale number
+---@field stream Godot.VideoStream
+---@field stream_position number
+---@field volume number
+---@field volume_db number
+---@field finished Godot.Signal
+---@field get_audio_track fun(self: Godot.VideoStreamPlayer): integer
+---@field get_buffering_msec fun(self: Godot.VideoStreamPlayer): integer
+---@field get_bus fun(self: Godot.VideoStreamPlayer): string
+---@field get_speed_scale fun(self: Godot.VideoStreamPlayer): number
+---@field get_stream fun(self: Godot.VideoStreamPlayer): Godot.VideoStream
+---@field get_stream_length fun(self: Godot.VideoStreamPlayer): number
+---@field get_stream_name fun(self: Godot.VideoStreamPlayer): string
+---@field get_stream_position fun(self: Godot.VideoStreamPlayer): number
+---@field get_video_texture fun(self: Godot.VideoStreamPlayer): Godot.Texture2D
+---@field get_volume fun(self: Godot.VideoStreamPlayer): number
+---@field get_volume_db fun(self: Godot.VideoStreamPlayer): number
+---@field has_autoplay fun(self: Godot.VideoStreamPlayer): boolean
+---@field has_expand fun(self: Godot.VideoStreamPlayer): boolean
+---@field has_loop fun(self: Godot.VideoStreamPlayer): boolean
+---@field is_paused fun(self: Godot.VideoStreamPlayer): boolean
+---@field is_playing fun(self: Godot.VideoStreamPlayer): boolean
+---@field play fun(self: Godot.VideoStreamPlayer)
+---@field set_audio_track fun(self: Godot.VideoStreamPlayer, track: integer)
+---@field set_autoplay fun(self: Godot.VideoStreamPlayer, enabled: boolean)
+---@field set_buffering_msec fun(self: Godot.VideoStreamPlayer, msec: integer)
+---@field set_bus fun(self: Godot.VideoStreamPlayer, bus: string)
+---@field set_expand fun(self: Godot.VideoStreamPlayer, enable: boolean)
+---@field set_loop fun(self: Godot.VideoStreamPlayer, loop: boolean)
+---@field set_paused fun(self: Godot.VideoStreamPlayer, paused: boolean)
+---@field set_speed_scale fun(self: Godot.VideoStreamPlayer, speed_scale: number)
+---@field set_stream fun(self: Godot.VideoStreamPlayer, stream: Godot.VideoStream)
+---@field set_stream_position fun(self: Godot.VideoStreamPlayer, position: number)
+---@field set_volume fun(self: Godot.VideoStreamPlayer, volume: number)
+---@field set_volume_db fun(self: Godot.VideoStreamPlayer, db: number)
+---@field stop fun(self: Godot.VideoStreamPlayer)
+---@class Godot.VideoStreamPlayer.__type
+---@field new fun(): Godot.VideoStreamPlayer
+
+---@class Godot.Viewport : Godot.Node
+---@field anisotropic_filtering_level integer
+---@field audio_listener_enable_2d boolean
+---@field audio_listener_enable_3d boolean
+---@field canvas_cull_mask integer
+---@field canvas_item_default_texture_filter integer
+---@field canvas_item_default_texture_repeat integer
+---@field canvas_transform Godot.Transform2D
+---@field debug_draw integer
+---@field disable_3d boolean
+---@field fsr_sharpness number
+---@field global_canvas_transform Godot.Transform2D
+---@field gui_disable_input boolean
+---@field gui_drag_threshold integer
+---@field gui_embed_subwindows boolean
+---@field gui_snap_controls_to_pixels boolean
+---@field handle_input_locally boolean
+---@field mesh_lod_threshold number
+---@field msaa_2d integer
+---@field msaa_3d integer
+---@field oversampling boolean
+---@field oversampling_override number
+---@field own_world_3d boolean
+---@field physics_object_picking boolean
+---@field physics_object_picking_first_only boolean
+---@field physics_object_picking_sort boolean
+---@field positional_shadow_atlas_16_bits boolean
+---@field positional_shadow_atlas_quad_0 integer
+---@field positional_shadow_atlas_quad_1 integer
+---@field positional_shadow_atlas_quad_2 integer
+---@field positional_shadow_atlas_quad_3 integer
+---@field positional_shadow_atlas_size integer
+---@field scaling_3d_mode integer
+---@field scaling_3d_scale number
+---@field screen_space_aa integer
+---@field sdf_oversize integer
+---@field sdf_scale integer
+---@field snap_2d_transforms_to_pixel boolean
+---@field snap_2d_vertices_to_pixel boolean
+---@field texture_mipmap_bias number
+---@field transparent_bg boolean
+---@field use_debanding boolean
+---@field use_hdr_2d boolean
+---@field use_occlusion_culling boolean
+---@field use_taa boolean
+---@field use_xr boolean
+---@field vrs_mode integer
+---@field vrs_texture Godot.Texture2D
+---@field vrs_update_mode integer
+---@field world_2d Godot.World2D
+---@field world_3d Godot.World3D
+---@field gui_focus_changed Godot.Signal
+---@field size_changed Godot.Signal
+---@field find_world_2d fun(self: Godot.Viewport): Godot.World2D
+---@field find_world_3d fun(self: Godot.Viewport): Godot.World3D
+---@field get_anisotropic_filtering_level fun(self: Godot.Viewport): integer
+---@field get_audio_listener_2d fun(self: Godot.Viewport): Godot.AudioListener2D
+---@field get_audio_listener_3d fun(self: Godot.Viewport): Godot.AudioListener3D
+---@field get_camera_2d fun(self: Godot.Viewport): Godot.Camera2D
+---@field get_camera_3d fun(self: Godot.Viewport): Godot.Camera3D
+---@field get_canvas_cull_mask fun(self: Godot.Viewport): integer
+---@field get_canvas_cull_mask_bit fun(self: Godot.Viewport, layer: integer): boolean
+---@field get_canvas_transform fun(self: Godot.Viewport): Godot.Transform2D
+---@field get_debug_draw fun(self: Godot.Viewport): integer
+---@field get_default_canvas_item_texture_filter fun(self: Godot.Viewport): integer
+---@field get_default_canvas_item_texture_repeat fun(self: Godot.Viewport): integer
+---@field get_drag_threshold fun(self: Godot.Viewport): integer
+---@field get_embedded_subwindows fun(self: Godot.Viewport): table
+---@field get_final_transform fun(self: Godot.Viewport): Godot.Transform2D
+---@field get_fsr_sharpness fun(self: Godot.Viewport): number
+---@field get_global_canvas_transform fun(self: Godot.Viewport): Godot.Transform2D
+---@field get_mesh_lod_threshold fun(self: Godot.Viewport): number
+---@field get_mouse_position fun(self: Godot.Viewport): Godot.Vector2
+---@field get_msaa_2d fun(self: Godot.Viewport): integer
+---@field get_msaa_3d fun(self: Godot.Viewport): integer
+---@field get_oversampling fun(self: Godot.Viewport): number
+---@field get_oversampling_override fun(self: Godot.Viewport): number
+---@field get_physics_object_picking fun(self: Godot.Viewport): boolean
+---@field get_physics_object_picking_first_only fun(self: Godot.Viewport): boolean
+---@field get_physics_object_picking_sort fun(self: Godot.Viewport): boolean
+---@field get_positional_shadow_atlas_16_bits fun(self: Godot.Viewport): boolean
+---@field get_positional_shadow_atlas_quadrant_subdiv fun(self: Godot.Viewport, quadrant: integer): integer
+---@field get_positional_shadow_atlas_size fun(self: Godot.Viewport): integer
+---@field get_render_info fun(self: Godot.Viewport, type: integer, info: integer): integer
+---@field get_scaling_3d_mode fun(self: Godot.Viewport): integer
+---@field get_scaling_3d_scale fun(self: Godot.Viewport): number
+---@field get_screen_space_aa fun(self: Godot.Viewport): integer
+---@field get_screen_transform fun(self: Godot.Viewport): Godot.Transform2D
+---@field get_sdf_oversize fun(self: Godot.Viewport): integer
+---@field get_sdf_scale fun(self: Godot.Viewport): integer
+---@field get_stretch_transform fun(self: Godot.Viewport): Godot.Transform2D
+---@field get_texture fun(self: Godot.Viewport): Godot.ViewportTexture
+---@field get_texture_mipmap_bias fun(self: Godot.Viewport): number
+---@field get_viewport_rid fun(self: Godot.Viewport): Godot.Rid
+---@field get_visible_rect fun(self: Godot.Viewport): Godot.Rect2
+---@field get_vrs_mode fun(self: Godot.Viewport): integer
+---@field get_vrs_texture fun(self: Godot.Viewport): Godot.Texture2D
+---@field get_vrs_update_mode fun(self: Godot.Viewport): integer
+---@field get_world_2d fun(self: Godot.Viewport): Godot.World2D
+---@field get_world_3d fun(self: Godot.Viewport): Godot.World3D
+---@field gui_cancel_drag fun(self: Godot.Viewport)
+---@field gui_get_drag_data fun(self: Godot.Viewport)
+---@field gui_get_drag_description fun(self: Godot.Viewport): string
+---@field gui_get_focus_owner fun(self: Godot.Viewport): Godot.Control
+---@field gui_get_hovered_control fun(self: Godot.Viewport): Godot.Control
+---@field gui_is_drag_successful fun(self: Godot.Viewport): boolean
+---@field gui_is_dragging fun(self: Godot.Viewport): boolean
+---@field gui_release_focus fun(self: Godot.Viewport)
+---@field gui_set_drag_description fun(self: Godot.Viewport, description: string)
+---@field has_transparent_background fun(self: Godot.Viewport): boolean
+---@field is_3d_disabled fun(self: Godot.Viewport): boolean
+---@field is_audio_listener_2d fun(self: Godot.Viewport): boolean
+---@field is_audio_listener_3d fun(self: Godot.Viewport): boolean
+---@field is_embedding_subwindows fun(self: Godot.Viewport): boolean
+---@field is_handling_input_locally fun(self: Godot.Viewport): boolean
+---@field is_input_disabled fun(self: Godot.Viewport): boolean
+---@field is_input_handled fun(self: Godot.Viewport): boolean
+---@field is_snap_2d_transforms_to_pixel_enabled fun(self: Godot.Viewport): boolean
+---@field is_snap_2d_vertices_to_pixel_enabled fun(self: Godot.Viewport): boolean
+---@field is_snap_controls_to_pixels_enabled fun(self: Godot.Viewport): boolean
+---@field is_using_debanding fun(self: Godot.Viewport): boolean
+---@field is_using_hdr_2d fun(self: Godot.Viewport): boolean
+---@field is_using_occlusion_culling fun(self: Godot.Viewport): boolean
+---@field is_using_oversampling fun(self: Godot.Viewport): boolean
+---@field is_using_own_world_3d fun(self: Godot.Viewport): boolean
+---@field is_using_taa fun(self: Godot.Viewport): boolean
+---@field is_using_xr fun(self: Godot.Viewport): boolean
+---@field notify_mouse_entered fun(self: Godot.Viewport)
+---@field notify_mouse_exited fun(self: Godot.Viewport)
+---@field push_input fun(self: Godot.Viewport, event: Godot.InputEvent, in_local_coords: boolean)
+---@field push_text_input fun(self: Godot.Viewport, text: string)
+---@field push_unhandled_input fun(self: Godot.Viewport, event: Godot.InputEvent, in_local_coords: boolean)
+---@field set_anisotropic_filtering_level fun(self: Godot.Viewport, anisotropic_filtering_level: integer)
+---@field set_as_audio_listener_2d fun(self: Godot.Viewport, enable: boolean)
+---@field set_as_audio_listener_3d fun(self: Godot.Viewport, enable: boolean)
+---@field set_canvas_cull_mask fun(self: Godot.Viewport, mask: integer)
+---@field set_canvas_cull_mask_bit fun(self: Godot.Viewport, layer: integer, enable: boolean)
+---@field set_canvas_transform fun(self: Godot.Viewport, xform: Godot.Transform2D)
+---@field set_debug_draw fun(self: Godot.Viewport, debug_draw: integer)
+---@field set_default_canvas_item_texture_filter fun(self: Godot.Viewport, mode: integer)
+---@field set_default_canvas_item_texture_repeat fun(self: Godot.Viewport, mode: integer)
+---@field set_disable_3d fun(self: Godot.Viewport, disable: boolean)
+---@field set_disable_input fun(self: Godot.Viewport, disable: boolean)
+---@field set_drag_threshold fun(self: Godot.Viewport, threshold: integer)
+---@field set_embedding_subwindows fun(self: Godot.Viewport, enable: boolean)
+---@field set_fsr_sharpness fun(self: Godot.Viewport, fsr_sharpness: number)
+---@field set_global_canvas_transform fun(self: Godot.Viewport, xform: Godot.Transform2D)
+---@field set_handle_input_locally fun(self: Godot.Viewport, enable: boolean)
+---@field set_input_as_handled fun(self: Godot.Viewport)
+---@field set_mesh_lod_threshold fun(self: Godot.Viewport, pixels: number)
+---@field set_msaa_2d fun(self: Godot.Viewport, msaa: integer)
+---@field set_msaa_3d fun(self: Godot.Viewport, msaa: integer)
+---@field set_oversampling_override fun(self: Godot.Viewport, oversampling: number)
+---@field set_physics_object_picking fun(self: Godot.Viewport, enable: boolean)
+---@field set_physics_object_picking_first_only fun(self: Godot.Viewport, enable: boolean)
+---@field set_physics_object_picking_sort fun(self: Godot.Viewport, enable: boolean)
+---@field set_positional_shadow_atlas_16_bits fun(self: Godot.Viewport, enable: boolean)
+---@field set_positional_shadow_atlas_quadrant_subdiv fun(self: Godot.Viewport, quadrant: integer, subdiv: integer)
+---@field set_positional_shadow_atlas_size fun(self: Godot.Viewport, size: integer)
+---@field set_scaling_3d_mode fun(self: Godot.Viewport, scaling_3d_mode: integer)
+---@field set_scaling_3d_scale fun(self: Godot.Viewport, scale: number)
+---@field set_screen_space_aa fun(self: Godot.Viewport, screen_space_aa: integer)
+---@field set_sdf_oversize fun(self: Godot.Viewport, oversize: integer)
+---@field set_sdf_scale fun(self: Godot.Viewport, scale: integer)
+---@field set_snap_2d_transforms_to_pixel fun(self: Godot.Viewport, enabled: boolean)
+---@field set_snap_2d_vertices_to_pixel fun(self: Godot.Viewport, enabled: boolean)
+---@field set_snap_controls_to_pixels fun(self: Godot.Viewport, enabled: boolean)
+---@field set_texture_mipmap_bias fun(self: Godot.Viewport, texture_mipmap_bias: number)
+---@field set_transparent_background fun(self: Godot.Viewport, enable: boolean)
+---@field set_use_debanding fun(self: Godot.Viewport, enable: boolean)
+---@field set_use_hdr_2d fun(self: Godot.Viewport, enable: boolean)
+---@field set_use_occlusion_culling fun(self: Godot.Viewport, enable: boolean)
+---@field set_use_oversampling fun(self: Godot.Viewport, enable: boolean)
+---@field set_use_own_world_3d fun(self: Godot.Viewport, enable: boolean)
+---@field set_use_taa fun(self: Godot.Viewport, enable: boolean)
+---@field set_use_xr fun(self: Godot.Viewport, use: boolean)
+---@field set_vrs_mode fun(self: Godot.Viewport, mode: integer)
+---@field set_vrs_texture fun(self: Godot.Viewport, texture: Godot.Texture2D)
+---@field set_vrs_update_mode fun(self: Godot.Viewport, mode: integer)
+---@field set_world_2d fun(self: Godot.Viewport, world_2d: Godot.World2D)
+---@field set_world_3d fun(self: Godot.Viewport, world_3d: Godot.World3D)
+---@field update_mouse_cursor_state fun(self: Godot.Viewport)
+---@field warp_mouse fun(self: Godot.Viewport, position: Godot.Vector2)
+---@class Godot.Viewport.__type
+---@field new fun(): Godot.Viewport
+---@field AnisotropicFiltering Godot.Viewport.AnisotropicFiltering
+---@field DebugDrawEnum Godot.Viewport.DebugDrawEnum
+---@field DefaultCanvasItemTextureFilter Godot.Viewport.DefaultCanvasItemTextureFilter
+---@field DefaultCanvasItemTextureRepeat Godot.Viewport.DefaultCanvasItemTextureRepeat
+---@field Msaa Godot.Viewport.Msaa
+---@field PositionalShadowAtlasQuadrantSubdiv Godot.Viewport.PositionalShadowAtlasQuadrantSubdiv
+---@field RenderInfo Godot.Viewport.RenderInfo
+---@field RenderInfoType Godot.Viewport.RenderInfoType
+---@field Scaling3DModeEnum Godot.Viewport.Scaling3DModeEnum
+---@field ScreenSpaceAAEnum Godot.Viewport.ScreenSpaceAAEnum
+---@field SdfOversizeEnum Godot.Viewport.SdfOversizeEnum
+---@field SdfScaleEnum Godot.Viewport.SdfScaleEnum
+---@field VrsModeEnum Godot.Viewport.VrsModeEnum
+---@field VrsUpdateModeEnum Godot.Viewport.VrsUpdateModeEnum
+---@class Godot.Viewport.AnisotropicFiltering
+---@field Disabled integer
+---@field Anisotropy2X integer
+---@field Anisotropy4X integer
+---@field Anisotropy8X integer
+---@field Anisotropy16X integer
+---@field Max integer
+---@class Godot.Viewport.DebugDrawEnum
+---@field Disabled integer
+---@field Unshaded integer
+---@field Lighting integer
+---@field Overdraw integer
+---@field Wireframe integer
+---@field NormalBuffer integer
+---@field VoxelGIAlbedo integer
+---@field VoxelGILighting integer
+---@field VoxelGIEmission integer
+---@field ShadowAtlas integer
+---@field DirectionalShadowAtlas integer
+---@field SceneLuminance integer
+---@field Ssao integer
+---@field Ssil integer
+---@field PssmSplits integer
+---@field DecalAtlas integer
+---@field Sdfgi integer
+---@field SdfgiProbes integer
+---@field GIBuffer integer
+---@field DisableLod integer
+---@field ClusterOmniLights integer
+---@field ClusterSpotLights integer
+---@field ClusterDecals integer
+---@field ClusterReflectionProbes integer
+---@field Occluders integer
+---@field MotionVectors integer
+---@field InternalBuffer integer
+---@class Godot.Viewport.DefaultCanvasItemTextureFilter
+---@field Nearest integer
+---@field Linear integer
+---@field LinearWithMipmaps integer
+---@field NearestWithMipmaps integer
+---@field Max integer
+---@class Godot.Viewport.DefaultCanvasItemTextureRepeat
+---@field Disabled integer
+---@field Enabled integer
+---@field Mirror integer
+---@field Max integer
+---@class Godot.Viewport.Msaa
+---@field Disabled integer
+---@field Msaa2X integer
+---@field Msaa4X integer
+---@field Msaa8X integer
+---@field Max integer
+---@class Godot.Viewport.PositionalShadowAtlasQuadrantSubdiv
+---@field Disabled integer
+---@field Subdiv1 integer
+---@field Subdiv4 integer
+---@field Subdiv16 integer
+---@field Subdiv64 integer
+---@field Subdiv256 integer
+---@field Subdiv1024 integer
+---@field Max integer
+---@class Godot.Viewport.RenderInfo
+---@field ObjectsInFrame integer
+---@field PrimitivesInFrame integer
+---@field DrawCallsInFrame integer
+---@field Max integer
+---@class Godot.Viewport.RenderInfoType
+---@field Visible integer
+---@field Shadow integer
+---@field Canvas integer
+---@field Max integer
+---@class Godot.Viewport.Scaling3DModeEnum
+---@field Bilinear integer
+---@field Fsr integer
+---@field Fsr2 integer
+---@field MetalfxSpatial integer
+---@field MetalfxTemporal integer
+---@field Max integer
+---@class Godot.Viewport.ScreenSpaceAAEnum
+---@field Disabled integer
+---@field Fxaa integer
+---@field Smaa integer
+---@field Max integer
+---@class Godot.Viewport.SdfOversizeEnum
+---@field Oversize100Percent integer
+---@field Oversize120Percent integer
+---@field Oversize150Percent integer
+---@field Oversize200Percent integer
+---@field Max integer
+---@class Godot.Viewport.SdfScaleEnum
+---@field Scale100Percent integer
+---@field Scale50Percent integer
+---@field Scale25Percent integer
+---@field Max integer
+---@class Godot.Viewport.VrsModeEnum
+---@field Disabled integer
+---@field Texture integer
+---@field XR integer
+---@field Max integer
+---@class Godot.Viewport.VrsUpdateModeEnum
+---@field Disabled integer
+---@field Once integer
+---@field Always integer
+---@field Max integer
+
+---@class Godot.VisibleOnScreenEnabler2D : Godot.VisibleOnScreenNotifier2D
+---@field enable_mode integer
+---@field enable_node_path string
+---@field get_enable_mode fun(self: Godot.VisibleOnScreenEnabler2D): integer
+---@field get_enable_node_path fun(self: Godot.VisibleOnScreenEnabler2D): string
+---@field set_enable_mode fun(self: Godot.VisibleOnScreenEnabler2D, mode: integer)
+---@field set_enable_node_path fun(self: Godot.VisibleOnScreenEnabler2D, path: string)
+---@class Godot.VisibleOnScreenEnabler2D.__type
+---@field new fun(): Godot.VisibleOnScreenEnabler2D
+---@field EnableModeEnum Godot.VisibleOnScreenEnabler2D.EnableModeEnum
+---@class Godot.VisibleOnScreenEnabler2D.EnableModeEnum
+---@field Inherit integer
+---@field Always integer
+---@field WhenPaused integer
+
+---@class Godot.VisibleOnScreenEnabler3D : Godot.VisibleOnScreenNotifier3D
+---@field enable_mode integer
+---@field enable_node_path string
+---@field get_enable_mode fun(self: Godot.VisibleOnScreenEnabler3D): integer
+---@field get_enable_node_path fun(self: Godot.VisibleOnScreenEnabler3D): string
+---@field set_enable_mode fun(self: Godot.VisibleOnScreenEnabler3D, mode: integer)
+---@field set_enable_node_path fun(self: Godot.VisibleOnScreenEnabler3D, path: string)
+---@class Godot.VisibleOnScreenEnabler3D.__type
+---@field new fun(): Godot.VisibleOnScreenEnabler3D
+---@field EnableModeEnum Godot.VisibleOnScreenEnabler3D.EnableModeEnum
+---@class Godot.VisibleOnScreenEnabler3D.EnableModeEnum
+---@field Inherit integer
+---@field Always integer
+---@field WhenPaused integer
+
+---@class Godot.VisibleOnScreenNotifier2D : Godot.Node2D
+---@field rect Godot.Rect2
+---@field show_rect boolean
+---@field screen_entered Godot.Signal
+---@field screen_exited Godot.Signal
+---@field get_rect fun(self: Godot.VisibleOnScreenNotifier2D): Godot.Rect2
+---@field is_on_screen fun(self: Godot.VisibleOnScreenNotifier2D): boolean
+---@field is_showing_rect fun(self: Godot.VisibleOnScreenNotifier2D): boolean
+---@field set_rect fun(self: Godot.VisibleOnScreenNotifier2D, rect: Godot.Rect2)
+---@field set_show_rect fun(self: Godot.VisibleOnScreenNotifier2D, show_rect: boolean)
+---@class Godot.VisibleOnScreenNotifier2D.__type
+---@field new fun(): Godot.VisibleOnScreenNotifier2D
+
+---@class Godot.VisibleOnScreenNotifier3D : Godot.VisualInstance3D
+---@field aabb Godot.Aabb
+---@field screen_entered Godot.Signal
+---@field screen_exited Godot.Signal
+---@field is_on_screen fun(self: Godot.VisibleOnScreenNotifier3D): boolean
+---@field set_aabb fun(self: Godot.VisibleOnScreenNotifier3D, rect: Godot.Aabb)
+---@class Godot.VisibleOnScreenNotifier3D.__type
+---@field new fun(): Godot.VisibleOnScreenNotifier3D
+
+---@class Godot.VisualInstance3D : Godot.Node3D
+---@field layers integer
+---@field sorting_offset number
+---@field sorting_use_aabb_center boolean
+---@field get_aabb fun(self: Godot.VisualInstance3D): Godot.Aabb
+---@field get_base fun(self: Godot.VisualInstance3D): Godot.Rid
+---@field get_instance fun(self: Godot.VisualInstance3D): Godot.Rid
+---@field get_layer_mask fun(self: Godot.VisualInstance3D): integer
+---@field get_layer_mask_value fun(self: Godot.VisualInstance3D, layer_number: integer): boolean
+---@field get_sorting_offset fun(self: Godot.VisualInstance3D): number
+---@field is_sorting_use_aabb_center fun(self: Godot.VisualInstance3D): boolean
+---@field set_base fun(self: Godot.VisualInstance3D, base: Godot.Rid)
+---@field set_layer_mask fun(self: Godot.VisualInstance3D, mask: integer)
+---@field set_layer_mask_value fun(self: Godot.VisualInstance3D, layer_number: integer, value: boolean)
+---@field set_sorting_offset fun(self: Godot.VisualInstance3D, offset: number)
+---@field set_sorting_use_aabb_center fun(self: Godot.VisualInstance3D, enabled: boolean)
+---@class Godot.VisualInstance3D.__type
+---@field new fun(): Godot.VisualInstance3D
+
+---@class Godot.VoxelGI : Godot.VisualInstance3D
+---@field camera_attributes Godot.CameraAttributesPractical,CameraAttributesPhysical
+---@field data Godot.VoxelGIData
+---@field size Godot.Vector3
+---@field subdiv integer
+---@field bake fun(self: Godot.VoxelGI, from_node: Godot.Node, create_visual_debug: boolean)
+---@field debug_bake fun(self: Godot.VoxelGI)
+---@field get_camera_attributes fun(self: Godot.VoxelGI): Godot.CameraAttributes
+---@field get_probe_data fun(self: Godot.VoxelGI): Godot.VoxelGIData
+---@field get_size fun(self: Godot.VoxelGI): Godot.Vector3
+---@field get_subdiv fun(self: Godot.VoxelGI): integer
+---@field set_camera_attributes fun(self: Godot.VoxelGI, camera_attributes: Godot.CameraAttributes)
+---@field set_probe_data fun(self: Godot.VoxelGI, data: Godot.VoxelGIData)
+---@field set_size fun(self: Godot.VoxelGI, size: Godot.Vector3)
+---@field set_subdiv fun(self: Godot.VoxelGI, subdiv: integer)
+---@class Godot.VoxelGI.__type
+---@field new fun(): Godot.VoxelGI
+---@field SubdivEnum Godot.VoxelGI.SubdivEnum
+---@class Godot.VoxelGI.SubdivEnum
+---@field Subdiv64 integer
+---@field Subdiv128 integer
+---@field Subdiv256 integer
+---@field Subdiv512 integer
+---@field Max integer
+
+---@class Godot.VScrollBar : Godot.ScrollBar
+---@class Godot.VScrollBar.__type
+---@field new fun(): Godot.VScrollBar
+
+---@class Godot.VSeparator : Godot.Separator
+---@class Godot.VSeparator.__type
+---@field new fun(): Godot.VSeparator
+
+---@class Godot.VSlider : Godot.Slider
+---@class Godot.VSlider.__type
+---@field new fun(): Godot.VSlider
+
+---@class Godot.VSplitContainer : Godot.SplitContainer
+---@class Godot.VSplitContainer.__type
+---@field new fun(): Godot.VSplitContainer
+
+---@class Godot.Window : Godot.Viewport
+---@field accessibility_description string
+---@field accessibility_name string
+---@field always_on_top boolean
+---@field auto_translate boolean
+---@field borderless boolean
+---@field content_scale_aspect integer
+---@field content_scale_factor number
+---@field content_scale_mode integer
+---@field content_scale_size Godot.Vector2I
+---@field content_scale_stretch integer
+---@field current_screen integer
+---@field exclude_from_capture boolean
+---@field exclusive boolean
+---@field extend_to_title boolean
+---@field force_native boolean
+---@field initial_position integer
+---@field keep_title_visible boolean
+---@field max_size Godot.Vector2I
+---@field maximize_disabled boolean
+---@field min_size Godot.Vector2I
+---@field minimize_disabled boolean
+---@field mode integer
+---@field mouse_passthrough boolean
+---@field mouse_passthrough_polygon table
+---@field nonclient_area Godot.Rect2I
+---@field popup_window boolean
+---@field popup_wm_hint boolean
+---@field position Godot.Vector2I
+---@field sharp_corners boolean
+---@field size Godot.Vector2I
+---@field theme Godot.Theme
+---@field theme_type_variation string
+---@field title string
+---@field transient boolean
+---@field transient_to_focused boolean
+---@field transparent boolean
+---@field unfocusable boolean
+---@field unresizable boolean
+---@field visible boolean
+---@field wrap_controls boolean
+---@field about_to_popup Godot.Signal
+---@field close_requested Godot.Signal
+---@field dpi_changed Godot.Signal
+---@field files_dropped Godot.Signal
+---@field focus_entered Godot.Signal
+---@field focus_exited Godot.Signal
+---@field go_back_requested Godot.Signal
+---@field mouse_entered Godot.Signal
+---@field mouse_exited Godot.Signal
+---@field nonclient_window_input Godot.Signal
+---@field theme_changed Godot.Signal
+---@field title_changed Godot.Signal
+---@field titlebar_changed Godot.Signal
+---@field visibility_changed Godot.Signal
+---@field window_input Godot.Signal
+---@field add_theme_color_override fun(self: Godot.Window, name: string, color: Godot.Color)
+---@field add_theme_constant_override fun(self: Godot.Window, name: string, constant: integer)
+---@field add_theme_font_override fun(self: Godot.Window, name: string, font: Godot.Font)
+---@field add_theme_font_size_override fun(self: Godot.Window, name: string, font_size: integer)
+---@field add_theme_icon_override fun(self: Godot.Window, name: string, texture: Godot.Texture2D)
+---@field add_theme_stylebox_override fun(self: Godot.Window, name: string, stylebox: Godot.StyleBox)
+---@field begin_bulk_theme_override fun(self: Godot.Window)
+---@field can_draw fun(self: Godot.Window): boolean
+---@field child_controls_changed fun(self: Godot.Window)
+---@field end_bulk_theme_override fun(self: Godot.Window)
+---@field get_accessibility_description fun(self: Godot.Window): string
+---@field get_accessibility_name fun(self: Godot.Window): string
+---@field get_content_scale_aspect fun(self: Godot.Window): integer
+---@field get_content_scale_factor fun(self: Godot.Window): number
+---@field get_content_scale_mode fun(self: Godot.Window): integer
+---@field get_content_scale_size fun(self: Godot.Window): Godot.Vector2I
+---@field get_content_scale_stretch fun(self: Godot.Window): integer
+---@field get_contents_minimum_size fun(self: Godot.Window): Godot.Vector2
+---@field get_current_screen fun(self: Godot.Window): integer
+---@field get_flag fun(self: Godot.Window, flag: integer): boolean
+---@field get_force_native fun(self: Godot.Window): boolean
+---@field get_initial_position fun(self: Godot.Window): integer
+---@field get_keep_title_visible fun(self: Godot.Window): boolean
+---@field get_layout_direction fun(self: Godot.Window): integer
+---@field get_max_size fun(self: Godot.Window): Godot.Vector2I
+---@field get_min_size fun(self: Godot.Window): Godot.Vector2I
+---@field get_mode fun(self: Godot.Window): integer
+---@field get_mouse_passthrough_polygon fun(self: Godot.Window): table
+---@field get_nonclient_area fun(self: Godot.Window): Godot.Rect2I
+---@field get_position fun(self: Godot.Window): Godot.Vector2I
+---@field get_position_with_decorations fun(self: Godot.Window): Godot.Vector2I
+---@field get_size fun(self: Godot.Window): Godot.Vector2I
+---@field get_size_with_decorations fun(self: Godot.Window): Godot.Vector2I
+---@field get_theme fun(self: Godot.Window): Godot.Theme
+---@field get_theme_color fun(self: Godot.Window, name: string, theme_type: string): Godot.Color
+---@field get_theme_constant fun(self: Godot.Window, name: string, theme_type: string): integer
+---@field get_theme_default_base_scale fun(self: Godot.Window): number
+---@field get_theme_default_font fun(self: Godot.Window): Godot.Font
+---@field get_theme_default_font_size fun(self: Godot.Window): integer
+---@field get_theme_font fun(self: Godot.Window, name: string, theme_type: string): Godot.Font
+---@field get_theme_font_size fun(self: Godot.Window, name: string, theme_type: string): integer
+---@field get_theme_icon fun(self: Godot.Window, name: string, theme_type: string): Godot.Texture2D
+---@field get_theme_stylebox fun(self: Godot.Window, name: string, theme_type: string): Godot.StyleBox
+---@field get_theme_type_variation fun(self: Godot.Window): string
+---@field get_title fun(self: Godot.Window): string
+---@field get_window_id fun(self: Godot.Window): integer
+---@field grab_focus fun(self: Godot.Window)
+---@field has_focus fun(self: Godot.Window): boolean
+---@field has_theme_color fun(self: Godot.Window, name: string, theme_type: string): boolean
+---@field has_theme_color_override fun(self: Godot.Window, name: string): boolean
+---@field has_theme_constant fun(self: Godot.Window, name: string, theme_type: string): boolean
+---@field has_theme_constant_override fun(self: Godot.Window, name: string): boolean
+---@field has_theme_font fun(self: Godot.Window, name: string, theme_type: string): boolean
+---@field has_theme_font_override fun(self: Godot.Window, name: string): boolean
+---@field has_theme_font_size fun(self: Godot.Window, name: string, theme_type: string): boolean
+---@field has_theme_font_size_override fun(self: Godot.Window, name: string): boolean
+---@field has_theme_icon fun(self: Godot.Window, name: string, theme_type: string): boolean
+---@field has_theme_icon_override fun(self: Godot.Window, name: string): boolean
+---@field has_theme_stylebox fun(self: Godot.Window, name: string, theme_type: string): boolean
+---@field has_theme_stylebox_override fun(self: Godot.Window, name: string): boolean
+---@field hide fun(self: Godot.Window)
+---@field is_auto_translating fun(self: Godot.Window): boolean
+---@field is_embedded fun(self: Godot.Window): boolean
+---@field is_exclusive fun(self: Godot.Window): boolean
+---@field is_layout_rtl fun(self: Godot.Window): boolean
+---@field is_maximize_allowed fun(self: Godot.Window): boolean
+---@field is_transient fun(self: Godot.Window): boolean
+---@field is_transient_to_focused fun(self: Godot.Window): boolean
+---@field is_using_font_oversampling fun(self: Godot.Window): boolean
+---@field is_visible fun(self: Godot.Window): boolean
+---@field is_wrapping_controls fun(self: Godot.Window): boolean
+---@field move_to_center fun(self: Godot.Window)
+---@field move_to_foreground fun(self: Godot.Window)
+---@field popup fun(self: Godot.Window, rect: Godot.Rect2I)
+---@field popup_centered fun(self: Godot.Window, minsize: Godot.Vector2I)
+---@field popup_centered_clamped fun(self: Godot.Window, minsize: Godot.Vector2I, fallback_ratio: number)
+---@field popup_centered_ratio fun(self: Godot.Window, ratio: number)
+---@field popup_exclusive fun(self: Godot.Window, from_node: Godot.Node, rect: Godot.Rect2I)
+---@field popup_exclusive_centered fun(self: Godot.Window, from_node: Godot.Node, minsize: Godot.Vector2I)
+---@field popup_exclusive_centered_clamped fun(self: Godot.Window, from_node: Godot.Node, minsize: Godot.Vector2I, fallback_ratio: number)
+---@field popup_exclusive_centered_ratio fun(self: Godot.Window, from_node: Godot.Node, ratio: number)
+---@field popup_exclusive_on_parent fun(self: Godot.Window, from_node: Godot.Node, parent_rect: Godot.Rect2I)
+---@field popup_on_parent fun(self: Godot.Window, parent_rect: Godot.Rect2I)
+---@field remove_theme_color_override fun(self: Godot.Window, name: string)
+---@field remove_theme_constant_override fun(self: Godot.Window, name: string)
+---@field remove_theme_font_override fun(self: Godot.Window, name: string)
+---@field remove_theme_font_size_override fun(self: Godot.Window, name: string)
+---@field remove_theme_icon_override fun(self: Godot.Window, name: string)
+---@field remove_theme_stylebox_override fun(self: Godot.Window, name: string)
+---@field request_attention fun(self: Godot.Window)
+---@field reset_size fun(self: Godot.Window)
+---@field set_accessibility_description fun(self: Godot.Window, description: string)
+---@field set_accessibility_name fun(self: Godot.Window, name: string)
+---@field set_auto_translate fun(self: Godot.Window, enable: boolean)
+---@field set_content_scale_aspect fun(self: Godot.Window, aspect: integer)
+---@field set_content_scale_factor fun(self: Godot.Window, factor: number)
+---@field set_content_scale_mode fun(self: Godot.Window, mode: integer)
+---@field set_content_scale_size fun(self: Godot.Window, size: Godot.Vector2I)
+---@field set_content_scale_stretch fun(self: Godot.Window, stretch: integer)
+---@field set_current_screen fun(self: Godot.Window, index: integer)
+---@field set_exclusive fun(self: Godot.Window, exclusive: boolean)
+---@field set_flag fun(self: Godot.Window, flag: integer, enabled: boolean)
+---@field set_force_native fun(self: Godot.Window, force_native: boolean)
+---@field set_ime_active fun(self: Godot.Window, active: boolean)
+---@field set_ime_position fun(self: Godot.Window, position: Godot.Vector2I)
+---@field set_initial_position fun(self: Godot.Window, initial_position: integer)
+---@field set_keep_title_visible fun(self: Godot.Window, title_visible: boolean)
+---@field set_layout_direction fun(self: Godot.Window, direction: integer)
+---@field set_max_size fun(self: Godot.Window, max_size: Godot.Vector2I)
+---@field set_min_size fun(self: Godot.Window, min_size: Godot.Vector2I)
+---@field set_mode fun(self: Godot.Window, mode: integer)
+---@field set_mouse_passthrough_polygon fun(self: Godot.Window, polygon: table)
+---@field set_nonclient_area fun(self: Godot.Window, area: Godot.Rect2I)
+---@field set_position fun(self: Godot.Window, position: Godot.Vector2I)
+---@field set_size fun(self: Godot.Window, size: Godot.Vector2I)
+---@field set_theme fun(self: Godot.Window, theme: Godot.Theme)
+---@field set_theme_type_variation fun(self: Godot.Window, theme_type: string)
+---@field set_title fun(self: Godot.Window, title: string)
+---@field set_transient fun(self: Godot.Window, transient: boolean)
+---@field set_transient_to_focused fun(self: Godot.Window, enable: boolean)
+---@field set_unparent_when_invisible fun(self: Godot.Window, unparent: boolean)
+---@field set_use_font_oversampling fun(self: Godot.Window, enable: boolean)
+---@field set_visible fun(self: Godot.Window, visible: boolean)
+---@field set_wrap_controls fun(self: Godot.Window, enable: boolean)
+---@field show fun(self: Godot.Window)
+---@field start_drag fun(self: Godot.Window)
+---@field start_resize fun(self: Godot.Window, edge: integer)
+---@class Godot.Window.__type
+---@field new fun(): Godot.Window
+---@field GetFocusedWindow fun(): Godot.Window
+---@field NotificationVisibilityChanged integer
+---@field NotificationThemeChanged integer
+---@field ContentScaleAspectEnum Godot.Window.ContentScaleAspectEnum
+---@field ContentScaleModeEnum Godot.Window.ContentScaleModeEnum
+---@field ContentScaleStretchEnum Godot.Window.ContentScaleStretchEnum
+---@field Flags Godot.Window.Flags
+---@field LayoutDirection Godot.Window.LayoutDirection
+---@field ModeEnum Godot.Window.ModeEnum
+---@field WindowInitialPosition Godot.Window.WindowInitialPosition
+---@class Godot.Window.ContentScaleAspectEnum
+---@field Ignore integer
+---@field Keep integer
+---@field KeepWidth integer
+---@field KeepHeight integer
+---@field Expand integer
+---@class Godot.Window.ContentScaleModeEnum
+---@field Disabled integer
+---@field CanvasItems integer
+---@field Viewport integer
+---@class Godot.Window.ContentScaleStretchEnum
+---@field Fractional integer
+---@field Integer integer
+---@class Godot.Window.Flags
+---@field ResizeDisabled integer
+---@field Borderless integer
+---@field AlwaysOnTop integer
+---@field Transparent integer
+---@field NoFocus integer
+---@field Popup integer
+---@field ExtendToTitle integer
+---@field MousePassthrough integer
+---@field SharpCorners integer
+---@field ExcludeFromCapture integer
+---@field PopupWMHint integer
+---@field MinimizeDisabled integer
+---@field MaximizeDisabled integer
+---@field Max integer
+---@class Godot.Window.LayoutDirection
+---@field Inherited integer
+---@field ApplicationLocale integer
+---@field Locale integer
+---@field Ltr integer
+---@field Rtl integer
+---@field SystemLocale integer
+---@field Max integer
+---@class Godot.Window.ModeEnum
+---@field Windowed integer
+---@field Minimized integer
+---@field Maximized integer
+---@field Fullscreen integer
+---@field ExclusiveFullscreen integer
+---@class Godot.Window.WindowInitialPosition
+---@field Absolute integer
+---@field CenterPrimaryScreen integer
+---@field CenterMainWindowScreen integer
+---@field CenterOtherScreen integer
+---@field CenterScreenWithMouseFocus integer
+---@field CenterScreenWithKeyboardFocus integer
+
+---@class Godot.WorldEnvironment : Godot.Node
+---@field camera_attributes Godot.CameraAttributesPractical,CameraAttributesPhysical
+---@field compositor Godot.Compositor
+---@field environment Godot.Environment
+---@field get_camera_attributes fun(self: Godot.WorldEnvironment): Godot.CameraAttributes
+---@field get_compositor fun(self: Godot.WorldEnvironment): Godot.Compositor
+---@field get_environment fun(self: Godot.WorldEnvironment): Godot.Environment
+---@field set_camera_attributes fun(self: Godot.WorldEnvironment, camera_attributes: Godot.CameraAttributes)
+---@field set_compositor fun(self: Godot.WorldEnvironment, compositor: Godot.Compositor)
+---@field set_environment fun(self: Godot.WorldEnvironment, env: Godot.Environment)
+---@class Godot.WorldEnvironment.__type
+---@field new fun(): Godot.WorldEnvironment
+
+---@class Godot.XRAnchor3D : Godot.XRNode3D
+---@field get_plane fun(self: Godot.XRAnchor3D): Godot.Plane
+---@field get_size fun(self: Godot.XRAnchor3D): Godot.Vector3
+---@class Godot.XRAnchor3D.__type
+---@field new fun(): Godot.XRAnchor3D
+
+---@class Godot.XRBodyModifier3D : Godot.SkeletonModifier3D
+---@field body_tracker string
+---@field body_update integer
+---@field bone_update integer
+---@field get_body_tracker fun(self: Godot.XRBodyModifier3D): string
+---@field get_body_update fun(self: Godot.XRBodyModifier3D): integer
+---@field get_bone_update fun(self: Godot.XRBodyModifier3D): integer
+---@field set_body_tracker fun(self: Godot.XRBodyModifier3D, tracker_name: string)
+---@field set_body_update fun(self: Godot.XRBodyModifier3D, body_update: integer)
+---@field set_bone_update fun(self: Godot.XRBodyModifier3D, bone_update: integer)
+---@class Godot.XRBodyModifier3D.__type
+---@field new fun(): Godot.XRBodyModifier3D
+---@field BodyUpdateEnum Godot.XRBodyModifier3D.BodyUpdateEnum
+---@field BoneUpdateEnum Godot.XRBodyModifier3D.BoneUpdateEnum
+---@class Godot.XRBodyModifier3D.BodyUpdateEnum
+---@field UpperBody integer
+---@field LowerBody integer
+---@field Hands integer
+---@class Godot.XRBodyModifier3D.BoneUpdateEnum
+---@field Full integer
+---@field RotationOnly integer
+---@field Max integer
+
+---@class Godot.XRCamera3D : Godot.Camera3D
+---@class Godot.XRCamera3D.__type
+---@field new fun(): Godot.XRCamera3D
+
+---@class Godot.XRController3D : Godot.XRNode3D
+---@field button_pressed Godot.Signal
+---@field button_released Godot.Signal
+---@field input_float_changed Godot.Signal
+---@field input_vector2_changed Godot.Signal
+---@field profile_changed Godot.Signal
+---@field get_float fun(self: Godot.XRController3D, name: string): number
+---@field get_input fun(self: Godot.XRController3D, name: string)
+---@field get_tracker_hand fun(self: Godot.XRController3D): integer
+---@field get_vector2 fun(self: Godot.XRController3D, name: string): Godot.Vector2
+---@field is_button_pressed fun(self: Godot.XRController3D, name: string): boolean
+---@class Godot.XRController3D.__type
+---@field new fun(): Godot.XRController3D
+
+---@class Godot.XRFaceModifier3D : Godot.Node3D
+---@field face_tracker string
+---@field target string
+---@field get_face_tracker fun(self: Godot.XRFaceModifier3D): string
+---@field get_target fun(self: Godot.XRFaceModifier3D): string
+---@field set_face_tracker fun(self: Godot.XRFaceModifier3D, tracker_name: string)
+---@field set_target fun(self: Godot.XRFaceModifier3D, target: string)
+---@class Godot.XRFaceModifier3D.__type
+---@field new fun(): Godot.XRFaceModifier3D
+
+---@class Godot.XRHandModifier3D : Godot.SkeletonModifier3D
+---@field bone_update integer
+---@field hand_tracker string
+---@field get_bone_update fun(self: Godot.XRHandModifier3D): integer
+---@field get_hand_tracker fun(self: Godot.XRHandModifier3D): string
+---@field set_bone_update fun(self: Godot.XRHandModifier3D, bone_update: integer)
+---@field set_hand_tracker fun(self: Godot.XRHandModifier3D, tracker_name: string)
+---@class Godot.XRHandModifier3D.__type
+---@field new fun(): Godot.XRHandModifier3D
+---@field BoneUpdateEnum Godot.XRHandModifier3D.BoneUpdateEnum
+---@class Godot.XRHandModifier3D.BoneUpdateEnum
+---@field Full integer
+---@field RotationOnly integer
+---@field Max integer
+
+---@class Godot.XRNode3D : Godot.Node3D
+---@field pose string
+---@field show_when_tracked boolean
+---@field tracker string
+---@field tracking_changed Godot.Signal
+---@field get_has_tracking_data fun(self: Godot.XRNode3D): boolean
+---@field get_is_active fun(self: Godot.XRNode3D): boolean
+---@field get_pose fun(self: Godot.XRNode3D): Godot.XRPose
+---@field get_pose_name fun(self: Godot.XRNode3D): string
+---@field get_show_when_tracked fun(self: Godot.XRNode3D): boolean
+---@field get_tracker fun(self: Godot.XRNode3D): string
+---@field set_pose_name fun(self: Godot.XRNode3D, pose: string)
+---@field set_show_when_tracked fun(self: Godot.XRNode3D, show: boolean)
+---@field set_tracker fun(self: Godot.XRNode3D, tracker_name: string)
+---@field trigger_haptic_pulse fun(self: Godot.XRNode3D, action_name: string, frequency: number, amplitude: number, duration_sec: number, delay_sec: number)
+---@class Godot.XRNode3D.__type
+---@field new fun(): Godot.XRNode3D
+
+---@class Godot.XROrigin3D : Godot.Node3D
+---@field current boolean
+---@field world_scale number
+---@field get_world_scale fun(self: Godot.XROrigin3D): number
+---@field is_current fun(self: Godot.XROrigin3D): boolean
+---@field set_current fun(self: Godot.XROrigin3D, enabled: boolean)
+---@field set_world_scale fun(self: Godot.XROrigin3D, world_scale: number)
+---@class Godot.XROrigin3D.__type
+---@field new fun(): Godot.XROrigin3D
+
+---@class Godot.ClockDirection
+---@field Clockwise integer
+---@field Counterclockwise integer
+
+---@class Godot.Corner
+---@field TopLeft integer
+---@field TopRight integer
+---@field BottomRight integer
+---@field BottomLeft integer
+
+---@class Godot.Error
+---@field Ok integer
+---@field Failed integer
+---@field Unavailable integer
+---@field Unconfigured integer
+---@field Unauthorized integer
+---@field ParameterRangeError integer
+---@field OutOfMemory integer
+---@field FileNotFound integer
+---@field FileBadDrive integer
+---@field FileBadPath integer
+---@field FileNoPermission integer
+---@field FileAlreadyInUse integer
+---@field FileCantOpen integer
+---@field FileCantWrite integer
+---@field FileCantRead integer
+---@field FileUnrecognized integer
+---@field FileCorrupt integer
+---@field FileMissingDependencies integer
+---@field FileEof integer
+---@field CantOpen integer
+---@field CantCreate integer
+---@field QueryFailed integer
+---@field AlreadyInUse integer
+---@field Locked integer
+---@field Timeout integer
+---@field CantConnect integer
+---@field CantResolve integer
+---@field ConnectionError integer
+---@field CantAcquireResource integer
+---@field CantFork integer
+---@field InvalidData integer
+---@field InvalidParameter integer
+---@field AlreadyExists integer
+---@field DoesNotExist integer
+---@field DatabaseCantRead integer
+---@field DatabaseCantWrite integer
+---@field CompilationFailed integer
+---@field MethodNotFound integer
+---@field LinkFailed integer
+---@field ScriptFailed integer
+---@field CyclicLink integer
+---@field InvalidDeclaration integer
+---@field DuplicateSymbol integer
+---@field ParseError integer
+---@field Busy integer
+---@field Skip integer
+---@field Help integer
+---@field Bug integer
+---@field PrinterOnFire integer
+
+---@class Godot.EulerOrder
+---@field Xyz integer
+---@field Xzy integer
+---@field Yxz integer
+---@field Yzx integer
+---@field Zxy integer
+---@field Zyx integer
+
+---@class Godot.HorizontalAlignment
+---@field Left integer
+---@field Center integer
+---@field Right integer
+---@field Fill integer
+
+---@class Godot.InlineAlignment
+---@field TopTo integer
+---@field ToTop integer
+---@field Top integer
+---@field CenterTo integer
+---@field BottomTo integer
+---@field BaselineTo integer
+---@field ImageMask integer
+---@field ToCenter integer
+---@field Center integer
+---@field ToBaseline integer
+---@field ToBottom integer
+---@field TextMask integer
+---@field Bottom integer
+
+---@class Godot.JoyAxis
+---@field LeftX integer
+---@field LeftY integer
+---@field RightX integer
+---@field RightY integer
+---@field TriggerLeft integer
+---@field TriggerRight integer
+---@field SdlMax integer
+---@field Max integer
+---@field Invalid integer
+
+---@class Godot.JoyButton
+---@field A integer
+---@field B integer
+---@field X integer
+---@field Y integer
+---@field Back integer
+---@field Guide integer
+---@field Start integer
+---@field LeftStick integer
+---@field RightStick integer
+---@field LeftShoulder integer
+---@field RightShoulder integer
+---@field DpadUp integer
+---@field DpadDown integer
+---@field DpadLeft integer
+---@field DpadRight integer
+---@field Misc1 integer
+---@field Paddle1 integer
+---@field Paddle2 integer
+---@field Paddle3 integer
+---@field Paddle4 integer
+---@field Touchpad integer
+---@field SdlMax integer
+---@field Max integer
+---@field Invalid integer
+
+---@class Godot.Key
+---@field None integer
+---@field Space integer
+---@field Exclam integer
+---@field Quotedbl integer
+---@field Numbersign integer
+---@field Dollar integer
+---@field Percent integer
+---@field Ampersand integer
+---@field Apostrophe integer
+---@field Parenleft integer
+---@field Parenright integer
+---@field Asterisk integer
+---@field Plus integer
+---@field Comma integer
+---@field Minus integer
+---@field Period integer
+---@field Slash integer
+---@field Key0 integer
+---@field Key1 integer
+---@field Key2 integer
+---@field Key3 integer
+---@field Key4 integer
+---@field Key5 integer
+---@field Key6 integer
+---@field Key7 integer
+---@field Key8 integer
+---@field Key9 integer
+---@field Colon integer
+---@field Semicolon integer
+---@field Less integer
+---@field Equal integer
+---@field Greater integer
+---@field Question integer
+---@field At integer
+---@field A integer
+---@field B integer
+---@field C integer
+---@field D integer
+---@field E integer
+---@field F integer
+---@field G integer
+---@field H integer
+---@field I integer
+---@field J integer
+---@field K integer
+---@field L integer
+---@field M integer
+---@field N integer
+---@field O integer
+---@field P integer
+---@field Q integer
+---@field R integer
+---@field S integer
+---@field T integer
+---@field U integer
+---@field V integer
+---@field W integer
+---@field X integer
+---@field Y integer
+---@field Z integer
+---@field Bracketleft integer
+---@field Backslash integer
+---@field Bracketright integer
+---@field Asciicircum integer
+---@field Underscore integer
+---@field Quoteleft integer
+---@field Braceleft integer
+---@field Bar integer
+---@field Braceright integer
+---@field Asciitilde integer
+---@field Yen integer
+---@field Section integer
+---@field Special integer
+---@field Escape integer
+---@field Tab integer
+---@field Backtab integer
+---@field Backspace integer
+---@field Enter integer
+---@field KpEnter integer
+---@field Insert integer
+---@field Delete integer
+---@field Pause integer
+---@field Print integer
+---@field Sysreq integer
+---@field Clear integer
+---@field Home integer
+---@field End integer
+---@field Left integer
+---@field Up integer
+---@field Right integer
+---@field Down integer
+---@field Pageup integer
+---@field Pagedown integer
+---@field Shift integer
+---@field Ctrl integer
+---@field Meta integer
+---@field Alt integer
+---@field Capslock integer
+---@field Numlock integer
+---@field Scrolllock integer
+---@field F1 integer
+---@field F2 integer
+---@field F3 integer
+---@field F4 integer
+---@field F5 integer
+---@field F6 integer
+---@field F7 integer
+---@field F8 integer
+---@field F9 integer
+---@field F10 integer
+---@field F11 integer
+---@field F12 integer
+---@field F13 integer
+---@field F14 integer
+---@field F15 integer
+---@field F16 integer
+---@field F17 integer
+---@field F18 integer
+---@field F19 integer
+---@field F20 integer
+---@field F21 integer
+---@field F22 integer
+---@field F23 integer
+---@field F24 integer
+---@field F25 integer
+---@field F26 integer
+---@field F27 integer
+---@field F28 integer
+---@field F29 integer
+---@field F30 integer
+---@field F31 integer
+---@field F32 integer
+---@field F33 integer
+---@field F34 integer
+---@field F35 integer
+---@field Menu integer
+---@field Hyper integer
+---@field Help integer
+---@field Back integer
+---@field Forward integer
+---@field Stop integer
+---@field Refresh integer
+---@field Volumedown integer
+---@field Volumemute integer
+---@field Volumeup integer
+---@field Mediaplay integer
+---@field Mediastop integer
+---@field Mediaprevious integer
+---@field Medianext integer
+---@field Mediarecord integer
+---@field Homepage integer
+---@field Favorites integer
+---@field Search integer
+---@field Standby integer
+---@field Openurl integer
+---@field Launchmail integer
+---@field Launchmedia integer
+---@field Launch0 integer
+---@field Launch1 integer
+---@field Launch2 integer
+---@field Launch3 integer
+---@field Launch4 integer
+---@field Launch5 integer
+---@field Launch6 integer
+---@field Launch7 integer
+---@field Launch8 integer
+---@field Launch9 integer
+---@field Launcha integer
+---@field Launchb integer
+---@field Launchc integer
+---@field Launchd integer
+---@field Launche integer
+---@field Launchf integer
+---@field Globe integer
+---@field Keyboard integer
+---@field JisEisu integer
+---@field JisKana integer
+---@field KpMultiply integer
+---@field KpDivide integer
+---@field KpSubtract integer
+---@field KpPeriod integer
+---@field KpAdd integer
+---@field Kp0 integer
+---@field Kp1 integer
+---@field Kp2 integer
+---@field Kp3 integer
+---@field Kp4 integer
+---@field Kp5 integer
+---@field Kp6 integer
+---@field Kp7 integer
+---@field Kp8 integer
+---@field Kp9 integer
+---@field Unknown integer
+
+---@class Godot.KeyLocation
+---@field Unspecified integer
+---@field Left integer
+---@field Right integer
+
+---@class Godot.KeyModifierMask
+---@field CodeMask integer
+---@field MaskCmdOrCtrl integer
+---@field MaskShift integer
+---@field MaskAlt integer
+---@field MaskMeta integer
+---@field MaskCtrl integer
+---@field MaskKpad integer
+---@field MaskGroupSwitch integer
+---@field ModifierMask integer
+
+---@class Godot.MethodFlags
+---@field Normal integer
+---@field Default integer
+---@field Editor integer
+---@field Const integer
+---@field Virtual integer
+---@field Vararg integer
+---@field Static integer
+---@field ObjectCore integer
+---@field VirtualRequired integer
+
+---@class Godot.MidiMessage
+---@field None integer
+---@field NoteOff integer
+---@field NoteOn integer
+---@field Aftertouch integer
+---@field ControlChange integer
+---@field ProgramChange integer
+---@field ChannelPressure integer
+---@field PitchBend integer
+---@field SystemExclusive integer
+---@field QuarterFrame integer
+---@field SongPositionPointer integer
+---@field SongSelect integer
+---@field TuneRequest integer
+---@field TimingClock integer
+---@field Start integer
+---@field Continue integer
+---@field Stop integer
+---@field ActiveSensing integer
+---@field SystemReset integer
+
+---@class Godot.MouseButton
+---@field None integer
+---@field Left integer
+---@field Right integer
+---@field Middle integer
+---@field WheelUp integer
+---@field WheelDown integer
+---@field WheelLeft integer
+---@field WheelRight integer
+---@field Xbutton1 integer
+---@field Xbutton2 integer
+
+---@class Godot.MouseButtonMask
+---@field Left integer
+---@field Right integer
+---@field Middle integer
+---@field MbXbutton1 integer
+---@field MbXbutton2 integer
+
+---@class Godot.Orientation
+---@field Horizontal integer
+---@field Vertical integer
+
+---@class Godot.PropertyHint
+---@field None integer
+---@field Range integer
+---@field Enum integer
+---@field EnumSuggestion integer
+---@field ExpEasing integer
+---@field Link integer
+---@field Flags integer
+---@field Layers2DRender integer
+---@field Layers2DPhysics integer
+---@field Layers2DNavigation integer
+---@field Layers3DRender integer
+---@field Layers3DPhysics integer
+---@field Layers3DNavigation integer
+---@field File integer
+---@field Dir integer
+---@field GlobalFile integer
+---@field GlobalDir integer
+---@field ResourceType integer
+---@field MultilineText integer
+---@field Expression integer
+---@field PlaceholderText integer
+---@field ColorNoAlpha integer
+---@field ObjectId integer
+---@field TypeString integer
+---@field NodePathToEditedNode integer
+---@field ObjectTooBig integer
+---@field NodePathValidTypes integer
+---@field SaveFile integer
+---@field GlobalSaveFile integer
+---@field IntIsObjectid integer
+---@field IntIsPointer integer
+---@field ArrayType integer
+---@field LocaleId integer
+---@field LocalizableString integer
+---@field NodeType integer
+---@field HideQuaternionEdit integer
+---@field Password integer
+---@field LayersAvoidance integer
+---@field DictionaryType integer
+---@field ToolButton integer
+---@field Oneshot integer
+---@field GroupEnable integer
+---@field InputName integer
+---@field FilePath integer
+---@field Max integer
+
+---@class Godot.PropertyUsageFlags
+---@field None integer
+---@field NoEditor integer
+---@field Storage integer
+---@field Editor integer
+---@field Default integer
+---@field Internal integer
+---@field Checkable integer
+---@field Checked integer
+---@field Group integer
+---@field Category integer
+---@field Subgroup integer
+---@field ClassIsBitfield integer
+---@field NoInstanceState integer
+---@field RestartIfChanged integer
+---@field ScriptVariable integer
+---@field StoreIfNull integer
+---@field UpdateAllIfModified integer
+---@field ScriptDefaultValue integer
+---@field ClassIsEnum integer
+---@field NilIsVariant integer
+---@field Array integer
+---@field AlwaysDuplicate integer
+---@field NeverDuplicate integer
+---@field HighEndGfx integer
+---@field NodePathFromSceneRoot integer
+---@field ResourceNotPersistent integer
+---@field KeyingIncrements integer
+---@field DeferredSetResource integer
+---@field EditorInstantiateObject integer
+---@field EditorBasicSetting integer
+---@field ReadOnly integer
+---@field Secret integer
+
+---@class Godot.Side
+---@field Left integer
+---@field Top integer
+---@field Right integer
+---@field Bottom integer
+
+---@class Godot.VerticalAlignment
+---@field Top integer
+---@field Center integer
+---@field Bottom integer
+---@field Fill integer
+

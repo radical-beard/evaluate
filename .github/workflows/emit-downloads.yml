@@ -1,0 +1,70 @@
+name: Emit downloads
+
+# On a version tag: regenerate the Lua API spec against the release's Godot (a live engine,
+# so ClassDB introspection is exact for that build), bundle it with the agent skill, and
+# attach `evaluate-downloads-<version>.zip` to the GitHub release. This keeps the published
+# spec auto-tracking the framework + the pinned Godot, with no hand-maintenance — the same
+# "instant, always-fresh distribution" idea as the release-addon workflow.
+#
+# GODOT_VERSION must match the Godot the package targets (see Evaluate.csproj GodotSharp).
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: write
+
+env:
+  GODOT_VERSION: "4.6"
+
+jobs:
+  emit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Godot (mono, headless)
+        run: |
+          set -euo pipefail
+          base="Godot_v${GODOT_VERSION}-stable_mono_linux_x86_64"
+          url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/${base}.zip"
+          curl -fsSL "$url" -o godot.zip
+          unzip -q godot.zip
+          echo "GODOT_BIN=$PWD/${base}/${base}" >> "$GITHUB_ENV"
+
+      - name: Build the dev host (consumes the library by project reference)
+        run: dotnet build dev/Dev.csproj -c Debug
+
+      - name: Import Godot resources
+        run: "\"$GODOT_BIN\" --headless --path dev --import || true"
+
+      - name: Emit the API spec
+        run: "\"$GODOT_BIN\" --headless --path dev -- --emit-api \"$PWD/downloads/spec\""
+
+      - name: Package the downloads bundle
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          # Sanity: the emitter must have produced the spec.
+          test -f downloads/spec/evaluate-api.json
+          test -f downloads/spec/luacats/godot-core.lua
+          ( cd downloads && zip -rq "../evaluate-downloads-${version}.zip" spec skill README.md )
+          # Report whether the committed spec drifted from a fresh generation (informational).
+          git --no-pager diff --stat -- downloads/spec || true
+
+      - name: Attach to the GitHub release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 \
+            || gh release create "$GITHUB_REF_NAME" --verify-tag --title "Evaluate $version" --generate-notes
+          gh release upload "$GITHUB_REF_NAME" "evaluate-downloads-${version}.zip" --clobber

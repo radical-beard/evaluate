@@ -517,7 +517,10 @@ public sealed class GodotBinder
         || t == typeof(float) || t == typeof(double);
 
     // Any C# type we can convert to/from a Lua value (the full Variant set).
-    private static bool CanMarshal(Type t)
+    // Internal so the docs emitter can apply the exact same "is this bindable?"
+    // filter the static-method binder uses (Resolve), keeping docs honest about
+    // which statics are actually reachable from Lua.
+    internal static bool CanMarshal(Type t)
     {
         if (t.IsByRef || t.IsPointer || t.IsGenericParameter) return false;
         if (IsNumeric(t) || t == typeof(bool) || t == typeof(string) || t.IsEnum) return true;

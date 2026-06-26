@@ -1,0 +1,18 @@
+---
+apis:
+ - sql
+returns:
+ - result
+---
+-- Exercises the `sql` capability end-to-end through the Lua binder (a test fixture).
+sql.exec("DROP TABLE IF EXISTS _lt")
+sql.exec("CREATE TABLE _lt(id INTEGER PRIMARY KEY, name TEXT)")
+sql.exec("INSERT INTO _lt(name) VALUES(@p1)", { "zed" })
+sql.exec_async("INSERT INTO _lt(name) VALUES(@p1)", { "qux" })
+sql.flush()
+local rows = sql.query("SELECT id, name FROM _lt ORDER BY id")
+local n = 0
+for _ in ipairs(rows) do n = n + 1 end
+local first = rows[1] and rows[1].name or "none"
+sql.exec("DROP TABLE _lt")
+return { result = first .. ":" .. n }     -- expect "zed:2"

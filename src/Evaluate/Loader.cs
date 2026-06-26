@@ -83,7 +83,10 @@ public sealed class Loader
     // Input state the host can toggle to simulate the player pressing keys.
     public HashSet<string> Pressed { get; } = new();
 
-    private static readonly string[] SafeGlobals =
+    // The language-level globals every sandbox gets (capability-free). Exposed
+    // internally so the docs emitter reads the SAME list the sandbox copies in
+    // (Loader.cs BuildSandbox), never a parallel hand-maintained one.
+    internal static readonly string[] SafeGlobals =
         { "pairs", "ipairs", "next", "type", "tostring", "tonumber",
           "error", "assert", "select", "string", "math", "table",
           // Metatable toolkit: lets scripts build classes/objects the idiomatic
@@ -615,6 +618,11 @@ public sealed class Loader
 
     // ---- engine APIs ----------------------------------------------------------
 
+    // The capability APIs a script may declare in `apis:`. Single source of truth:
+    // the BuildApi switch dispatches on these names and the docs emitter walks them,
+    // so a newly-added api (a new switch arm + array entry) self-documents.
+    internal static readonly string[] ApiNames = { "input", "world", "scene", "save", "sql" };
+
     private LuaValue BuildApi(string path, string name, LoadContext ctx) => name switch
     {
         "input" => BuildInputApi(),
@@ -624,6 +632,27 @@ public sealed class Loader
         "sql" => BuildSqlApi(),
         _ => throw new EvaluateException($"{path} requests unknown api '{name}'"),
     };
+
+    // Build each table-shaped capability api so the docs emitter can enumerate its
+    // members by walking the live LuaTable keys (no hardcoded member list). `world`
+    // is a wrapped Godot node, not a table, so it is reported separately by name.
+    // Side-effecting builders (sql opens a db, save touches user://) are tolerated:
+    // this only runs under the `--emit-api` doc path, never in a real game.
+    internal IReadOnlyList<(string Name, LuaTable Table)> DocApiTables()
+    {
+        var result = new List<(string, LuaTable)>();
+        foreach (var name in ApiNames)
+        {
+            if (name == "world") continue;   // a wrapped instance, documented as a note
+            try
+            {
+                if (BuildApi("<docs>", name, new LoadContext(_globalRoot, null)).TryRead<LuaTable>(out var table))
+                    result.Add((name, table));
+            }
+            catch (System.Exception e) { _log($"docs: could not build api '{name}': {e.Message}"); }
+        }
+        return result;
+    }
 
     // `sql` exposes full SQL to scripts; the game owns its schema (slots, inventory, …),
     // the framework owns the connection, durability, async, crash-safety:

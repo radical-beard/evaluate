@@ -116,6 +116,16 @@ hot-reloaded by default.
   `IIncrementalGenerator`: `[BindGodot(typeof(Godot.OS))]` emits `OsBinding.Create()`
   with direct, reflection-free calls (53 bound `OS` methods), filtered to
   Lua-convertible signatures. The binder prefers pre-baked bindings.
+- **API spec & agent skill (consumer onboarding).** `godot --headless --path . --
+  --emit-api <dir>` dumps the *entire* Lua surface a script sees — read live, so nothing is
+  hand-written or hard-coded: `godot.*` classes/methods/properties/signals come from engine
+  `ClassDB` introspection, enums/constants/statics + the class set from GodotSharp reflection,
+  `std.*` from the `[LuaObject]` types, the capability apis by walking the tables `Loader`
+  builds, and hooks/frontmatter from the runtime's arrays (`src/Evaluate/EvaluateDocs.cs` —
+  the runtime analogue of the build-time generator). It emits `evaluate-api.json`, LuaCATS
+  `---@meta` files for IDE autocomplete (the whole `godot.*`/`std.*` surface), and a Markdown
+  reference. A pre-generated copy plus a drop-in **agent skill** (teaching an LLM the script
+  contract) live under `downloads/`; each release also ships `evaluate-downloads-<version>.zip`.
 
 ## Base VM
 
@@ -130,6 +140,7 @@ custom dialect's `+=`.
     godot --headless --path dev                       # demo: global layer, scene switch (menu -> level1), node script
     godot --headless --path dev -- --test             # enforcement suite (18 tests)
     godot --headless --path dev -- --quit-after 8     # demo, then quit after 8 frames
+    godot --headless --path dev -- --emit-api out/    # dump the full Lua API spec (json + LuaCATS + markdown)
 
 ## Layout
 
@@ -137,7 +148,10 @@ custom dialect's `+=`.
     src/Evaluate/            Evaluate.csproj  EvaluateRuntime.cs  Loader.cs  Std.cs
                              Frontmatter.cs  Toml.cs  SceneFile.cs  SceneBuilder.cs
                              GodotBinder.cs  Persistence.cs  BindGodotAttribute.cs  Prebaked.cs  EvaluateTests.cs
+                             EvaluateDocs.cs  EvaluateDocsModel.cs  EvaluateDocsWriters.cs   (--emit-api spec generator)
     src/Evaluate.Generator/  Evaluate.Generator.csproj  BindGodotGenerator.cs   (Roslyn source generator)
+    downloads/  drop-in resources for consumers: spec/ (generated Lua API spec — json + LuaCATS
+                + markdown) and skill/evaluate-scripting/ (a downloadable agent skill)
     dev/        the demo / enforcement-test harness game (consumes the lib by project reference):
       project.godot  main.tscn  EvaluateHost.cs  Dev.csproj
       scripts/  global.scene  menu.scene  level1.scene

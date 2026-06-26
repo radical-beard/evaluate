@@ -34,6 +34,16 @@ public partial class EvaluateRuntime : Node
             return;
         }
 
+        // Docs mode: `godot --headless -- --emit-api <dir>` dumps the full Lua API spec
+        // for THIS Godot + Evaluate (ClassDB needs a live engine) and quits. Runs before
+        // any script discovery, so it works in a bare consumer project.
+        if (ArgValue(args, "--emit-api") is { } emitDir)
+        {
+            EvaluateDocs.Emit(emitDir, GD.Print);
+            GetTree().Quit();
+            return;
+        }
+
         _quitAfter = ArgValue(args, "--quit-after") is { } q && int.TryParse(q, out var n) ? n : -1;
         _screenshot = ArgValue(args, "--screenshot");
 

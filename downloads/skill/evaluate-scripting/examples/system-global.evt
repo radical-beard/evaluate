@@ -1,0 +1,42 @@
+---
+config:
+ - game.toml
+apis:
+ - save
+register:
+ - on_start
+ - on_update
+---
+-- A GLOBAL system (no scenes:) — runs in every scene. Its on_update coexists
+-- with each scene's own on_update, which is exactly the per-scene registration
+-- the scenes feature unlocks. on_start fires once, after the global layer loads.
+local ticks = 0
+
+function on_start()
+  print("running on " .. godot.OS.GetName())
+
+  -- SQLite persistence: a launch counter that survives across runs.
+  local launches = save.get("launch_count", 0) + 1
+  save.set("launch_count", launches)
+  print(string.format("launch #%d (persisted to SQLite)", launches))
+  print(string.format("title=%q debug=%s", config.game.title, tostring(config.game.debug)))
+
+  -- instance + signal: a real Godot Timer, property set/get, connect + fire.
+  local timer = godot.Timer.new()
+  timer.wait_time = 2.5
+  timer:connect("timeout", function() print("timer 'timeout' -> lua callback fired") end)
+  timer:emit_signal("timeout")
+  timer:free()
+
+  -- Vector3 marshalling: std.vec3 <-> Godot Vector3 across the boundary.
+  local node = godot.Node3D.new()
+  node.position = std.vec3(1, 2, 3)
+  local p = node.position
+  print(string.format("node3d.position = (%.0f, %.0f, %.0f)", p.x, p.y, p.z))
+  node:free()
+end
+
+function on_update(dt)
+  ticks = ticks + 1
+  if ticks == 1 then print("global on_update: first tick (fires in every scene)") end
+end

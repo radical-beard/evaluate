@@ -1,0 +1,10 @@
+---
+returns:
+ - hp: get double
+---
+-- Positive control: `hp` is get-only, so the narrowed handle must expose
+-- get_hp and must NOT expose set_hp.
+local M = {}
+local hp = 100
+function M.get_hp() return hp end
+return M

@@ -1,0 +1,32 @@
+---
+returns:
+ - result
+---
+-- Positive control: metatable-based OOP must work inside the sandbox.
+-- Exercises setmetatable (a class), inheritance via __index, method dispatch,
+-- and the raw* family. If any of these are missing from the sandbox, the
+-- enforcement suite fails.
+local Animal = {}
+Animal.__index = Animal
+function Animal.new(name, legs) return setmetatable({ name = name, legs = legs }, Animal) end
+function Animal:describe() return self.name .. " has " .. self.legs .. " legs" end
+
+local Dog = setmetatable({}, { __index = Animal })   -- Dog inherits Animal
+Dog.__index = Dog
+function Dog.new(name) return setmetatable(Animal.new(name, 4), Dog) end
+function Dog:speak() return self.name .. " says woof" end
+
+local M = {}
+local d = Dog.new("Rex")
+
+-- raw access (rawget/rawset/rawlen/rawequal)
+local t = {}
+rawset(t, 1, "a"); rawset(t, 2, "b")
+local rawok = rawget(t, 1) == "a" and rawlen(t) == 2 and rawequal(t, t)
+
+-- getmetatable round-trip
+local gmok = getmetatable(d) == Dog
+
+M.result = string.format("%s | %s | raw=%s | gm=%s",
+  d:speak(), d:describe(), tostring(rawok), tostring(gmok))   -- d:describe is inherited
+return M
