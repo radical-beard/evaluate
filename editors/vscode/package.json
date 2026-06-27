@@ -1,0 +1,111 @@
+{
+  "name": "evaluate-evt",
+  "displayName": "EvaLuate (.evt)",
+  "description": "Syntax, IntelliSense and autocomplete for EvaLuate .evt scripts (YAML frontmatter + sandboxed Lua) inside Godot.",
+  "version": "0.1.0",
+  "publisher": "radical-beard",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/radical-beard/evaluate"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "evaluate",
+    "evt",
+    "godot",
+    "lua"
+  ],
+  "icon": "icons/icon.png",
+  "galleryBanner": {
+    "color": "#2b2f3a",
+    "theme": "dark"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "languages": [
+      {
+        "id": "evt",
+        "aliases": [
+          "EvaLuate",
+          "evt"
+        ],
+        "extensions": [
+          ".evt"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/evt.svg",
+          "dark": "./icons/evt.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "evt",
+        "scopeName": "source.evt",
+        "path": "./syntaxes/evt.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.frontmatter.evt": "yaml",
+          "meta.embedded.block.lua.evt": "lua"
+        }
+      }
+    ],
+    "configuration": {
+      "title": "EvaLuate (.evt)",
+      "properties": {
+        "evt.lua.enable": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Provide Lua IntelliSense (completion, hover, diagnostics) in the body of `.evt` files via lua-language-server."
+        },
+        "evt.lua.serverPath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Absolute path to a `lua-language-server` executable. Leave empty to auto-detect the binary bundled with the [sumneko Lua](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) extension."
+        },
+        "evt.lua.libraryPaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "downloads/spec/luacats"
+          ],
+          "markdownDescription": "Folders of LuaCATS (`---@meta`) definitions to load as the type library (relative to the workspace folder, or absolute). Point these at the `luacats/` produced by `--emit-api` so the body knows the whole `godot.*`/`std.*` surface."
+        },
+        "evt.spec.path": {
+          "type": "string",
+          "default": "downloads/spec/evaluate-api.json",
+          "markdownDescription": "Path (relative to the workspace folder, or absolute) to the generated `evaluate-api.json`. Drives frontmatter completion for `apis:`/`register:`. Falls back to a small bundled copy when missing."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.js --production",
+    "watch": "node esbuild.js --watch",
+    "check-types": "tsc --noEmit",
+    "package": "vsce package --no-dependencies -o evaluate-evt.vsix",
+    "publish": "vsce publish --no-dependencies",
+    "publish:ovsx": "ovsx publish evaluate-evt.vsix"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.24.0",
+    "ovsx": "^0.10.0",
+    "typescript": "^5.5.0"
+  }
+}

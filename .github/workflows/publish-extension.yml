@@ -1,0 +1,66 @@
+name: Publish VS Code extension
+
+# Releases the editors/vscode extension to the Open VSX registry (open-vsx.org) — the one
+# used by VSCodium, Cursor, Windsurf, Gitpod and Theia. Versioned independently from the
+# library (which uses `v*` tags): tag the extension `vscode-v<version>` matching
+# editors/vscode/package.json, e.g. `vscode-v0.1.0`.
+#
+# Required repository secret:
+#   OVSX_PAT  - an open-vsx.org access token (no credit card; created via GitHub/Eclipse login)
+#
+# (To also publish to the VS Code Marketplace later, add a step:
+#    npx @vscode/vsce publish --no-dependencies --packagePath evaluate-evt.vsix -p "$VSCE_PAT"
+#  with a VSCE_PAT secret from an Azure DevOps PAT.)
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - vscode-v*
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: editors/vscode
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+          cache-dependency-path: editors/vscode/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify version matches tag
+        if: github.ref_type == 'tag'
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          expected="vscode-v${version}"
+          if [ "${GITHUB_REF_NAME}" != "$expected" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package version ($expected)" >&2
+            exit 1
+          fi
+
+      - name: Build + package
+        run: |
+          npm run build
+          npx @vscode/vsce package --no-dependencies -o evaluate-evt.vsix
+
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          set -euo pipefail
+          if [ -z "${OVSX_PAT:-}" ]; then
+            echo "OVSX_PAT secret not set — add it under Settings ▸ Secrets ▸ Actions." >&2
+            exit 1
+          fi
+          npx ovsx publish evaluate-evt.vsix -p "$OVSX_PAT"
