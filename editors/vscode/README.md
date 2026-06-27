@@ -82,32 +82,47 @@ npm run watch        # rebuild on change
 
 ## Publishing
 
-The package is marketplace-ready (icon, metadata, bundled build). To publish you need a
-publisher identity and a token — these are account steps only the maintainer can do:
+The package is marketplace-ready (icon, metadata, bundled build). We publish to
+**[Open VSX](https://open-vsx.org)** — the registry used by VSCodium, Cursor, Windsurf,
+Gitpod and Theia. (No credit card; you log in with GitHub.)
 
-**VS Code Marketplace** (used by VS Code):
-1. Create a publisher at <https://marketplace.visualstudio.com/manage> (the id must match
-   `publisher` in `package.json`, currently `radical-beard`).
-2. Create an Azure DevOps **Personal Access Token** with the *Marketplace ▸ Manage* scope.
-3. `npm run build && npx vsce login radical-beard` (paste the token), then `npm run publish`.
+**One-time setup:**
 
-**Open VSX** (used by VSCodium, Cursor, Gitpod, Theia, …):
-1. Create a token at <https://open-vsx.org> (namespace must match `publisher`).
-2. `npm run package && npx ovsx publish evaluate-evt.vsix -p <token>`.
+1. Sign in at <https://open-vsx.org> with GitHub, then sign the Eclipse Foundation Open VSX
+   Publisher Agreement (Settings ▸ Profile).
+2. Create an access token at <https://open-vsx.org/user-settings/tokens>.
+3. Create the publisher namespace (must match `publisher` in `package.json`, `radical-beard`):
+   ```
+   npx ovsx create-namespace radical-beard -p <token>
+   ```
+4. Store the token as a GitHub Actions secret so CI can publish:
+   ```
+   gh secret set OVSX_PAT --repo radical-beard/evaluate
+   ```
+   (Run it from anywhere; it prompts for the value so the token never lands in your shell
+   history. Drop `--repo` if you run it inside a clone of this repo.)
 
-**Automated (recommended):** the `publish-extension` GitHub workflow publishes to **both**
-registries on a `vscode-v<version>` tag (versioned independently from the library's `v*`
-tags). Add `VSCE_PAT` and `OVSX_PAT` as repository secrets, bump the version in
-`package.json`, then:
+**Release (CI):** bump `version` in `package.json`, then tag — the `publish-extension`
+workflow builds and publishes to Open VSX:
 
 ```
 git tag vscode-v0.1.0 && git push origin vscode-v0.1.0
 ```
 
-A missing secret skips that one registry instead of failing the run.
+**Or publish from your machine:**
 
-Either way, **no account is needed just to use it** — share the `.vsix` and
+```
+npm run package
+npx ovsx publish evaluate-evt.vsix -p <token>
+```
+
+**No account is needed just to use it** — share the `.vsix` and
 `code --install-extension evaluate-evt.vsix`.
+
+> Want the VS Code Marketplace too (reaches stock VS Code)? It needs an Azure DevOps PAT.
+> Create a publisher at <https://marketplace.visualstudio.com/manage>, then
+> `npx @vscode/vsce publish --no-dependencies --packagePath evaluate-evt.vsix -p <pat>`
+> (and add the matching step back to the workflow).
 
 ## License
 

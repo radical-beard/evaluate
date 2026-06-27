@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <rect width="128" height="128" rx="24" fill="#2b2f3a"/>
-  <rect x="14" y="14" width="100" height="34" rx="8" fill="#3b4252"/>
-  <text x="64" y="39" font-family="monospace" font-size="20" font-weight="700" fill="#a3be8c" text-anchor="middle">---</text>
-  <text x="64" y="92" font-family="monospace" font-size="44" font-weight="800" fill="#7dd3fc" text-anchor="middle">evt</text>
-</svg>
