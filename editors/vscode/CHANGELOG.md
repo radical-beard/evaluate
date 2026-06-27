@@ -13,3 +13,6 @@ Initial release.
   middleware (no changes to user settings).
 - Sandbox-aware: body completion only offers the capability apis declared in `apis:`, and using
   an undeclared api in the body is flagged — mirroring the EvaLuate runtime sandbox.
+- Marketplace-ready: 128×128 icon + gallery banner; `publish` / `publish:ovsx` scripts and a
+  `publish-extension` CI workflow that releases to the VS Code Marketplace and Open VSX on a
+  `vscode-v<version>` tag.

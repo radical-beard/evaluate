@@ -80,6 +80,35 @@ npm run watch        # rebuild on change
 # press F5 in VS Code to launch the Extension Development Host, open an .evt file
 ```
 
+## Publishing
+
+The package is marketplace-ready (icon, metadata, bundled build). To publish you need a
+publisher identity and a token — these are account steps only the maintainer can do:
+
+**VS Code Marketplace** (used by VS Code):
+1. Create a publisher at <https://marketplace.visualstudio.com/manage> (the id must match
+   `publisher` in `package.json`, currently `radical-beard`).
+2. Create an Azure DevOps **Personal Access Token** with the *Marketplace ▸ Manage* scope.
+3. `npm run build && npx vsce login radical-beard` (paste the token), then `npm run publish`.
+
+**Open VSX** (used by VSCodium, Cursor, Gitpod, Theia, …):
+1. Create a token at <https://open-vsx.org> (namespace must match `publisher`).
+2. `npm run package && npx ovsx publish evaluate-evt.vsix -p <token>`.
+
+**Automated (recommended):** the `publish-extension` GitHub workflow publishes to **both**
+registries on a `vscode-v<version>` tag (versioned independently from the library's `v*`
+tags). Add `VSCE_PAT` and `OVSX_PAT` as repository secrets, bump the version in
+`package.json`, then:
+
+```
+git tag vscode-v0.1.0 && git push origin vscode-v0.1.0
+```
+
+A missing secret skips that one registry instead of failing the run.
+
+Either way, **no account is needed just to use it** — share the `.vsix` and
+`code --install-extension evaluate-evt.vsix`.
+
 ## License
 
 MIT OR Apache-2.0, matching EvaLuate.

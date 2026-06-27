@@ -21,6 +21,11 @@
     "godot",
     "lua"
   ],
+  "icon": "icons/icon.png",
+  "galleryBanner": {
+    "color": "#2b2f3a",
+    "theme": "dark"
+  },
   "main": "./dist/extension.js",
   "activationEvents": [],
   "contributes": {
@@ -88,7 +93,9 @@
     "build": "node esbuild.js --production",
     "watch": "node esbuild.js --watch",
     "check-types": "tsc --noEmit",
-    "package": "vsce package --no-dependencies -o evaluate-evt.vsix"
+    "package": "vsce package --no-dependencies -o evaluate-evt.vsix",
+    "publish": "vsce publish --no-dependencies",
+    "publish:ovsx": "ovsx publish evaluate-evt.vsix"
   },
   "dependencies": {
     "vscode-languageclient": "^9.0.1"
@@ -98,6 +105,7 @@
     "@types/vscode": "^1.85.0",
     "@vscode/vsce": "^3.0.0",
     "esbuild": "^0.24.0",
+    "ovsx": "^0.10.0",
     "typescript": "^5.5.0"
   }
 }

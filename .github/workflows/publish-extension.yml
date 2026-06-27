@@ -1,0 +1,74 @@
+name: Publish VS Code extension
+
+# Releases the editors/vscode extension to BOTH the VS Code Marketplace and Open VSX.
+# Versioned independently from the library (which uses `v*` tags): tag the extension
+# `vscode-v<version>` matching editors/vscode/package.json, e.g. `vscode-v0.1.0`.
+#
+# Required repository secrets:
+#   VSCE_PAT  - Azure DevOps PAT with Marketplace ▸ Manage  (VS Code Marketplace)
+#   OVSX_PAT  - open-vsx.org access token                    (Open VSX)
+# A missing secret skips that registry with a clear log line rather than failing the run.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - vscode-v*
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: editors/vscode
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+          cache-dependency-path: editors/vscode/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify version matches tag
+        if: github.ref_type == 'tag'
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          expected="vscode-v${version}"
+          if [ "${GITHUB_REF_NAME}" != "$expected" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package version ($expected)" >&2
+            exit 1
+          fi
+
+      - name: Build + package
+        run: |
+          npm run build
+          npx @vscode/vsce package --no-dependencies -o evaluate-evt.vsix
+
+      - name: Publish to the VS Code Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          set -euo pipefail
+          if [ -z "${VSCE_PAT:-}" ]; then
+            echo "VSCE_PAT secret not set — skipping VS Code Marketplace." >&2
+            exit 0
+          fi
+          npx @vscode/vsce publish --no-dependencies --packagePath evaluate-evt.vsix -p "$VSCE_PAT"
+
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          set -euo pipefail
+          if [ -z "${OVSX_PAT:-}" ]; then
+            echo "OVSX_PAT secret not set — skipping Open VSX." >&2
+            exit 0
+          fi
+          npx ovsx publish evaluate-evt.vsix -p "$OVSX_PAT"
