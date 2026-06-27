@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "EvaLuate",
+  "scopeName": "source.evt",
+  "patterns": [
+    { "include": "#frontmatter" },
+    { "include": "source.lua" }
+  ],
+  "repository": {
+    "frontmatter": {
+      "comment": "Leading --- ... --- YAML signature block, highlighted as YAML.",
+      "begin": "\\A(---)[ \\t]*$",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.frontmatter.begin.evt" }
+      },
+      "end": "^(---)[ \\t]*$",
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.frontmatter.end.evt" }
+      },
+      "name": "meta.frontmatter.evt",
+      "contentName": "meta.embedded.block.frontmatter.evt",
+      "patterns": [
+        { "include": "source.yaml" }
+      ]
+    }
+  }
+}

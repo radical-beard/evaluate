@@ -152,6 +152,8 @@ custom dialect's `+=`.
     src/Evaluate.Generator/  Evaluate.Generator.csproj  BindGodotGenerator.cs   (Roslyn source generator)
     downloads/  drop-in resources for consumers: spec/ (generated Lua API spec — json + LuaCATS
                 + markdown) and skill/evaluate-scripting/ (a downloadable agent skill)
+    editors/vscode/  VS Code extension for .evt: YAML+Lua highlighting, frontmatter IntelliSense,
+                and sandbox-aware Lua-body autocomplete via lua-language-server + the LuaCATS spec
     dev/        the demo / enforcement-test harness game (consumes the lib by project reference):
       project.godot  main.tscn  EvaluateHost.cs  Dev.csproj
       scripts/  global.scene  menu.scene  level1.scene
