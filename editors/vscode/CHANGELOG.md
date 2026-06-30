@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+- Frontmatter IntelliSense now knows the node-script `params:` key: completion offers it
+  (with a map snippet, not a list), hover documents the `<type> [= default]` grammar, and the
+  bundled key fallback includes it — matching the runtime's per-node `params` feature.
+
 ## 0.1.0
 
 Initial release.

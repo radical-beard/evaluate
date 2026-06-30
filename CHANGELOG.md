@@ -7,7 +7,23 @@ the version is `0.x`, minor bumps may include breaking changes.
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-06-30
+
 ### Added
+- **Per-node `params:` — typed, per-instance config a scene supplies to a node script.**
+  A `*.node.evt` may declare a `params:` block in its frontmatter; the `.scene` file that
+  attaches it supplies values per node via `params = { … }` (next to `position`), and the
+  body reads them through a new ambient **`params`** table. It is the per-instance analogue
+  of `config` (which is shared across all nodes): two enemies can share one script with
+  different stats. Entries are `name: <default>` (type inferred), `name: <type>` (required —
+  the scene must supply it), or `name: "<type> = <default>"`; types are
+  `number`/`string`/`bool`/`list`/`table`/`any`. The loader fills omitted defaults,
+  type-checks each supplied value, and rejects a param the script never declared or a
+  required one the scene omits — the same signature-is-the-contract enforcement as the
+  capability sandbox. Hot-reload-safe (a script reload re-validates against the same scene
+  values) and editor-round-trippable (stashed as `__evt_params`, re-emitted by `SceneWriter`).
+  Declaring `params:` on a system script (which has no node instance) is rejected.
+  (`Frontmatter`/`SceneFile`/`SceneBuilder`/`SceneWriter`/`Loader`, `src/Evaluate/`.)
 - **`--emit-api <dir>` — generate the full Lua API spec for consumers.** A new runtime
   command (`godot --headless --path . -- --emit-api downloads/spec`, alongside `--test`)
   dumps the entire Lua surface a script sees, read **live**: the `godot.*` classes/methods/

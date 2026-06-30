@@ -2,7 +2,7 @@
   "name": "evaluate-evt",
   "displayName": "EvaLuate (.evt)",
   "description": "Syntax, IntelliSense and autocomplete for EvaLuate .evt scripts (YAML frontmatter + sandboxed Lua) inside Godot.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "radical-beard",
   "license": "MIT OR Apache-2.0",
   "repository": {
