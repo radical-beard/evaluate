@@ -38,7 +38,13 @@ jobs:
           url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/${base}.zip"
           curl -fsSL "$url" -o godot.zip
           unzip -q godot.zip
-          echo "GODOT_BIN=$PWD/${base}/${base}" >> "$GITHUB_ENV"
+          # The mono zip extracts to a folder named ${base}, but the binary inside is
+          # `Godot_v..._mono_linux.x86_64` (a dot, not the folder's trailing underscore).
+          # Locate it instead of hardcoding the name so a Godot naming tweak can't break us.
+          godot_bin="$(find "$PWD" -maxdepth 2 -type f -name 'Godot_v*_mono_linux*' ! -name '*.zip' | head -1)"
+          test -n "$godot_bin" || { echo "Godot binary not found after unzip" >&2; ls -R; exit 1; }
+          chmod +x "$godot_bin"
+          echo "GODOT_BIN=$godot_bin" >> "$GITHUB_ENV"
 
       - name: Build the dev host (consumes the library by project reference)
         run: dotnet build dev/Dev.csproj -c Debug
