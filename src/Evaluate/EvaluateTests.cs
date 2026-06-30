@@ -907,8 +907,119 @@ public static class EvaluateTests
             Check("runtime struct properties are named-field (.size.x / .basis.z)", ok, detail);
         }
 
+        // 52: frontmatter `params:` grammar — a bare scalar is the default (type inferred),
+        // a type token alone is required (no default), and `type = default` is both.
+        {
+            var fm = Frontmatter.Parse(
+                "---\nparams:\n  hp: 100\n  faction: \"neutral\"\n  speed: number\n  range: number = 8\n---\nbody\n");
+            var byName = fm.Params.ToDictionary(p => p.Name);
+            var ok =
+                byName["hp"].Type == "number" && byName["hp"].HasDefault && (double)byName["hp"].Default! == 100
+                && byName["faction"].Type == "string" && (string)byName["faction"].Default! == "neutral"
+                && byName["speed"].Type == "number" && byName["speed"].Required
+                && byName["range"].Type == "number" && byName["range"].HasDefault && (double)byName["range"].Default! == 8;
+            Check("frontmatter params: parses default/required/type=default forms", ok, $"count={fm.Params.Count}");
+        }
+
+        // 53: a scene node's `params = {..}` parses into NodeSpec.Params — a reserved key,
+        // neither a child node nor an engine property.
+        {
+            var spec = SceneFile.Parse(
+                "[nodes.Mob]\ntype = \"Node\"\nscript = \"m.node.evt\"\nparams = { hp = 60, faction = \"goblin\" }\n");
+            var mob = spec.Nodes[0];
+            var ok = mob.Params.Count == 2 && (double)mob.Params["hp"] == 60
+                && (string)mob.Params["faction"] == "goblin" && !mob.Props.ContainsKey("params");
+            Check("scene node params parses into NodeSpec.Params", ok,
+                $"params={mob.Params.Count}, leakedToProps={mob.Props.ContainsKey("params")}");
+        }
+
+        // 54: params reach the node script — the scene OVERRIDES some, the script's DEFAULT
+        // fills the rest (read via the `params` global, stashed onto the node here).
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var src = new Dictionary<string, string>
+                {
+                    ["global.scene"] =
+                        "[nodes.Mob]\ntype = \"Node\"\nscript = \"mob.node.evt\"\nparams = { hp = 60 }\n",
+                    ["mob.node.evt"] =
+                        "---\nparams:\n  hp: 100\n  faction: \"neutral\"\nregister:\n - on_attach\n---\n" +
+                        "function on_attach() self:set_meta(\"hp\", params.hp) self:set_meta(\"faction\", params.faction) end\n",
+                };
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var mob = root.GetNodeOrNull("Mob");
+                var overridden = mob is not null && mob.GetMeta("hp").AsDouble() == 60;            // scene wins
+                var defaulted = mob is not null && mob.GetMeta("faction").AsString() == "neutral"; // default fills
+                ok = overridden && defaulted;
+                detail = $"hp={mob?.GetMeta("hp").AsDouble()}, faction={mob?.GetMeta("faction").AsString()}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("scene params override defaults; omitted params fall back to defaults", ok, detail);
+        }
+
+        // 55: a scene param the script never declared is rejected — the scene cannot inject
+        // values past the signature contract (mirrors the sandbox's undeclared-global stance).
+        Check("an undeclared scene param is rejected", ParamLoadThrows(
+            "[nodes.Mob]\ntype = \"Node\"\nscript = \"m.node.evt\"\nparams = { hp = 1, bogus = 2 }\n",
+            "---\nparams:\n  hp: 100\nregister:\n - on_attach\n---\nfunction on_attach() end\n"));
+
+        // 56: a declared param with no default is REQUIRED — the scene omitting it is an error.
+        Check("a required param the scene omits is rejected", ParamLoadThrows(
+            "[nodes.Mob]\ntype = \"Node\"\nscript = \"m.node.evt\"\n",
+            "---\nparams:\n  speed: number\nregister:\n - on_attach\n---\nfunction on_attach() end\n"));
+
+        // 57: a scene value whose type disagrees with the declared type is rejected.
+        Check("a wrong-typed scene param is rejected", ParamLoadThrows(
+            "[nodes.Mob]\ntype = \"Node\"\nscript = \"m.node.evt\"\nparams = { hp = \"lots\" }\n",
+            "---\nparams:\n  hp: number\nregister:\n - on_attach\n---\nfunction on_attach() end\n"));
+
+        // 58: scene params round-trip through SceneBuilder/SceneWriter (stashed as __evt_params).
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (a, b, text) = RoundTrip(
+                    "[nodes.Mob]\ntype = \"Node\"\nscript = \"m.node.evt\"\nparams = { hp = 60, faction = \"goblin\" }\n");
+                var mob = b.Nodes.FirstOrDefault(n => n.Name == "Mob");
+                ok = text.Contains("params = {") && mob is not null && mob.Params.Count == 2
+                    && (double)mob.Params["hp"] == 60 && (string)mob.Params["faction"] == "goblin" && SpecEquals(a, b);
+                detail = $"text=<<{text}>>";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("scene params round-trip through SceneWriter", ok, detail);
+        }
+
+        // 59: `params:` is a node-script concept — a SYSTEM script declaring it is rejected
+        // (a system has no scene instance to be parameterized).
+        {
+            var src = new Dictionary<string, string>
+            {
+                ["sys.evt"] = "---\nparams:\n  hp: 100\nregister:\n - on_start\n---\nfunction on_start() end\n",
+            };
+            var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+            Check("a system script declaring params is rejected", Throws(() => loader.LoadSystem("sys.evt")));
+        }
+
         log($"[tests] {passed} passed, {failed} failed");
         return failed;
+    }
+
+    // Build a one-node global layer from (sceneToml, nodeScriptSource) and report whether
+    // attaching the node script throws — i.e. the params contract is enforced at attach.
+    private static bool ParamLoadThrows(string sceneToml, string nodeScript)
+    {
+        var src = new Dictionary<string, string> { ["m.node.evt"] = nodeScript };
+        var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+        var root = new Node();
+        loader.SetGlobalRoot(root);
+        var threw = Throws(() => loader.LoadGlobalLayer(SceneFile.Parse(sceneToml)));
+        root.QueueFree();
+        return threw;
     }
 
     // parse -> build under a container -> SceneWriter -> parse again.
@@ -950,7 +1061,8 @@ public static class EvaluateTests
             if (a.Connections[i].Signal != b.Connections[i].Signal
                 || a.Connections[i].To != b.Connections[i].To
                 || a.Connections[i].Method != b.Connections[i].Method) return false;
-        return MapEquals(a.Meta, b.Meta) && MapEquals(a.Props, b.Props) && NodesEqual(a.Children, b.Children);
+        return MapEquals(a.Meta, b.Meta) && MapEquals(a.Props, b.Props)
+            && MapEquals(a.Params, b.Params) && NodesEqual(a.Children, b.Children);
     }
 
     private static bool SetEquals(List<string> a, List<string> b)

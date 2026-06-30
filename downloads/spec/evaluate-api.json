@@ -1,5 +1,5 @@
 {
-  "evaluateVersion": "0.7.2\u002Bab3cfe3802e4a601e3be7165bccf77c84b482722",
+  "evaluateVersion": "0.8.0\u002B8d784df185af8b81ebcece8c7029d8893699eb55",
   "godotVersion": "4.6-stable (official)",
   "safePrimitives": [
     "assert",
@@ -64,10 +64,12 @@
       "apis",
       "register",
       "returns",
+      "params",
       "assets",
       "scenes"
     ],
-    "returnsGrammar": "\u003Cname\u003E  |  \u003Cname\u003E: \u0027get set \u003Ctype\u003E\u0027  (read-only omits \u0027set\u0027)"
+    "returnsGrammar": "\u003Cname\u003E  |  \u003Cname\u003E: \u0027get set \u003Ctype\u003E\u0027  (read-only omits \u0027set\u0027)",
+    "paramsGrammar": "\u003Cname\u003E: \u003Ctype\u003E | \u003Cname\u003E: \u003Cdefault\u003E | \u003Cname\u003E: \u0027\u003Ctype\u003E = \u003Cdefault\u003E\u0027  (node scripts only; types: number/string/bool/list/table/any; no default = required; the scene supplies values via \u0060params = {..}\u0060 on the node)"
   },
   "std": [
     {

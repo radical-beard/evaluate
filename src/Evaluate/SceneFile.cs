@@ -13,6 +13,7 @@ public sealed class NodeSpec
     public string Type = "";
     public string? Script;
     public Dictionary<string, object> Props = new();
+    public Dictionary<string, object> Params = new();  // `params = {..}` -> the script's `params` global
     public Dictionary<string, object> Meta = new();   // `meta = {..}` -> node.set_meta
     public List<string> Groups = new();               // `groups = [..]` -> node.add_to_group
     public string? Instance;                          // `instance = "scene"` -> that scene's roots become children
@@ -71,8 +72,8 @@ public static class SceneFile
         return spec;
     }
 
-    // A node's name is its table key. `meta` (a table) and `groups` (an array) are
-    // reserved STRUCTURAL keys (so a node can't be named `meta`/`groups`); otherwise a
+    // A node's name is its table key. `meta` (a table), `params` (a table) and `groups`
+    // (an array) are reserved STRUCTURAL keys (so a node can't be named those); otherwise a
     // sub-table is ALWAYS a child node (even one keyed `type`/`script`); `type`/`script`
     // scalars are reserved; everything else is an engine property. Every node needs a
     // `type` (except a pure `instance=` node — not yet).
@@ -101,6 +102,17 @@ public static class SceneFile
                     foreach (var g in ga) node.Groups.Add(g?.ToString() ?? "");
                 else
                     throw new EvaluateException($"scene node '{name}': 'groups' must be an array of strings");
+                continue;
+            }
+            // `params = {..}` (or a `[nodes.X.params]` section) supplies per-instance values
+            // for the node's `*.node.evt` script. Validated against the script's declared
+            // `params:` at attach time (see Loader); here we just collect the raw values.
+            if (kv.Key == "params")
+            {
+                if (kv.Value is TomlTable pt)
+                    foreach (var pk in pt) node.Params[pk.Key] = Toml.FromToml(pk.Value);
+                else
+                    throw new EvaluateException($"scene node '{name}': 'params' must be a table of key = value");
                 continue;
             }
             if (kv.Key == "instance") { node.Instance = kv.Value?.ToString(); continue; }

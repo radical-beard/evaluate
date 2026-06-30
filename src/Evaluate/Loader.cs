@@ -35,6 +35,11 @@ public sealed class LoadedNode
     public Godot.GodotObject Node = null!;
     public readonly Dictionary<string, LuaValue> Hooks = new();
     public List<string> Configs = new();   // declared config TOMLs (a change to one fires on_load)
+    // Per-instance values the scene file supplied (`params = {..}`). Kept so a script
+    // reload re-validates and re-exposes the SAME params (the scene didn't change).
+    public IReadOnlyDictionary<string, object> Params = EmptyParams;
+
+    internal static readonly Dictionary<string, object> EmptyParams = new();
 }
 
 // The heart of Evaluate. Turns a script's frontmatter signature into a real,
@@ -335,7 +340,7 @@ public sealed class Loader
         void Attach(NodeSpec ns, Node node)
         {
             if (!string.IsNullOrEmpty(ns.Script))
-                nodes.Add(LoadNodeScript(ns.Script!, node, container));
+                nodes.Add(LoadNodeScript(ns.Script!, node, container, ns.Params));
             foreach (var c in ns.Connections) conns.Add((node, c));
         }
         foreach (var ns in spec.Nodes)
@@ -362,12 +367,13 @@ public sealed class Loader
         foreach (var child in node.GetChildren()) { child.Owner = owner; SetOwnerRecursive(child, owner); }
     }
 
-    // Load a `*.node.evt` bound to one live node: fresh sandbox with `self`, then
-    // collect its registered node hooks.
-    private LoadedNode LoadNodeScript(string path, GodotObject self, Node container)
+    // Load a `*.node.evt` bound to one live node: fresh sandbox with `self` + the scene's
+    // per-instance `params`, then collect its registered node hooks.
+    private LoadedNode LoadNodeScript(string path, GodotObject self, Node container,
+        IReadOnlyDictionary<string, object> sceneParams)
     {
-        var (env, _, fm) = Run(path, new LoadContext(container, self));
-        var ln = new LoadedNode { Path = path, Node = self, Configs = fm.Configs };
+        var (env, _, fm) = Run(path, new LoadContext(container, self, sceneParams));
+        var ln = new LoadedNode { Path = path, Node = self, Configs = fm.Configs, Params = sceneParams };
         foreach (var name in fm.Register)
         {
             if (!NodeHooks.Contains(name))
@@ -469,7 +475,7 @@ public sealed class Loader
             {
                 if (ln.Path != path) continue;
                 Fire(ln, "on_unload");   // old closures still valid: tear down BEFORE the body re-runs
-                var (env, _, fm) = Run(path, new LoadContext(container, ln.Node));
+                var (env, _, fm) = Run(path, new LoadContext(container, ln.Node, ln.Params));
                 ln.Hooks.Clear();
                 ln.Configs = fm.Configs;
                 foreach (var name in fm.Register)
@@ -517,8 +523,11 @@ public sealed class Loader
     // ---- sandbox + require ----------------------------------------------------
 
     // What a script's sandbox is wired to: the `world` container its spawned
-    // nodes parent to, and (for node scripts) the `self` node it drives.
-    private readonly record struct LoadContext(GodotObject? Container, GodotObject? Self);
+    // nodes parent to, (for node scripts) the `self` node it drives, and the
+    // per-instance `params` the scene supplied for that node (empty otherwise).
+    private readonly record struct LoadContext(
+        GodotObject? Container, GodotObject? Self,
+        IReadOnlyDictionary<string, object>? Params = null);
 
     private (LuaTable env, LuaValue ret, Frontmatter fm) Run(string path, LoadContext ctx)
     {
@@ -557,6 +566,18 @@ public sealed class Loader
         if (ctx.Self is not null) env["self"] = _godotBinder.WrapInstance(ctx.Self);
 
         env["config"] = BuildConfigView(fm.Configs);
+
+        // `params`: per-instance values the scene supplied for this node, resolved against
+        // the script's declared `params:` (defaults filled, types checked, undeclared/missing
+        // rejected). Only node scripts get it — systems aren't attached to a scene node, so
+        // they have no instance to be parameterized. A script that declares `params:` but is
+        // loaded as a system would never receive values, so that is rejected up front.
+        if (ctx.Self is not null)
+            env["params"] = BuildParamsView(path, fm.Params, ctx.Params);
+        else if (fm.Params.Count > 0)
+            throw new EvaluateException(
+                $"{path} declares 'params:' but is not a node script; params are per-node " +
+                "(declare them in a '*.node.evt' attached via a scene, not a system script)");
 
         foreach (var api in fm.Apis)
         {
@@ -950,6 +971,72 @@ public sealed class Loader
         view.Metatable = mt;
         return view;
     }
+
+    // Resolve a node's declared `params:` against the values its scene supplied, into the
+    // `params` table the body reads. The contract mirrors the sandbox's reject-undeclared
+    // stance: a scene value for an UNDECLARED param is an error; a supplied value must match
+    // its declared type; a declared param the scene omits falls back to its default, or — if
+    // it has none — is a hard error (it was required). Unlike `config`, this is built once at
+    // attach (and re-built on reload), not a live view: params are per-instance constants set
+    // where the node is declared, so the natural reload unit is the scene rebuild.
+    private static LuaTable BuildParamsView(string path, List<ParamSpec> declared,
+        IReadOnlyDictionary<string, object>? supplied)
+    {
+        supplied ??= LoadedNode.EmptyParams;
+
+        foreach (var key in supplied.Keys)
+            if (!declared.Exists(p => p.Name == key))
+                throw new EvaluateException(
+                    $"{path}: the scene supplies param '{key}', but the script declares no such " +
+                    "param (add it under 'params:' to accept it)");
+
+        var t = new LuaTable();
+        foreach (var p in declared)
+        {
+            if (supplied.TryGetValue(p.Name, out var v))
+            {
+                CheckParamType(path, p, v);
+                t[p.Name] = SceneBuilder.TomlToLua(v);
+            }
+            else if (p.HasDefault)
+                t[p.Name] = SceneBuilder.TomlToLua(p.Default!);
+            else
+                throw new EvaluateException(
+                    $"{path}: required param '{p.Name}' ({TypeLabel(p.Type)}) was not supplied by the scene");
+        }
+        return t;
+    }
+
+    // A scene-supplied param value must match the declared type. Values come from TOML, so
+    // they are bool / double / string / object[] / Dictionary<string,object>; `any` skips.
+    private static void CheckParamType(string path, ParamSpec p, object v)
+    {
+        bool ok = p.Type switch
+        {
+            "" => true,                                     // `any`: no constraint
+            "number" => v is double,
+            "string" => v is string,
+            "bool" => v is bool,
+            "list" => v is object[],
+            "table" => v is Dictionary<string, object>,
+            _ => true,
+        };
+        if (!ok)
+            throw new EvaluateException(
+                $"{path}: param '{p.Name}' expects {p.Type}, but the scene supplies {ActualType(v)}");
+    }
+
+    private static string TypeLabel(string type) => type.Length == 0 ? "any" : type;
+
+    private static string ActualType(object v) => v switch
+    {
+        bool => "bool",
+        double => "number",
+        string => "string",
+        object[] => "list",
+        Dictionary<string, object> => "table",
+        _ => v.GetType().Name,
+    };
 
     private static T Sync<T>(ValueTask<T> vt) =>
         vt.IsCompleted ? vt.Result : vt.AsTask().GetAwaiter().GetResult();

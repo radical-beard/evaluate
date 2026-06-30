@@ -94,7 +94,24 @@ must be both `register:`-ed and defined as `function <name>(...) end`.
   rewrite the name and break `scene.find` path lookup.
 - **Missing `type`:** every node needs `type = "SomeGodotClass"`.
 
-## 8. Spawning from a node script
+## 8. `params` mismatches between a node script and its scene
+
+`params` is a contract, like everything else in the signature — so the loader rejects:
+
+- **A scene param the script never declared.** `params = { hp = 9, bogis = 1 }` against a
+  `params:` block with no `bogis` errors (typo or undeclared). Declare it under `params:`, or
+  remove it from the scene.
+- **A required param the scene omits.** A `params:` entry given only a type (`speed: number`)
+  is **required**; if the scene supplies no `speed`, it errors. Give it a default
+  (`speed: number = 5`) or supply it in the scene.
+- **A wrong-typed value.** `max_health: number` but the scene passes `max_health = "lots"`
+  errors. Match the declared type (`number`/`string`/`bool`/`list`/`table`/`any`).
+
+Also: `params:` is **node scripts only** — declaring it on a system `.evt` (which has no node
+instance) errors. And `params.*` is *per-instance*; for values shared by every node use
+`config` (a TOML file) instead.
+
+## 9. Spawning from a node script
 
 A `*.node.evt` acts on `self`; it should not create the world around it. Create nodes from a
 **system** script (`world:add_child(...)` / `scene.add(...)`) or declare them in a `.scene`

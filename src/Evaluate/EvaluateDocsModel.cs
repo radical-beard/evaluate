@@ -28,6 +28,7 @@ public sealed class FrontmatterDocModel
 {
     public List<string> Keys { get; set; } = new();
     public string ReturnsGrammar { get; set; } = "";
+    public string ParamsGrammar { get; set; } = "";
 }
 
 public sealed class StdType

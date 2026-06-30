@@ -36,6 +36,7 @@ assets:
 | `apis` | list of capability names | Adds each to the sandbox. Valid: `input`, `world`, `scene`, `save`, `sql`. Anything not listed here is **absent**. (`godot`/`std` are ambient — no declaration needed.) |
 | `register` | list of hook names | Lifecycle hooks this script handles. Each name must have a matching global `function <name>(...)` in the body. See [lifecycle-hooks.md](lifecycle-hooks.md). |
 | `returns` | list of member specs | For a script loaded via `require` — the contract of the returned module. See below. |
+| `params` | map of name → spec | **Node scripts only.** Typed, per-instance values the `.scene` file supplies (`params = {..}`), read via the `params` global. See below. |
 | `scenes` | list of scene names | **System scripts only.** Restricts the script's hooks to those scenes. Omit ⇒ **global** (runs in every scene). |
 | `assets` | list of resource paths | Files to watch for hot-reload alongside the script. |
 
@@ -68,3 +69,48 @@ return M
 
 The access spec is `get`/`set` tokens plus a trailing type name (the type is documentation —
 there is no Lua type system; the contract is structural).
+
+## The `params` grammar
+
+`params:` (node scripts only) declares **per-instance** values supplied by the `.scene` file
+that attaches the script — the per-node analogue of `config` (which is shared across all
+nodes). It is a YAML **map** of `name → spec`. The scene supplies values with a `params = {..}`
+table on the node; the body reads the resolved set through the `params` global.
+
+Each spec is one of:
+
+- **`name: <default>`** — a bare scalar is the default; the type is inferred from it.
+  `max_health: 100` (number), `faction: "neutral"` (string), `can_fly: false` (bool). A
+  list/table value is a list/table default.
+- **`name: <type>`** — a type token alone makes the param **required**: the scene *must*
+  supply it. `patrol_speed: number`.
+- **`name: '<type> = <default>'`** — both. `aggro_range: number = 8`.
+
+Types: `number`, `string`, `bool`, `list`, `table`, `any` (`any` skips the type check).
+
+The contract is enforced when the node is built:
+
+- a scene value for a param the script **did not declare** is an error (you can't inject
+  values past the signature);
+- a value whose type **disagrees** with the declared type is an error;
+- a **required** param (no default) the scene **omits** is an error.
+
+```
+--- turret.node.evt
+params:
+  range: number = 12      # typed, default 12
+  team: "red"             # default "red"
+  target_tag: string      # REQUIRED — the scene must supply it
+register:
+ - on_attach
+---
+function on_attach()
+  print(params.team .. " turret, range " .. params.range .. ", targets " .. params.target_tag)
+end
+```
+```toml
+[nodes.Turret]
+type = "Node3D"
+script = "turret.node.evt"
+params = { target_tag = "enemy", range = 20 }   # team omitted -> "red"
+```

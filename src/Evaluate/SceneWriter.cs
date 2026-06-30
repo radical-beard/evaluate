@@ -74,6 +74,13 @@ public static class SceneWriter
             if (node.HasMeta(SceneBuilder.MetaInstance)) spec.Instance = node.GetMeta(SceneBuilder.MetaInstance).AsString();
             spec.Unique = node.UniqueNameInOwner;
 
+            if (node.HasMeta(SceneBuilder.MetaParams))
+                foreach (var kv in node.GetMeta(SceneBuilder.MetaParams).AsGodotDictionary())
+                {
+                    var val = ToToml(kv.Value);
+                    if (val is not null) spec.Params[kv.Key.AsString()] = val;
+                }
+
             foreach (StringName g in node.GetGroups())
             {
                 var name = g.ToString();
@@ -306,6 +313,7 @@ public static class SceneWriter
         foreach (var kv in n.Props) sb.Append(EmitKey(kv.Key)).Append(" = ").Append(EmitValue(kv.Value)).Append('\n');
         if (n.Groups.Count > 0)
             sb.Append("groups = [").Append(string.Join(", ", n.Groups.Select(Quote))).Append("]\n");
+        if (n.Params.Count > 0) sb.Append("params = ").Append(EmitInline(n.Params)).Append('\n');
         if (n.Meta.Count > 0) sb.Append("meta = ").Append(EmitInline(n.Meta)).Append('\n');
         if (n.Unique) sb.Append("unique = true\n");
         if (n.Connections.Count > 0)

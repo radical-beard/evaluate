@@ -107,7 +107,8 @@ function completionProvider(spec: () => EvtSpec): vscode.CompletionItemProvider 
         }
         return s.frontmatterKeys.filter((k) => !present.has(k)).map((k) => {
           const c = new vscode.CompletionItem(k, vscode.CompletionItemKind.Property);
-          c.insertText = new vscode.SnippetString(`${k}:\n - $0`);
+          // `params:` is a YAML map (name: spec); every other key is a `- item` list.
+          c.insertText = new vscode.SnippetString(k === "params" ? `${k}:\n  $0` : `${k}:\n - $0`);
           c.detail = "frontmatter key";
           return c;
         });
@@ -212,6 +213,10 @@ function hoverProvider(spec: () => EvtSpec): vscode.HoverProvider {
     apis: "Capability apis added to the sandbox. Only what you list here is reachable.",
     register: "Lifecycle hooks this script handles — each needs a matching global `function`.",
     returns: "The narrowed module contract for `require` consumers.",
+    params:
+      "Node scripts only: typed per-instance values the scene supplies via `params = {..}`, " +
+      "read through the `params` global. `name: <type>` (required) / `name: <default>` / " +
+      "`name: '<type> = <default>'`. Types: number/string/bool/list/table/any.",
     assets: "Files watched for hot-reload alongside the script.",
     scenes: "System scripts only: restrict hooks to these scenes (omit ⇒ global).",
   };

@@ -13,7 +13,7 @@ hot-reloaded by default.
 
 - **Frontmatter → signature.** The leading `---` block is split off and parsed
   as real YAML (YamlDotNet) into `config:`, `apis:`, `register:`, `returns:`,
-  `assets:`, `scenes:`; the Lua body is handed to the VM verbatim (line numbers
+  `params:`, `assets:`, `scenes:`; the Lua body is handed to the VM verbatim (line numbers
   preserved).
   The signature *is* the C#↔Lua boundary contract — `returns` declares typed,
   access-scoped members (no Lua type system). (`src/Evaluate/Frontmatter.cs`)
@@ -61,7 +61,15 @@ hot-reloaded by default.
     under a per-scene container that is **freed wholesale** on switch. The editor addon
     can round-trip all of this back to the `.scene` (see below).
   - **`*.node.evt`** is one node's behavior, attached via the scene file; its
-    hooks run with **`self`** bound to that node (no spawning in the script).
+    hooks run with **`self`** bound to that node (no spawning in the script). It may
+    declare a **`params:`** block — typed, per-instance values the scene supplies via
+    `params = { … }` on the node and the body reads through the ambient **`params`**
+    table. The per-node analogue of `config` (which is shared): `params:` entries are
+    `name: <default>` (type inferred), `name: <type>` (required), or
+    `name: "<type> = <default>"`; the loader fills defaults, type-checks each supplied
+    value, and rejects an undeclared or missing-required param — the same
+    signature-is-the-contract stance as the sandbox. Stashed as `__evt_params` so the
+    editor round-trips it.
   - **`*.evt`** systems are conductors: no `scenes:` ⇒ **global** (always run);
     `scenes: [a, b]` ⇒ active only while `a`/`b` is current. The `scene` API does
     routing — `scene.change(name)` (applied at the next frame boundary, never
@@ -157,7 +165,7 @@ custom dialect's `+=`.
     dev/        the demo / enforcement-test harness game (consumes the lib by project reference):
       project.godot  main.tscn  EvaluateHost.cs  Dev.csproj
       scripts/  global.scene  menu.scene  level1.scene
-                player.node.evt  showcase.evt  menu.evt  level1.evt  game.toml  player.toml
+                player.node.evt  enemy.node.evt (per-node params)  showcase.evt  menu.evt  level1.evt  game.toml  player.toml
       addons/evaluate_scene/  editor import plugin (.scene -> PackedScene preview)
       tests/    enforcement suite (.evt): forbidden_global / undeclared_api / missing_accessor /
                 system_a / system_b / readonly_module / metatable_oop / scene_a / scene_b /

@@ -3,7 +3,7 @@ name: evaluate-scripting
 description: >-
   Author and edit EvaLuate game scripts — sandboxed Lua (.evt / .node.evt) and
   TOML scene files that run inside Godot 4.6. Use whenever writing or modifying
-  EvaLuate scripts: declaring frontmatter (apis/config/register/returns/scenes),
+  EvaLuate scripts: declaring frontmatter (apis/config/register/returns/params/scenes),
   wiring lifecycle hooks (on_start/on_update/on_ready/…), calling the godot.*,
   std.*, save, scene, sql, input or world APIs, or building .scene node trees.
   Covers the capability sandbox rules that make scripts fail if you skip them.
@@ -28,6 +28,7 @@ always-available things. If you use something you didn't declare, the script err
 - Language primitives: `pairs ipairs next type tostring tonumber error assert select
   string math table setmetatable getmetatable rawget rawset rawequal rawlen print`.
 - `self` — in node scripts only (the node this script is attached to).
+- `params` — in node scripts only (typed, per-instance values the scene supplies; see below).
 
 **Must be declared** in frontmatter `apis:` before use:
 - `input`, `world`, `scene`, `save`, `sql`.
@@ -90,6 +91,34 @@ function on_update(dt)
     self.position = p                                   -- assign back to persist
   end
 end
+```
+
+#### Per-instance `params` (node scripts)
+`config.*` is shared by every node; **`params.*` is per-node**. The node script declares
+typed parameters in a `params:` block; the `.scene` file supplies values for each instance
+via `params = {..}` (next to `position`). The script reads them through the `params` global.
+A param with no default is **required** (the scene must supply it); the scene cannot pass a
+param the script didn't declare, nor a value of the wrong type — both error at load.
+
+```
+--- enemy.node.evt
+params:
+  max_health: 100         # default 100 (number) — scene may override
+  faction: "neutral"      # default "neutral"
+  patrol_speed: number    # typed + REQUIRED — the scene must supply it
+register:
+ - on_attach
+---
+function on_attach()
+  self:set_meta("hp", params.max_health)   -- 60 if the scene overrode it, else 100
+end
+```
+```toml
+[nodes.Enemy]
+type = "Node3D"
+script = "enemy.node.evt"
+position = [3, 0, 0]
+params = { patrol_speed = 2.5, max_health = 60 }   # faction omitted -> default "neutral"
 ```
 
 ### Scene file — `name.scene` (TOML)

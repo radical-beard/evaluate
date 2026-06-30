@@ -68,6 +68,7 @@ public static class SceneBuilder
     public const string MetaScript     = MetaPrefix + "script";       // -> `script = "..."`
     public const string MetaInstance   = MetaPrefix + "instance";     // -> `instance = "..."`
     public const string MetaPropKeys   = MetaPrefix + "propkeys";     // author's original prop keys
+    public const string MetaParams     = MetaPrefix + "params";       // -> `params = {...}` (node-script instance params)
     public const string MetaConnections = MetaPrefix + "connections"; // -> `connections = [{...}]`
     public const string MetaInstanced  = MetaPrefix + "instanced";    // a root pulled in by `instance=`
 
@@ -75,6 +76,12 @@ public static class SceneBuilder
     {
         if (!string.IsNullOrEmpty(spec.Script)) node.SetMeta(MetaScript, spec.Script);
         if (spec.Instance is { } inst) node.SetMeta(MetaInstance, inst);
+        if (spec.Params.Count > 0)
+        {
+            var d = new Godot.Collections.Dictionary();
+            foreach (var kv in spec.Params) d[kv.Key] = TomlToVariant(kv.Value);
+            node.SetMeta(MetaParams, d);                 // SceneWriter reverses this back to `params = {..}`
+        }
         if (spec.Props.Count > 0)
         {
             var keys = new string[spec.Props.Count];

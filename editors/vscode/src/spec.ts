@@ -40,7 +40,7 @@ const BUNDLED: Omit<EvtSpec, "source"> = {
     "on_attach", "on_load", "on_unload", "on_update", "on_physics_update",
     "on_input", "on_exit", "on_quit", "on_focus_in", "on_focus_out", "on_pause", "on_resume",
   ],
-  frontmatterKeys: ["config", "apis", "register", "returns", "assets", "scenes"],
+  frontmatterKeys: ["config", "apis", "register", "returns", "params", "assets", "scenes"],
   returnsGrammar: "<name>  |  <name>: 'get set <type>'  (read-only omits 'set')",
 };
 

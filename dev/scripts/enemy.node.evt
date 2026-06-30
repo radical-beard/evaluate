@@ -1,0 +1,21 @@
+---
+# Per-instance `params`: typed values the SCENE supplies for THIS node, read through the
+# `params` global (the per-node analogue of `config`, which is shared across all nodes).
+# A bare scalar is the default (type inferred); a type token alone makes it required; the
+# scene rejects any param not declared here, and any value of the wrong type.
+params:
+  max_health: 100          # default 100 (number) — level1.scene overrides to 60
+  faction: "neutral"       # default "neutral"    — level1.scene overrides to "goblin"
+  aggro_range: number = 8  # typed + default      — level1.scene omits it, so 8 is used
+register:
+ - on_attach
+---
+-- A NODE script: `self` IS this Enemy Node3D. Its config came from where it was declared
+-- (level1.scene), not a global TOML — so two Enemies could share this script with
+-- different stats. Stash onto the node so the rest of the game can read it back.
+function on_attach()
+  self:set_meta("hp", params.max_health)
+  self:set_meta("faction", params.faction)
+  print(string.format("enemy ready: hp=%.0f faction=%s aggro=%.0f",
+    params.max_health, params.faction, params.aggro_range))
+end

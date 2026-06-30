@@ -34,14 +34,15 @@ position = [0, 2, -4]      # any other key => an engine property on the node
 |-----|------|--------|
 | `type` | string | The Godot class to instantiate (**required**). |
 | `script` | string | Attach a `.node.evt` node script. |
+| `params` | table | `params = { k = v }` → per-instance values for the node script, read via its `params` global. Validated against the script's declared `params:` (types, defaults, required). |
 | `meta` | table | `meta = { k = v }` → `node.set_meta(k, v)` for each. |
 | `groups` | array | `groups = ["enemies"]` → `node.add_to_group(...)`. |
 | `unique` | bool | `unique = true` → unique name in owner (`%Name` lookups). |
 | `instance` | string | Instance another scene; its roots become children here. |
 | `connections` | array of tables | Declarative signal wiring: `{ signal = "...", to = "Path", method = "..." }` connects this node's signal to a built-in method on the node at `to`. (Lua handlers connect in code via `obj:connect(...)`.) |
 
-Because `meta`/`groups`/`instance`/`unique`/`connections` are reserved, a node can't be
-named one of them.
+Because `params`/`meta`/`groups`/`instance`/`unique`/`connections` are reserved, a node
+can't be named one of them.
 
 ## Inline resources & composite structs — `_type`
 

@@ -3,9 +3,17 @@
 [nodes.Level]
 type = "Node3D"
 
+# The Enemy carries a `*.node.evt` behavior script AND per-instance `params`. The
+# script (enemy.node.evt) declares those params with types + defaults; here the scene
+# overrides two of them and lets `aggro_range` fall back to the script's default. This
+# is the per-node config feature: values authored at the declaration site, ingested by
+# the node's script through its `params` global — distinct from the engine `position`
+# property right next to them.
 [nodes.Level.Enemy]
 type = "Node3D"
+script = "enemy.node.evt"
 position = [3, 0, 0]
+params = { max_health = 60, faction = "goblin" }
 
 [nodes.Level.Enemy.Weapon]
 type = "Node3D"

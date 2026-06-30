@@ -90,8 +90,11 @@ public static class EvaluateDocs
         // The authoring grammar (the one inherently-static part: it is syntax, not API
         // surface). The *values* these keys accept are the dynamic surface above:
         // `apis:` <- Apis, `register:` <- Hooks, `returns:` <- the get/set grammar.
-        Keys = new() { "config", "apis", "register", "returns", "assets", "scenes" },
+        Keys = new() { "config", "apis", "register", "returns", "params", "assets", "scenes" },
         ReturnsGrammar = "<name>  |  <name>: 'get set <type>'  (read-only omits 'set')",
+        ParamsGrammar = "<name>: <type> | <name>: <default> | <name>: '<type> = <default>'  " +
+                        "(node scripts only; types: number/string/bool/list/table/any; no default = required; " +
+                        "the scene supplies values via `params = {..}` on the node)",
     };
 
     // ---- std (Evaluate-authored [LuaObject] types) ----------------------------

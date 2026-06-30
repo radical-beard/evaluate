@@ -21,16 +21,35 @@ public sealed class ReturnSpec
     }
 }
 
+// One declared instance parameter of a node script, e.g. `max_health: number = 100`.
+// The scene file that attaches the script supplies a value per node; the script body
+// reads the resolved set through the `params` global. Each param has a type (used to
+// reject ill-typed scene values) and, optionally, a default (so the scene may omit it);
+// a param with no default is REQUIRED — the scene must supply it. Type `""` means "any"
+// (no type check). The default/values use Evaluate's plain object model
+// (double / string / bool / object[] / Dictionary), the same model TOML produces.
+public sealed class ParamSpec
+{
+    public string Name = "";
+    public string Type = "";        // number | string | bool | list | table | "" (any)
+    public bool HasDefault;
+    public object? Default;
+
+    public bool Required => !HasDefault;
+}
+
 // A script's `---` YAML signature plus the Lua body that follows it. The body is
 // split off and handed to Lua-CSharp verbatim; the signature is parsed as real
-// YAML. (The `returns` access spec — "get set vec3" — is a small grammar parsed
-// from the YAML scalar value, not part of YAML itself.)
+// YAML. (The `returns` access spec — "get set vec3" — and the `params` spec —
+// "number = 100" — are small grammars parsed from the YAML scalar value, not part
+// of YAML itself.)
 public sealed class Frontmatter
 {
     public List<string> Configs = new();
     public List<string> Apis = new();
     public List<string> Register = new();
     public List<ReturnSpec> Returns = new();
+    public List<ParamSpec> Params = new();
     public List<string> Assets = new();
     // Scenes this system participates in. Empty = global (runs in every scene).
     // Only meaningful for system `.evt` scripts; node scripts get their scene
@@ -73,8 +92,106 @@ public sealed class Frontmatter
             foreach (var item in items)
                 fm.Returns.Add(ParseReturn(item));
 
+        // `params:` is a YAML MAP (name -> spec), not a list: order is irrelevant and
+        // names are unique, so a map reads better than a list of single-key maps.
+        if (root.TryGetValue("params", out var p) && p is IDictionary<object, object> pmap)
+            foreach (var kv in pmap)
+                fm.Params.Add(ParseParam(kv.Key?.ToString() ?? "", kv.Value));
+
         return fm;
     }
+
+    // The param type tokens the grammar recognizes. Anything else in type position is
+    // an error (caught here, at parse time, not deep inside a hook).
+    private static readonly HashSet<string> TypeTokens =
+        new() { "number", "string", "bool", "list", "table", "any" };
+
+    // Parse one `name: <spec>` entry. The YAML value is either a scalar string carrying
+    // the `<type> [= default]` grammar (`number`, `100`, `number = 5`, `"neutral"`), or a
+    // YAML sequence/mapping that is itself a list/table default.
+    private static ParamSpec ParseParam(string name, object? value) => value switch
+    {
+        // YamlDotNet's untyped deserializer gives strings for scalars and
+        // List/Dictionary for sequences/mappings (so a number reads as the string "100").
+        string s => ParseParamSpec(name, s),
+        IDictionary<object, object> map => new ParamSpec
+            { Name = name, Type = "table", HasDefault = true, Default = DefaultFromYaml(map) },
+        IEnumerable<object> seq => new ParamSpec
+            { Name = name, Type = "list", HasDefault = true, Default = DefaultFromYaml(seq) },
+        // `name:` with an empty value -> an untyped, required param.
+        null => new ParamSpec { Name = name },
+        _ => new ParamSpec { Name = name, HasDefault = true, Default = value.ToString() },
+    };
+
+    // The `<type> [= default]` grammar on a scalar string:
+    //   "number"          -> typed, REQUIRED (no default)
+    //   "number = 100"    -> typed, default 100
+    //   "= 100" / "100"   -> default 100, type inferred (number)
+    //   "neutral"         -> default "neutral" (a bare word is a string literal default)
+    private static ParamSpec ParseParamSpec(string name, string raw)
+    {
+        var spec = new ParamSpec { Name = name };
+        int eq = raw.IndexOf('=');
+        if (eq >= 0)
+        {
+            var typePart = raw[..eq].Trim();
+            spec.Default = ParseLiteral(raw[(eq + 1)..].Trim());
+            spec.HasDefault = true;
+            spec.Type = typePart.Length == 0 ? InferType(spec.Default) : RequireType(name, typePart);
+            return spec;
+        }
+
+        var token = raw.Trim();
+        if (TypeTokens.Contains(token)) { spec.Type = NormalizeType(token); return spec; }   // typed, required
+
+        spec.Default = ParseLiteral(token);     // a bare scalar is a default; type inferred
+        spec.HasDefault = true;
+        spec.Type = InferType(spec.Default);
+        return spec;
+    }
+
+    private static string RequireType(string name, string token)
+    {
+        if (!TypeTokens.Contains(token))
+            throw new EvaluateException(
+                $"param '{name}': unknown type '{token}' (valid: {string.Join(", ", TypeTokens)})");
+        return NormalizeType(token);
+    }
+
+    private static string NormalizeType(string token) => token == "any" ? "" : token;
+
+    // A scalar literal default: bool / number / "quoted" string / bare string.
+    private static object ParseLiteral(string s)
+    {
+        if (s.Length >= 2 && s[0] == '"' && s[^1] == '"') return s[1..^1];   // quoted -> verbatim string
+        if (s == "true") return true;
+        if (s == "false") return false;
+        if (double.TryParse(s, System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out var d)) return d;
+        return s;
+    }
+
+    // A YAML default value (sequence/mapping) -> Evaluate's plain object model, coercing
+    // each scalar through ParseLiteral so a numeric/bool list default isn't left as strings.
+    private static object DefaultFromYaml(object? v) => v switch
+    {
+        string s => ParseLiteral(s),
+        IDictionary<object, object> map => map.ToDictionary(
+            kv => kv.Key?.ToString() ?? "", kv => DefaultFromYaml(kv.Value)),
+        IEnumerable<object> seq => seq.Select(DefaultFromYaml).ToArray(),
+        null => "",
+        _ => v.ToString() ?? "",
+    };
+
+    private static string InferType(object? def) => def switch
+    {
+        bool => "bool",
+        double => "number",
+        string => "string",
+        object[] => "list",
+        IDictionary<string, object> => "table",
+        _ => "",
+    };
 
     private static List<string> StringList(Dictionary<string, object> root, string key)
     {
