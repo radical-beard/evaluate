@@ -27,21 +27,43 @@ that run inside Godot. The Neovim counterpart of `editors/vscode`.
 
 ## Install
 
-With [lazy.nvim](https://github.com/folke/lazy.nvim), pointing at this subdirectory:
+The plugin lives in the **`editors/nvim/` subfolder** of the repo, which most plugin managers
+don't expose as a runtimepath by default — so add that subfolder to `runtimepath` yourself.
+
+With [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 {
   "radical-beard/evaluate",
-  -- the plugin lives in a subfolder of the repo:
-  config = function() require("evaluate").setup() end,
-  -- lazy.nvim: set `rtp = "editors/nvim"` (or vendor editors/nvim as its own plugin).
+  branch = "main",
+  lazy = false, -- a filetype plugin: register `.evt` detection at startup
+  dependencies = { "hrsh7th/cmp-omni" }, -- optional: frontmatter completion in nvim-cmp
+  config = function()
+    -- lazy clones the repo to <lazy-root>/evaluate; the plugin is under editors/nvim.
+    vim.opt.rtp:append(vim.fn.stdpath("data") .. "/lazy/evaluate/editors/nvim")
+    vim.filetype.add({ extension = { evt = "evt" } })
+    require("evaluate").setup()
+
+    -- optional: surface frontmatter completion (omnifunc) in nvim-cmp for `.evt`
+    local ok, cmp = pcall(require, "cmp")
+    if ok then
+      cmp.setup.filetype("evt", {
+        sources = cmp.config.sources({
+          { name = "omni" },      -- frontmatter keys/apis/hooks
+          { name = "nvim_lsp" },  -- Lua body (the attached lua-language-server)
+          { name = "path" },
+        }),
+      })
+    end
+  end,
 }
 ```
 
-Or drop `editors/nvim/` onto your `runtimepath` any way you like (packer, `:packadd`, a manual
-`set rtp+=…`). No `setup()` call is required for filetype detection, highlighting, or
-frontmatter IntelliSense — those activate from the runtimepath alone. `setup()` is only needed
-to change defaults (e.g. turn the body LSP off, or point at a specific spec/server).
+Without nvim-cmp, frontmatter completion is still available via built-in omni-completion
+(`<C-x><C-o>`), and body completion/hover/diagnostics come from the attached
+`lua-language-server`. `setup()` only adjusts defaults (turn the body LSP off, point at a
+specific spec/server); filetype detection, highlighting and frontmatter IntelliSense need only
+the `editors/nvim/` dir on `runtimepath`.
 
 ## Configuration
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.0
+
+- **Versioning realigned to the library (lockstep).** The extension now shares the library's
+  version — the single source of truth is `<Version>` in `Directory.Build.props`, stamped into
+  `package.json` at publish time — so a single `v<version>` tag releases both. No functional
+  change from 0.1.2 (the jump to 0.9.0 is just the alignment).
+
 ## 0.1.2
 
 - Frontmatter IntelliSense now knows the `require:` key: completion offers it, hover documents

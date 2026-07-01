@@ -69,11 +69,21 @@ function M.attach(bufnr, config)
     or (name ~= "" and vim.fs.dirname(name))
     or vim.uv.cwd()
 
+  -- Advertise the completion capabilities a completion engine expects. Prefer an
+  -- explicit override, else cmp_nvim_lsp's (so nvim-cmp gets rich body completion),
+  -- else the protocol defaults.
+  local capabilities = config and config.lua_ls and config.lua_ls.capabilities
+  if not capabilities then
+    local ok, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+    capabilities = ok and cmp_lsp.default_capabilities() or vim.lsp.protocol.make_client_capabilities()
+  end
+
   vim.b[bufnr].evaluate_lua_attached = true
   vim.lsp.start({
     name = "evaluate_lua",
     cmd = cmd,
     root_dir = root,
+    capabilities = capabilities,
     settings = lua_settings(libdirs),
     on_init = function(client)
       local rpc = client.rpc

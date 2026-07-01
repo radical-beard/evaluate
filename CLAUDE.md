@@ -57,6 +57,14 @@ If you are unsure whether a change touches the contract, assume it does and chec
 The `--emit-api` emitter reads these live (engine ClassDB + reflection + the tables the loader
 builds), so regenerating is what keeps the spec exact — don't hand-write API surface.
 
+## Versioning
+
+`<Version>` in `Directory.Build.props` is the **single version for the whole repo** — library,
+addon, downloads, AND the VS Code extension (kept in lockstep; the publish workflow stamps
+`editors/vscode/package.json` from it). Bump it in ONE place; do not hand-bump package.json.
+A single `v<version>` tag (e.g. `v0.9.0`) releases everything. The Neovim plugin (`editors/nvim`)
+is unversioned (consumers pin a branch/commit).
+
 ## Conventions
 
 - The signature **is** the contract: the sandbox exposes only what frontmatter declares.

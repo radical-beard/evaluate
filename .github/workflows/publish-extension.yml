@@ -1,9 +1,13 @@
 name: Publish VS Code extension
 
 # Releases the editors/vscode extension to the Open VSX registry (open-vsx.org) — the one
-# used by VSCodium, Cursor, Windsurf, Gitpod and Theia. Versioned independently from the
-# library (which uses `v*` tags): tag the extension `vscode-v<version>` matching
-# editors/vscode/package.json, e.g. `vscode-v0.1.0`.
+# used by VSCodium, Cursor, Windsurf, Gitpod and Theia. The extension version is kept in
+# LOCKSTEP with the library: the single source of truth is <Version> in Directory.Build.props,
+# and this workflow stamps package.json from it before packaging. So one `v<version>` tag
+# releases everything (NuGet, addon, downloads AND the extension) at the same version —
+# there is no separate extension version to bump.
+#
+# (workflow_dispatch stays as a manual escape hatch — it publishes the current props version.)
 #
 # Required repository secret:
 #   OVSX_PAT  - an open-vsx.org access token (no credit card; created via GitHub/Eclipse login)
@@ -15,7 +19,9 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - vscode-v*
+      # Same library-release tag as the other workflows (e.g. v0.9.0). The leading-digit
+      # class keeps it from matching a stray `vscode-v*` tag.
+      - 'v[0-9]*'
 
 permissions:
   contents: read
@@ -38,14 +44,22 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Verify version matches tag
+      - name: Stamp version from Directory.Build.props (single source of truth)
+        run: |
+          set -euo pipefail
+          version="$(grep -oP '<Version>\K[^<]+' ../../Directory.Build.props)"
+          if [ -z "$version" ]; then echo "Could not read <Version> from Directory.Build.props" >&2; exit 1; fi
+          echo "Extension version = $version (from Directory.Build.props)"
+          npm version "$version" --no-git-tag-version --allow-same-version
+          echo "EXT_VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Verify tag matches version
         if: github.ref_type == 'tag'
         run: |
           set -euo pipefail
-          version="$(node -p "require('./package.json').version")"
-          expected="vscode-v${version}"
+          expected="v${EXT_VERSION}"
           if [ "${GITHUB_REF_NAME}" != "$expected" ]; then
-            echo "Tag ${GITHUB_REF_NAME} does not match package version ($expected)" >&2
+            echo "Tag ${GITHUB_REF_NAME} does not match Directory.Build.props version ($expected)" >&2
             exit 1
           fi
 

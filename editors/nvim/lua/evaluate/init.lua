@@ -17,6 +17,8 @@ M.config = {
     enable = true, -- attach lua-language-server to the Lua body (needs the binary on PATH)
     cmd = { "lua-language-server" },
     library = nil, -- extra LuaCATS/library dirs, in addition to the generated one
+    -- LSP capabilities. nil => cmp_nvim_lsp's if present, else the protocol defaults.
+    capabilities = nil,
   },
 }
 
