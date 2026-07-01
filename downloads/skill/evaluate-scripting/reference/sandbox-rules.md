@@ -7,7 +7,7 @@ Each script body runs in a fresh environment that holds **only**:
 3. `self` (node scripts only),
 4. `config` built from the declared `config:` files,
 5. each capability listed in `apis:`,
-6. `require`.
+6. `require`, plus any locals bound by `require:` frontmatter.
 
 Nothing else. The standard Lua `os`/`io` libraries exist on the shared VM but are **never
 copied in**, so a script cannot reach them. `pcall` is withheld on purpose — errors should
@@ -53,3 +53,11 @@ Use one without declaring it and the lookup yields `nil` → a runtime error (se
 
 This is the C# ↔ Lua and module ↔ module boundary: callers can reach exactly the declared
 surface, nothing more.
+
+You can also declare the dependency in frontmatter with `require:` (see
+[frontmatter-contract.md](frontmatter-contract.md)) — `require: { base: "lib/base.evt" }`
+binds `base` as a sandbox local with no `local base = require(...)` line. It resolves the
+same narrowed handle. Two guarantees the frontmatter form makes explicit: a **require cycle**
+(direct or transitive, including self-require) is rejected with a clear error rather than
+overflowing the stack, and editing a required module **hot-reloads every consumer** that
+requires it (transitively).

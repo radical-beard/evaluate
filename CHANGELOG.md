@@ -7,6 +7,27 @@ the version is `0.x`, minor bumps may include breaking changes.
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-07-01
+
+### Added
+- **Frontmatter `require:` — declare a script's module dependencies in its signature.**
+  A `require:` block binds each module to a sandbox local (`require: { base: "lib/base.evt" }`
+  makes `base` usable with no `local base = require(...)` line in the body). Accepts a list of
+  single-key maps or a `params:`-style map. Each binding resolves the same returns-narrowed
+  handle inline `require(path)` would, and a binding may not shadow a reserved/declared sandbox
+  name. (`src/Evaluate/Frontmatter.cs`, `src/Evaluate/Loader.cs`)
+- **Require cycle detection.** A cycle (A→B→A, transitive, or self-require) is now rejected
+  with the offending chain instead of overflowing the stack — for both frontmatter and inline
+  `require`.
+- **Two-way dependency hot reload.** Editing a required module now reloads every consumer that
+  requires it, transitively: systems re-run their bodies and live node scripts refresh, each
+  rebinding the fresh module. Previously a dependency change only invalidated the module's own
+  cache.
+- **Neovim plugin (`editors/nvim/`).** Parity with the VS Code extension: `evt` filetype +
+  embedded YAML/Lua highlighting, frontmatter IntelliSense (completion, diagnostics, hover) from
+  the generated spec, and Lua-body IntelliSense via `lua-language-server` (frontmatter blanked
+  with identity line-mapping, LuaCATS library loaded).
+
 ## [0.8.0] — 2026-06-30
 
 ### Added

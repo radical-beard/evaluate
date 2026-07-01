@@ -217,6 +217,11 @@ function hoverProvider(spec: () => EvtSpec): vscode.HoverProvider {
       "Node scripts only: typed per-instance values the scene supplies via `params = {..}`, " +
       "read through the `params` global. `name: <type>` (required) / `name: <default>` / " +
       "`name: '<type> = <default>'`. Types: number/string/bool/list/table/any.",
+    require:
+      "Bind modules to sandbox locals up front — `name: \"path/to/module.evt\"` — so the " +
+      "body uses `name` with no `local name = require(...)` line. Each binds the same " +
+      "returns-narrowed handle `require(path)` would. Accepts a list of `- name: \"path\"` " +
+      "or a `params:`-style map.",
     assets: "Files watched for hot-reload alongside the script.",
     scenes: "System scripts only: restrict hooks to these scenes (omit ⇒ global).",
   };

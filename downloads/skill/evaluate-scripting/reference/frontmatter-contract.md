@@ -37,6 +37,7 @@ assets:
 | `register` | list of hook names | Lifecycle hooks this script handles. Each name must have a matching global `function <name>(...)` in the body. See [lifecycle-hooks.md](lifecycle-hooks.md). |
 | `returns` | list of member specs | For a script loaded via `require` — the contract of the returned module. See below. |
 | `params` | map of name → spec | **Node scripts only.** Typed, per-instance values the `.scene` file supplies (`params = {..}`), read via the `params` global. See below. |
+| `require` | name → module path | Binds modules to sandbox locals up front, so the body uses them with no `local x = require(...)` line. See below. |
 | `scenes` | list of scene names | **System scripts only.** Restricts the script's hooks to those scenes. Omit ⇒ **global** (runs in every scene). |
 | `assets` | list of resource paths | Files to watch for hot-reload alongside the script. |
 
@@ -69,6 +70,45 @@ return M
 
 The access spec is `get`/`set` tokens plus a trailing type name (the type is documentation —
 there is no Lua type system; the contract is structural).
+
+## The `require` grammar
+
+`require:` binds other modules to **sandbox locals**, so shared code is declared in the
+signature instead of restated as `local x = require("…")` boilerplate atop the body. Each
+binding resolves through the same custom `require` the body could call — the path is loaded,
+run once (cached), and **narrowed to its `returns` contract** — so a `require:` binding is
+exactly what `require(path)` would return, just bound to a name up front. Paths resolve
+relative to the scripts root (the same string you'd pass to `require`).
+
+Two equivalent forms — a list of single-key maps, or a map (like `params:`):
+
+```
+---
+require:
+ - base: "lib/control/controllable.evt"     # list form
+ - locomotion: "player/locomotion.evt"
+---
+```
+```
+---
+require:
+  base: "lib/control/controllable.evt"       # map form — identical result
+  locomotion: "player/locomotion.evt"
+---
+-- `base` and `locomotion` are ready to use; no `local base = require(...)` needed.
+function on_ready() base.init(self); locomotion.walk(self, 2) end
+```
+
+Rules:
+
+- A binding name may **not** shadow a reserved/declared sandbox name (`std`, `godot`,
+  `config`, `params`, `self`, a declared `api`, a language global, or another binding) — a
+  collision is an error at load time.
+- A **require cycle** (A requires B requires A, directly or transitively — including a script
+  requiring itself) is rejected with a clear error, not a stack overflow.
+- Editing a required module **hot-reloads every consumer** that requires it (transitively):
+  systems re-run their bodies and live node scripts refresh, rebinding the fresh module.
+- Inline `require("path")` still works; `require:` is just the declared-up-front form.
 
 ## The `params` grammar
 

@@ -3,6 +3,8 @@ config:
  - game.toml
 apis:
  - save
+require:
+ - mathx: "lib/mathx.evt"
 register:
  - on_start
  - on_update
@@ -27,6 +29,11 @@ function on_start()
   timer:connect("timeout", function() print("timer 'timeout' -> lua callback fired") end)
   timer:emit_signal("timeout")
   timer:free()
+
+  -- `mathx` was bound by the frontmatter `require:` above — no `local mathx =
+  -- require(...)` line — and is the narrowed handle of lib/mathx.evt.
+  print(string.format("mathx (frontmatter require): clamp(12,0,10)=%d lerp(0,10,0.5)=%d",
+    mathx.clamp(12, 0, 10), mathx.lerp(0, 10, 0.5)))
 
   -- Vector3 marshalling: std.vec3 <-> Godot Vector3 across the boundary.
   local node = godot.Node3D.new()

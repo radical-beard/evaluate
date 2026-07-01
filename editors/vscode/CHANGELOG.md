@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2
+
+- Frontmatter IntelliSense now knows the `require:` key: completion offers it, hover documents
+  the `name: "path.evt"` binding grammar (list or map form), and the bundled key fallback
+  includes it — matching the runtime's frontmatter `require:` feature (bind modules to sandbox
+  locals up front, cycle-guarded, with two-way hot reload).
+
 ## 0.1.1
 
 - Frontmatter IntelliSense now knows the node-script `params:` key: completion offers it

@@ -1,0 +1,14 @@
+---
+require:
+ - dep: "require_dep.evt"
+returns:
+ - result
+ - narrowed
+---
+-- Positive control: `dep` is bound by the frontmatter `require:` above — no
+-- `local dep = require(...)` line in the body — and it is the returns-narrowed
+-- handle of require_dep.evt.
+local M = {}
+M.result = dep.greet("world")     -- "hello world": the binding is callable
+M.narrowed = (dep.secret == nil)  -- true: narrowing hid the dependency's private field
+return M

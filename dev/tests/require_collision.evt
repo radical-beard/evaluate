@@ -1,0 +1,8 @@
+---
+require:
+ - std: "require_dep.evt"
+---
+-- Negative control: a require binding may not shadow a reserved/declared sandbox
+-- name (here `std`). The loader must reject this at build time, not let the binding
+-- silently clobber the standard library.
+return {}

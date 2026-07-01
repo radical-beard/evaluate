@@ -108,6 +108,7 @@ internal static class LuaCats
         sb.Append("-- frontmatter keys: " + string.Join(", ", spec.Frontmatter.Keys) + "\n");
         sb.Append("-- returns grammar: " + spec.Frontmatter.ReturnsGrammar + "\n");
         sb.Append("-- params grammar:  " + spec.Frontmatter.ParamsGrammar + "\n");
+        sb.Append("-- require grammar: " + spec.Frontmatter.RequireGrammar + "\n");
         return sb.ToString();
     }
 
@@ -207,6 +208,7 @@ internal static class Markdown
         sb.Append("`" + string.Join("`, `", spec.Frontmatter.Keys) + "`\n\n");
         sb.Append($"`returns:` grammar — `{spec.Frontmatter.ReturnsGrammar}`\n\n");
         sb.Append($"`params:` grammar — `{spec.Frontmatter.ParamsGrammar}`\n\n");
+        sb.Append($"`require:` grammar — `{spec.Frontmatter.RequireGrammar}`\n\n");
 
         sb.Append("## Variant structs (named-field / positional tables)\n\n");
         sb.Append("Read as tables; assigned back type-aware. All-scalar structs use a positional array; ");

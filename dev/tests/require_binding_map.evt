@@ -1,0 +1,12 @@
+---
+require:
+  dep: "require_dep.evt"
+returns:
+ - result
+---
+-- Same as require_binding.evt but using the `params:`-style MAP form of `require:`
+-- (names are unique and order is irrelevant, so a map reads well too). Both the map
+-- and the list-of-single-key-maps forms must resolve identically.
+local M = {}
+M.result = dep.greet("map")   -- "hello map"
+return M

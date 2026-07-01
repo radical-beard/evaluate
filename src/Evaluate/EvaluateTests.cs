@@ -1005,6 +1005,113 @@ public static class EvaluateTests
             Check("a system script declaring params is rejected", Throws(() => loader.LoadSystem("sys.evt")));
         }
 
+        // 60: frontmatter `require:` (list form) binds a module to a sandbox local, so the
+        // body uses it with no `local x = require(...)` line, and the binding is the
+        // returns-narrowed handle (the dependency's private field is not reachable).
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var handle = NewLoader().Require("require_binding.evt").Read<LuaTable>();
+                var result = handle["result"].Type == LuaValueType.String ? handle["result"].Read<string>() : "";
+                var narrowed = handle["narrowed"].Type == LuaValueType.Boolean && handle["narrowed"].Read<bool>();
+                ok = result == "hello world" && narrowed;
+                detail = $"result=\"{result}\", narrowed={narrowed}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("frontmatter require: binds a module to a sandbox local (narrowed)", ok, detail);
+        }
+
+        // 61: the `params:`-style MAP form of `require:` resolves identically to the list form.
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var handle = NewLoader().Require("require_binding_map.evt").Read<LuaTable>();
+                var result = handle["result"].Type == LuaValueType.String ? handle["result"].Read<string>() : "";
+                ok = result == "hello map";
+                detail = $"result=\"{result}\"";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("frontmatter require: accepts the map form too", ok, detail);
+        }
+
+        // 62: a require binding may not shadow a reserved/declared sandbox name (here `std`).
+        Check("a require binding colliding with a reserved name is rejected",
+            Throws(() => { NewLoader().Require("require_collision.evt"); }));
+
+        // 63: a require cycle (a -> b -> a) is rejected with a clear error, not a stack overflow.
+        {
+            var src = new Dictionary<string, string>
+            {
+                ["cyc_a.evt"] = "---\nrequire:\n - b: \"cyc_b.evt\"\n---\nreturn {}\n",
+                ["cyc_b.evt"] = "---\nrequire:\n - a: \"cyc_a.evt\"\n---\nreturn {}\n",
+            };
+            var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+            Check("a require cycle is rejected, not stack-overflowed",
+                Throws(() => loader.Require("cyc_a.evt")));
+        }
+
+        // 64: a self-require (a script requiring itself) is rejected as a cycle.
+        {
+            var src = new Dictionary<string, string>
+            {
+                ["selfreq.evt"] = "---\nrequire:\n - me: \"selfreq.evt\"\n---\nreturn {}\n",
+            };
+            var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+            Check("a self-require is rejected as a cycle", Throws(() => loader.Require("selfreq.evt")));
+        }
+
+        // 65: changing a REQUIRED module reloads its consumer (two-way dependency reload).
+        // The system captured the module's v1 value; editing only the module must refresh
+        // the system's live hook so a subsequent call sees v2.
+        {
+            var sink = new List<string>();
+            var src = new Dictionary<string, string>
+            {
+                ["dep_lib.evt"] = "---\nreturns:\n - msg\n---\nreturn { msg = \"v1\" }\n",
+                ["dep_sys.evt"] = "---\nrequire:\n - lib: \"dep_lib.evt\"\nregister:\n - on_start\n---\n"
+                                + "function on_start() print(lib.msg) end\n",
+            };
+            var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", sink.Add);
+            var sys = loader.LoadSystem("dep_sys.evt");
+            loader.Call(sys.OnStart);
+            var v1 = sink.Contains("v1");
+
+            src["dep_lib.evt"] = "---\nreturns:\n - msg\n---\nreturn { msg = \"v2\" }\n";
+            loader.ReloadOnChange("dep_lib.evt");   // dependency change must cascade to the consumer
+            loader.Call(sys.OnStart);               // same system instance, binding refreshed to v2
+            var v2 = sink.Contains("v2");
+
+            Check("changing a required module reloads its consumer", v1 && v2, $"v1={v1}, v2={v2}");
+        }
+
+        // 66: the cascade is transitive — module -> module -> system. Editing the leaf
+        // module must rebuild the middle module AND refresh the system that requires it.
+        {
+            var sink = new List<string>();
+            var src = new Dictionary<string, string>
+            {
+                ["leaf.evt"] = "---\nreturns:\n - v\n---\nreturn { v = \"a\" }\n",
+                ["mid.evt"] = "---\nrequire:\n - leaf: \"leaf.evt\"\nreturns:\n - v\n---\n"
+                            + "return { v = leaf.v .. \"-mid\" }\n",
+                ["top.evt"] = "---\nrequire:\n - mid: \"mid.evt\"\nregister:\n - on_start\n---\n"
+                            + "function on_start() print(mid.v) end\n",
+            };
+            var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", sink.Add);
+            var sys = loader.LoadSystem("top.evt");
+            loader.Call(sys.OnStart);
+            var before = sink.Contains("a-mid");
+
+            src["leaf.evt"] = "---\nreturns:\n - v\n---\nreturn { v = \"b\" }\n";
+            loader.ReloadOnChange("leaf.evt");      // must transit leaf -> mid -> top
+            loader.Call(sys.OnStart);
+            var after = sink.Contains("b-mid");
+
+            Check("a require change cascades transitively (leaf -> mid -> system)",
+                before && after, $"before={before}, after={after}");
+        }
+
         log($"[tests] {passed} passed, {failed} failed");
         return failed;
     }

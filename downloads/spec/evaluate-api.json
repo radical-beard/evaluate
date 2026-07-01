@@ -1,5 +1,5 @@
 {
-  "evaluateVersion": "0.8.0\u002B8d784df185af8b81ebcece8c7029d8893699eb55",
+  "evaluateVersion": "0.9.0\u002B8a6f68d8ed953a79da288257acdbc797d78ee4a4",
   "godotVersion": "4.6-stable (official)",
   "safePrimitives": [
     "assert",
@@ -65,11 +65,13 @@
       "register",
       "returns",
       "params",
+      "require",
       "assets",
       "scenes"
     ],
     "returnsGrammar": "\u003Cname\u003E  |  \u003Cname\u003E: \u0027get set \u003Ctype\u003E\u0027  (read-only omits \u0027set\u0027)",
-    "paramsGrammar": "\u003Cname\u003E: \u003Ctype\u003E | \u003Cname\u003E: \u003Cdefault\u003E | \u003Cname\u003E: \u0027\u003Ctype\u003E = \u003Cdefault\u003E\u0027  (node scripts only; types: number/string/bool/list/table/any; no default = required; the scene supplies values via \u0060params = {..}\u0060 on the node)"
+    "paramsGrammar": "\u003Cname\u003E: \u003Ctype\u003E | \u003Cname\u003E: \u003Cdefault\u003E | \u003Cname\u003E: \u0027\u003Ctype\u003E = \u003Cdefault\u003E\u0027  (node scripts only; types: number/string/bool/list/table/any; no default = required; the scene supplies values via \u0060params = {..}\u0060 on the node)",
+    "requireGrammar": "\u003Cname\u003E: \u0022\u003Cpath.evt\u003E\u0022  (a list of single-key maps or a map; each binds the returns-narrowed module at \u003Cpath\u003E \u2014 resolved relative to the scripts root \u2014 to a sandbox local \u003Cname\u003E, so the body uses it with no \u0060local \u003Cname\u003E = require(...)\u0060 line)"
   },
   "std": [
     {

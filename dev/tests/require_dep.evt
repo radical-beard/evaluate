@@ -1,0 +1,11 @@
+---
+returns:
+ - greet
+---
+-- A dependency module consumed via a frontmatter `require:` binding. Its returns
+-- contract narrows the handle, so a consumer sees exactly `greet` and not the
+-- private `secret` — the binding is the SAME narrowed handle `require(...)` returns.
+local M = {}
+local secret = "hidden"
+function M.greet(who) return "hello " .. who end
+return M

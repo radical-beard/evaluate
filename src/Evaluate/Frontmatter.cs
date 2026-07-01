@@ -38,6 +38,18 @@ public sealed class ParamSpec
     public bool Required => !HasDefault;
 }
 
+// One `require:` binding, e.g. `base: "lib/control/controllable.evt"`. Binds a
+// sandbox-local name to the module a path resolves to, so composition is declared
+// in the signature instead of restated as `local x = require("…")` at the top of
+// the body. The path is resolved by the SAME custom `require` the body could call
+// (cache + `returns`-narrowing), so a frontmatter binding is exactly what an inline
+// `require(path)` would return — just bound to a name up front.
+public sealed class RequireSpec
+{
+    public string Name = "";
+    public string Path = "";
+}
+
 // A script's `---` YAML signature plus the Lua body that follows it. The body is
 // split off and handed to Lua-CSharp verbatim; the signature is parsed as real
 // YAML. (The `returns` access spec — "get set vec3" — and the `params` spec —
@@ -50,6 +62,7 @@ public sealed class Frontmatter
     public List<string> Register = new();
     public List<ReturnSpec> Returns = new();
     public List<ParamSpec> Params = new();
+    public List<RequireSpec> Requires = new();
     public List<string> Assets = new();
     // Scenes this system participates in. Empty = global (runs in every scene).
     // Only meaningful for system `.evt` scripts; node scripts get their scene
@@ -98,7 +111,58 @@ public sealed class Frontmatter
             foreach (var kv in pmap)
                 fm.Params.Add(ParseParam(kv.Key?.ToString() ?? "", kv.Value));
 
+        if (root.TryGetValue("require", out var rq))
+            ParseRequires(rq, fm.Requires);
+
         return fm;
+    }
+
+    // `require:` binds names to module paths. Accepts either a YAML map (like
+    // `params:` — names are unique and order is irrelevant, so a map reads best):
+    //   require:
+    //     base: "lib/control/controllable.evt"
+    //     locomotion: "player/locomotion.evt"
+    // or a sequence of single-key maps (mirrors `returns:`):
+    //   require:
+    //    - base: "lib/control/controllable.evt"
+    //    - locomotion: "player/locomotion.evt"
+    // Both express the same name -> path bindings. Errors are raised here, at parse
+    // time — the same signature-is-the-contract stance as the rest of the frontmatter.
+    private static void ParseRequires(object? node, List<RequireSpec> into)
+    {
+        void Add(string name, object? path)
+        {
+            var p = path?.ToString() ?? "";
+            if (name.Length == 0 || p.Length == 0)
+                throw new EvaluateException(
+                    $"require: each entry binds a name to a module path (got '{name}: {p}')");
+            if (into.Any(r => r.Name == name))
+                throw new EvaluateException($"require: duplicate binding '{name}'");
+            into.Add(new RequireSpec { Name = name, Path = p });
+        }
+
+        switch (node)
+        {
+            case IDictionary<object, object> map:
+                foreach (var kv in map) Add(kv.Key?.ToString() ?? "", kv.Value);
+                break;
+            case IEnumerable<object> seq:
+                foreach (var item in seq)
+                {
+                    if (item is IDictionary<object, object> m && m.Count == 1)
+                    {
+                        var kv = m.Cast<KeyValuePair<object, object>>().First();
+                        Add(kv.Key?.ToString() ?? "", kv.Value);
+                    }
+                    else
+                        throw new EvaluateException(
+                            "require: list entries must each be a single `name: \"path\"` mapping");
+                }
+                break;
+            default:
+                throw new EvaluateException(
+                    "require: expected a map or a list of `name: \"path\"` bindings");
+        }
     }
 
     // The param type tokens the grammar recognizes. Anything else in type position is

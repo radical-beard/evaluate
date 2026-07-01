@@ -13,7 +13,7 @@ hot-reloaded by default.
 
 - **Frontmatter → signature.** The leading `---` block is split off and parsed
   as real YAML (YamlDotNet) into `config:`, `apis:`, `register:`, `returns:`,
-  `params:`, `assets:`, `scenes:`; the Lua body is handed to the VM verbatim (line numbers
+  `params:`, `require:`, `assets:`, `scenes:`; the Lua body is handed to the VM verbatim (line numbers
   preserved).
   The signature *is* the C#↔Lua boundary contract — `returns` declares typed,
   access-scoped members (no Lua type system). (`src/Evaluate/Frontmatter.cs`)
@@ -27,7 +27,13 @@ hot-reloaded by default.
   (`src/Evaluate/Loader.cs`)
 - **Custom `require`** narrows the returned module to its `returns` contract
   (get/set property → `get_`/`set_` accessors; plain method; read-only hides the
-  setter; missing accessor errors).
+  setter; missing accessor errors). A script may also declare its modules in
+  frontmatter — `require:` binds each to a sandbox local (`require: { base:
+  "lib/base.evt" }` → `base` usable with no `local base = require(...)` line),
+  resolving the same narrowed handle. A **require cycle** (direct or transitive,
+  including self-require) is rejected with the offending chain rather than a stack
+  overflow, and editing a required module **hot-reloads every consumer** that
+  requires it (transitively — systems re-run, live node scripts refresh).
 - **Data lives in the engine.** Game objects *are* Godot nodes — declared in scene
   files or created via `godot.<Type>.new()` / `world` — so there is no separate
   entity system. The Lua handle is a thin proxy whose metatable routes reads/writes
@@ -162,6 +168,8 @@ custom dialect's `+=`.
                 + markdown) and skill/evaluate-scripting/ (a downloadable agent skill)
     editors/vscode/  VS Code extension for .evt: YAML+Lua highlighting, frontmatter IntelliSense,
                 and sandbox-aware Lua-body autocomplete via lua-language-server + the LuaCATS spec
+    editors/nvim/    Neovim plugin for .evt: the same filetype/highlighting, frontmatter
+                IntelliSense (completion/diagnostics/hover) and Lua-body lua-language-server wiring
     dev/        the demo / enforcement-test harness game (consumes the lib by project reference):
       project.godot  main.tscn  EvaluateHost.cs  Dev.csproj
       scripts/  global.scene  menu.scene  level1.scene

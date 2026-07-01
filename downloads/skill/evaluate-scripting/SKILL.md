@@ -3,7 +3,7 @@ name: evaluate-scripting
 description: >-
   Author and edit EvaLuate game scripts — sandboxed Lua (.evt / .node.evt) and
   TOML scene files that run inside Godot 4.6. Use whenever writing or modifying
-  EvaLuate scripts: declaring frontmatter (apis/config/register/returns/params/scenes),
+  EvaLuate scripts: declaring frontmatter (apis/config/register/returns/params/require/scenes),
   wiring lifecycle hooks (on_start/on_update/on_ready/…), calling the godot.*,
   std.*, save, scene, sql, input or world APIs, or building .scene node trees.
   Covers the capability sandbox rules that make scripts fail if you skip them.

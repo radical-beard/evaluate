@@ -63,6 +63,18 @@ public sealed class Loader
     private readonly LuaValue _loadFn;
     private readonly Dictionary<string, LuaValue> _requireCache = new();
     private readonly Dictionary<string, LuaTable> _tomlCache = new();
+
+    // Require dependency graph. Kept so a changed module reloads everything that
+    // (transitively) requires it, and a require cycle is rejected up front instead of
+    // overflowing the stack. Populated by Require() for BOTH forms — frontmatter
+    // `require:` bindings and inline `require(path)` — since both funnel through it.
+    //   `_dependents[dep]`      = scripts to reload when `dep` changes (dep -> consumers)
+    //   `_dependencies[consumer]` = what `consumer` requires (cleared + rebuilt on re-run)
+    //   `_loadStack`            = scripts currently being Run; its top is the consumer of
+    //                             any require made now, and a path already on it is a cycle.
+    private readonly Dictionary<string, HashSet<string>> _dependents = new();
+    private readonly Dictionary<string, HashSet<string>> _dependencies = new();
+    private readonly List<string> _loadStack = new();
     // (scene-namespace, hook) -> owning script. A hook may be claimed once per
     // scene namespace; global systems share the reserved "<global>" namespace.
     private readonly Dictionary<string, string> _claimedHooks = new();
@@ -404,26 +416,9 @@ public sealed class Loader
     // its hook closures, but on_start is NOT re-invoked (no re-spawn).
     public string ReloadOnChange(string path)
     {
-        _requireCache.Remove(path);
-
-        // Node script: refresh its hook closures on every live instance, keeping
-        // each node's identity and `self`.
-        if (path.EndsWith(".node.evt"))
-        {
-            int n = RefreshNodeScript(path);
-            return n > 0
-                ? $"reloaded node script {path} ({n} live instance(s) refreshed)"
-                : $"invalidated node script {path} (no live instances)";
-        }
-
-        var sys = _systems.Find(s => s.Path == path);
-        if (sys != null)
-        {
-            FireSystem(sys, "on_unload");         // tear down (old closures) before the body re-runs
-            LoadSystem(path);                     // re-run body, refresh hook closures
-            FireSystem(sys, "on_load");           // rebuild against the fresh body
-            return $"reloaded system {path} (hooks refreshed, entities preserved)";
-        }
+        // .evt scripts (systems, node scripts, plain modules) reload through the require
+        // graph, so a change also refreshes everything that requires it (transitively).
+        if (path.EndsWith(".evt")) return ReloadModuleGraph(path);
 
         // Scene file: rebuild the active scene in place; others rebuild on entry.
         // The global manifest is the heavy case — it owns persistent nodes, so a
@@ -460,8 +455,42 @@ public sealed class Loader
                 return $"kept last-good config {path} ({e.Message})";
             }
         }
-        if (path.EndsWith(".evt")) return $"invalidated module {path} (re-required on next use)";
         return $"noted change to asset {path} (would re-import)";
+    }
+
+    // Reload a changed `.evt` and everything that (transitively) requires it. All affected
+    // modules are evicted and their edges cleared FIRST, so when the concrete consumers
+    // (systems + live node scripts) re-run, each require() rebuilds against fresh
+    // dependencies in natural order — no matter which consumer runs first. Plain modules
+    // with no live presence stay evicted and rebuild lazily on next use.
+    private string ReloadModuleGraph(string changed)
+    {
+        var affected = AffectedByChange(changed);
+        foreach (var p in affected) { _requireCache.Remove(p); ClearDependencies(p); }
+
+        var messages = new List<string>();
+        foreach (var p in affected)
+        {
+            if (p.EndsWith(".node.evt"))
+            {
+                int n = RefreshNodeScript(p);
+                messages.Add(n > 0
+                    ? $"reloaded node script {p} ({n} live instance(s) refreshed)"
+                    : $"invalidated node script {p} (no live instances)");
+            }
+            else if (_systems.Find(s => s.Path == p) is { } sys)
+            {
+                FireSystem(sys, "on_unload");   // tear down old closures before the body re-runs
+                LoadSystem(p);                  // re-run body -> fresh hooks + fresh require bindings
+                FireSystem(sys, "on_load");     // rebuild against the fresh body
+                messages.Add($"reloaded system {p} (hooks refreshed, entities preserved)");
+            }
+            else
+            {
+                messages.Add($"invalidated module {p} (re-required on next use)");
+            }
+        }
+        return string.Join("; ", messages);
     }
 
     // Re-run a changed node script's body on each live instance, refreshing its
@@ -531,24 +560,35 @@ public sealed class Loader
 
     private (LuaTable env, LuaValue ret, Frontmatter fm) Run(string path, LoadContext ctx)
     {
-        var fm = Frontmatter.Parse(_readScript(path));
-
-        // Record watch targets: the script itself, its configs, its assets.
-        _loadedScripts.Add(path);
-        foreach (var c in fm.Configs) _configFiles.Add(c);
-        foreach (var a in fm.Assets) _assetFiles.Add(a);
-
-        var env = BuildSandbox(path, fm, ctx);
-
-        var loaded = Sync(_lua.CallAsync(_loadFn, new LuaValue[] { fm.Body, path, "t", env }));
-        if (loaded[0].Type != LuaValueType.Function)
+        // A path already mid-load means a require cycle (frontmatter or inline). Reject it
+        // with the offending chain instead of recursing into a stack overflow.
+        if (_loadStack.Contains(path))
+            throw new EvaluateException(
+                $"require cycle: {string.Join(" -> ", _loadStack)} -> {path} " +
+                "(a script cannot require itself, directly or transitively)");
+        _loadStack.Add(path);
+        try
         {
-            var err = loaded.Length > 1 ? loaded[1].ToString() : "syntax error";
-            throw new EvaluateException($"failed to load {path}: {err}");
-        }
+            var fm = Frontmatter.Parse(_readScript(path));
 
-        var ret = Sync(_lua.CallAsync(loaded[0], Array.Empty<LuaValue>()));
-        return (env, ret.Length > 0 ? ret[0] : LuaValue.Nil, fm);
+            // Record watch targets: the script itself, its configs, its assets.
+            _loadedScripts.Add(path);
+            foreach (var c in fm.Configs) _configFiles.Add(c);
+            foreach (var a in fm.Assets) _assetFiles.Add(a);
+
+            var env = BuildSandbox(path, fm, ctx);
+
+            var loaded = Sync(_lua.CallAsync(_loadFn, new LuaValue[] { fm.Body, path, "t", env }));
+            if (loaded[0].Type != LuaValueType.Function)
+            {
+                var err = loaded.Length > 1 ? loaded[1].ToString() : "syntax error";
+                throw new EvaluateException($"failed to load {path}: {err}");
+            }
+
+            var ret = Sync(_lua.CallAsync(loaded[0], Array.Empty<LuaValue>()));
+            return (env, ret.Length > 0 ? ret[0] : LuaValue.Nil, fm);
+        }
+        finally { _loadStack.RemoveAt(_loadStack.Count - 1); }
     }
 
     // The ONLY environment the script body sees: declared capabilities + std +
@@ -591,16 +631,75 @@ public sealed class Loader
             return new(1);
         });
 
+        // Frontmatter `require:` bindings — resolve each declared module up front and
+        // bind it as a sandbox local, so composition is declared in the signature
+        // rather than restated as `local x = require("…")` boilerplate atop the body.
+        // Resolved via the SAME custom require (cache + returns-narrowing) as an inline
+        // call, so `require: { base: p }` yields exactly what `require(p)` would. Done
+        // last so a binding cannot silently shadow std/godot/config/params/self, a
+        // declared api, a language global, or the `require` function itself.
+        foreach (var req in fm.Requires)
+        {
+            if (env[req.Name].Type != LuaValueType.Nil)
+                throw new EvaluateException(
+                    $"{path}: require binding '{req.Name}' collides with a reserved or declared " +
+                    "sandbox name (std/godot/config/params/self, an api, a language global, " +
+                    "the require function, or another require binding)");
+            env[req.Name] = Require(req.Path);
+        }
+
         return env;
     }
 
     public LuaValue Require(string path)
     {
+        // Record the edge on EVERY require — even a cache hit — so the consumer is
+        // reloaded whenever `path` later changes. The consumer is whatever is loading
+        // now (top of the stack); a top-level require (empty stack) has no consumer.
+        if (_loadStack.Count > 0) AddDependency(_loadStack[^1], path);
+
         if (_requireCache.TryGetValue(path, out var cached)) return cached;
         var (_, ret, fm) = Run(path, new LoadContext(_globalRoot, null));
         var handle = Narrow(path, ret, fm);
         _requireCache[path] = handle;
         return handle;
+    }
+
+    // Record "consumer requires dep" in both directions. Self-edges are skipped (a
+    // self-require is already rejected as a cycle by Run).
+    private void AddDependency(string consumer, string dep)
+    {
+        if (consumer == dep) return;
+        (_dependents.TryGetValue(dep, out var d) ? d : _dependents[dep] = new()).Add(consumer);
+        (_dependencies.TryGetValue(consumer, out var c) ? c : _dependencies[consumer] = new()).Add(dep);
+    }
+
+    // Drop all of `consumer`'s outgoing edges. Called before its body re-runs so a
+    // require the edit removed no longer leaves a stale dependency; the re-run rebuilds
+    // whatever it still requires.
+    private void ClearDependencies(string consumer)
+    {
+        if (!_dependencies.TryGetValue(consumer, out var deps)) return;
+        foreach (var dep in deps)
+            if (_dependents.TryGetValue(dep, out var set)) set.Remove(consumer);
+        deps.Clear();
+    }
+
+    // `changed` plus every script that (transitively) requires it — the full set a
+    // change must refresh.
+    private HashSet<string> AffectedByChange(string changed)
+    {
+        var affected = new HashSet<string>();
+        var stack = new Stack<string>();
+        stack.Push(changed);
+        while (stack.Count > 0)
+        {
+            var p = stack.Pop();
+            if (!affected.Add(p)) continue;                 // guards graph cycles + diamonds
+            if (_dependents.TryGetValue(p, out var consumers))
+                foreach (var c in consumers) stack.Push(c);
+        }
+        return affected;
     }
 
     // Enforce the returns contract: a fresh table containing ONLY the declared
