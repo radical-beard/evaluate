@@ -1,6 +1,6 @@
 ---
 apis:
- - input
+ - actions
 attributes:
   stamina: { base: 100, min: 0, max: 100, regen: 20, regen_delay: 0.5, recover: 25 }
   speed:   { base: 4, min: 0, max: 12 }
@@ -8,7 +8,7 @@ abilities:
  - sprint.ability
 register:
  - on_attach
- - on_update
+ - on_load
 ---
 -- GAS-lite: attribute pools + granted abilities, declared in the signature.
 -- Built-in stamina semantics: `regen`/second after `regen_delay` since the last
@@ -22,11 +22,18 @@ function on_attach()
   end)
 end
 
-function on_update(dt)
-  local held = input.is_down("sprint")
-  if held and self.abilities:can_activate("sprint") then
-    self.abilities:activate("sprint")        -- channeled: stays active until deactivated
-  elseif not held and self.abilities:is_active("sprint") then
-    self.abilities:deactivate("sprint")
-  end
+-- Subscribe in on_load: a hot reload drops this script's stale closures, then
+-- re-fires on_load — so subscriptions never double up. The callback key is
+-- `run`, not `do` (a Lua keyword).
+function on_load()
+  actions.Gameplay.Sprint:subscribe{ on = "press", run = function()
+    if self.abilities:can_activate("sprint") then
+      self.abilities:activate("sprint")      -- channeled: stays active until deactivated
+    end
+  end }
+  actions.Gameplay.Sprint:subscribe{ on = "release", run = function()
+    if self.abilities:is_active("sprint") then
+      self.abilities:deactivate("sprint")
+    end
+  end }
 end

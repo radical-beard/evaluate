@@ -9,10 +9,13 @@ YAML-frontmatter-plus-sandboxed-Lua files you write to script a Godot game with
 - **Highlighting** — the leading `---` … `---` signature is highlighted as YAML; the body as
   Lua.
 - **Frontmatter IntelliSense** — completion, validation and hover for the signature block:
-  - `apis:` → the framework services (`input`, `world`, `scene`, `save`, `sql`) plus — since
-    0.10.0 — every Godot class/enum by PascalCase name (each injected as a bare global);
-    unknown lowercase names warn, the removed `godot:` prefix and the blocked
-    `DirAccess`/`FileAccess`/`ResourceLoader`/`ResourceSaver` are errors;
+  - `apis:` → the framework services (`world`, `scene`, `save`, `sql`, `actions`,
+    `controller`, `store`) plus — since 0.10.0 — every Godot class/enum by PascalCase name
+    (each injected as a bare global); unknown lowercase names warn, the removed `godot:`
+    prefix is an error, and so are the blocked names — the file/resource-IO classes
+    (`DirAccess`/`FileAccess`/`ResourceLoader`/`ResourceSaver`) and, since 0.11.0, the whole
+    raw-input surface (`Input`, `Key`, `JoyButton`, `InputEvent*`, …: input is native — use
+    the `actions` api);
   - `register:` → the actual lifecycle hooks (system vs node hooks, picked by filename —
     `*.behavior.evt`, `*.statemachine.evt` and the deprecated `*.node.evt` get node hooks);
   - all top-level keys (`config`/`apis`/`register`/`returns`/`params`/`require`/`assets`/

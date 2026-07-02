@@ -89,7 +89,7 @@ public partial class EvaluateRuntime : Node
             if (start is not null)
             {
                 GD.Print($"[evaluate] entering start scene '{start}'");
-                _loader.GotoScene(start);
+                _loader.GotoScene(start, reason: "start");
             }
             else
             {
@@ -128,13 +128,35 @@ public partial class EvaluateRuntime : Node
             catch (System.Exception e) { GD.PushError($"[evaluate] hot reload failed for {changed}: {e.Message}"); }
         }
 
-        // Apply a requested scene switch at a safe point — never mid-hook, so a
-        // scene's nodes are never freed while their on_update is running. A
-        // malformed/unknown target is logged; the current scene keeps running.
-        if (_loader.TakePendingScene() is { } next)
+        // Apply a requested scene op (change/push/pop) at a safe point — never
+        // mid-hook, so a scene's nodes are never freed while their on_update is
+        // running. A malformed/unknown target is logged; the current scene keeps
+        // running.
+        if (_loader.TakePendingOp() is { } op)
         {
-            try { GD.Print($"[evaluate] scene change -> '{next}'"); _loader.GotoScene(next); loadedNew = true; }
-            catch (System.Exception e) { GD.PushError($"[evaluate] failed to enter scene '{next}': {e.Message}"); }
+            try
+            {
+                switch (op.Kind)
+                {
+                    case Loader.PendingOpKind.Change:
+                        GD.Print($"[evaluate] scene change -> '{op.Name}'");
+                        _loader.GotoScene(op.Name, op.Ctx);
+                        break;
+                    case Loader.PendingOpKind.Push:
+                        GD.Print($"[evaluate] scene push -> '{op.Name}'");
+                        _loader.PushScene(op.Name, op.Ctx);
+                        break;
+                    case Loader.PendingOpKind.Pop:
+                        GD.Print("[evaluate] scene pop");
+                        _loader.PopScene();
+                        break;
+                }
+                loadedNew = true;
+            }
+            catch (System.Exception e)
+            {
+                GD.PushError($"[evaluate] scene op failed ({op.Kind} '{op.Name}'): {e.Message}");
+            }
         }
         if (loadedNew && _watcher is not null) RefreshAssetWatchers();
 
@@ -166,16 +188,18 @@ public partial class EvaluateRuntime : Node
 
     public override void _PhysicsProcess(double delta)
     {
+        // The controller polls devices + fires action subscriptions FIRST, so every
+        // script's on_physics_update sees this tick's input state.
+        _loader?.PollController(delta);
         CallHook("on_physics_update", delta);
         // Machines + abilities tick after behaviors, so guards and channel drains
         // see this tick's final state.
         _loader?.Tick(delta);
     }
 
-    public override void _Input(InputEvent @event)
-    {
-        if (_loader is not null) CallHook("on_input", _loader.Wrap(@event));
-    }
+    // NOTE: there is deliberately no _Input fan-out — raw input never reaches
+    // scripts. The PlayerController translates devices into mapped actions
+    // (subscribe via the `actions` api); its own _Input handles text capture only.
 
     // App-level notifications routed to script hooks. AutoAcceptQuit is off, so a
     // window-close request is turned into an explicit quit (on_quit then fires via

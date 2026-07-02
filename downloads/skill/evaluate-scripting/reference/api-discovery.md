@@ -13,7 +13,7 @@ In an EvaLuate download these sit under `spec/` (next to this `skill/`):
 |------|-----|
 | `spec/evaluate-api.md` | Human/LLM-readable reference. **Read this first** to find a class, method, hook, or struct. |
 | `spec/evaluate-api.json` | The full machine-readable spec (every class, method, property, signal, enum, constant). Grep/parse it for an exact signature. |
-| `spec/luacats/godot-core.lua` | LuaCATS defs for the common classes (Node/Node2D/Node3D/CharacterBody*/Area*/Timer/Input/OS/…). |
+| `spec/luacats/godot-core.lua` | LuaCATS defs for the common classes (Node/Node2D/Node3D/CharacterBody*/Area*/Timer/OS/…). |
 | `spec/luacats/godot-full.lua` | LuaCATS defs for **every** engine class (opt-in; large). |
 | `spec/luacats/std.lua`, `spec/luacats/evt-apis.lua` | LuaCATS for `std.*` and the capability apis. |
 
@@ -38,15 +38,17 @@ Run it whenever you upgrade Godot or EvaLuate.
 
 ## Naming conventions (so a name resolves)
 
-- **Class tables are declared, then bare:** `apis: [Timer, Key, OS]` →
-  `Timer.new()`, `Key.Space`, `OS.GetName()`. There is no `godot.` prefix — an undeclared
-  class name is `nil` in the body, and an unknown name *in* `apis:` errors at load.
+- **Class tables are declared, then bare:** `apis: [Timer, Node3D, OS]` →
+  `Timer.new()`, `Node3D.new()`, `OS.GetName()`. There is no `godot.` prefix — an undeclared
+  class name is `nil` in the body, and an unknown name *in* `apis:` errors at load. (The raw
+  input classes — `Input`, `Key`, `InputEvent*`, … — are blocked from declaration; use the
+  `actions` api.)
 - **Instance methods & properties → engine `snake_case`:** `node:get_node("X")`,
   `node.global_position`, `body:move_and_slide()`, `timer:emit_signal("timeout")`.
   `node:GetNode()` (PascalCase) will **not** resolve on an instance. Instances expose their
   members regardless of what their class's declaration status is.
 - **Constructors, enums, constants, static methods → C# `PascalCase`** on the declared class
-  table: `Timer.new()`, `Key.Space`, `MouseButton.Left`, `Timer.TimerProcessCallback.Idle`,
+  table: `Timer.new()`, `Timer.TimerProcessCallback.Idle`, `Node.ProcessModeEnum.Disabled`,
   `OS.GetName()`.
 - **Signals:** connect from Lua with `obj:connect("signal_name", fn)` (0–6 args). The
   callback runs on the main thread.

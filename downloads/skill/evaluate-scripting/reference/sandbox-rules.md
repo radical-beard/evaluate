@@ -35,9 +35,11 @@ Godot class/enum** — and an unknown name is a **load error**, not a silent `ni
 
 | api | What it is |
 |-----|------------|
-| `input` | `input.is_down(key)` — is a (host-mapped) key currently held. |
+| `actions` | mapped input — `actions.<Scenario>.<Action>`: subscribe to press/release/tap/held, poll `.down`/`.value`/`.vector`. See "The input model" below. |
+| `controller` | the native PlayerController — scenario switching, possession, rebinding, rumble, text capture. See "The input model" below. |
+| `store` | global **session** state — survives every scene switch, never touches disk — `store.set/get/has/delete/keys/subscribe`. See below. |
 | `world` | the persistent global-root **Node** (not a table) — `world:add_child(node)`; survives scene switches. |
-| `scene` | `scene.change(name)`, `scene.current()`, `scene.find(path)`, `scene.add(node)`, `scene.list()` (every switchable scene name, manifest excluded). |
+| `scene` | `scene.change(name[, ctx])`, `scene.push/pop/stack` (a scene **stack**), `scene.context()`, `scene.current()`, `scene.find(path)`, `scene.add(node)`, `scene.list()` (every switchable scene name, manifest excluded). Stack + context semantics: [scene-grammar.md](scene-grammar.md) → "Scenarios, the player, and transitions". |
 | `save` | SQLite-backed key/value persistence in `user://` — `save.set/get/delete`. |
 | `sql` | full SQL — `sql.exec/exec_async/query/query_row/transaction/flush/snapshot`. |
 
@@ -45,8 +47,8 @@ Godot class/enum** — and an unknown name is a **load error**, not a silent `ni
 (before the runtime entered the tree). Declared like any other api and called dot-style:
 `apis: [combat_native]` → `combat_native.SweepArc(...)`.
 
-**Godot classes & enums:** any engine class or enum name — `apis: [Input, Node3D, Key,
-Timer]` → `Input.GetJoyAxis(...)`, `Node3D.new()`, `Key.Space`,
+**Godot classes & enums:** any engine class or enum name — `apis: [OS, Node3D,
+Timer]` → `OS.GetName()`, `Node3D.new()`,
 `Timer.TimerProcessCallback.Idle`.
 
 Two boundaries to keep straight:
@@ -55,12 +57,82 @@ Two boundaries to keep straight:
   `self`, `get_node(...)`, a signal argument, any call's return value — expose their members
   regardless. You declare a class to *name* it (constructor, statics, enums, constants), not
   to touch its instances.
-- **Blocked from declaration:** `ResourceLoader`, `ResourceSaver`, `FileAccess`, `DirAccess`.
-  Assets come from frontmatter `assets:` (see
-  [frontmatter-contract.md](frontmatter-contract.md)); persistence from `save`/`sql`.
+- **Blocked from declaration:** `ResourceLoader`, `ResourceSaver`, `FileAccess`, `DirAccess`
+  — assets come from frontmatter `assets:` (see
+  [frontmatter-contract.md](frontmatter-contract.md)), persistence from `save`/`sql` — and
+  the raw input classes: `Input`, `InputMap`, `Key`, `KeyModifierMask`, `JoyButton`,
+  `JoyAxis`, `MouseButton`, `MouseButtonMask`, plus every `InputEvent*` class
+  (prefix-blocked). The error points to the `actions` api — see "The input model" below.
 
 Use an undeclared name in the body and the lookup yields `nil` → a runtime error (see
 [common-mistakes.md](../common-mistakes.md)). A typo *inside* `apis:` errors at load.
+
+## The input model — `actions` + `controller`
+
+Raw input never reaches scripts: there is no input hook, and the raw input classes are
+blocked from `apis:` (list above). Instead a native **PlayerController** node — implicitly
+added to the global layer — reads the hardware and resolves it through the manifest's
+controls TOML (`controls = "path/to/controls.toml"` in `global.scene`; scripts-relative,
+hot-reloaded), which maps physical bindings to named **actions**, grouped by **scenario**.
+TOML grammar and scenario semantics: [scene-grammar.md](scene-grammar.md).
+
+**`actions`** exposes `actions.<Scenario>.<Action>` — an unknown scenario or action name
+errors listing what exists. Per action:
+
+```lua
+-- Subscribe in on_load: a hot reload drops the subscribing script's stale closures and
+-- re-fires on_load (scene-layer subscriptions also die with their scene). Returns a
+-- handle table with cancel().
+local h = actions.Gameplay.Jump:subscribe{ on = "press", run = function() ... end }
+actions.Gameplay.Interact:subscribe{ on = "tap",  after = 0.15, run = ... }  -- max hold time
+actions.Gameplay.Charge:subscribe{ on = "held", after = 0.4,  run = ... }    -- min hold time
+-- `after` defaults to 0.2 s. The callback key is `run`, NOT `do` (a Lua keyword —
+-- the same reason statemachine transitions use `run`).
+
+-- Live polled reads:
+actions.Gameplay.Jump.down     -- bool
+actions.Gameplay.Block.value   -- 0..1 (analog axis; "down" past axis_threshold)
+actions.Gameplay.Move.vector   -- {x, y}; +y = up/forward; stick deadzone applied radially
+```
+
+Action events fire once per **physics tick**, before any `on_physics_update` runs.
+
+**`controller`** is the PlayerController's surface:
+
+```lua
+controller.scenario("Menu")        -- set the active scenario; controller.scenario() reads it
+controller.possess(node)           -- route control to a node; controller.possessed() / .release()
+controller.rebind("Gameplay", "Key_e", "Interact")  -- action nil = unbind; persisted in the
+                                   -- save DB (control_overrides), applied over the TOML
+controller.overrides()             -- the persisted override set
+controller.reset_overrides()
+controller.rumble(0.8, 0.3)        -- strength 0..1, seconds
+controller.capture_text(function(kind, char) ... end)
+                                   -- kind = "char" (with the character) | "backspace";
+                                   -- while capturing, printable keys stop firing mapped
+                                   -- actions; capture_text(nil) stops
+controller.joy_name()
+```
+
+Exactly **one scenario is active** at a time (plus the reserved `Always` section, active in
+every scenario). Switching scenarios fires synthetic **releases** for held actions, and a
+binding physically held across the switch is suppressed until first released.
+
+## `store` — global session state
+
+`store` is key/value state scoped to the **session**: it survives every scene switch but is
+**not persisted to disk** (persistence is `save`/`sql`).
+
+```lua
+store.set("run.gold", 120)
+store.get("run.gold", 0)                 -- default when absent
+store.has("run.gold")                    -- bool
+store.delete("run.gold")
+store.keys("run.")                       -- every key under the prefix
+store.subscribe("run.gold", function(key, new, old) ... end)   -- exact key
+store.subscribe("run.",     function(key, new, old) ... end)   -- trailing "." = prefix
+-- subscribe returns a handle table with cancel()
+```
 
 ## Node surfaces (not sandbox globals)
 

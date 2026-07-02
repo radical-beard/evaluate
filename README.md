@@ -27,16 +27,18 @@ hot-reloaded by default.
   `rawset`/`rawequal`/`rawlen`) so scripts can define classes the idiomatic Lua
   way. There is **no ambient `godot.*`**: an `apis:` name resolves **framework
   service → host-registered extension → Godot class/enum** (memoized), so
-  `apis: [save, Input, Node3D, Key]` injects the `save` service next to
-  `Input.GetJoyAxis(...)`, `Node3D.new()` and `Key.Space`. Declaration gates the
-  **class table** only — instances reaching a script (`self`, `get_node`, signal
-  args, return values) expose members regardless. An unknown `apis:` name is a
+  `apis: [save, Node3D, Timer, Side]` injects the `save` service next to
+  `Node3D.new()`, `Timer.TimerProcessCallback.Idle` and `Side.Bottom`. Declaration
+  gates the **class table** only — instances reaching a script (`self`, `get_node`,
+  signal args, return values) expose members regardless. An unknown `apis:` name is a
   load error (typo-proofing); a legacy `godot:`-prefixed entry errors with a
   migration hint; `ResourceLoader`/`ResourceSaver`/`FileAccess`/`DirAccess` are
   blocked from declaration (assets come from `assets:`, persistence from
-  `save`/`sql`). Undeclared globals (`os`, `io`, …) are absent, and `pcall` is
-  intentionally withheld (errors surface rather than being swallowed).
-  (`src/Evaluate/Loader.cs`)
+  `save`/`sql`), and so is the whole raw-input surface — `Input`, `InputMap`,
+  `Key`, `JoyButton`, `JoyAxis`, `MouseButton`, every `InputEvent*` — because input
+  is native: subscribe to mapped actions via the `actions` api instead. Undeclared
+  globals (`os`, `io`, …) are absent, and `pcall` is intentionally withheld (errors
+  surface rather than being swallowed). (`src/Evaluate/Loader.cs`)
 - **Host extension apis.** The embedding game registers C# api modules with
   `runtime.RegisterApi("combat_native", implObjectOrStaticType)` **before**
   adding the runtime to the tree; scripts declare `apis: [combat_native]` and
@@ -77,8 +79,9 @@ hot-reloaded by default.
   swappable **scene layer**, so one program holds many scenes, each with its own
   registered functions:
   - **`global.scene`** (reserved manifest) declares nodes that *never* clear
-    (e.g. the player) plus `start_scene`. Loaded once into a persistent
-    **Global root**.
+    plus `start_scene` and (optionally) `controls = "…toml"` — the action map the
+    implicit native PlayerController loads (see *Native input* below). Loaded once
+    into a persistent **Global root**.
   - **`*.scene`** files (TOML content) declare a node tree as keyed, nested tables —
     `[nodes.Player]` then `[nodes.Player.Camera]` makes Camera a child of Player.
     A node's name is the table key; reserved keys `type`/`behaviors`/`machines`
@@ -143,9 +146,45 @@ hot-reloaded by default.
     hot-reload live.
   - **`*.evt`** systems are conductors: no `scenes:` ⇒ **global** (always run);
     `scenes: [a, b]` ⇒ active only while `a`/`b` is current. The `scene` API does
-    routing — `scene.change(name)` (applied at the next frame boundary, never
-    mid-hook), `scene.current()`, `scene.find(path)` (unique by node path, e.g.
-    `"Level/Enemy"`), `scene.add(node)`.
+    routing — `scene.change(name[, ctx])` (applied at the next frame boundary, never
+    mid-hook; `ctx` is a table carried to the destination), `scene.current()`,
+    `scene.find(path)` (unique by node path, e.g. `"Level/Enemy"`), `scene.add(node)`,
+    `scene.list()`, plus the scene STACK — `scene.push(name[, ctx])` overlays a scene
+    (the one beneath freezes: engine processing off, no hooks, still rendered — a pause
+    menu over the live world), `scene.pop()` thaws it back (controller scenario +
+    possession restore to their push-time values), `scene.stack()` lists the layers,
+    and `scene.context()` returns the current transition's context (caller keys +
+    `from`/`to`/`reason`). `scene.change` clears the whole stack.
+  - **Scene-level `[player]` spawner.** A scene that wants a possessed player declares
+    `player = { node = "<fragment>", spawn = "<module.evt>" }` at top level: the
+    single-root fragment scene is instantiated on entry, placed by the module's
+    exported `spawn(ctx) -> { x, y, z, facing? }` (ctx = the transition context — a
+    loading zone passes `{ entry = ... }` through `scene.change`), and auto-possessed
+    by the native controller; an optional top-level `scenario = "…"` switches the
+    controller scenario on entry. Hot-reload rebuilds of the active scene preserve the
+    live player transform (spawn scripts don't re-run).
+- **Native input — the PlayerController + `actions`.** Raw input never reaches scripts:
+  the `input` service and `on_input` hook are gone, and the input classes (`Input`,
+  `Key`, `JoyButton`, `InputEvent*`, …) are blocked from `apis:`. Instead the manifest
+  declares `controls = "…toml"` and an implicit **`PlayerController`** node in the
+  global layer maps devices → ACTIONS: TOML sections are SCENARIOS (`[Gameplay]`,
+  `[Menu]`, the always-active `[Always]`, `[settings]` for deadzone/threshold), keys
+  are binding tokens (`Button_a`, `Key_space`, `Stick_left`, `Axis_trigger_right`,
+  `Mouse_left`; digital keys feed vector axes via `"Move+x"` suffixes), values are
+  action names. Devices are polled once per physics tick (before any
+  `on_physics_update`); scripts declare `apis: [actions]` and use
+  `actions.<Scenario>.<Action>` — `subscribe{ on = "press|release|tap|held",
+  after = seconds, run = fn }` (a `cancel()` handle back; hot-reload- and
+  scene-lifetime-safe) or the live `down`/`value`/`vector` reads. The `controller` api
+  adds `scenario()`, `possess()`/`possessed()`, save-DB rebinds
+  (`rebind`/`overrides`/`reset_overrides` — a `control_overrides` table applied over
+  the TOML), `rumble`, and `capture_text` (menu typing without raw key access).
+  (`src/Evaluate/Controls.cs`, `src/Evaluate/PlayerController.cs`)
+- **`store` — global session state.** `store.set/get/has/delete/keys(prefix)` +
+  `store.subscribe(key_or_"prefix.", fn(key, new, old))`: values live in the global
+  layer and survive every scene switch/push/pop; nothing touches disk (durable saves
+  stay `save`/`sql`). Subscriptions are owner-attributed and die with their scene
+  layer. (`src/Evaluate/Store.cs`)
 - **Editor preview + write-back (optional addon).** A `.scene` file is TOML, which the
   Godot editor doesn't render natively. The `dev/addons/evaluate_scene` addon registers an
   `EditorImportPlugin` that converts `.scene` → a `PackedScene` (via the *same*
@@ -166,11 +205,12 @@ hot-reloaded by default.
 - **Lifecycle hooks.** `register:` wires Godot's Node lifecycle. **System hooks:**
   `on_start` (global, once), `on_load`/`on_unload` (every (re)load / before reload),
   `on_enter`/`on_exit` (scene-scoped, per activation), `on_update(dt)`,
-  `on_physics_update(dt)`, `on_input(event)`, `on_focus_in`/`on_focus_out`,
-  `on_pause`/`on_resume`, `on_quit`. **Behavior hooks** (`*.behavior.evt` /
-  `*.node.evt`, with `self`): `on_attach` (once, at first attach),
-  `on_load`/`on_unload`, `on_update`, `on_physics_update`, `on_input`, `on_exit`,
-  `on_quit`, plus the same focus/pause pairs. Machines register no hooks — they
+  `on_physics_update(dt)`, `on_focus_in`/`on_focus_out`,
+  `on_pause`/`on_resume` (app pause AND scene-stack freeze/thaw), `on_quit`.
+  **Behavior hooks** (`*.behavior.evt` / `*.node.evt`, with `self`): `on_attach`
+  (once, at first attach), `on_load`/`on_unload`, `on_update`, `on_physics_update`,
+  `on_exit`, `on_quit`, plus the same focus/pause pairs. (`on_input` was removed in
+  0.11.0 — input arrives as mapped actions.) Machines register no hooks — they
   are polled data.
 - **`std.*` standard library.** Real C#-backed types via the `[LuaObject]` source
   generator — `std.vec3`, `std.vec2`, `std.color`, `std.vector`,
@@ -222,7 +262,7 @@ custom dialect's `+=`.
 ## Run
 
     godot --headless --path dev                       # demo: global layer, scene switch (menu -> level1), behaviors
-    godot --headless --path dev -- --test             # enforcement suite (98 tests)
+    godot --headless --path dev -- --test             # enforcement suite (115 tests)
     godot --headless --path dev -- --quit-after 8     # demo, then quit after 8 frames
     godot --headless --path dev -- --emit-api out/    # dump the full Lua API spec (json + LuaCATS + markdown)
 

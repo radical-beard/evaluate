@@ -1,0 +1,6 @@
+# The level1 PLAYER FRAGMENT: the node tree the scene-level [player] section
+# spawns on entry (exactly one root — it becomes the possessed node). Behaviors
+# compose the player out of small scripts instead of one monolith.
+[nodes.Hero]
+type = "Node3D"
+behaviors = ["hero.behavior.evt"]

@@ -6,7 +6,8 @@ description: >-
   writing or modifying EvaLuate scripts: declaring frontmatter (apis/config/register/
   returns/params/require/scenes/assets/properties/behaviors/machines/attributes/abilities),
   wiring lifecycle hooks (on_start/on_update/on_attach/…), declaring Godot classes and the
-  input/save/scene/sql/world apis as modules, loading assets, building .scene node trees,
+  actions/controller/store/save/scene/sql/world apis as modules, loading assets, building
+  .scene node trees, mapping input through the controls TOML,
   or authoring state machines and GAS-lite abilities. Covers the capability sandbox rules
   that make scripts fail if you skip them.
 ---
@@ -33,17 +34,21 @@ always-available things. If you use something you didn't declare, the script err
 
 **Everything else is declared** in frontmatter `apis:`, each entry injected as its own bare
 global table (resolution order: framework service → host-registered api → Godot class/enum):
-- framework services: `input`, `world`, `scene`, `save`, `sql`;
+- framework services: `actions`, `controller`, `store`, `world`, `scene`, `save`, `sql`;
 - host-registered C# apis (the game registers them via `runtime.RegisterApi`);
-- **any Godot class or enum**: `apis: [Input, Node3D, Key]` → `Input.GetJoyAxis(...)`,
-  `Node3D.new()`, `Key.Space`. There is **no ambient `godot.*` table anymore.** Declaring
+- **any Godot class or enum**: `apis: [OS, Node3D, Timer]` → `OS.GetName()`,
+  `Node3D.new()`, `Timer.TimerProcessCallback.Idle`. There is **no ambient `godot.*` table anymore.** Declaring
   gates the class table only — instances you get from `self`, `get_node`, signal args or
   return values expose their members regardless.
 
-**Never available**: `os`, `io`, `pcall` (deliberately removed), and the imperative IO
+**Never available**: `os`, `io`, `pcall` (deliberately removed); the imperative IO
 classes `ResourceLoader` / `ResourceSaver` / `FileAccess` / `DirAccess` — assets come from
 frontmatter `assets:` (a map of `name: "path"`, eagerly loaded, hot-reloaded, injected as
-the ambient `assets` table), persistence from `save`/`sql`.
+the ambient `assets` table), persistence from `save`/`sql`; and the raw input classes
+(`Input`, `InputMap`, `Key`, `JoyButton`, `MouseButton`, every `InputEvent*`, …) — raw
+input never reaches scripts. Physical bindings map to named **actions** in the manifest's
+controls TOML (`controls = "controls.toml"` in `global.scene`), read via the `actions` api
+(`subscribe` in `on_load`, or poll `.down`/`.value`/`.vector`).
 
 > Full, version-exact API surface is in the generated spec — see
 > [reference/api-discovery.md](reference/api-discovery.md). Read it before guessing a
@@ -91,21 +96,22 @@ single-behavior alias**; new code uses behaviors.
 config:
  - player.toml
 apis:
- - input
+ - actions
 properties:
   position: [0, 0.5, 0]   # native engine state, applied at attach + on hot reload
 register:
  - on_attach
- - on_update
+ - on_physics_update
 ---
 function on_attach()
   self:set_meta("dmg", config.player.base_weapon_damage)
 end
 
-function on_update(dt)
-  if input.is_down("right") then
+function on_physics_update(dt)
+  local mv = actions.Gameplay.Move.vector               -- {x, y}, deadzone applied
+  if mv.x ~= 0 then
     local p = self.position
-    p.x = p.x + config.player.move_speed * dt
+    p.x = p.x + mv.x * config.player.move_speed * dt
     self.position = p                                   -- assign back to persist
   end
 end
@@ -179,7 +185,10 @@ drive with `self.abilities:activate/deactivate/can_activate/has_tag/apply/on_end
 ### Scene file — `name.scene` (TOML)
 A node tree. Table nesting **is** the tree. Node keys: `type` (required), `behaviors`,
 `machines`, `params`, `meta`, `groups`, `unique`, `instance`, `connections` (+ the
-deprecated `script`). See [reference/scene-grammar.md](reference/scene-grammar.md).
+deprecated `script`). Scene-**level** (top-level) keys: `start_scene` / `controls` (the
+`global.scene` manifest), `scenario` (the controller scenario set on entry), and a
+`[player]` section (per-scene player fragment + spawn script). See
+[reference/scene-grammar.md](reference/scene-grammar.md).
 
 ```
 [nodes.Player]
@@ -198,7 +207,7 @@ position = [0, 2, -4]                    # property: array -> Vector3
   `node.position`, `timer:emit_signal("timeout")`. (They route through the engine, which
   uses snake_case — `node:GetNode()` will NOT work.)
 - **Constructors, enums and constants are C# `PascalCase`** on the declared class table:
-  `Timer.new()`, `Key.Space`, `Timer.TimerProcessCallback.Idle`, `OS.GetName()`.
+  `Timer.new()`, `Timer.TimerProcessCallback.Idle`, `OS.GetName()`.
 - **Vectors/colors/transforms** cross the boundary as tables: read a `Vector3` and you get
   `{x=,y=,z=}` (or `std.vec3`); assign a table/`std.vec3` back and it rebuilds the struct.
 
@@ -219,9 +228,9 @@ position = [0, 2, -4]                    # property: array -> Vector3
 ## Reference
 
 - [reference/frontmatter-contract.md](reference/frontmatter-contract.md) — every frontmatter key (incl. assets, properties, behaviors/machines, state machines, GAS-lite, dna).
-- [reference/sandbox-rules.md](reference/sandbox-rules.md) — capabilities, api resolution, node surfaces, `require`/`returns`, what's withheld.
+- [reference/sandbox-rules.md](reference/sandbox-rules.md) — capabilities, api resolution, the input model (`actions`/`controller`) + `store`, node surfaces, `require`/`returns`, what's withheld.
 - [reference/lifecycle-hooks.md](reference/lifecycle-hooks.md) — every hook, args, and when it fires.
-- [reference/scene-grammar.md](reference/scene-grammar.md) — `.scene` TOML rules.
+- [reference/scene-grammar.md](reference/scene-grammar.md) — `.scene` TOML rules, the controls TOML, `scenario`/`[player]`, the scene stack + transition context.
 - [reference/api-discovery.md](reference/api-discovery.md) — the generated, version-exact API spec.
 - [common-mistakes.md](common-mistakes.md) — the sandbox errors and their fixes.
 - [examples/](examples/) — runnable scripts to copy from (one consistent mini-game).

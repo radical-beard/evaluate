@@ -1,0 +1,15 @@
+---
+returns:
+ - spawn
+---
+-- level1's spawn resolver: spawn(ctx) -> where the [player] node appears. `ctx`
+-- is the transition context (scene.change's table plus from/to/reason) — a
+-- loading zone would pass { entry = "..." } and be resolved here.
+local M = {}
+
+function M.spawn(ctx)
+  if ctx.entry == "east_gate" then return { x = 8, y = 0, z = 0, facing = -1.57 } end
+  return { x = 0, y = 0, z = 5 }
+end
+
+return M

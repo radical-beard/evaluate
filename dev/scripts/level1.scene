@@ -1,5 +1,11 @@
 # A second swappable scene. Entering it frees the menu's container and builds
 # this tree fresh — while the global Player (and its Camera) carries straight over.
+#
+# `scenario` switches the controller's active scenario on entry; the scene-level
+# [player] section spawns the hero fragment via the spawn module and possesses it.
+scenario = "Demo"
+player = { node = "hero", spawn = "spawn_level1.evt" }
+
 [nodes.Level]
 type = "Node3D"
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Godot;
 using Microsoft.Data.Sqlite;
@@ -25,7 +26,46 @@ public sealed class Persistence : IDisposable
         _conn = new SqliteConnection($"Data Source={Path.Combine(dir, "save.db")}");
         _conn.Open();
         Exec("CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, type TEXT NOT NULL, value TEXT NOT NULL)");
+        // The player's control REBINDS (profile-level, not per-save-slot): one row
+        // per (scenario, binding token) applied over the controls TOML at map build.
+        // An empty action means "unbind the token".
+        Exec("CREATE TABLE IF NOT EXISTS control_overrides (" +
+             "scenario TEXT NOT NULL, binding TEXT NOT NULL, action TEXT NOT NULL, " +
+             "PRIMARY KEY(scenario, binding))");
     }
+
+    public List<(string scenario, string binding, string action)> Overrides()
+    {
+        var list = new List<(string, string, string)>();
+        using var cmd = _conn.CreateCommand();
+        cmd.CommandText = "SELECT scenario, binding, action FROM control_overrides ORDER BY scenario, binding";
+        using var r = cmd.ExecuteReader();
+        while (r.Read()) list.Add((r.GetString(0), r.GetString(1), r.GetString(2)));
+        return list;
+    }
+
+    public void SetOverride(string scenario, string binding, string action)
+    {
+        using var cmd = _conn.CreateCommand();
+        cmd.CommandText =
+            "INSERT INTO control_overrides(scenario,binding,action) VALUES($s,$b,$a) " +
+            "ON CONFLICT(scenario,binding) DO UPDATE SET action=$a";
+        cmd.Parameters.AddWithValue("$s", scenario);
+        cmd.Parameters.AddWithValue("$b", binding);
+        cmd.Parameters.AddWithValue("$a", action);
+        cmd.ExecuteNonQuery();
+    }
+
+    public void DeleteOverride(string scenario, string binding)
+    {
+        using var cmd = _conn.CreateCommand();
+        cmd.CommandText = "DELETE FROM control_overrides WHERE scenario=$s AND binding=$b";
+        cmd.Parameters.AddWithValue("$s", scenario);
+        cmd.Parameters.AddWithValue("$b", binding);
+        cmd.ExecuteNonQuery();
+    }
+
+    public void ClearOverrides() => Exec("DELETE FROM control_overrides");
 
     public void Set(string key, string type, string value)
     {

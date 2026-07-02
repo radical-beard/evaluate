@@ -25,6 +25,8 @@ function on_update(dt)
   frames = frames + 1
   if frames == 3 then
     print("menu: advancing to level1")
-    scene.change("level1")
+    -- the ctx table travels with the transition: the destination reads it via
+    -- scene.context() — { entry = ..., from = "menu", to = "level1", reason = "change" }
+    scene.change("level1", { entry = scene.current() })
   end
 end

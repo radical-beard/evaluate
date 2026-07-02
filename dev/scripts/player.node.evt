@@ -2,13 +2,19 @@
 config:
  - player.toml
 apis:
- - input
+ - actions
+ - store
 register:
  - on_attach
- - on_update
+ - on_load
+ - on_physics_update
 ---
 -- A NODE script: behavior for one node. `self` IS the Godot Node3D this script
 -- is attached to (declared in global.scene), so there is no spawning here.
+--
+-- Input arrives as mapped ACTIONS (controls.toml), never raw devices: subscribe
+-- for edges (in on_load, so a hot reload re-subscribes fresh closures) and poll
+-- `actions.<Scenario>.<Action>.vector/.down/.value` for continuous state.
 function on_attach()
   self.position = std.vec3(config.player.start_pos)
   self:set_meta("base_weapon_damage", config.player.base_weapon_damage)
@@ -17,12 +23,21 @@ function on_attach()
     p.x, p.y, p.z, self:get_meta("base_weapon_damage")))
 end
 
+function on_load()
+  actions.Demo.Jump.subscribe{ on = "press", run = function()
+    print("player: Jump pressed (mapped from Button_a / Key_space)")
+  end }
+end
+
 -- Fires while the player's node is alive — which, being global, is always.
-function on_update(dt)
-  if input.is_down("right") then
+function on_physics_update(dt)
+  local v = actions.Demo.Move.vector
+  if v.x ~= 0 or v.y ~= 0 then
     local p = self.position
-    p.x = p.x + config.player.move_speed * dt
+    p.x = p.x + config.player.move_speed * v.x * dt
+    p.z = p.z - config.player.move_speed * v.y * dt
     self.position = p
+    store.set("demo.player_x", p.x)      -- session state other scripts can watch
     print(string.format("player moved to x=%.3f", self.position.x))
   end
 end

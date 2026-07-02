@@ -18,10 +18,14 @@ is never called; a name in `register:` with no matching function is simply not w
 | `on_exit` | — | Each time that scene is left (its nodes are about to be freed). |
 | `on_update` | `dt` | Every frame while active. `dt` = seconds since last frame. |
 | `on_physics_update` | `delta` | Every physics tick while active. |
-| `on_input` | `event` | On input events (an `InputEvent` node). |
 | `on_focus_in` / `on_focus_out` | — | App window gains / loses focus. |
-| `on_pause` / `on_resume` | — | Scene tree paused / resumed. |
+| `on_pause` / `on_resume` | — | Scene tree paused / resumed — incl. a scene frozen beneath a `scene.push` / thawed by `scene.pop`. |
 | `on_quit` | — | Once, as the tree tears down (good place to `sql.flush()` / final `save`). |
+
+**There is no input hook** (systems or behaviors — raw input events never reach scripts).
+Input arrives as mapped **actions** via the `actions` api: subscribe in `on_load`, or poll
+`.down`/`.value`/`.vector`. Action events fire once per **physics tick**, before any
+`on_physics_update` runs.
 
 **Global vs scene-scoped:** a system with no `scenes:` is global — its hooks run in every
 scene. With `scenes: [menu, level1]` its hooks run only while one of those is active. The
@@ -43,11 +47,10 @@ in order, then frontmatter-composed behaviors (depth-first, deduped per node).
 | `on_unload` | — | Before a reload tears the behavior's setup down. |
 | `on_update` | `dt` | Every frame while the node is alive. |
 | `on_physics_update` | `delta` | Every physics tick while alive. |
-| `on_input` | `event` | On input events. |
 | `on_exit` | — | When the node's container is freed. |
 | `on_quit` | — | As the tree tears down. |
 | `on_focus_in` / `on_focus_out` | — | Window focus changes. |
-| `on_pause` / `on_resume` | — | Tree paused / resumed. |
+| `on_pause` / `on_resume` | — | Tree paused / resumed — incl. a scene frozen beneath a `scene.push` / thawed by `scene.pop`. |
 
 Behaviors never spawn — they act on `self`. To create nodes, do it from a **system**
 script (`world:add_child(...)` / `scene.add(...)`) or declare them in a `.scene` file.

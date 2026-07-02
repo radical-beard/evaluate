@@ -51,6 +51,9 @@ public sealed class LoadedNode
     // attribute tuning).
     public Dictionary<string, object> DeclaredAttributes = new();
     public List<string> GrantedAbilities = new();
+    // The scene layer this instance belongs to (null = global). Subscriptions the
+    // script makes (actions/store) carry this lifetime and die with the layer.
+    internal object? Lifetime;
 
     internal static readonly Dictionary<string, object> EmptyParams = new();
 }
@@ -65,11 +68,37 @@ public sealed class Loader
     private readonly Action<string> _log;
     private readonly GodotBinder _godotBinder;
     private Node? _globalRoot;              // persistent layer; never cleared
-    private Node? _sceneContainer;          // current swappable scene; freed on scene change
-    private string? _activeScene;           // name of the active scene
-    private string? _pendingScene;          // requested by scene.goto, applied next frame
-    private Persistence? _persistence;      // lazily opened SQLite save store (flat kv)
+    private PendingOp? _pendingOp;          // requested by scene.change/push/pop, applied next frame
+    private Persistence? _persistence;      // lazily opened SQLite save store (flat kv + control overrides)
     private Sql? _sql;                       // lazily opened full-SQL capability (game schema)
+    private PlayerController? _controller;  // the native input owner, implicit in the global layer
+    private readonly Store _store;          // global session state (store api)
+    private string? _controlsFile;          // manifest-declared controls TOML (watched)
+    private LuaValue _sceneCtx = LuaValue.Nil;   // the active transition context (scene.context())
+    private object? _currentLifetime;       // scene layer owning subscriptions made right now (null = global)
+
+    // One live entry of the scene STACK. The top layer is the active scene; layers
+    // beneath are frozen (engine processing disabled, no hook dispatch) but keep
+    // their tree, machines, and subscriptions until popped back or torn down.
+    private sealed class SceneLayer
+    {
+        public string Name = "";
+        public Node Container = null!;
+        public readonly List<LoadedNode> Nodes = new();
+        public readonly List<MachineInstance> Machines = new();
+        public readonly List<NodeAbilityState> AbilityStates = new();
+        public Node? PlayerNode;             // the [player]-spawned node (freed with the container)
+        public string? PlayerFragment;       // the fragment's .scene file (watched for rebuilds)
+        public string? RestoreScenario;      // controller scenario to restore when THIS layer pops
+        public Node? RestorePossessed;       // possession to restore when THIS layer pops
+    }
+
+    // A frame-boundary scene operation (never applied mid-hook).
+    public readonly record struct PendingOp(PendingOpKind Kind, string Name, LuaValue Ctx);
+    public enum PendingOpKind { Change, Push, Pop }
+
+    private readonly List<SceneLayer> _sceneStack = new();
+    private SceneLayer? Top => _sceneStack.Count > 0 ? _sceneStack[^1] : null;
 
     private readonly LuaTable _std;
     private readonly Dictionary<string, LuaValue> _godotModules = new();   // memoized declared class/enum tables
@@ -97,11 +126,8 @@ public sealed class Loader
     private readonly List<LoadedNode> _globalNodes = new();              // persistent node scripts
     private readonly List<Node> _globalLayerRoots = new();               // manifest's instantiated root nodes (for reload)
     private SceneSpec? _globalManifest;                                  // last-loaded manifest (for live rebuild)
-    private readonly List<LoadedNode> _sceneNodes = new();               // active-scene node scripts
     private readonly List<MachineInstance> _globalMachines = new();     // machines on persistent nodes
-    private readonly List<MachineInstance> _sceneMachines = new();      // machines on active-scene nodes
     private readonly List<NodeAbilityState> _globalAbilityStates = new();   // ability/attribute state, persistent nodes
-    private readonly List<NodeAbilityState> _sceneAbilityStates = new();    // ability/attribute state, scene nodes
     private AbilityRuntime _abilities = null!;                           // set in ctor (needs binder)
     private string? _hookOwner;                                          // script whose hook is executing (listener attribution)
     private readonly HashSet<string> _loadedScripts = new();             // every .evt Run so far
@@ -116,11 +142,12 @@ public sealed class Loader
     // Systems discovered/registered in this project (scripts with a register: block).
     public IReadOnlyList<LoadedSystem> Systems => _systems;
 
-    // The name of the active scene (null before the first scene change).
-    public string? ActiveScene => _activeScene;
+    // The name of the active scene — the TOP of the scene stack (null before the
+    // first scene change).
+    public string? ActiveScene => Top?.Name;
 
-    // Input state the host can toggle to simulate the player pressing keys.
-    public HashSet<string> Pressed { get; } = new();
+    // The native player controller (created with the global layer; null before).
+    public PlayerController? Controller => _controller;
 
     // The language-level globals every sandbox gets (capability-free). Exposed
     // internally so the docs emitter reads the SAME list the sandbox copies in
@@ -161,6 +188,8 @@ public sealed class Loader
         _abilities = new AbilityRuntime(_godotBinder, _readScript, _log,
             () => _hookOwner, (fn, args) => Call(fn, args));
 
+        _store = new Store((fn, args) => Call(fn, args));
+
         _loadFn = _lua.Environment["load"];
     }
 
@@ -177,6 +206,17 @@ public sealed class Loader
     // persistence through `save`/`sql`.
     internal static readonly string[] BlockedApis =
         { "ResourceLoader", "ResourceSaver", "FileAccess", "DirAccess" };
+
+    // Raw input is native-only: the PlayerController owns every device read, and
+    // scripts consume ACTIONS (`actions` api, mapped by the controls TOML). No
+    // input class or event type is declarable — input outside the controller is
+    // impossible by construction, not convention. (InputEvent* is prefix-blocked.)
+    internal static readonly string[] BlockedInputApis =
+        { "Input", "InputMap", "Key", "KeyModifierMask", "JoyButton", "JoyAxis",
+          "MouseButton", "MouseButtonMask" };
+
+    internal static bool IsBlockedInputApi(string name) =>
+        BlockedInputApis.Contains(name) || name.StartsWith("InputEvent", StringComparison.Ordinal);
 
     // Register a C#-side api module under `name`. Scripts reach it by declaring the
     // name in `apis:` — it is then implicitly callable as a normal Lua table of
@@ -286,7 +326,7 @@ public sealed class Loader
     public static readonly string[] SystemHooks =
         { "on_start", "on_load", "on_unload", "on_quit", "on_enter", "on_exit",
           "on_focus_in", "on_focus_out", "on_pause", "on_resume",
-          "on_update", "on_physics_update", "on_input" };
+          "on_update", "on_physics_update" };
 
     // Lifecycle hooks a NODE script (`*.node.evt`) may register. on_attach fires ONCE, when
     // the node + its script first enter the tree (never again); on_load runs EVERY (re)load —
@@ -294,7 +334,7 @@ public sealed class Loader
     // config (so imperative builders rebuild; make it idempotent); on_exit when its container
     // is freed; the rest fire while alive. Each runs with `self` bound.
     public static readonly string[] NodeHooks =
-        { "on_attach", "on_load", "on_unload", "on_update", "on_physics_update", "on_input",
+        { "on_attach", "on_load", "on_unload", "on_update", "on_physics_update",
           "on_exit", "on_quit", "on_focus_in", "on_focus_out", "on_pause", "on_resume" };
 
     // Wrap a live Godot object for Lua (used by the host to pass e.g. InputEvents).
@@ -313,61 +353,248 @@ public sealed class Loader
         return LoadGlobalLayer(SceneFile.Parse(_readScript(ManifestName)));
     }
 
-    // Build the persistent global layer: instantiate the manifest's nodes under
-    // the global root, attach their node scripts, fire on_attach. Never torn down.
+    // Build the persistent global layer: create the native PlayerController (with
+    // the manifest's controls map + save-DB overrides), instantiate the manifest's
+    // nodes under the global root, attach their node scripts, fire on_attach.
+    // Never torn down.
     public string? LoadGlobalLayer(SceneSpec manifest)
     {
         if (_globalRoot is null) throw new EvaluateException("LoadGlobalLayer called before SetGlobalRoot");
         _globalManifest = manifest;
+
+        // The controller exists BEFORE any manifest node script runs, so global
+        // behaviors can subscribe to actions from their bodies/hooks. Created once;
+        // a manifest reload just re-reads the controls file into the same node.
+        if (_controller is null)
+        {
+            _controller = new PlayerController
+            {
+                Name = PlayerController.NodeName,
+                CallLua = (fn, args) => Call(fn, args),
+                Log = _log,
+            };
+            _globalRoot.AddChild(_controller);
+        }
+        _controlsFile = manifest.Controls;
+        if (_controlsFile is not null) _configFiles.Add(_controlsFile);   // watched like a config
+        RebuildControlsMap(_controller);
+
         InstantiateTree(manifest, _globalRoot, _globalNodes, _globalMachines, _globalLayerRoots);
         foreach (var n in _globalNodes) Fire(n, "on_attach");
         foreach (var n in _globalNodes) Fire(n, "on_load");
         return manifest.StartScene;
     }
 
-    // Switch the active scene: tear the current scene container down wholesale,
-    // instantiate the new scene under a fresh container, and move hook dispatch
-    // to it. The global layer (player, etc.) is untouched.
-    public void GotoScene(string name)
+    // Switch the active scene: tear the WHOLE scene stack down (top first), then
+    // enter the new scene as the sole layer. The global layer is untouched.
+    public void GotoScene(string name, LuaValue ctx = default, string reason = "change")
     {
         if (_globalRoot is null) throw new EvaluateException("GotoScene called before SetGlobalRoot");
+        var from = Top?.Name;
+        while (_sceneStack.Count > 0) TearDownTop();
+        EnterScene(name, ctx, from, reason, null, null, null);
+    }
 
-        // Leaving the current scene: on_exit for its nodes + scene systems.
-        if (_activeScene is not null)
-        {
-            foreach (var n in _sceneNodes) Fire(n, "on_exit");
-            foreach (var s in SystemsFor(_activeScene)) FireSystem(s, "on_exit");
-        }
-        _sceneNodes.Clear();
-        _sceneMachines.Clear();
-        _sceneAbilityStates.Clear();
-        if (_sceneContainer is not null)
-        {
-            _globalRoot.RemoveChild(_sceneContainer);   // free the name slot NOW, so a
-            _sceneContainer.QueueFree();                // same-name rebuild keeps its name
-        }
+    // Push a scene ON TOP of the active one: the layer beneath freezes (engine
+    // processing off, no hook dispatch, still rendered) until the new layer pops.
+    // The controller scenario + possession at push time are restored on pop.
+    public void PushScene(string name, LuaValue ctx = default)
+    {
+        if (_globalRoot is null) throw new EvaluateException("PushScene called before SetGlobalRoot");
+        var below = Top;
+        string? restoreScenario = _controller?.Scenario;
+        Node? restorePossessed = _controller?.Possessed;
+        if (below is not null) FreezeLayer(below);
+        EnterScene(name, ctx, below?.Name, "push", null, restoreScenario, restorePossessed);
+    }
 
-        // Entering the new scene under a fresh container.
+    // Pop the top scene: its on_exit runs and its container is freed; the layer
+    // beneath thaws (on_resume fires on it) and scenario + possession are restored.
+    public void PopScene()
+    {
+        if (_sceneStack.Count == 0)
+            throw new EvaluateException("scene.pop: the scene stack is empty");
+        if (_sceneStack.Count == 1)
+            throw new EvaluateException(
+                "scene.pop: popping the only scene would leave none — use scene.change");
+        var popped = Top!;
+        TearDownTop();
+        var revealed = Top!;
+        UnfreezeLayer(revealed);
+        if (popped.RestoreScenario is { } rs) _controller?.SetScenario(rs);
+        if (_controller is not null)
+            _controller.Possess(popped.RestorePossessed is { } n && GodotObject.IsInstanceValid(n) ? n : null);
+        _sceneCtx = BuildCtx(LuaValue.Nil, popped.Name, revealed.Name, "pop");
+    }
+
+    // Rebuild the ACTIVE (top) layer in place — the scene-file hot-reload path.
+    // The player transform survives the rebuild (spawn scripts don't re-run), so
+    // live scene editing never yanks you back to the spawn point.
+    public void RebuildTop()
+    {
+        var top = Top ?? throw new EvaluateException("RebuildTop with no active scene");
+        // Local transform: the player sits directly under the (identity) scene
+        // container, and local reads work even before the tree is live.
+        Transform3D? keep = top.PlayerNode is Node3D n && GodotObject.IsInstanceValid(n)
+            ? n.Transform : null;
+        var restoreScenario = top.RestoreScenario;
+        var restorePossessed = top.RestorePossessed;
+        TearDownTop();
+        EnterScene(top.Name, LuaValue.Nil, top.Name, "reload", keep, restoreScenario, restorePossessed);
+    }
+
+    // Instantiate one scene as a new stack layer and make it active: build the
+    // tree, fire attach/load, apply the scene's `scenario`, spawn + possess the
+    // `[player]`, then let the scene's systems enter.
+    private void EnterScene(string name, LuaValue ctx, string? from, string reason,
+        Transform3D? preservedPlayer, string? restoreScenario, Node? restorePossessed)
+    {
         var spec = SceneFile.Parse(_readScript(SceneFileName(name)));
         _sceneFiles.Add(SceneFileName(name));
         if (spec.Nodes.Count == 0)
             _log($"scene '{name}' has no nodes — '{SceneFileName(name)}' is empty or missing");
+
         var container = new Node { Name = name };
-        _globalRoot.AddChild(container);
-        _sceneContainer = container;
-        _activeScene = name;
-        InstantiateTree(spec, container, _sceneNodes, _sceneMachines);
-        foreach (var n in _sceneNodes) Fire(n, "on_attach");
-        foreach (var n in _sceneNodes) Fire(n, "on_load");
-        foreach (var s in SystemsFor(name)) FireSystem(s, "on_enter");
+        _globalRoot!.AddChild(container);
+        var layer = new SceneLayer
+        {
+            Name = name, Container = container,
+            RestoreScenario = restoreScenario, RestorePossessed = restorePossessed,
+        };
+        _sceneStack.Add(layer);
+        _sceneCtx = BuildCtx(ctx, from, name, reason);
+
+        var prevLifetime = _currentLifetime;
+        _currentLifetime = layer;
+        try
+        {
+            InstantiateTree(spec, container, layer.Nodes, layer.Machines);
+            foreach (var n in layer.Nodes) Fire(n, "on_attach");
+            foreach (var n in layer.Nodes) Fire(n, "on_load");
+            if (spec.Scenario is { } scenario) _controller?.SetScenario(scenario);
+            if (spec.Player is { } player) SpawnPlayer(player, layer, preservedPlayer);
+            foreach (var s in SystemsFor(name)) FireSystem(s, "on_enter", layer);
+        }
+        finally { _currentLifetime = prevLifetime; }
     }
 
-    // A pending scene.change target (applied by the host at the next frame
-    // boundary, never mid-hook), consumed once.
-    public string? TakePendingScene()
+    // Tear down the top layer: on_exit for its nodes + systems, drop its
+    // subscriptions (actions/store/text-capture die with the layer), release a
+    // possession that lives inside it, free the container.
+    private void TearDownTop()
     {
-        var p = _pendingScene;
-        _pendingScene = null;
+        var layer = Top!;
+        foreach (var n in layer.Nodes) Fire(n, "on_exit");
+        foreach (var s in SystemsFor(layer.Name)) FireSystem(s, "on_exit", layer);
+        _controller?.RemoveLifetimeSubscriptions(layer);
+        _store.RemoveLifetimeSubscriptions(layer);
+        if (_controller?.Possessed is { } p && GodotObject.IsInstanceValid(p)
+            && (p == layer.Container || layer.Container.IsAncestorOf(p)))
+            _controller.Possess(null);
+        _globalRoot!.RemoveChild(layer.Container);   // free the name slot NOW, so a
+        layer.Container.QueueFree();                 // same-name rebuild keeps its name
+        _sceneStack.RemoveAt(_sceneStack.Count - 1);
+    }
+
+    // Freeze/thaw a covered layer: Godot processing off/on for the whole subtree,
+    // with on_pause/on_resume as the script-visible bookends. Hook dispatch and
+    // machine/ability ticking follow the TOP layer only (see ActiveNodes/Tick).
+    private void FreezeLayer(SceneLayer layer)
+    {
+        foreach (var n in layer.Nodes) Fire(n, "on_pause");
+        foreach (var s in SystemsFor(layer.Name)) FireSystem(s, "on_pause", layer);
+        layer.Container.ProcessMode = Node.ProcessModeEnum.Disabled;
+    }
+
+    private void UnfreezeLayer(SceneLayer layer)
+    {
+        layer.Container.ProcessMode = Node.ProcessModeEnum.Inherit;
+        foreach (var n in layer.Nodes) Fire(n, "on_resume");
+        foreach (var s in SystemsFor(layer.Name)) FireSystem(s, "on_resume", layer);
+    }
+
+    // Instantiate the `[player]` fragment, place it via the spawn script (or the
+    // preserved transform on a hot-reload rebuild), and possess it.
+    private void SpawnPlayer(PlayerSpec spec, SceneLayer layer, Transform3D? preserved)
+    {
+        var fragFile = SceneFileName(spec.Node);
+        var frag = SceneFile.Parse(_readScript(fragFile));
+        _sceneFiles.Add(fragFile);
+        if (frag.Nodes.Count != 1)
+            throw new EvaluateException(
+                $"player fragment '{spec.Node}' must declare exactly one root node " +
+                $"(found {frag.Nodes.Count}) — the root is what the controller possesses");
+
+        // Resolve the spawn position BEFORE the node exists, so its behaviors
+        // attach already in place (on_attach sees the real position).
+        double x = 0, y = 0, z = 0; double? facing = null;
+        if (preserved is null)
+        {
+            var module = Require(spec.Spawn);
+            if (module.Type != LuaValueType.Table
+                || module.Read<LuaTable>()["spawn"].Type != LuaValueType.Function)
+                throw new EvaluateException(
+                    $"[player] spawn module '{spec.Spawn}' must export a spawn(ctx) function " +
+                    "(declare it under 'returns:')");
+            var ret = CallRet(module.Read<LuaTable>()["spawn"], _sceneCtx);
+            if (ret.Type == LuaValueType.Table)
+            {
+                var t = ret.Read<LuaTable>();
+                LuaValue N(string k, int i) => t[k].Type == LuaValueType.Number ? t[k] : t[i];
+                if (N("x", 1).Type == LuaValueType.Number) x = N("x", 1).Read<double>();
+                if (N("y", 2).Type == LuaValueType.Number) y = N("y", 2).Read<double>();
+                if (N("z", 3).Type == LuaValueType.Number) z = N("z", 3).Read<double>();
+                if (t["facing"].Type == LuaValueType.Number) facing = t["facing"].Read<double>();
+            }
+            else if (ret.Type != LuaValueType.Nil)
+                throw new EvaluateException(
+                    $"[player] spawn '{spec.Spawn}': spawn(ctx) must return a table " +
+                    "{{ x=, y=, z=, facing=? }} (or nil for the origin)");
+        }
+
+        int before = layer.Nodes.Count;
+        var roots = new List<Node>();
+        InstantiateTree(frag, layer.Container, layer.Nodes, layer.Machines, roots);
+        var node = roots[0];
+        layer.PlayerNode = node;
+        layer.PlayerFragment = fragFile;
+        if (node is Node3D n3)
+        {
+            if (preserved is { } t3) n3.Transform = t3;
+            else
+            {
+                n3.Position = new Vector3((float)x, (float)y, (float)z);
+                if (facing is { } f) n3.Rotation = new Vector3(0, (float)f, 0);
+            }
+        }
+        else if (preserved is null)
+            _log($"player fragment '{spec.Node}' root is not a Node3D; spawn position ignored");
+
+        for (int i = before; i < layer.Nodes.Count; i++) Fire(layer.Nodes[i], "on_attach");
+        for (int i = before; i < layer.Nodes.Count; i++) Fire(layer.Nodes[i], "on_load");
+        _controller?.Possess(node);
+    }
+
+    // The transition context: whatever the caller passed to scene.change/push,
+    // plus from/to/reason. Readable as scene.context() until the next transition
+    // and handed to the spawn script verbatim.
+    private LuaValue BuildCtx(LuaValue userCtx, string? from, string to, string reason)
+    {
+        var t = new LuaTable();
+        if (userCtx.Type == LuaValueType.Table)
+            foreach (var kv in userCtx.Read<LuaTable>()) t[kv.Key] = kv.Value;
+        if (from is not null) t["from"] = from;
+        t["to"] = to;
+        t["reason"] = reason;
+        return t;
+    }
+
+    // A pending scene.change/push/pop (applied by the host at the next frame
+    // boundary, never mid-hook), consumed once.
+    public PendingOp? TakePendingOp()
+    {
+        var p = _pendingOp;
+        _pendingOp = null;
         return p;
     }
 
@@ -378,31 +605,55 @@ public sealed class Loader
         foreach (var s in _systems) FireSystem(s, "on_load");
     }
 
-    // Systems + node scripts whose hooks the host should drive this frame.
+    // Systems + node scripts whose hooks the host should drive this frame — the
+    // global layer plus the TOP of the scene stack (frozen layers get no hooks).
     public IEnumerable<LoadedSystem> ActiveSystems =>
-        _systems.Where(s => s.IsGlobal || (_activeScene is not null && s.Scenes.Contains(_activeScene)));
-    public IEnumerable<LoadedNode> ActiveNodes => _globalNodes.Concat(_sceneNodes);
+        _systems.Where(s => s.IsGlobal || (Top is { } t && s.Scenes.Contains(t.Name)));
+    public IEnumerable<LoadedNode> ActiveNodes =>
+        Top is { } top ? _globalNodes.Concat(top.Nodes) : _globalNodes;
 
     private IEnumerable<LoadedSystem> SystemsFor(string scene) =>
         _systems.Where(s => s.Scenes.Contains(scene));
 
+    // Every layer's collections, top included (reload paths refresh frozen layers too).
+    private IEnumerable<LoadedNode> AllSceneNodes => _sceneStack.SelectMany(l => l.Nodes);
+    private IEnumerable<MachineInstance> AllMachines =>
+        _globalMachines.Concat(_sceneStack.SelectMany(l => l.Machines));
+    private IEnumerable<NodeAbilityState> AllAbilityStates =>
+        _globalAbilityStates.Concat(_sceneStack.SelectMany(l => l.AbilityStates));
+
+    // The ability-state list a node list belongs to (global or its layer).
+    private List<NodeAbilityState> StatesFor(List<LoadedNode> nodes)
+    {
+        if (nodes == _globalNodes) return _globalAbilityStates;
+        foreach (var layer in _sceneStack)
+            if (ReferenceEquals(layer.Nodes, nodes)) return layer.AbilityStates;
+        return _globalAbilityStates;
+    }
+
     // Hook dispatch sets `_hookOwner` so anything the hook subscribes (fsm state
-    // listeners) is attributed to the script — a hot reload of that script then
-    // drops its stale listeners before on_load re-subscribes fresh ones.
+    // listeners, action/store subscriptions) is attributed to the script — a hot
+    // reload of that script then drops its stale listeners before on_load
+    // re-subscribes fresh ones. `_currentLifetime` scopes subscriptions to the
+    // scene layer the node lives in, so they die when the layer does.
     private void Fire(LoadedNode n, string hook)
     {
         if (!n.Hooks.TryGetValue(hook, out var fn)) return;
         var prev = _hookOwner; _hookOwner = n.Path;
-        try { Call(fn); } finally { _hookOwner = prev; }
+        var prevLife = _currentLifetime; _currentLifetime = n.Lifetime;
+        try { Call(fn); } finally { _hookOwner = prev; _currentLifetime = prevLife; }
     }
-    private void FireSystem(LoadedSystem s, string hook)
+    private void FireSystem(LoadedSystem s, string hook, object? lifetime = null)
     {
         if (!s.Hooks.TryGetValue(hook, out var fn)) return;
         var prev = _hookOwner; _hookOwner = s.Path;
-        try { Call(fn); } finally { _hookOwner = prev; }
+        var prevLife = _currentLifetime; _currentLifetime = lifetime;
+        try { Call(fn); } finally { _hookOwner = prev; _currentLifetime = prevLife; }
     }
 
     private static string SceneFileName(string name) => name + ".scene";
+
+    private bool TopUsesFragment(string sceneFile) => Top?.PlayerFragment == sceneFile;
 
     // Instantiate a scene/manifest node tree under `container`: SceneBuilder builds
     // the visual tree (types, properties, hierarchy) and, via the visit callback,
@@ -511,8 +762,9 @@ public sealed class Loader
                 "legacy *.node.evt)");
         if (!attached.Add(path)) return;
         var ln = LoadNodeScript(path, node, container, sceneParams, scenePropKeys);
+        ln.Lifetime = _currentLifetime;
         nodes.Add(ln);
-        ApplyGasDeclarations(path, ln, nodes == _globalNodes ? _globalAbilityStates : _sceneAbilityStates);
+        ApplyGasDeclarations(path, ln, StatesFor(nodes));
         foreach (var composed in ln.ComposedBehaviors)
             AttachBehavior(composed, node, container, LoadedNode.EmptyParams, scenePropKeys,
                 nodes, machines, attached);
@@ -539,8 +791,7 @@ public sealed class Loader
     }
 
     private NodeAbilityState? StateOf(GodotObject node) =>
-        _globalAbilityStates.FirstOrDefault(s => s.Node == node)
-        ?? _sceneAbilityStates.FirstOrDefault(s => s.Node == node);
+        AllAbilityStates.FirstOrDefault(s => s.Node == node);
 
     // Attach one `*.statemachine.evt` to a node: run its body, parse the returned
     // transition list against the frontmatter's states, and install the
@@ -556,7 +807,7 @@ public sealed class Loader
 
         var (_, ret, fm) = Run(path, new LoadContext(container, node, sceneParams));
         var def = ParseMachineDef(path, fm, ret);
-        foreach (var other in _globalMachines.Concat(_sceneMachines))
+        foreach (var other in AllMachines)
             if (other.Node == node && other.Def.Name == def.Name)
                 throw new EvaluateException(
                     $"{path}: node '{node.Name}' already has a machine named '{def.Name}' " +
@@ -762,12 +1013,18 @@ public sealed class Loader
         finally { inst.Firing = false; }
     }
 
+    // Drive the native controller's device poll + action dispatch (the runtime
+    // calls this right before on_physics_update fan-out each physics tick).
+    public void PollController(double dt) => _controller?.Poll(dt);
+
     // Advance the framework's ticking runtimes one physics tick: state machines,
-    // then abilities (channel drains, effect timelines, attribute regen).
+    // then abilities (channel drains, effect timelines, attribute regen). Only the
+    // ACTIVE layers tick — machines/abilities in frozen (pushed-over) scenes hold.
     public void Tick(double dt)
     {
         TickMachines(dt);
-        _abilities.Tick(_globalAbilityStates.Concat(_sceneAbilityStates), dt);
+        var states = Top is { } t ? _globalAbilityStates.Concat(t.AbilityStates) : _globalAbilityStates;
+        _abilities.Tick(states, dt);
     }
 
     // Advance every active machine one physics tick: deferred events first, then the
@@ -775,7 +1032,8 @@ public sealed class Loader
     // `after` timer wins. At most ONE transition per machine per tick (no cascades).
     public void TickMachines(double dt)
     {
-        foreach (var inst in _globalMachines.Concat(_sceneMachines).ToList())
+        var machines = Top is { } t ? _globalMachines.Concat(t.Machines) : _globalMachines;
+        foreach (var inst in machines.ToList())
         {
             inst.TimeInState += dt;
 
@@ -818,7 +1076,7 @@ public sealed class Loader
     private int RefreshMachines(string path)
     {
         int count = 0;
-        foreach (var inst in _globalMachines.Concat(_sceneMachines).ToList())
+        foreach (var inst in AllMachines.ToList())
         {
             if (inst.Def.Path != path) continue;
             var (_, ret, fm) = Run(path, new LoadContext(inst.Container, inst.Node, inst.Params));
@@ -840,7 +1098,7 @@ public sealed class Loader
     // script's body re-runs, so on_load re-subscribes fresh closures, not stale ones).
     private void RemoveMachineListeners(GodotObject node, string ownerPath)
     {
-        foreach (var inst in _globalMachines.Concat(_sceneMachines))
+        foreach (var inst in AllMachines)
         {
             if (inst.Node != node) continue;
             foreach (var list in inst.EnterListeners.Values) list.RemoveAll(l => l.Owner == ownerPath);
@@ -872,18 +1130,34 @@ public sealed class Loader
         // graph, so a change also refreshes everything that requires it (transitively).
         if (path.EndsWith(".evt")) return ReloadModuleGraph(path);
 
-        // Scene file: rebuild the active scene in place; others rebuild on entry.
-        // The global manifest is the heavy case — it owns persistent nodes, so a
-        // restart applies it cleanly.
+        // Scene file: rebuild the active (top) scene in place — including when the
+        // changed file is its [player] fragment; others rebuild on entry. The
+        // player's transform survives the rebuild (see RebuildTop). The global
+        // manifest is the heavy case — it owns persistent nodes.
         if (path == ManifestName) return ReloadGlobalLayer();
         if (path.EndsWith(".scene"))
         {
-            if (_activeScene is not null && SceneFileName(_activeScene) == path)
+            if (Top is { } top && (SceneFileName(top.Name) == path || TopUsesFragment(path)))
             {
-                GotoScene(_activeScene);
-                return $"reloaded scene {path} (active scene rebuilt)";
+                RebuildTop();
+                return $"reloaded scene {path} (active scene rebuilt in place)";
             }
             return $"invalidated scene {path} (rebuilt on next entry)";
+        }
+
+        // The controls file: re-parse + re-apply overrides into the live controller.
+        // Subscriptions survive (they key on scenario/action names).
+        if (path == _controlsFile && _controller is not null)
+        {
+            try
+            {
+                RebuildControlsMap(_controller);
+                return $"reloaded controls {path} (bindings remapped live)";
+            }
+            catch (EvaluateException e)
+            {
+                return $"kept last-good controls {path} ({e.Message})";
+            }
         }
 
         if (path.EndsWith(".toml"))
@@ -896,7 +1170,7 @@ public sealed class Loader
                 _tomlCache[path] = BuildTomlTable(path);
                 // A node/system that builds from this config reads the live view at build time,
                 // so re-fire on_unload + on_load to let it rebuild against the new values.
-                foreach (var ln in _globalNodes.Concat(_sceneNodes))
+                foreach (var ln in _globalNodes.Concat(AllSceneNodes))
                     if (ln.Configs.Contains(path)) { Fire(ln, "on_unload"); Fire(ln, "on_load"); }
                 foreach (var s in _systems)
                     if (s.Configs.Contains(path)) { FireSystem(s, "on_unload"); FireSystem(s, "on_load"); }
@@ -928,7 +1202,15 @@ public sealed class Loader
     private string ReloadModuleGraph(string changed)
     {
         var affected = AffectedByChange(changed);
-        foreach (var p in affected) { _requireCache.Remove(p); ClearDependencies(p); }
+        foreach (var p in affected)
+        {
+            _requireCache.Remove(p);
+            ClearDependencies(p);
+            // Stale action/store subscriptions die with the old closures; the
+            // re-run bodies/hooks subscribe fresh ones.
+            _controller?.RemoveOwnerSubscriptions(p);
+            _store.RemoveOwnerSubscriptions(p);
+        }
 
         var messages = new List<string>();
         foreach (var p in affected)
@@ -963,7 +1245,8 @@ public sealed class Loader
     }
 
     // Re-run a changed node script's body on each live instance, refreshing its
-    // hook closures while preserving the node and its `self`.
+    // hook closures while preserving the node and its `self`. Instances in frozen
+    // (pushed-over) layers refresh too — their rebuilt content is simply paused.
     private int RefreshNodeScript(string path)
     {
         int RefreshIn(List<LoadedNode> list, Node? container)
@@ -975,13 +1258,16 @@ public sealed class Loader
                 Fire(ln, "on_unload");   // old closures still valid: tear down BEFORE the body re-runs
                 RemoveMachineListeners(ln.Node, path);   // stale fsm subscriptions die with the old body
                 if (StateOf(ln.Node) is { } gas) _abilities.RemoveListeners(gas, path);
-                var (env, _, fm) = Run(path, new LoadContext(container, ln.Node, ln.Params));
+                var prevLife = _currentLifetime; _currentLifetime = ln.Lifetime;
+                Lua.LuaTable env; Frontmatter fm;
+                try { (env, _, fm) = Run(path, new LoadContext(container, ln.Node, ln.Params)); }
+                finally { _currentLifetime = prevLife; }
                 ln.Hooks.Clear();
                 ln.Configs = fm.Configs;
                 ln.DeclaredAttributes = fm.Attributes;
                 ln.GrantedAbilities = fm.Abilities;
                 ApplyFrontmatterProperties(path, fm, ln.Node, ln.ScenePropKeys);   // edits to properties: apply live
-                ApplyGasDeclarations(path, ln, list == _globalNodes ? _globalAbilityStates : _sceneAbilityStates);
+                ApplyGasDeclarations(path, ln, StatesFor(list));
                 foreach (var name in fm.Register)
                     if (NodeHooks.Contains(name) && env[name].Type == LuaValueType.Function)
                         ln.Hooks[name] = env[name];
@@ -990,7 +1276,9 @@ public sealed class Loader
             }
             return count;
         }
-        return RefreshIn(_globalNodes, _globalRoot) + RefreshIn(_sceneNodes, _sceneContainer);
+        int total = RefreshIn(_globalNodes, _globalRoot);
+        foreach (var layer in _sceneStack) total += RefreshIn(layer.Nodes, layer.Container);
+        return total;
     }
 
     // Rebuild the persistent global layer in place from the re-read manifest: fire
@@ -1018,6 +1306,13 @@ public sealed class Loader
 
         var manifest = SceneFile.Parse(_readScript(ManifestName));
         _globalManifest = manifest;
+        // The controller node persists; a changed `controls =` path applies live.
+        if (_controller is not null)
+        {
+            _controlsFile = manifest.Controls;
+            if (_controlsFile is not null) _configFiles.Add(_controlsFile);
+            RebuildControlsMap(_controller);
+        }
         InstantiateTree(manifest, _globalRoot, _globalNodes, _globalMachines, _globalLayerRoots);
         foreach (var n in _globalNodes) Fire(n, "on_attach");
         foreach (var n in _globalNodes) Fire(n, "on_load");
@@ -1253,7 +1548,8 @@ public sealed class Loader
     // the BuildApi switch dispatches on these names and the docs emitter walks them,
     // so a newly-added api (a new switch arm + array entry) self-documents. `apis:` also
     // accepts host-registered extension names and Godot class/enum names (ResolveApi).
-    internal static readonly string[] ApiNames = { "input", "world", "scene", "save", "sql" };
+    internal static readonly string[] ApiNames =
+        { "world", "scene", "save", "sql", "actions", "controller", "store" };
 
     // Resolve one declared `apis:` entry to the table the sandbox injects under that
     // name. Precedence: framework service -> host extension -> Godot class/enum
@@ -1265,6 +1561,11 @@ public sealed class Loader
             throw new EvaluateException(
                 $"{path} requests '{name}', which is not a script capability: assets load " +
                 "through frontmatter 'assets:', persistence through 'save'/'sql'");
+        if (IsBlockedInputApi(name))
+            throw new EvaluateException(
+                $"{path} requests '{name}', but raw input is not a script capability: " +
+                "subscribe to mapped actions via the 'actions' api (bindings live in the " +
+                "controls TOML); rumble/text-capture/possession live on the 'controller' api");
         if (ApiNames.Contains(name)) return BuildApi(path, name, ctx);
         if (_hostApis.TryGetValue(name, out var host)) return host;
         if (_godotModules.TryGetValue(name, out var cached)) return cached;
@@ -1279,11 +1580,13 @@ public sealed class Loader
 
     private LuaValue BuildApi(string path, string name, LoadContext ctx) => name switch
     {
-        "input" => BuildInputApi(),
         "world" => BuildWorldApi(path, ctx),
         "scene" => BuildSceneApi(),
         "save" => BuildSaveApi(),
         "sql" => BuildSqlApi(),
+        "actions" => BuildActionsApi(path),
+        "controller" => BuildControllerApi(),
+        "store" => BuildStoreApi(),
         _ => throw new EvaluateException($"{path} requests unknown api '{name}'"),
     };
 
@@ -1409,8 +1712,18 @@ public sealed class Loader
     };
 
     // `scene` is the routing + active-scene capability:
-    //   scene.change(name) - request a switch (applied at the next frame boundary)
-    //   scene.current()    - the active scene's name (or nil)
+    //   scene.change(name[, ctx]) - request a switch (applied at the next frame
+    //                        boundary, never mid-hook). `ctx` is a table carried to
+    //                        the destination — the spawn script's argument and
+    //                        scene.context() — e.g. { entry = "south_gate" }
+    //   scene.push(name[, ctx]) - overlay a scene on the STACK: the scene beneath
+    //                        freezes (still rendered) until the new one pops.
+    //                        Scenario + possession restore on pop. Menus live here.
+    //   scene.pop()        - leave the pushed scene, thaw the one beneath
+    //   scene.stack()      - the stack's scene names, bottom -> top
+    //   scene.context()    - the active transition's context table ({from, to,
+    //                        reason, ...caller keys}); stable until the next transition
+    //   scene.current()    - the active (top) scene's name (or nil)
     //   scene.find(path)   - look up a node by PATH in the active scene
     //                        (e.g. "Level/Enemy") — unique by construction
     //   scene.add(node)    - parent a node under the active scene container
@@ -1442,28 +1755,52 @@ public sealed class Loader
         });
         api["change"] = new LuaFunction((c, ct) =>
         {
-            _pendingScene = c.GetArgument<string>(0);
+            _pendingOp = new PendingOp(PendingOpKind.Change, c.GetArgument<string>(0),
+                c.ArgumentCount > 1 ? c.GetArgument(1) : LuaValue.Nil);
             return new(0);
+        });
+        api["push"] = new LuaFunction((c, ct) =>
+        {
+            _pendingOp = new PendingOp(PendingOpKind.Push, c.GetArgument<string>(0),
+                c.ArgumentCount > 1 ? c.GetArgument(1) : LuaValue.Nil);
+            return new(0);
+        });
+        api["pop"] = new LuaFunction((c, ct) =>
+        {
+            _pendingOp = new PendingOp(PendingOpKind.Pop, "", LuaValue.Nil);
+            return new(0);
+        });
+        api["stack"] = new LuaFunction((c, ct) =>
+        {
+            var t = new LuaTable();
+            for (int i = 0; i < _sceneStack.Count; i++) t[i + 1] = _sceneStack[i].Name;
+            c.Return(t);
+            return new(1);
+        });
+        api["context"] = new LuaFunction((c, ct) =>
+        {
+            c.Return(_sceneCtx.Type == LuaValueType.Table ? _sceneCtx : new LuaTable());
+            return new(1);
         });
         api["current"] = new LuaFunction((c, ct) =>
         {
-            c.Return(_activeScene is null ? LuaValue.Nil : _activeScene);
+            c.Return(Top is { } t ? t.Name : LuaValue.Nil);
             return new(1);
         });
         api["find"] = new LuaFunction((c, ct) =>
         {
             // Resolve against the live scene tree: a node path is unique by
             // construction, so there is no name-collision ambiguity.
-            var node = _sceneContainer?.GetNodeOrNull(c.GetArgument<string>(0));
+            var node = Top?.Container.GetNodeOrNull(c.GetArgument<string>(0));
             c.Return(node is null ? LuaValue.Nil : _godotBinder.WrapInstance(node));
             return new(1);
         });
         api["add"] = new LuaFunction((c, ct) =>
         {
-            if (_sceneContainer is null) throw new EvaluateException("scene.add called with no active scene");
+            if (Top is not { } top) throw new EvaluateException("scene.add called with no active scene");
             var arg = c.GetArgument(0);
             if (arg.TryRead<GodotInstanceProxy>(out var p) && p.Target is Node child)
-                _sceneContainer.AddChild(child);
+                top.Container.AddChild(child);
             return new(0);
         });
         return api;
@@ -1519,12 +1856,285 @@ public sealed class Loader
         _ => double.Parse(text, CultureInfo.InvariantCulture),
     };
 
-    private LuaValue BuildInputApi()
+    // The subscribing script for owner attribution: the executing hook's script, or
+    // the script currently loading (a body-top-level subscribe), or the runtime.
+    private string CurrentOwner() =>
+        _hookOwner ?? (_loadStack.Count > 0 ? _loadStack[^1] : "<runtime>");
+
+    private PlayerController RequireController(string what) =>
+        _controller ?? throw new EvaluateException(
+            $"{what} called before the global layer loaded (no PlayerController yet)");
+
+    // `actions` — the mapped-input surface: actions.<Scenario>.<Action> resolves
+    // against the live controls map (unknown names error, listing what exists) to a
+    // surface with `subscribe{ on=, after=, run= }` plus live `down`/`value`/`vector`
+    // reads. Scenario/action tables are memoized views; state lives on the controller.
+    private LuaValue BuildActionsApi(string path)
+    {
+        var root = new LuaTable();
+        var rootMt = new LuaTable();
+        var scenarioViews = new Dictionary<string, LuaValue>();
+        rootMt["__index"] = new LuaFunction((c, ct) =>
+        {
+            var key = c.GetArgument(1);
+            if (key.Type != LuaValueType.String) { c.Return(LuaValue.Nil); return new(1); }
+            var scenario = key.Read<string>();
+            if (scenarioViews.TryGetValue(scenario, out var cached)) { c.Return(cached); return new(1); }
+            var pc = RequireController($"{path}: actions.{scenario}");
+            if (!pc.Map.Scenarios.ContainsKey(scenario))
+                throw new EvaluateException(
+                    $"{path}: actions.{scenario}: the controls file declares no such scenario " +
+                    $"(declared: {string.Join(", ", pc.ScenarioNames)})");
+            var view = BuildScenarioView(path, scenario);
+            scenarioViews[scenario] = view;
+            c.Return(view);
+            return new(1);
+        });
+        root.Metatable = rootMt;
+        return root;
+    }
+
+    private LuaValue BuildScenarioView(string path, string scenario)
+    {
+        var view = new LuaTable();
+        var mt = new LuaTable();
+        var actionViews = new Dictionary<string, LuaValue>();
+        mt["__index"] = new LuaFunction((c, ct) =>
+        {
+            var key = c.GetArgument(1);
+            if (key.Type != LuaValueType.String) { c.Return(LuaValue.Nil); return new(1); }
+            var action = key.Read<string>();
+            if (actionViews.TryGetValue(action, out var cached)) { c.Return(cached); return new(1); }
+            var pc = RequireController($"{path}: actions.{scenario}.{action}");
+            if (!pc.HasAction(scenario, action))
+                throw new EvaluateException(
+                    $"{path}: actions.{scenario}.{action}: no such action " +
+                    $"(scenario '{scenario}' declares: {string.Join(", ", pc.ActionNames(scenario))})");
+            var av = BuildActionView(scenario, action);
+            actionViews[action] = av;
+            c.Return(av);
+            return new(1);
+        });
+        view.Metatable = mt;
+        return view;
+    }
+
+    private LuaValue BuildActionView(string scenario, string action)
+    {
+        var view = new LuaTable();
+        view["subscribe"] = new LuaFunction((c, ct) =>
+        {
+            var arg = c.GetArgument(c.ArgumentCount - 1);
+            if (arg.Type != LuaValueType.Table)
+                throw new EvaluateException(
+                    $"actions.{scenario}.{action}.subscribe expects a table: " +
+                    "{ on = \"press|release|tap|held\", after = seconds, run = fn }");
+            var spec = arg.Read<LuaTable>();
+            var on = spec["on"].Type == LuaValueType.String ? spec["on"].Read<string>() : "press";
+            var after = spec["after"].Type == LuaValueType.Number ? spec["after"].Read<double>() : 0.2;
+            var run = spec["run"];
+            if (run.Type != LuaValueType.Function)
+                throw new EvaluateException(
+                    $"actions.{scenario}.{action}.subscribe: 'run' must be a function " +
+                    "(note: the key is 'run', not 'do' — 'do' is a Lua keyword)");
+            var pc = RequireController($"actions.{scenario}.{action}.subscribe");
+            var id = pc.Subscribe(scenario, action, on, after, run, CurrentOwner(), _currentLifetime);
+            var handle = new LuaTable();
+            handle["cancel"] = new LuaFunction((c2, ct2) => { pc.Unsubscribe(id); return new(0); });
+            c.Return(handle);
+            return new(1);
+        });
+        var mt = new LuaTable();
+        mt["__index"] = new LuaFunction((c, ct) =>
+        {
+            var key = c.GetArgument(1);
+            if (key.Type != LuaValueType.String || _controller is null) { c.Return(LuaValue.Nil); return new(1); }
+            var (down, value, x, y) = _controller.State(scenario, action);
+            switch (key.Read<string>())
+            {
+                case "down": c.Return(down); break;
+                case "value": c.Return(value); break;
+                case "vector":
+                    var v = new LuaTable(); v["x"] = x; v["y"] = y;
+                    c.Return(v);
+                    break;
+                default: c.Return(LuaValue.Nil); break;
+            }
+            return new(1);
+        });
+        view.Metatable = mt;
+        return view;
+    }
+
+    // `controller` — the native PlayerController surface: scenario routing,
+    // possession, save-DB rebinds, rumble, and text capture.
+    private LuaValue BuildControllerApi()
     {
         var api = new LuaTable();
-        api["is_down"] = new LuaFunction((ctx, ct) =>
+        api["scenario"] = new LuaFunction((c, ct) =>
         {
-            ctx.Return(Pressed.Contains(ctx.GetArgument<string>(0)));
+            var pc = RequireController("controller.scenario");
+            // one string arg = set; no args = get
+            if (c.ArgumentCount > 0 && c.GetArgument(c.ArgumentCount - 1).Type == LuaValueType.String)
+            {
+                pc.SetScenario(c.GetArgument(c.ArgumentCount - 1).Read<string>());
+                return new(0);
+            }
+            c.Return(pc.Scenario);
+            return new(1);
+        });
+        api["possess"] = new LuaFunction((c, ct) =>
+        {
+            var pc = RequireController("controller.possess");
+            var arg = c.GetArgument(c.ArgumentCount - 1);
+            if (arg.TryRead<GodotInstanceProxy>(out var p) && p.Target is Node n) pc.Possess(n);
+            else throw new EvaluateException("controller.possess expects a node");
+            return new(0);
+        });
+        api["possessed"] = new LuaFunction((c, ct) =>
+        {
+            var pc = RequireController("controller.possessed");
+            c.Return(pc.Possessed is { } n && GodotObject.IsInstanceValid(n)
+                ? _godotBinder.WrapInstance(n) : LuaValue.Nil);
+            return new(1);
+        });
+        api["release"] = new LuaFunction((c, ct) =>
+        {
+            RequireController("controller.release").Possess(null);
+            return new(0);
+        });
+        api["rebind"] = new LuaFunction((c, ct) =>
+        {
+            var pc = RequireController("controller.rebind");
+            var scenario = c.GetArgument<string>(0);
+            var token = c.GetArgument<string>(1);
+            var action = c.ArgumentCount > 2 && c.GetArgument(2).Type == LuaValueType.String
+                ? c.GetArgument(2).Read<string>() : "";
+            _persistence ??= new Persistence();
+            if (action.Length == 0 && !HasBaseBinding(scenario, token))
+                _persistence.DeleteOverride(scenario, token);   // clearing a pure-override bind
+            else
+                _persistence.SetOverride(scenario, token, action);
+            RebuildControlsMap(pc);
+            return new(0);
+        });
+        api["overrides"] = new LuaFunction((c, ct) =>
+        {
+            _persistence ??= new Persistence();
+            var list = new LuaTable();
+            int i = 1;
+            foreach (var (scenario, token, action) in _persistence.Overrides())
+            {
+                var row = new LuaTable();
+                row["scenario"] = scenario; row["binding"] = token; row["action"] = action;
+                list[i++] = row;
+            }
+            c.Return(list);
+            return new(1);
+        });
+        api["reset_overrides"] = new LuaFunction((c, ct) =>
+        {
+            var pc = RequireController("controller.reset_overrides");
+            _persistence ??= new Persistence();
+            _persistence.ClearOverrides();
+            RebuildControlsMap(pc);
+            return new(0);
+        });
+        api["rumble"] = new LuaFunction((c, ct) =>
+        {
+            RequireController("controller.rumble")
+                .Rumble(c.GetArgument<double>(0), c.GetArgument<double>(1));
+            return new(0);
+        });
+        api["capture_text"] = new LuaFunction((c, ct) =>
+        {
+            var pc = RequireController("controller.capture_text");
+            var arg = c.ArgumentCount > 0 ? c.GetArgument(c.ArgumentCount - 1) : LuaValue.Nil;
+            if (arg.Type is not (LuaValueType.Function or LuaValueType.Nil))
+                throw new EvaluateException(
+                    "controller.capture_text expects fn(kind, char) or nil to stop capturing");
+            pc.CaptureText(arg, CurrentOwner(), _currentLifetime);
+            return new(0);
+        });
+        api["joy_name"] = new LuaFunction((c, ct) =>
+        {
+            c.Return(Input.GetJoyName(0));
+            return new(1);
+        });
+        return api;
+    }
+
+    // Does the controls FILE (pre-override) bind this token in this scenario? Used
+    // by rebind to distinguish "override a file binding" from "remove an override".
+    private bool HasBaseBinding(string scenario, string token)
+    {
+        if (_controlsFile is null) return false;
+        try
+        {
+            var baseMap = ControlsMap.Parse(_readScript(_controlsFile));
+            return baseMap.Scenarios.TryGetValue(scenario, out var actions)
+                && actions.Values.Any(a => a.Bindings.Any(b =>
+                    string.Equals(b.Token, token, StringComparison.OrdinalIgnoreCase)));
+        }
+        catch (EvaluateException) { return false; }
+    }
+
+    private void RebuildControlsMap(PlayerController pc)
+    {
+        if (_controlsFile is null) { pc.SetMap(new ControlsMap()); return; }
+        _persistence ??= new Persistence();
+        pc.SetMap(ControlsMap.Parse(_readScript(_controlsFile), _persistence.Overrides()));
+    }
+
+    // `store` — the global session state store: set/get/has/delete/keys(prefix)/
+    // subscribe(key-or-"prefix.", fn(key, new, old)). Values survive every scene
+    // switch; nothing here touches disk (that's `save`/`sql`).
+    private LuaValue BuildStoreApi()
+    {
+        var api = new LuaTable();
+        api["set"] = new LuaFunction((c, ct) =>
+        {
+            _store.Set(c.GetArgument<string>(0), c.GetArgument(1));
+            return new(0);
+        });
+        api["get"] = new LuaFunction((c, ct) =>
+        {
+            var v = _store.Get(c.GetArgument<string>(0));
+            c.Return(v.Type == LuaValueType.Nil && c.ArgumentCount > 1 ? c.GetArgument(1) : v);
+            return new(1);
+        });
+        api["has"] = new LuaFunction((c, ct) =>
+        {
+            c.Return(_store.Has(c.GetArgument<string>(0)));
+            return new(1);
+        });
+        api["delete"] = new LuaFunction((c, ct) =>
+        {
+            _store.Delete(c.GetArgument<string>(0));
+            return new(0);
+        });
+        api["keys"] = new LuaFunction((c, ct) =>
+        {
+            var prefix = c.ArgumentCount > 0 && c.GetArgument(0).Type == LuaValueType.String
+                ? c.GetArgument(0).Read<string>() : "";
+            var list = new LuaTable();
+            int i = 1;
+            foreach (var k in _store.Keys(prefix)) list[i++] = k;
+            c.Return(list);
+            return new(1);
+        });
+        api["subscribe"] = new LuaFunction((c, ct) =>
+        {
+            var pattern = c.GetArgument<string>(0);
+            var fn = c.GetArgument(1);
+            if (fn.Type != LuaValueType.Function)
+                throw new EvaluateException(
+                    "store.subscribe expects (key_or_prefix, fn(key, new, old)) — a trailing " +
+                    "'.' subscribes to the whole prefix");
+            var id = _store.Subscribe(pattern, fn, CurrentOwner(), _currentLifetime);
+            var handle = new LuaTable();
+            handle["cancel"] = new LuaFunction((c2, ct2) => { _store.Unsubscribe(id); return new(0); });
+            c.Return(handle);
             return new(1);
         });
         return api;

@@ -7,6 +7,71 @@ the version is `0.x`, minor bumps may include breaking changes.
 
 ## [Unreleased]
 
+## [0.11.0] — 2026-07-02
+
+The native-input release: raw input becomes impossible for scripts and is replaced by a
+native PlayerController + a controls-TOML action map; scenes gain a native player
+spawner with transition context, a scene STACK for menus, and a global session `store`.
+Enforcement suite: 115 tests.
+
+### Changed
+- **Breaking — raw input is gone from the script surface.** The `input` capability
+  service (`input.is_down`) and the `on_input` lifecycle hook (systems + behaviors) are
+  REMOVED, and the input classes — `Input`, `InputMap`, `Key`, `KeyModifierMask`,
+  `JoyButton`, `JoyAxis`, `MouseButton`, `MouseButtonMask`, and every `InputEvent*` —
+  are blocked from `apis:` declaration (same stance as `FileAccess`). Input outside the
+  controller is impossible by construction, not convention. Migration: bind devices to
+  actions in the controls TOML and subscribe/poll via `actions`; UI text entry goes
+  through `controller.capture_text`. (`src/Evaluate/Loader.cs`,
+  `src/Evaluate/EvaluateRuntime.cs`)
+- **`scene.change(name[, ctx])`** now takes an optional context table, carried to the
+  destination — the `[player]` spawn script's argument and `scene.context()`; the
+  framework adds `from`/`to`/`reason` (`"start" | "change" | "push" | "pop" | "reload"`).
+  Loading zones pass `{ entry = ... }` instead of inventing save-DB batons.
+
+### Added
+- **Native `PlayerController` + controls TOML + `actions` api.** `global.scene` declares
+  `controls = "…toml"` (hot-reloaded); sections are SCENARIOS (`[Gameplay]`, `[Menu]`,
+  the reserved always-active `[Always]`, and `[settings]` for `deadzone`/
+  `axis_threshold`), keys are binding tokens (`Button_a`, `Key_space`, `Axis_trigger_right`,
+  `Stick_left`, `Mouse_left`; digital keys feed vector axes via `"Move+x"`-style
+  suffixes; unknown tokens are load errors), values are action names. One implicit
+  controller node in the global layer polls devices once per physics tick (before any
+  `on_physics_update`) and dispatches `actions.<Scenario>.<Action>` —
+  `subscribe{ on = "press|release|tap|held", after = seconds, run = fn }` (returns a
+  `cancel()` handle; owner-attributed for hot reload, lifetime-scoped to the subscribing
+  scene layer) plus live `down`/`value`/`vector` reads. Scenario switches fire synthetic
+  releases and suppress bindings held across the switch until first released.
+  (`src/Evaluate/Controls.cs`, `src/Evaluate/PlayerController.cs`)
+- **`controller` api** — `scenario(name?)`, `possess(node)`/`possessed()`/`release()`,
+  save-DB rebinds (`rebind(scenario, token, action|nil)` persisted in a
+  `control_overrides` table and applied over the TOML, `overrides()`,
+  `reset_overrides()`), `rumble(strength, seconds)`, `capture_text(fn|nil)` (printable
+  keys become text and stop firing actions while capturing), `joy_name()`.
+  (`src/Evaluate/Persistence.cs`)
+- **Scene-level `[player]` spawner + `scenario` key.** A scene that wants a possessed
+  player declares `player = { node = "<fragment scene>", spawn = "<module.evt>" }`:
+  the single-root fragment is instantiated on entry, placed by the module's exported
+  `spawn(ctx) -> { x, y, z, facing? }`, and auto-possessed; a top-level
+  `scenario = "…"` switches the controller scenario on entry. Spawn order: scene tree
+  attach/load → spawn(ctx) → player attach/load → possession → systems' `on_enter`. A
+  hot-reload rebuild of the active scene PRESERVES the live player transform (spawn
+  scripts don't re-run; reason `"reload"`).
+- **Scene stack** — `scene.push(name[, ctx])` / `scene.pop()` / `scene.stack()`. Pushing
+  freezes the layer beneath (engine processing disabled, no hook dispatch, machines +
+  abilities hold, still rendered) and fires `on_pause` on it; popping frees the top
+  (its `on_exit` runs, its subscriptions die) and thaws the layer beneath (`on_resume`),
+  restoring the controller scenario + possession captured at push time. `scene.change`
+  clears the whole stack. Menus (pause over the live world) are the intended use.
+- **`store` api — global session state.** `set`/`get(key[, default])`/`has`/`delete`/
+  `keys(prefix)`/`subscribe(key_or_"prefix.", fn(key, new, old))` with `cancel()`
+  handles. Values live in the global layer and survive every scene switch/push/pop;
+  nothing is written to disk (durable saves stay `save`/`sql`, where slot semantics
+  live). Subscriptions are owner-attributed (hot reload) and lifetime-scoped (scene
+  layers). (`src/Evaluate/Store.cs`)
+- **SceneWriter/addon round-trip** of the new scene-level header fields
+  (`controls`/`scenario`/`[player]`), so editor edits never drop them.
+
 ## [0.10.2] — 2026-07-01
 
 ### Fixed

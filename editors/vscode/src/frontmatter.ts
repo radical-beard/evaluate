@@ -180,8 +180,11 @@ function validate(doc: vscode.TextDocument, s: EvtSpec, sink: vscode.DiagnosticC
           `'godot:'-prefixed entries were removed in 0.10.0 — declare the Godot class/enum name directly ` +
           `(e.g. '${entry.slice("godot:".length) || "Node3D"}'); it is injected as a bare global.`,
           vscode.DiagnosticSeverity.Error));
-      } else if (blocked.has(value)) {
-        diags.push(diag(i, value, col, `'${value}' is blocked from declaration — assets load via frontmatter assets:`,
+      } else if (blocked.has(value) || value.startsWith("InputEvent")) {
+        const why = /^(Input|Key|Joy|Mouse)/.test(value)
+          ? "raw input is native-only — subscribe to mapped actions via the 'actions' api"
+          : "assets load via frontmatter assets:; persistence via save/sql";
+        diags.push(diag(i, value, col, `'${value}' is blocked from declaration — ${why}.`,
           vscode.DiagnosticSeverity.Error));
       } else if (!validApis.has(value) && !/^[A-Z]/.test(value)) {
         // PascalCase entries are Godot classes/enums (or host extension apis) — accepted.
@@ -318,9 +321,12 @@ function hoverProvider(spec: () => EvtSpec): vscode.HoverProvider {
         const members = (s.apiMembers[word] ?? []).map((m) => `\`${word}.${m}\``).join(", ");
         return new vscode.Hover(new vscode.MarkdownString(`**${word}** — ${note ?? (members || "capability api")}`), range);
       }
-      if (s.blockedApis.includes(word)) {
+      if (s.blockedApis.includes(word) || word.startsWith("InputEvent")) {
+        const why = /^(Input|Key|Joy|Mouse)/.test(word)
+          ? "raw input is native-only — subscribe to mapped actions via the `actions` api"
+          : "assets load via frontmatter `assets:`";
         return new vscode.Hover(new vscode.MarkdownString(
-          `**${word}** — blocked from \`apis:\` — assets load via frontmatter \`assets:\`.`), range);
+          `**${word}** — blocked from \`apis:\` — ${why}.`), range);
       }
       if (s.godotClasses.includes(word)) {
         return new vscode.Hover(new vscode.MarkdownString(

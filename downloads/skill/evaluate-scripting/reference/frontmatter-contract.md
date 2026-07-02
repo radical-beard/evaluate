@@ -14,7 +14,7 @@ config:
  - game.toml
 apis:
  - save
- - Input
+ - actions
  - Node3D
 assets:
   tint: "shaders/tint.gdshader"
@@ -60,14 +60,14 @@ own bare global table:
 ```
 ---
 apis:
- - input          # framework service
+ - actions        # framework service (mapped input)
  - combat_native  # a host api the game registered via runtime.RegisterApi(...)
- - Input          # the Godot Input singleton-class
+ - OS             # a Godot singleton-class: OS.GetName()
  - Node3D         # a Godot class: Node3D.new()
- - Key            # a Godot enum: Key.Space
+ - Timer          # classes carry their enums: Timer.TimerProcessCallback.Idle
 ---
 local n = Node3D.new()
-if Input.GetJoyAxis(0, 0) > 0.5 or Key.Space ~= nil then ... end
+if actions.Gameplay.Jump.down and OS.GetName() ~= "Web" then ... end
 ```
 
 Rules:
@@ -77,12 +77,17 @@ Rules:
   members regardless of what is declared. Declaring `Node3D` is about *naming the class*
   (constructor, statics, enums, constants), not about touching Node3D instances.
 - **An unknown name is a load error** (typo-proofing), not a silent `nil`: the message lists
-  what a name can be (a framework api `input`/`world`/`scene`/`save`/`sql`, a registered
+  what a name can be (a framework api
+  `actions`/`controller`/`store`/`world`/`scene`/`save`/`sql`, a registered
   host api, or a Godot class/enum).
 - **`godot:`-prefixed entries error** with a migration hint — declare the class itself
   (`apis: [Node3D]`) and use it as a bare global.
 - **Blocked from declaration:** `ResourceLoader`, `ResourceSaver`, `FileAccess`,
-  `DirAccess`. Assets come from frontmatter `assets:`; persistence from `save`/`sql`.
+  `DirAccess` — assets come from frontmatter `assets:`; persistence from `save`/`sql`.
+  Likewise the raw input classes — `Input`, `InputMap`, `Key`, `KeyModifierMask`,
+  `JoyButton`, `JoyAxis`, `MouseButton`, `MouseButtonMask`, and every `InputEvent*` class
+  (prefix-blocked) — input is mapped through the controls TOML and read via the `actions`
+  api (the error says so). See [sandbox-rules.md](sandbox-rules.md) → "The input model".
 
 ## The `returns` grammar
 

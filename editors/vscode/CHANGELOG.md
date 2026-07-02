@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.11.0
+
+Tracks the Evaluate 0.11.0 scripting contract (BREAKING in the runtime; the extension follows).
+
+- **Raw input is native-only.** The `input` service and the `on_input` hook are gone from
+  completion/validation; the input classes (`Input`, `InputMap`, `Key`, `KeyModifierMask`,
+  `JoyButton`, `JoyAxis`, `MouseButton`, `MouseButtonMask`, and every `InputEvent*` — the
+  prefix is checked) are flagged as blocked `apis:` errors pointing at the `actions` api.
+- **New capability apis** in completion + hover: `actions` (mapped input —
+  `actions.<Scenario>.<Action>` with `subscribe{ on, after, run }` and live
+  `down`/`value`/`vector` reads; scenarios/actions come from the game's controls TOML),
+  `controller` (scenario routing, possession, save-DB rebinds, rumble, text capture), and
+  `store` (global session state with prefix subscriptions).
+- **`scene` api members updated**: `change(name[, ctx])`, plus `push`/`pop`/`stack`
+  (the scene stack) and `context()` (the transition context).
+
 ## 0.10.0
 
 Tracks the Evaluate 0.10.0 scripting contract (BREAKING in the runtime; the extension follows).

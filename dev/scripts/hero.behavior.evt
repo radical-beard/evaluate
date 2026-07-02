@@ -1,0 +1,17 @@
+---
+apis:
+ - controller
+ - scene
+register:
+ - on_attach
+---
+-- One small behavior on the spawned Hero. The framework placed the node via the
+-- scene's [player] spawn script BEFORE on_attach, and possesses it right after
+-- the fragment's behaviors load — so controller.possessed() is us by the time
+-- any system's on_enter runs.
+function on_attach()
+  local p = self.position
+  local ctx = scene.context()
+  print(string.format("hero: spawned at (%.1f, %.1f, %.1f) reason=%s",
+    p.x, p.y, p.z, tostring(ctx.reason)))
+end

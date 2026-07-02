@@ -43,12 +43,27 @@ public sealed class AttachSpec
     public Dictionary<string, object> Params = new();
 }
 
+// The scene-level `[player]` section: the node tree fragment the framework spawns
+// on entry (a `*.scene` whose single root becomes the possessed player node) and
+// the module whose exported `spawn(ctx)` returns where to place it. Declared only
+// in scenes that want a possessed player — it is scene DATA, not a marker node.
+public sealed class PlayerSpec
+{
+    public string Node = "";    // scene fragment (scripts-relative scene name)
+    public string Spawn = "";   // .evt module exporting spawn(ctx) -> { x, y, z[, facing] }
+}
+
 // A parsed `*.scene` file: a node tree, plus (for the reserved `global.scene`
-// manifest) the scene to start in, and an optional free-text `description` (scene
+// manifest) the scene to start in and the `controls` TOML, an optional
+// `scenario` (the controller scenario to activate on entry), an optional
+// `[player]` spawner section, and an optional free-text `description` (scene
 // docs as data — survives editor round-trips, unlike comments).
 public sealed class SceneSpec
 {
     public string? StartScene;
+    public string? Controls;               // manifest-only: the controls TOML (scripts-relative)
+    public string? Scenario;               // controller scenario to set on scene entry
+    public PlayerSpec? Player;             // spawn a possessed player on entry
     public string? Description;
     public List<NodeSpec> Nodes = new();   // root-level nodes
 }
@@ -71,6 +86,34 @@ public static class SceneFile
 
         if (model.TryGetValue("start_scene", out var ss) && ss is string s)
             spec.StartScene = s;
+
+        if (model.TryGetValue("controls", out var cs) && cs is string c)
+            spec.Controls = c;
+
+        if (model.TryGetValue("scenario", out var sc) && sc is string scn)
+            spec.Scenario = scn;
+
+        if (model.TryGetValue("player", out var pl))
+        {
+            if (pl is not TomlTable pt)
+                throw new EvaluateException(
+                    "scene '[player]' must be a table with 'node' and 'spawn' keys");
+            var player = new PlayerSpec();
+            foreach (var kv in pt)
+                switch (kv.Key)
+                {
+                    case "node": player.Node = kv.Value?.ToString() ?? ""; break;
+                    case "spawn": player.Spawn = kv.Value?.ToString() ?? ""; break;
+                    default:
+                        throw new EvaluateException(
+                            $"scene '[player]' has unknown key '{kv.Key}' (only 'node' and 'spawn')");
+                }
+            if (player.Node.Length == 0 || player.Spawn.Length == 0)
+                throw new EvaluateException(
+                    "scene '[player]' needs both 'node' (the scene fragment to spawn) " +
+                    "and 'spawn' (the module whose spawn(ctx) places it)");
+            spec.Player = player;
+        }
 
         if (model.TryGetValue("description", out var ds) && ds is string d)
             spec.Description = d;

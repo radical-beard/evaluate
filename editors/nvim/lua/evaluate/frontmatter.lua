@@ -277,10 +277,15 @@ function M.validate(bufnr)
               message = ("'godot:'-prefixed entries were removed in 0.10.0 — declare the Godot class/enum "
                 .. "name directly (e.g. '%s'); it is injected as a bare global."):format(bare ~= "" and bare or "Node3D"),
             })
-          elseif blocked_apis[value] then
+          elseif blocked_apis[value] or value:match("^InputEvent") then
+            local is_input = value:match("^Input") or value:match("^Key")
+              or value:match("^Joy") or value:match("^Mouse")
+            local why = is_input
+              and "raw input is native-only — subscribe to mapped actions via the 'actions' api"
+              or "assets load via frontmatter assets:; persistence via save/sql"
             table.insert(diags, {
               lnum = i - 1, col = col, end_col = col + #value, severity = vim.diagnostic.severity.ERROR, source = "evt",
-              message = ("'%s' is blocked from declaration — assets load via frontmatter assets:"):format(value),
+              message = ("'%s' is blocked from declaration — %s."):format(value, why),
             })
           elseif not valid_apis[value] and not value:match("^%u") then
             -- PascalCase entries are Godot classes/enums (or host extension apis) — accepted.

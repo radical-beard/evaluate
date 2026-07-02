@@ -27,32 +27,50 @@ export interface EvtSpec {
 
 // Stable fallback (api/hook/key names rarely change; the live spec wins when found).
 const BUNDLED: Omit<EvtSpec, "source"> = {
-  // The five framework services. Since 0.10.0, `apis:` ALSO accepts any Godot class or
-  // global-enum name (PascalCase — `apis: [Input, Node3D, Key]` injects each as a bare
+  // The framework services. Since 0.10.0, `apis:` ALSO accepts any Godot class or
+  // global-enum name (PascalCase — `apis: [Node3D, Side]` injects each as a bare
   // global) and host-registered C# extension apis; those aren't enumerable here, so the
   // validator accepts PascalCase entries and only the blocked names below are errors.
-  apis: ["input", "world", "scene", "save", "sql"],
+  // 0.11.0: raw input is native — the `input` service and `on_input` hook are gone;
+  // input classes (Input, Key, InputEvent*, ...) are blocked. Use `actions`/`controller`.
+  apis: ["world", "scene", "save", "sql", "actions", "controller", "store"],
   apiMembers: {
-    input: ["is_down"],
     world: [],
-    scene: ["add", "change", "current", "find"],
+    scene: ["add", "change", "context", "current", "find", "list", "pop", "push", "stack"],
     save: ["delete", "get", "set"],
     sql: ["exec", "exec_async", "flush", "query", "query_row", "snapshot", "transaction"],
+    actions: [],
+    controller: [
+      "capture_text", "joy_name", "overrides", "possess", "possessed", "release",
+      "rebind", "reset_overrides", "rumble", "scenario",
+    ],
+    store: ["delete", "get", "has", "keys", "set", "subscribe"],
   },
   apiNotes: {
     world: "The persistent global-root Node (a wrapped instance, not a table). Survives scene switches.",
+    actions:
+      "actions.<Scenario>.<Action> — mapped input from the manifest's controls TOML. " +
+      "Each action exposes subscribe{ on = \"press|release|tap|held\", after = seconds, run = fn } " +
+      "plus live `down`/`value`/`vector` reads. Unknown names are load errors.",
+    controller: "The native PlayerController: scenario routing, possession, save-DB rebinds, rumble, text capture.",
+    store: "Global SESSION state (survives scene switches; never written to disk — that's save/sql).",
   },
-  blockedApis: ["DirAccess", "FileAccess", "ResourceLoader", "ResourceSaver"],
+  blockedApis: [
+    "DirAccess", "FileAccess", "ResourceLoader", "ResourceSaver",
+    // raw input is native-only (InputEvent* is prefix-blocked by the loader)
+    "Input", "InputMap", "Key", "KeyModifierMask", "JoyButton", "JoyAxis",
+    "MouseButton", "MouseButtonMask",
+  ],
   godotClasses: [],
   godotEnums: [],
   systemHooks: [
     "on_start", "on_load", "on_unload", "on_quit", "on_enter", "on_exit",
     "on_focus_in", "on_focus_out", "on_pause", "on_resume",
-    "on_update", "on_physics_update", "on_input",
+    "on_update", "on_physics_update",
   ],
   nodeHooks: [
     "on_attach", "on_load", "on_unload", "on_update", "on_physics_update",
-    "on_input", "on_exit", "on_quit", "on_focus_in", "on_focus_out", "on_pause", "on_resume",
+    "on_exit", "on_quit", "on_focus_in", "on_focus_out", "on_pause", "on_resume",
   ],
   frontmatterKeys: [
     "config", "apis", "register", "returns", "params", "require", "assets", "scenes",

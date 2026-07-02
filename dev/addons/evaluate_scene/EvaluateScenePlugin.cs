@@ -126,8 +126,14 @@ public partial class EvaluateScenePlugin : EditorPlugin
         var description = root.HasMeta(DescriptionMeta) ? root.GetMeta(DescriptionMeta).AsString() : null;
         var binder = new GodotBinder(Lua.LuaState.Create());
 
+        // Re-parse the source for its scene-LEVEL header (controls/scenario/[player])
+        // so a node-tree edit in the editor never drops fields the editor can't show.
+        SceneSpec? header = null;
+        try { header = SceneFile.Parse(Godot.FileAccess.GetFileAsString(scenePath)); }
+        catch (System.Exception) { /* unreadable/renamed source: emit without a header */ }
+
         string toml;
-        try { toml = SceneWriter.WriteContainer(root, binder, startScene, description); }
+        try { toml = SceneWriter.WriteContainer(root, binder, startScene, description, header); }
         catch (System.Exception e) { return $"serialize error: {e.Message}"; }
 
         using var f = Godot.FileAccess.Open(scenePath, Godot.FileAccess.ModeFlags.Write);

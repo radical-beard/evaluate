@@ -139,7 +139,8 @@ public static class EvaluateTests
                 var loader = NewLoader();
                 loader.SetGlobalRoot(root);
                 loader.LoadGlobalLayerFromFile();     // global.scene -> Probe + self_node.node.evt
-                var probe = root.GetChildCount() > 0 ? root.GetChild(0) : null;
+                // (child 0 is now the implicit PlayerController — resolve the probe by name)
+                var probe = root.GetNodeOrNull("Probe");
                 ok = probe is not null && probe.HasMeta("ready") && probe.GetMeta("ready").AsBool();
                 detail = probe is null ? "no node instantiated" : $"meta ready={probe.HasMeta("ready")}";
                 root.QueueFree();
@@ -1149,14 +1150,14 @@ public static class EvaluateTests
             bool ok = false; string detail = "";
             var src = new Dictionary<string, string>
             {
-                ["enum_api.evt"] = "---\napis:\n - Key\nreturns:\n - r\n---\nreturn { r = Key.Space }\n",
+                ["enum_api.evt"] = "---\napis:\n - Side\nreturns:\n - r\n---\nreturn { r = Side.Bottom }\n",
             };
             try
             {
                 var r = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { })
                     .Require("enum_api.evt").Read<LuaTable>()["r"];
-                ok = r.Type == LuaValueType.Number && r.Read<double>() == (double)(long)Key.Space;
-                detail = $"Key.Space={r}";
+                ok = r.Type == LuaValueType.Number && r.Read<double>() == (double)(long)Side.Bottom;
+                detail = $"Side.Bottom={r}";
             }
             catch (Exception e) { detail = e.Message; }
             Check("a declared Godot enum injects its value table", ok, detail);
@@ -2010,6 +2011,584 @@ public static class EvaluateTests
             Check("malformed / missing dna params are rejected",
                 tooShort && noPrefix && nonHex && wrongType && missing,
                 $"short={tooShort}, noPrefix={noPrefix}, nonHex={nonHex}, wrongType={wrongType}, missing={missing}");
+        }
+
+        // ---- 0.11: native input (controls TOML -> actions), spawner, stack, store ----
+
+        // Shared in-memory project for the controller tests: a manifest declaring a
+        // controls file, one global node that subscribes, and two scenes (s1 carries
+        // a [player] spawner + scenario, s2 is bare).
+        Dictionary<string, string> ControllerSrc() => new()
+        {
+            ["global.scene"] = """
+                controls = "c.toml"
+
+                [nodes.Sub]
+                type = "Node"
+                script = "sub.node.evt"
+                """,
+            ["c.toml"] = """
+                [Game]
+                Key_space = "Jump"
+                Key_escape = "Pause"
+                Stick_left = "Move"
+                Key_d = "Move+x"
+                Key_a = "Move-x"
+
+                [Menu]
+                Key_escape = "Back"
+
+                [Cutscene]
+
+                [settings]
+                deadzone = 0.1
+                """,
+            ["sub.node.evt"] = """
+                ---
+                apis:
+                 - actions
+                register:
+                 - on_load
+                ---
+                function on_load()
+                  actions.Game.Jump.subscribe{ on = "press", run = function() print("jump:press") end }
+                  actions.Game.Jump.subscribe{ on = "release", run = function() print("jump:release") end }
+                  actions.Game.Jump.subscribe{ on = "tap", after = 0.2, run = function() print("jump:tap") end }
+                  actions.Game.Jump.subscribe{ on = "held", after = 0.2, run = function() print("jump:held") end }
+                  actions.Menu.Back.subscribe{ on = "press", run = function() print("back:press") end }
+                  actions.Game.Pause.subscribe{ on = "press", run = function() print("pause:press") end }
+                end
+                """,
+            ["hero.scene"] = """
+                [nodes.Hero]
+                type = "Node3D"
+                behaviors = ["hero.behavior.evt"]
+                """,
+            ["hero.behavior.evt"] = """
+                ---
+                apis:
+                 - scene
+                register:
+                 - on_attach
+                ---
+                function on_attach()
+                  local c = scene.context()
+                  print(string.format("hero@%s entry=%s reason=%s",
+                    tostring(scene.current()), tostring(c.entry), tostring(c.reason)))
+                end
+                """,
+            ["spawn.evt"] = """
+                ---
+                returns:
+                 - spawn
+                ---
+                local M = {}
+                function M.spawn(ctx)
+                  if ctx.entry == "east" then return { x = 8, y = 0, z = 0, facing = 1.5 } end
+                  return { x = 1, y = 2, z = 3 }
+                end
+                return M
+                """,
+            ["s1.scene"] = """
+                scenario = "Game"
+                player = { node = "hero", spawn = "spawn.evt" }
+
+                [nodes.World]
+                type = "Node"
+                """,
+            ["s2.scene"] = """
+                [nodes.Empty]
+                type = "Node"
+                """,
+        };
+
+        (Loader loader, Node root, List<string> sink) NewControllerLoader(Dictionary<string, string> src)
+        {
+            var sink = new List<string>();
+            var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", sink.Add);
+            var root = new Node();
+            loader.SetGlobalRoot(root);
+            new Persistence().ClearOverrides();     // isolate from prior runs' rebinds
+            loader.LoadGlobalLayerFromFile();
+            return (loader, root, sink);
+        }
+
+        // 99: controls TOML parses scenarios, tokens, vector routing, settings
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var map = ControlsMap.Parse(ControllerSrc()["c.toml"]);
+                var jump = map.Find("Game", "Jump");
+                var move = map.Find("Game", "Move");
+                // 3 scenarios: Game, Menu, and the binding-LESS Cutscene (an empty
+                // section is a real, switchable input-silence scenario).
+                ok = map.Scenarios.Count == 3 && map.Scenarios.ContainsKey("Cutscene")
+                     && jump is { IsVector: false, Bindings.Count: 1 }
+                     && jump.Bindings[0].Source == BindingSource.Key
+                     && jump.Bindings[0].Code == (long)Key.Space
+                     && move is { IsVector: true, Bindings.Count: 3 }
+                     && move.Bindings[1].Component == AxisComponent.PlusX
+                     && System.Math.Abs(map.Deadzone - 0.1) < 1e-9;
+                detail = $"scenarios={map.Scenarios.Count}, move bindings={move?.Bindings.Count}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("controls TOML parses scenarios/tokens/vectors/settings", ok, detail);
+        }
+
+        // 100: controls contract violations fail at parse
+        {
+            var badToken = Throws(() => ControlsMap.Parse("[G]\nPedal_x = \"A\"\n"));
+            var badKey = Throws(() => ControlsMap.Parse("[G]\nKey_floop = \"A\"\n"));
+            var badValue = Throws(() => ControlsMap.Parse("[G]\nKey_a = 3\n"));
+            var mixed = Throws(() => ControlsMap.Parse("[G]\nStick_left = \"M\"\nKey_a = \"M\"\n"));
+            var badSetting = Throws(() => ControlsMap.Parse("[settings]\nturbo = 1\n"));
+            Check("controls contract violations fail at parse",
+                badToken && badKey && badValue && mixed && badSetting,
+                $"token={badToken}, key={badKey}, value={badValue}, mixed={mixed}, setting={badSetting}");
+        }
+
+        // 101: raw input classes are not declarable capabilities
+        {
+            bool Blocked(string api) => Throws(() =>
+            {
+                var src = new Dictionary<string, string>
+                {
+                    ["probe.evt"] = $"---\napis:\n - {api}\n---\nreturn {{}}\n",
+                };
+                new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { }).Require("probe.evt");
+            });
+            var input = Blocked("Input");
+            var evKey = Blocked("InputEventKey");
+            var key = Blocked("Key");
+            var joy = Blocked("JoyButton");
+            var oldSvc = Blocked("input");   // the pre-0.11 service name resolves to nothing
+            Check("raw input (Input/InputEvent*/Key/JoyButton/input) is undeclarable",
+                input && evKey && key && joy && oldSvc,
+                $"Input={input}, InputEventKey={evKey}, Key={key}, JoyButton={joy}, input={oldSvc}");
+        }
+
+        // 102: on_input is no longer a lifecycle hook (system + node)
+        {
+            var sys = Throws(() =>
+            {
+                var src = new Dictionary<string, string>
+                {
+                    ["s.evt"] = "---\nregister:\n - on_input\n---\nfunction on_input(e) end\n",
+                };
+                new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { }).LoadSystem("s.evt");
+            });
+            var node = GasLoadThrows(new Dictionary<string, string>
+            {
+                ["layer.scene"] = "[nodes.N]\ntype = \"Node\"\nscript = \"b.behavior.evt\"\n",
+                ["b.behavior.evt"] = "---\nregister:\n - on_input\n---\nfunction on_input(e) end\n",
+            });
+            Check("on_input is no longer a registrable hook", sys && node, $"sys={sys}, node={node}");
+        }
+
+        // 103: actions dispatch — press, held(after), tap-vs-held, release, polling
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (loader, root, sink) = NewControllerLoader(ControllerSrc());
+                var pc = loader.Controller!;
+                pc.SetScenario("Game");
+                var down = new HashSet<long>();
+                pc.ProbeKey = code => down.Contains(code);
+                pc.ProbeButton = _ => false; pc.ProbeMouse = _ => false; pc.ProbeAxis = _ => 0;
+
+                down.Add((long)Key.Space);
+                loader.PollController(1.0 / 60);                    // press edge
+                var pressed = sink.Contains("jump:press") && !sink.Contains("jump:held");
+                var polled = pc.State("Game", "Jump").down;
+                down.Remove((long)Key.Space);
+                loader.PollController(1.0 / 60);                    // quick release -> tap
+                var tapped = sink.Contains("jump:tap") && sink.Contains("jump:release");
+
+                sink.Clear();
+                down.Add((long)Key.Space);
+                loader.PollController(1.0 / 60);                    // press again
+                for (int i = 0; i < 20; i++) loader.PollController(1.0 / 60);   // hold ~0.33 s
+                var held = sink.Contains("jump:held");
+                var heldOnce = sink.FindAll(s => s == "jump:held").Count == 1;
+                down.Remove((long)Key.Space);
+                loader.PollController(1.0 / 60);                    // long release -> NO tap
+                var noTap = !sink.Contains("jump:tap") && sink.Contains("jump:release");
+
+                // vector polling: D key contributes +x
+                down.Add((long)Key.D);
+                loader.PollController(1.0 / 60);
+                var (vd, _, vx, _) = pc.State("Game", "Move");
+                var vector = vd && System.Math.Abs(vx - 1) < 1e-9;
+
+                ok = pressed && polled && tapped && held && heldOnce && noTap && vector;
+                detail = $"press={pressed}, poll={polled}, tap={tapped}, held={held}(x1={heldOnce}), " +
+                         $"noTap={noTap}, vector={vector}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("actions dispatch: press/tap/held/release + polled state", ok, detail);
+        }
+
+        // 104: scenario gating — inactive scenarios are silent; a switch fires a
+        // synthetic release and suppresses bindings held across it
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (loader, root, sink) = NewControllerLoader(ControllerSrc());
+                var pc = loader.Controller!;
+                var down = new HashSet<long>();
+                pc.ProbeKey = code => down.Contains(code);
+                pc.ProbeButton = _ => false; pc.ProbeMouse = _ => false; pc.ProbeAxis = _ => 0;
+
+                pc.SetScenario("Game");
+                down.Add((long)Key.Escape);
+                loader.PollController(1.0 / 60);
+                var pauseFired = sink.Contains("pause:press") && !sink.Contains("back:press");
+
+                pc.SetScenario("Menu");                       // Esc still physically held
+                loader.PollController(1.0 / 60);
+                loader.PollController(1.0 / 60);
+                var suppressed = !sink.Contains("back:press");  // stale until released once
+                down.Remove((long)Key.Escape);
+                loader.PollController(1.0 / 60);
+                down.Add((long)Key.Escape);
+                loader.PollController(1.0 / 60);
+                var backAfterRelease = sink.Contains("back:press");
+
+                // Jump (Game) must not fire while Menu is active
+                sink.Clear();
+                down.Add((long)Key.Space);
+                loader.PollController(1.0 / 60);
+                var gated = !sink.Contains("jump:press");
+
+                ok = pauseFired && suppressed && backAfterRelease && gated;
+                detail = $"pause={pauseFired}, suppressed={suppressed}, " +
+                         $"backAfterRelease={backAfterRelease}, gated={gated}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("scenario gating + stale-binding suppression on switch", ok, detail);
+        }
+
+        // 105: unknown scenario/action and a missing run fn are load-time errors
+        {
+            bool Fails(string body) => Throws(() =>
+            {
+                var src = ControllerSrc();
+                src["bad.evt"] = "---\napis:\n - actions\nregister:\n - on_start\n---\n" +
+                                 "function on_start() " + body + " end\n";
+                var sink = new List<string>();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", sink.Add);
+                var root = new Node();
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayerFromFile();
+                var sys = loader.LoadSystem("bad.evt");
+                loader.Call(sys.OnStart);
+                root.QueueFree();
+            });
+            var scenario = Fails("local x = actions.Nope.Jump");
+            var action = Fails("local x = actions.Game.Nope");
+            var run = Fails("actions.Game.Jump.subscribe{ on = \"press\" }");
+            var onKind = Fails("actions.Game.Jump.subscribe{ on = \"wiggle\", run = function() end }");
+            Check("actions: unknown scenario/action + bad subscribe specs error",
+                scenario && action && run && onKind,
+                $"scenario={scenario}, action={action}, run={run}, on={onKind}");
+        }
+
+        // 106: rebinds — a save-DB override remaps over the TOML, and reset restores
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var persistence = new Persistence();
+                persistence.ClearOverrides();
+                persistence.SetOverride("Game", "Key_space", "Pause");   // space now pauses
+                var map = ControlsMap.Parse(ControllerSrc()["c.toml"], persistence.Overrides());
+                var jumpUnbound = map.Find("Game", "Jump")!.Bindings.Count == 0;
+                var pauseHasSpace = map.Find("Game", "Pause")!.Bindings
+                    .Exists(b => b.Code == (long)Key.Space);
+                persistence.ClearOverrides();
+                var back = ControlsMap.Parse(ControllerSrc()["c.toml"], persistence.Overrides());
+                var restored = back.Find("Game", "Jump")!.Bindings.Count == 1;
+                ok = jumpUnbound && pauseHasSpace && restored;
+                detail = $"unbound={jumpUnbound}, remapped={pauseHasSpace}, restored={restored}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("control overrides remap over the TOML and reset cleanly", ok, detail);
+        }
+
+        // 107: the [player] spawner — fragment spawned, spawn(ctx) places it, the
+        // controller possesses it, and scene.context() carries the caller's entry
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (loader, root, sink) = NewControllerLoader(ControllerSrc());
+                loader.GotoScene("s1");
+                var hero = loader.Controller!.Possessed;
+                var placed = hero is Node3D n3 && n3.Position.IsEqualApprox(new Vector3(1, 2, 3));
+                var announced = sink.Exists(s => s.Contains("hero@s1 entry=nil reason=change"));
+                var scenarioSet = loader.Controller.Scenario == "Game";
+
+                var ctx = new LuaTable(); ctx["entry"] = "east";
+                loader.GotoScene("s1", ctx);
+                var hero2 = loader.Controller.Possessed;
+                var placed2 = hero2 is Node3D m3 && m3.Position.IsEqualApprox(new Vector3(8, 0, 0))
+                              && System.Math.Abs(m3.Rotation.Y - 1.5f) < 1e-3;
+                var announced2 = sink.Exists(s => s.Contains("hero@s1 entry=east reason=change"));
+                ok = placed && announced && scenarioSet && placed2 && announced2;
+                detail = $"placed={placed}, announced={announced}, scenario={scenarioSet}, " +
+                         $"entry placed={placed2}, entry ctx={announced2}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("[player] spawner: fragment + spawn(ctx) + possession + context", ok, detail);
+        }
+
+        // 108: spawner contract — multi-root fragments and a missing spawn export fail
+        {
+            var multiRoot = Throws(() =>
+            {
+                var src = ControllerSrc();
+                src["hero.scene"] = "[nodes.A]\ntype = \"Node3D\"\n[nodes.B]\ntype = \"Node3D\"\n";
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                var root = new Node();
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayerFromFile();
+                try { loader.GotoScene("s1"); } finally { root.QueueFree(); }
+            });
+            var noExport = Throws(() =>
+            {
+                var src = ControllerSrc();
+                src["spawn.evt"] = "---\nreturns:\n - spawn\n---\nreturn { spawn = 5 }\n";
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                var root = new Node();
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayerFromFile();
+                try { loader.GotoScene("s1"); } finally { root.QueueFree(); }
+            });
+            Check("[player] contract: single root + spawn(ctx) export enforced",
+                multiRoot && noExport, $"multiRoot={multiRoot}, noExport={noExport}");
+        }
+
+        // 109: the scene stack — push freezes the layer below (no hooks, on_pause),
+        // pop thaws it (on_resume) and restores scenario + possession
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var src = ControllerSrc();
+                src["under.behavior.evt"] = """
+                    ---
+                    register:
+                     - on_update
+                     - on_pause
+                     - on_resume
+                    ---
+                    function on_update(dt) print("under:update") end
+                    function on_pause() print("under:pause") end
+                    function on_resume() print("under:resume") end
+                    """;
+                src["s1.scene"] = """
+                    scenario = "Game"
+                    player = { node = "hero", spawn = "spawn.evt" }
+
+                    [nodes.World]
+                    type = "Node"
+                    script = "under.behavior.evt"
+                    """;
+                src["pause.scene"] = """
+                    scenario = "Menu"
+
+                    [nodes.PauseUi]
+                    type = "Node"
+                    """;
+                var (loader, root, sink) = NewControllerLoader(src);
+                loader.GotoScene("s1");
+                var hero = loader.Controller!.Possessed;
+
+                loader.PushScene("pause");
+                var paused = sink.Contains("under:pause");
+                var stackTop = loader.ActiveScene == "pause";
+                var menuScenario = loader.Controller.Scenario == "Menu";
+                sink.Clear();
+                foreach (var sys in loader.ActiveNodes)                  // frozen: no under:update
+                    if (sys.Hooks.TryGetValue("on_update", out var fn)) loader.Call(fn, 0.016);
+                var frozen = !sink.Contains("under:update");
+
+                loader.PopScene();
+                var resumed = sink.Contains("under:resume");
+                var backTop = loader.ActiveScene == "s1";
+                var scenarioBack = loader.Controller.Scenario == "Game";
+                var possessedBack = ReferenceEquals(loader.Controller.Possessed, hero);
+
+                var popSole = Throws(() => loader.PopScene());
+
+                loader.PushScene("pause");
+                loader.GotoScene("s2");                                   // change clears the stack
+                var cleared = loader.ActiveScene == "s2" && Throws(() => loader.PopScene());
+
+                ok = paused && stackTop && menuScenario && frozen && resumed && backTop
+                     && scenarioBack && possessedBack && popSole && cleared;
+                detail = $"paused={paused}, top={stackTop}, menu={menuScenario}, frozen={frozen}, " +
+                         $"resumed={resumed}, backTop={backTop}, scenario={scenarioBack}, " +
+                         $"possessed={possessedBack}, popSole={popSole}, cleared={cleared}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("scene stack: push freezes, pop restores scenario/possession", ok, detail);
+        }
+
+        // 110: store — set/get/default/keys(prefix)/subscribe(exact + prefix + cancel)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var src = new Dictionary<string, string>
+                {
+                    ["st.evt"] = """
+                        ---
+                        apis:
+                         - store
+                        returns:
+                         - run
+                        ---
+                        local M = {}
+                        function M.run()
+                          local log = {}
+                          store.set("player.hp", 5)
+                          store.set("player.stamina", 3)
+                          store.set("world.day", 2)
+                          local h1 = store.subscribe("player.hp", function(k, new, old)
+                            log[#log + 1] = string.format("exact %s %s->%s", k, tostring(old), tostring(new))
+                          end)
+                          local h2 = store.subscribe("player.", function(k) log[#log + 1] = "prefix " .. k end)
+                          store.set("player.hp", 4)
+                          h1.cancel()
+                          store.set("player.hp", 3)
+                          local keys = store.keys("player.")
+                          return string.format("hp=%d|day=%d|miss=%d|keys=%d|%s",
+                            store.get("player.hp"), store.get("world.day"), store.get("nope", -1),
+                            #keys, table.concat(log, ";"))
+                        end
+                        return M
+                        """,
+                };
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                var run = loader.Require("st.evt").Read<LuaTable>()["run"];
+                var result = loader.CallRet(run).Read<string>();
+                ok = result == "hp=3|day=2|miss=-1|keys=2|exact player.hp 5->4;prefix player.hp;prefix player.hp";
+                detail = result;
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("store: set/get/keys + exact/prefix subscribe + cancel", ok, detail);
+        }
+
+        // 111: a scene layer's subscriptions (actions + store) die with the layer
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var src = ControllerSrc();
+                src["watcher.behavior.evt"] = """
+                    ---
+                    apis:
+                     - store
+                     - actions
+                    register:
+                     - on_load
+                    ---
+                    function on_load()
+                      store.subscribe("sig", function(k, v) print("scene-sub sees " .. tostring(v)) end)
+                      actions.Game.Jump.subscribe{ on = "press", run = function() print("scene jump") end }
+                    end
+                    """;
+                src["s2.scene"] = """
+                    [nodes.Watcher]
+                    type = "Node"
+                    script = "watcher.behavior.evt"
+                    """;
+                src["setter.evt"] = """
+                    ---
+                    apis:
+                     - store
+                    returns:
+                     - set
+                    ---
+                    local M = {}
+                    function M.set(v) store.set("sig", v) end
+                    return M
+                    """;
+                var (loader, root, sink) = NewControllerLoader(src);
+                var set = loader.Require("setter.evt").Read<LuaTable>()["set"];
+                loader.GotoScene("s2");
+                loader.Call(set, 1);
+                var live = sink.Contains("scene-sub sees 1");
+                loader.GotoScene("s1");                      // s2's layer torn down
+                sink.Clear();
+                loader.Call(set, 2);
+                var storeDead = !sink.Exists(s => s.Contains("scene-sub"));
+                var pc = loader.Controller!;
+                pc.ProbeKey = _ => true; pc.ProbeButton = _ => false;
+                pc.ProbeMouse = _ => false; pc.ProbeAxis = _ => 0;
+                loader.PollController(1.0 / 60);
+                var actionDead = !sink.Contains("scene jump");
+                ok = live && storeDead && actionDead;
+                detail = $"live={live}, storeDead={storeDead}, actionDead={actionDead}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("scene-layer subscriptions die when the layer is torn down", ok, detail);
+        }
+
+        // 112: a scene-file hot reload rebuilds the top layer in place, preserving
+        // the player's live transform (no yank back to the spawn point)
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (loader, root, sink) = NewControllerLoader(ControllerSrc());
+                loader.GotoScene("s1");
+                var hero = (Node3D)loader.Controller!.Possessed!;
+                hero.Position = new Vector3(9, 9, 9);
+                loader.ReloadOnChange("s1.scene");
+                var fresh = loader.Controller.Possessed;
+                var newNode = !ReferenceEquals(fresh, hero);
+                var kept = fresh is Node3D n3 && n3.Position.IsEqualApprox(new Vector3(9, 9, 9));
+                ok = newNode && kept;
+                detail = $"newNode={newNode}, kept={kept}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("active-scene rebuild preserves the player transform", ok, detail);
+        }
+
+        // 113: scene-level header fields round-trip through SceneWriter
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var text = """
+                    start_scene = "menu"
+                    controls = "c.toml"
+                    scenario = "Game"
+                    player = { node = "hero", spawn = "spawn.evt" }
+
+                    [nodes.N]
+                    type = "Node"
+                    """;
+                var emitted = SceneWriter.Emit(SceneFile.Parse(text));
+                var back = SceneFile.Parse(emitted);
+                ok = back.StartScene == "menu" && back.Controls == "c.toml"
+                     && back.Scenario == "Game"
+                     && back.Player is { Node: "hero", Spawn: "spawn.evt" };
+                detail = ok ? "round-tripped" : emitted.Replace('\n', ';');
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("controls/scenario/[player] survive a SceneWriter round-trip", ok, detail);
         }
 
         log($"[tests] {passed} passed, {failed} failed");

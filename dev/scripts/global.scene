@@ -1,7 +1,12 @@
 # The GLOBAL layer (reserved manifest, TOML content): nodes here persist across
 # every scene switch, and `start_scene` is entered once startup finishes. A
 # node's name is the table key; nesting is the tree (Camera is a child of Player).
+#
+# `controls` names the controls TOML: the native PlayerController (implicitly
+# added to this layer) maps devices -> actions from it; scripts consume them via
+# the `actions` api. Raw input classes are not declarable.
 start_scene = "menu"
+controls = "controls.toml"
 
 [nodes.Player]
 type = "Node3D"

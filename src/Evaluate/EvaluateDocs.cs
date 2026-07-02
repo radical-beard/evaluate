@@ -202,6 +202,14 @@ public static class EvaluateDocs
                 Note = "The persistent global-root Node (a wrapped godot instance, not a table). " +
                        "Use any Node method/property — e.g. world:add_child(node). Survives scene switches.",
             });
+        // `actions` is a dynamic view over the game's controls TOML — its members
+        // are the file's scenarios/actions, so nothing enumerates statically here.
+        foreach (var api in result.Where(a => a.Name == "actions"))
+            api.Note = "actions.<Scenario>.<Action> — mapped input, resolved against the manifest's " +
+                       "controls TOML (unknown names are load errors). Each action exposes " +
+                       "subscribe{ on = \"press|release|tap|held\", after = seconds, run = fn } " +
+                       "plus live `down` (bool), `value` (0..1), and `vector` ({x, y}) reads. " +
+                       "Raw input classes (Input, Key, InputEvent*, ...) are not declarable.";
         log($"docs: collected {result.Count} capability apis");
         return result.OrderBy(a => a.Name).ToList();
     }

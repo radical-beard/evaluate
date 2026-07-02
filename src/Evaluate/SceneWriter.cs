@@ -26,16 +26,21 @@ public static class SceneWriter
     // Serialize the CHILDREN of a container as the scene's root `[nodes.*]` — the
     // container itself (a scene/global layer wrapper) is never emitted. This is the
     // shape the runtime builds (Loader) and the editor edits (a synthetic root).
-    public static string WriteContainer(Node container, GodotBinder binder, string? startScene = null, string? description = null)
+    // `header` (optional) carries the scene-LEVEL fields that live outside the node
+    // tree — start_scene, controls, scenario, [player], description — so an editor
+    // round-trip preserves them verbatim (pass the SceneSpec you parsed).
+    public static string WriteContainer(Node container, GodotBinder binder, string? startScene = null,
+        string? description = null, SceneSpec? header = null)
     {
         var roots = new List<Node>();
         foreach (var c in container.GetChildren()) roots.Add(c);
-        return Write(roots, binder, startScene, description);
+        return Write(roots, binder, startScene, description, header);
     }
 
     // Serialize a set of root nodes (each becomes a top-level `[nodes.X]`).
-    public static string Write(IReadOnlyList<Node> roots, GodotBinder binder, string? startScene = null, string? description = null)
-        => Emit(ToScene(roots, binder, startScene, description));
+    public static string Write(IReadOnlyList<Node> roots, GodotBinder binder, string? startScene = null,
+        string? description = null, SceneSpec? header = null)
+        => Emit(ToScene(roots, binder, startScene, description, header));
 
     // Serialize one node + subtree as a fragment (tooling / tests).
     public static string WriteNode(Node node, GodotBinder binder)
@@ -46,9 +51,17 @@ public static class SceneWriter
         return Emit(scene);
     }
 
-    internal static SceneSpec ToScene(IReadOnlyList<Node> roots, GodotBinder binder, string? startScene, string? description = null)
+    internal static SceneSpec ToScene(IReadOnlyList<Node> roots, GodotBinder binder, string? startScene,
+        string? description = null, SceneSpec? header = null)
     {
-        var scene = new SceneSpec { StartScene = startScene, Description = description };
+        var scene = new SceneSpec
+        {
+            StartScene = startScene ?? header?.StartScene,
+            Description = description ?? header?.Description,
+            Controls = header?.Controls,
+            Scenario = header?.Scenario,
+            Player = header?.Player,
+        };
         using var b = new Builder(binder);
         foreach (var n in roots) scene.Nodes.Add(b.ToSpec(n));
         return scene;
@@ -316,8 +329,15 @@ public static class SceneWriter
         var sb = new StringBuilder();
         if (!string.IsNullOrEmpty(spec.StartScene))
             sb.Append("start_scene = ").Append(Quote(spec.StartScene!)).Append('\n');
+        if (!string.IsNullOrEmpty(spec.Controls))
+            sb.Append("controls = ").Append(Quote(spec.Controls!)).Append('\n');
+        if (!string.IsNullOrEmpty(spec.Scenario))
+            sb.Append("scenario = ").Append(Quote(spec.Scenario!)).Append('\n');
         if (!string.IsNullOrEmpty(spec.Description))
             sb.Append("description = ").Append(Quote(spec.Description!)).Append('\n');
+        if (spec.Player is { } player)
+            sb.Append("player = { node = ").Append(Quote(player.Node))
+              .Append(", spawn = ").Append(Quote(player.Spawn)).Append(" }\n");
         foreach (var n in spec.Nodes) EmitNode(sb, n, "nodes." + n.Name);
         return sb.ToString();
     }

@@ -1,5 +1,9 @@
 # A swappable scene. Entering it frees the previous scene's container and builds
 # this tree fresh — while the global Player (and its Camera) carries straight over.
+# `scenario` is scene-level (not a node): entering here puts the controller in
+# the [Gameplay] section of controls.toml.
+scenario = "Gameplay"
+
 [nodes.Level]
 type = "Node3D"
 

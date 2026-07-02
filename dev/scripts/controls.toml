@@ -1,0 +1,22 @@
+# The demo's controls map (declared by global.scene's `controls =` key).
+# Sections are SCENARIOS; keys are binding tokens; values are action names.
+# A digital key can feed one axis of a vector action via +x/-x/+y/-y.
+
+[Demo]
+Stick_left = "Move"
+Key_right  = "Move+x"
+Key_left   = "Move-x"
+Key_up     = "Move+y"
+Key_down   = "Move-y"
+Button_a   = "Jump"
+Key_space  = "Jump"
+
+[Menu]
+Button_a  = "Select"
+Key_enter = "Select"
+Button_b  = "Back"
+Key_escape = "Back"
+
+[settings]
+deadzone = 0.05
+axis_threshold = 0.3

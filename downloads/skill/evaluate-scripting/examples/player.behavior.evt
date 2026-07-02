@@ -2,12 +2,12 @@
 config:
  - player.toml
 apis:
- - input
+ - actions
 properties:
   position: [0, 0.5, 0]    # static initial engine state lives in the signature, not the body
 register:
  - on_attach
- - on_update
+ - on_physics_update
 ---
 -- A BEHAVIOR: `self` IS the node this file is attached to (via the scene's
 -- `behaviors = [...]` list). A node holds N behaviors — this one does movement;
@@ -18,10 +18,12 @@ function on_attach()
   self:set_meta("base_weapon_damage", config.player.base_weapon_damage)
 end
 
-function on_update(dt)
-  if input.is_down("right") then
+function on_physics_update(dt)
+  -- Mapped input, not raw: controls.toml binds Stick_left/WASD to "Move".
+  local mv = actions.Gameplay.Move.vector    -- {x, y}, deadzone applied, +y = forward
+  if mv.x ~= 0 then
     local p = self.position
-    p.x = p.x + self.attributes.speed * dt   -- modifier-aware read: +haste while sprinting
-    self.position = p                         -- assign back to persist
+    p.x = p.x + mv.x * self.attributes.speed * dt   -- modifier-aware read: +haste while sprinting
+    self.position = p                               -- assign back to persist
   end
 end

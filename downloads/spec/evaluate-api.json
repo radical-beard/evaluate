@@ -1,5 +1,5 @@
 {
-  "evaluateVersion": "0.10.1\u002B2673cbf7673b7863230711a9efd77873686032e1",
+  "evaluateVersion": "0.11.0\u002Be9ba25f5da9a203d84b0dca4d628f8eb39c2a79f",
   "godotVersion": "4.6-stable (official)",
   "safePrimitives": [
     "assert",
@@ -46,8 +46,7 @@
       "on_pause",
       "on_resume",
       "on_update",
-      "on_physics_update",
-      "on_input"
+      "on_physics_update"
     ],
     "node": [
       "on_attach",
@@ -55,7 +54,6 @@
       "on_unload",
       "on_update",
       "on_physics_update",
-      "on_input",
       "on_exit",
       "on_quit",
       "on_focus_in",
@@ -308,9 +306,23 @@
   ],
   "apis": [
     {
-      "name": "input",
+      "name": "actions",
+      "members": [],
+      "note": "actions.\u003CScenario\u003E.\u003CAction\u003E \u2014 mapped input, resolved against the manifest\u0027s controls TOML (unknown names are load errors). Each action exposes subscribe{ on = \u0022press|release|tap|held\u0022, after = seconds, run = fn } plus live \u0060down\u0060 (bool), \u0060value\u0060 (0..1), and \u0060vector\u0060 ({x, y}) reads. Raw input classes (Input, Key, InputEvent*, ...) are not declarable."
+    },
+    {
+      "name": "controller",
       "members": [
-        "is_down"
+        "capture_text",
+        "joy_name",
+        "overrides",
+        "possess",
+        "possessed",
+        "rebind",
+        "release",
+        "reset_overrides",
+        "rumble",
+        "scenario"
       ]
     },
     {
@@ -326,9 +338,13 @@
       "members": [
         "add",
         "change",
+        "context",
         "current",
         "find",
-        "list"
+        "list",
+        "pop",
+        "push",
+        "stack"
       ]
     },
     {
@@ -341,6 +357,17 @@
         "query_row",
         "snapshot",
         "transaction"
+      ]
+    },
+    {
+      "name": "store",
+      "members": [
+        "delete",
+        "get",
+        "has",
+        "keys",
+        "set",
+        "subscribe"
       ]
     },
     {

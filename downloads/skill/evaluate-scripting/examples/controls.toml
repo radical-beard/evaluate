@@ -1,0 +1,29 @@
+# The controls map, referenced from global.scene (`controls = "controls.toml"`,
+# scripts-relative, hot-reloaded). Physical bindings -> ACTIONS, one section per
+# SCENARIO; exactly one scenario is active at a time (plus [Always]). Scripts
+# never see raw input — they declare the `actions` api and read
+# actions.<Scenario>.<Action>. Token grammar: Button_<JoyButton>, Key_<Key>,
+# Axis_<JoyAxis>, Stick_left|right, Mouse_<MouseButton> (snake_case names;
+# unknown tokens are load errors; keyboard = physical key positions).
+
+[Gameplay]                     # entered via `scenario = "Gameplay"` in scene-swappable.scene
+Stick_left = "Move"            # vector action: actions.Gameplay.Move.vector
+Key_w      = "Move+y"          # digital keys feeding the vector's axes (+x/-x/+y/-y)
+Key_s      = "Move-y"
+Key_a      = "Move-x"
+Key_d      = "Move+x"
+Button_x   = "Sprint"          # sprint.behavior.evt subscribes to press/release
+Key_shift  = "Sprint"          # two bindings, one action
+Axis_trigger_right = "Block"   # analog: .value 0..1, "down" past axis_threshold
+
+[Menu]
+Button_a   = "Select"
+Key_enter  = "Select"
+Key_escape = "Back"
+
+[Always]                       # reserved: active in EVERY scenario (debug toggles)
+Key_h = "DebugOverlay"
+
+[settings]                     # reserved
+deadzone = 0.05
+axis_threshold = 0.3

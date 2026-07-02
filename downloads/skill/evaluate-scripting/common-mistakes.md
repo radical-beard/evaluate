@@ -29,8 +29,8 @@ hint — declare the class itself (`- Node3D`).
 
 ```lua
 -- frontmatter declares no apis:
-return input.is_down("right")   -- ERROR: `input` is nil — not declared in apis:
-local n = Node3D.new()          -- ERROR: same rule — Godot classes are capabilities too
+return actions.Gameplay.Jump.down   -- ERROR: `actions` is nil — not declared in apis:
+local n = Node3D.new()              -- ERROR: same rule — Godot classes are capabilities too
 ```
 
 **Fix:** add it to frontmatter:
@@ -38,12 +38,13 @@ local n = Node3D.new()          -- ERROR: same rule — Godot classes are capabi
 ```
 ---
 apis:
- - input
+ - actions
  - Node3D
 ---
 ```
 
-Everything is declared: framework services (`input`, `world`, `scene`, `save`, `sql`),
+Everything is declared: framework services (`actions`, `controller`, `store`, `world`,
+`scene`, `save`, `sql`),
 host-registered apis, and Godot classes/enums. Only `std` is ambient. A typo *inside*
 `apis:` (an unknown name) errors at load — you'll never get a silent `nil` from a
 misspelled declaration. Note the flip side: **instances** (from `self`, `get_node`, signal
@@ -73,7 +74,37 @@ assets:
 The pre-0.10 bare-list form (`assets:` as a list of paths) is rejected too — every entry
 needs a binding name (`name: "path"`).
 
-## 4. Declaring a `returns` property without its accessors
+## 4. Reading raw input (the removed `input` service, or a blocked input class)
+
+```
+---
+apis:
+ - input     # ERROR at load: removed in 0.11 — input is mapped, not raw
+ - Input     # ERROR at load: blocked from declaration
+ - Key       # ERROR: same — and every InputEvent* class is prefix-blocked
+---
+```
+
+**Fix:** raw input never reaches scripts (there is no `on_input` hook either). Physical
+bindings live in the manifest's controls TOML (`controls = "controls.toml"` in
+`global.scene`); scripts declare the `actions` api and read the mapped actions:
+
+```lua
+-- subscribe in on_load (a hot reload drops this script's stale closures, then
+-- re-fires on_load, so subscriptions never double up):
+actions.Gameplay.Jump:subscribe{ on = "press", run = function() ... end }
+-- or poll live: .down (bool), .value (0..1), .vector ({x, y})
+local mv = actions.Gameplay.Move.vector
+```
+
+Blocked names: `Input`, `InputMap`, `Key`, `KeyModifierMask`, `JoyButton`, `JoyAxis`,
+`MouseButton`, `MouseButtonMask`, and every `InputEvent*` class — the load error points
+you to `actions`. Two more traps: an unknown scenario/action name
+(`actions.Gameplay.Jmup`) errors listing what exists, and the `subscribe{}` callback key
+is **`run`**, not `do` (`do` is a Lua keyword — the same rule as state-machine
+transitions).
+
+## 5. Declaring a `returns` property without its accessors
 
 ```
 ---
@@ -96,7 +127,7 @@ return M
 Read-only? Declare `- position: get vec3` and expose only `get_position` (the setter stays
 hidden from callers).
 
-## 5. PascalCase on an instance method
+## 6. PascalCase on an instance method
 
 ```lua
 local n = Node3D.new()   -- (Node3D declared in apis:)
@@ -104,9 +135,10 @@ n:GetChildCount()        -- does nothing useful: instance members are engine sna
 ```
 
 **Fix:** `n:get_child_count()`. (Constructors/enums/statics on the declared class table
-*are* PascalCase: `Node3D.new()`, `OS.GetName()`, `Key.Space` — see api-discovery.md.)
+*are* PascalCase: `Node3D.new()`, `OS.GetName()`, `Timer.TimerProcessCallback.Idle` — see
+api-discovery.md.)
 
-## 6. Mutating a struct in place without assigning it back
+## 7. Mutating a struct in place without assigning it back
 
 ```lua
 self.position.x = self.position.x + 1     -- reads a COPY; the node doesn't move
@@ -120,13 +152,13 @@ p.x = p.x + 1
 self.position = p
 ```
 
-## 7. A `register:` hook with no function (or vice versa)
+## 8. A `register:` hook with no function (or vice versa)
 
 A name in `register:` with no matching global function is silently never called; a function
 not listed in `register:` is also never wired. Keep them in sync — every hook you implement
 must be both `register:`-ed and defined as `function <name>(...) end`.
 
-## 8. Scene-file slip-ups
+## 9. Scene-file slip-ups
 
 - **Vector property written as a table:** `position = {x=0,y=1,z=0}` is read as a *child
   node* (and then errors: "no type"). Use an array: `position = [0, 1, 0]`.
@@ -137,7 +169,7 @@ must be both `register:`-ed and defined as `function <name>(...) end`.
   entry must be a `*.behavior.evt` (or legacy `*.node.evt`); `machines` entries must be
   `*.statemachine.evt`.
 
-## 9. `params` mismatches between a behavior and its scene
+## 10. `params` mismatches between a behavior and its scene
 
 `params` is a contract, like everything else in the signature — so the loader rejects:
 
@@ -157,7 +189,7 @@ Also: `params:` is **node-attached scripts only** — declaring it on a system `
 has no node instance) errors. And `params.*` is *per-instance*; for values shared by every
 node use `config` (a TOML file) instead.
 
-## 10. Putting static engine state in the body (or breaking `properties:` rules)
+## 11. Putting static engine state in the body (or breaking `properties:` rules)
 
 `self.position = std.vec3(0, 0.5, 0)` in `on_attach` works, but the convention is
 frontmatter `properties:` (or the scene) for static initial engine state — it re-applies on
@@ -166,7 +198,7 @@ script, and a **property name the node's class doesn't have** (`bogus_prop: 1`).
 fight the scene: a key the scene sets on the node always wins over the script's
 `properties:`.
 
-## 11. State-machine slip-ups
+## 12. State-machine slip-ups
 
 - **`do = fn`** — `do` is a Lua keyword; the transition action key is **`run`**
   (`run = function(self, from, to) ... end`).
@@ -181,7 +213,7 @@ fight the scene: a key the scene sets on the node always wins over the script's
   once-only) and reloads never double-fire. A **machine** reload keeps state *and*
   listeners; only the machine's transitions refresh.
 
-## 12. GAS slip-ups
+## 13. GAS slip-ups
 
 - **Unknown keys are load errors:** an `.ability` with `bogus = 1`, an attribute spec key
   outside `base/min/max/regen/regen_delay/recover`, or an `.effect` targeting a field that
@@ -192,7 +224,7 @@ fight the scene: a key the scene sets on the node always wins over the script's
   drain — it clamps but does **not** exhaust. Only *spends* (ability costs) trigger the
   `exhausted:<name>` lockout.
 
-## 13. Spawning from a behavior
+## 14. Spawning from a behavior
 
 A `*.behavior.evt` acts on `self`; it should not create the world around it. Create nodes
 from a **system** script (`world:add_child(...)` / `scene.add(...)`) or declare them in a

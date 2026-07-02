@@ -2,8 +2,11 @@
 # every scene switch, and `start_scene` is entered once startup finishes. A
 # node's name is the table key; nesting is the tree (Camera is a child of
 # Player). `behaviors` attaches N behavior scripts in list order — sprint first,
-# so its attribute pools exist before player.behavior.evt reads them.
+# so its attribute pools exist before player.behavior.evt reads them. The global
+# layer also implicitly holds the native PlayerController, which resolves the
+# hardware against `controls` (bindings -> actions, per scenario; hot-reloaded).
 start_scene = "menu"
+controls = "controls.toml"
 
 [nodes.Player]
 type = "Node3D"
