@@ -1931,6 +1931,35 @@ public static class EvaluateTests
             Check("scene.list() enumerates scenes (manifest excluded)", ok, detail);
         }
 
+        // 96c: an engine NULL object marshals to Lua nil (a find_child miss must be
+        // `== nil`, not a truthy proxy that explodes on first use)
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] = "[nodes.N]\ntype = \"Node\"\nscript = \"nullprobe.node.evt\"\n",
+                ["nullprobe.node.evt"] =
+                    "---\nregister:\n - on_attach\n---\n" +
+                    "function on_attach()\n" +
+                    "  self:set_meta(\"missing_is_nil\", self:find_child(\"NoSuchChild\", false, false) == nil)\n" +
+                    "  self:set_meta(\"gnon_is_nil\", self:get_node_or_null(\"NoSuchPath\") == nil)\n" +
+                    "end\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var n = root.GetNodeOrNull("N")!;
+                ok = n.GetMeta("missing_is_nil").AsBool() && n.GetMeta("gnon_is_nil").AsBool();
+                detail = $"find_child={n.GetMeta("missing_is_nil")}, get_node_or_null={n.GetMeta("gnon_is_nil")}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("an engine NULL object marshals to Lua nil", ok, detail);
+        }
+
         // 97: the `dna` param type — hand-authored 16-hex-digit hash in, traits out
         {
             bool ok = false; string detail = "";

@@ -258,7 +258,9 @@ public sealed class GodotBinder
         Variant.Type.Int => (double)v.AsInt64(),
         Variant.Type.Float => v.AsDouble(),
         Variant.Type.String or Variant.Type.StringName or Variant.Type.NodePath => v.AsString(),
-        Variant.Type.Object => WrapInstance(v.AsGodotObject()),
+        // An engine NULL object (find_child miss, get_node_or_null, a freed ref) is Lua
+        // nil — wrapping it would hand scripts a truthy proxy whose every use explodes.
+        Variant.Type.Object => v.AsGodotObject() is { } obj ? WrapInstance(obj) : LuaValue.Nil,
         Variant.Type.Array => ArrayToTable(v.AsGodotArray()),
         Variant.Type.Dictionary => DictToTable(v.AsGodotDictionary()),
 
@@ -693,7 +695,7 @@ public sealed class GodotBinder
         Variant var => ToLua(var),
         Godot.Collections.Array arr => ArrayToTable(arr),
         Godot.Collections.Dictionary dict => DictToTable(dict),
-        GodotObject go => WrapInstance(go),
+        GodotObject go => WrapInstance(go),   // null lands in the `null =>` arm above
         byte[] arr => Pack(arr, x => (double)x),
         int[] arr => Pack(arr, x => (double)x),
         long[] arr => Pack(arr, x => (double)x),

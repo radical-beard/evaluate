@@ -7,6 +7,13 @@ the version is `0.x`, minor bumps may include breaking changes.
 
 ## [Unreleased]
 
+## [0.10.2] — 2026-07-01
+
+### Fixed
+- **An engine NULL object now marshals to Lua `nil`.** Previously a `find_child`
+  miss / `get_node_or_null` returned a truthy userdata proxy around null — `x ~= nil`
+  passed and the first use exploded deep in the engine. `== nil` checks now work.
+
 ## [0.10.1] — 2026-07-01
 
 ### Added
