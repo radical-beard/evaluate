@@ -1909,6 +1909,28 @@ public static class EvaluateTests
                 $"badKey={badKey}, badField={badField}, onSystem={onSystem}, noAttrs={noAttrs}");
         }
 
+        // 96b: scene.list() enumerates switchable scenes (manifest excluded, sorted)
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["lister.evt"] =
+                    "---\napis:\n - scene\nreturns:\n - r\n---\n" +
+                    "local names = {}\nfor _, n in ipairs(scene.list()) do names[n] = true end\n" +
+                    "return { r = (names[\"menu\"] == true) and (names[\"level1\"] == true) " +
+                    "and (names[\"global\"] == nil) }\n",
+            };
+            try
+            {
+                var r = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { })
+                    .Require("lister.evt").Read<LuaTable>()["r"];
+                ok = r.Type == LuaValueType.Boolean && r.Read<bool>();
+                detail = $"r={r}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("scene.list() enumerates scenes (manifest excluded)", ok, detail);
+        }
+
         // 97: the `dna` param type — hand-authored 16-hex-digit hash in, traits out
         {
             bool ok = false; string detail = "";

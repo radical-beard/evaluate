@@ -7,6 +7,14 @@ the version is `0.x`, minor bumps may include breaking changes.
 
 ## [Unreleased]
 
+## [0.10.1] — 2026-07-01
+
+### Added
+- **`scene.list()`** — every switchable scene name under the scripts root (sorted,
+  manifest excluded), in the exact form `scene.change` accepts. Closes the gap the
+  0.10.0 file-IO block opened for menus that auto-discover scenes: scenes are
+  framework artifacts, so enumerating them is a `scene` capability.
+
 ## [0.10.0] — 2026-07-01
 
 The apis-as-modules release: the whole engine surface becomes declared capabilities,

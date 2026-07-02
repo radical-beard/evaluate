@@ -1415,10 +1415,31 @@ public sealed class Loader
     //                        (e.g. "Level/Enemy") — unique by construction
     //   scene.add(node)    - parent a node under the active scene container
     //                        (so it is freed when the scene is left)
+    //   scene.list()       - every switchable scene name under the scripts root
+    //                        (sorted, manifest excluded) — feeds scene.change.
+    //                        Scenes are framework artifacts, so enumerating them is a
+    //                        scene capability (file IO classes stay undeclarable).
     // (`change`, not `goto`: `goto` is a reserved word in Lua 5.2.)
     private LuaValue BuildSceneApi()
     {
         var api = new LuaTable();
+        api["list"] = new LuaFunction((c, ct) =>
+        {
+            var t = new LuaTable();
+            var root = ProjectSettings.GlobalizePath("res://scripts");
+            int i = 1;
+            if (System.IO.Directory.Exists(root))
+                foreach (var f in System.IO.Directory
+                             .EnumerateFiles(root, "*.scene", System.IO.SearchOption.AllDirectories)
+                             .OrderBy(x => x, StringComparer.Ordinal))
+                {
+                    var rel = System.IO.Path.GetRelativePath(root, f).Replace('\\', '/');
+                    if (rel == ManifestName) continue;
+                    t[i++] = rel[..^".scene".Length];
+                }
+            c.Return(t);
+            return new(1);
+        });
         api["change"] = new LuaFunction((c, ct) =>
         {
             _pendingScene = c.GetArgument<string>(0);

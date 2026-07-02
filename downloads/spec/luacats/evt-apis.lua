@@ -19,6 +19,7 @@ save = {}
 ---@field change fun(...): any
 ---@field current fun(...): any
 ---@field find fun(...): any
+---@field list fun(...): any
 scene = {}
 
 ---@class evt.sql

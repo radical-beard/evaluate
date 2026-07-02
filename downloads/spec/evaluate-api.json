@@ -1,5 +1,5 @@
 {
-  "evaluateVersion": "0.10.0\u002B7a70e8dec369fe7090a023475c7b5c6601da71ab",
+  "evaluateVersion": "0.10.1\u002B2673cbf7673b7863230711a9efd77873686032e1",
   "godotVersion": "4.6-stable (official)",
   "safePrimitives": [
     "assert",
@@ -327,7 +327,8 @@
         "add",
         "change",
         "current",
-        "find"
+        "find",
+        "list"
       ]
     },
     {

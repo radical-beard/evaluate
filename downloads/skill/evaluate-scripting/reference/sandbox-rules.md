@@ -37,7 +37,7 @@ Godot class/enum** — and an unknown name is a **load error**, not a silent `ni
 |-----|------------|
 | `input` | `input.is_down(key)` — is a (host-mapped) key currently held. |
 | `world` | the persistent global-root **Node** (not a table) — `world:add_child(node)`; survives scene switches. |
-| `scene` | `scene.change(name)`, `scene.current()`, `scene.find(path)`, `scene.add(node)`. |
+| `scene` | `scene.change(name)`, `scene.current()`, `scene.find(path)`, `scene.add(node)`, `scene.list()` (every switchable scene name, manifest excluded). |
 | `save` | SQLite-backed key/value persistence in `user://` — `save.set/get/delete`. |
 | `sql` | full SQL — `sql.exec/exec_async/query/query_row/transaction/flush/snapshot`. |
 
