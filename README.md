@@ -171,7 +171,10 @@ hot-reloaded by default.
   `[Menu]`, the always-active `[Always]`, `[settings]` for deadzone/threshold), keys
   are binding tokens (`Button_a`, `Key_space`, `Stick_left`, `Axis_trigger_right`,
   `Mouse_left`; digital keys feed vector axes via `"Move+x"` suffixes), values are
-  action names. Devices are polled once per physics tick (before any
+  action names. **Keyboard layouts**: declare `layouts = ["qwerty", "dvorak"]` in
+  `[settings]` and scope bindings with `[Scenario.<layout>]` sub-blocks; the active
+  layout persists in the save DB (`controller.layout(name)` / `layouts()`). Devices
+  are polled once per physics tick (before any
   `on_physics_update`); scripts declare `apis: [actions]` and use
   `actions.<Scenario>.<Action>` — `subscribe{ on = "press|release|tap|held",
   after = seconds, run = fn }` (a `cancel()` handle back; hot-reload- and

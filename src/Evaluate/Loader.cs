@@ -188,7 +188,7 @@ public sealed class Loader
         _abilities = new AbilityRuntime(_godotBinder, _readScript, _log,
             () => _hookOwner, (fn, args) => Call(fn, args));
 
-        _store = new Store((fn, args) => Call(fn, args));
+        _store = new Store(DispatchWithContext);
 
         _loadFn = _lua.Environment["load"];
     }
@@ -371,6 +371,7 @@ public sealed class Loader
             {
                 Name = PlayerController.NodeName,
                 CallLua = (fn, args) => Call(fn, args),
+                DispatchLua = DispatchWithContext,
                 Log = _log,
             };
             _globalRoot.AddChild(_controller);
@@ -1861,6 +1862,18 @@ public sealed class Loader
     private string CurrentOwner() =>
         _hookOwner ?? (_loadStack.Count > 0 ? _loadStack[^1] : "<runtime>");
 
+    // Run a subscriber's callback under its REGISTRATION context (owner script +
+    // scene-layer lifetime), so registrations made inside the callback — another
+    // subscription, a text capture — inherit the same cleanup scope instead of
+    // leaking as global and outliving their scene's nodes.
+    private void DispatchWithContext(LuaValue fn, LuaValue[] args, string owner, object? lifetime)
+    {
+        var prevOwner = _hookOwner; _hookOwner = owner;
+        var prevLife = _currentLifetime; _currentLifetime = lifetime;
+        try { Call(fn, args); }
+        finally { _hookOwner = prevOwner; _currentLifetime = prevLife; }
+    }
+
     private PlayerController RequireController(string what) =>
         _controller ?? throw new EvaluateException(
             $"{what} called before the global layer loaded (no PlayerController yet)");
@@ -2046,6 +2059,33 @@ public sealed class Loader
                 .Rumble(c.GetArgument<double>(0), c.GetArgument<double>(1));
             return new(0);
         });
+        api["layout"] = new LuaFunction((c, ct) =>
+        {
+            var pc = RequireController("controller.layout");
+            // one string arg = set (validated + persisted); no args = get
+            if (c.ArgumentCount > 0 && c.GetArgument(c.ArgumentCount - 1).Type == LuaValueType.String)
+            {
+                var name = c.GetArgument(c.ArgumentCount - 1).Read<string>();
+                if (!pc.Map.Layouts.Contains(name))
+                    throw new EvaluateException(
+                        $"controller.layout('{name}'): the controls file declares no such layout " +
+                        $"(declared: {string.Join(", ", pc.Map.Layouts)})");
+                _persistence ??= new Persistence();
+                _persistence.Set(LayoutKey, "string", name);
+                RebuildControlsMap(pc);
+                return new(0);
+            }
+            c.Return(pc.Map.ActiveLayout);
+            return new(1);
+        });
+        api["layouts"] = new LuaFunction((c, ct) =>
+        {
+            var pc = RequireController("controller.layouts");
+            var list = new LuaTable();
+            for (int i = 0; i < pc.Map.Layouts.Count; i++) list[i + 1] = pc.Map.Layouts[i];
+            c.Return(list);
+            return new(1);
+        });
         api["capture_text"] = new LuaFunction((c, ct) =>
         {
             var pc = RequireController("controller.capture_text");
@@ -2079,11 +2119,15 @@ public sealed class Loader
         catch (EvaluateException) { return false; }
     }
 
+    // The persisted keyboard-layout choice (profile-level, like control overrides).
+    private const string LayoutKey = "controls.layout";
+
     private void RebuildControlsMap(PlayerController pc)
     {
         if (_controlsFile is null) { pc.SetMap(new ControlsMap()); return; }
         _persistence ??= new Persistence();
-        pc.SetMap(ControlsMap.Parse(_readScript(_controlsFile), _persistence.Overrides()));
+        var layout = _persistence.Get(LayoutKey) is { } saved ? saved.value : null;
+        pc.SetMap(ControlsMap.Parse(_readScript(_controlsFile), _persistence.Overrides(), layout));
     }
 
     // `store` — the global session state store: set/get/has/delete/keys(prefix)/

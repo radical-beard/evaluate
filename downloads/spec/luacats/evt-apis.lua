@@ -8,6 +8,8 @@
 ---@class evt.controller
 ---@field capture_text fun(...): any
 ---@field joy_name fun(...): any
+---@field layout fun(...): any
+---@field layouts fun(...): any
 ---@field overrides fun(...): any
 ---@field possess fun(...): any
 ---@field possessed fun(...): any

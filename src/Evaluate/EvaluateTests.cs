@@ -2591,6 +2591,135 @@ public static class EvaluateTests
             Check("controls/scenario/[player] survive a SceneWriter round-trip", ok, detail);
         }
 
+        // 114: a registration made INSIDE a subscription callback inherits the
+        // subscriber's scene-layer lifetime — the disposed-Panel regression: a menu
+        // registered capture_text from a Select-press callback; the capture leaked as
+        // global, survived the scene switch, and fired against freed nodes.
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var src = ControllerSrc();
+                src["s2.scene"] = """
+                    scenario = "Game"
+
+                    [nodes.Ui]
+                    type = "Node"
+                    script = "ui.behavior.evt"
+                    """;
+                src["ui.behavior.evt"] = """
+                    ---
+                    apis:
+                     - actions
+                     - controller
+                    register:
+                     - on_load
+                    ---
+                    function on_load()
+                      actions.Game.Jump.subscribe{ on = "press", run = function()
+                        controller.capture_text(function(kind, ch) print("typed " .. tostring(ch)) end)
+                      end }
+                    end
+                    """;
+                var (loader, root, sink) = NewControllerLoader(src);
+                loader.GotoScene("s2");
+                var pc = loader.Controller!;
+                var down = new HashSet<long>();
+                pc.ProbeKey = code => down.Contains(code);
+                pc.ProbeButton = _ => false; pc.ProbeMouse = _ => false; pc.ProbeAxis = _ => 0;
+                down.Add((long)Key.Space);
+                loader.PollController(1.0 / 60);        // press -> the callback registers capture
+                var captured = pc.Capturing;
+                loader.GotoScene("s1");                 // s2's layer dies -> so must its capture
+                var released = !pc.Capturing;
+                ok = captured && released;
+                detail = $"captured={captured}, released={released}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("callback-registered captures die with the subscriber's layer", ok, detail);
+        }
+
+        // 115: keyboard layouts — @layout tokens bind only in the active layout;
+        // undeclared layouts error; the persisted choice survives a map rebuild
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var toml = """
+                    [Game]
+                    Key_space = "Jump"
+
+                    [Game.qwerty]
+                    Key_w = "Move+y"
+
+                    [Game.dvorak]
+                    Key_comma = "Move+y"
+
+                    [settings]
+                    layouts = ["qwerty", "dvorak"]
+                    """;
+                var qwerty = ControlsMap.Parse(toml);                      // default = first declared
+                var move = qwerty.Find("Game", "Move")!;
+                var defaultQwerty = qwerty.ActiveLayout == "qwerty"
+                    && move.Bindings.Count == 1 && move.Bindings[0].Code == (long)Key.W;
+                var universal = qwerty.Find("Game", "Jump")!.Bindings.Count == 1;
+
+                var dvorak = ControlsMap.Parse(toml, null, "dvorak");
+                var dv = dvorak.Find("Game", "Move")!;
+                var dvorakSwap = dvorak.ActiveLayout == "dvorak"
+                    && dv.Bindings.Count == 1 && dv.Bindings[0].Code == (long)Key.Comma;
+
+                var stale = ControlsMap.Parse(toml, null, "colemak");      // undeclared choice -> default
+                var fallback = stale.ActiveLayout == "qwerty";
+
+                var undeclared = Throws(() => ControlsMap.Parse("[G.nope]\nKey_w = \"A\"\n"));
+
+                ok = defaultQwerty && universal && dvorakSwap && fallback && undeclared;
+                detail = $"default={defaultQwerty}, universal={universal}, swap={dvorakSwap}, " +
+                         $"fallback={fallback}, undeclared={undeclared}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("@layout tokens scope bindings to the active keyboard layout", ok, detail);
+        }
+
+        // 116: controller.layout(name) persists and re-applies over a rebuild
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var persistence = new Persistence();
+                persistence.Set("controls.layout", "string", "dvorak");
+                var src = ControllerSrc();
+                src["global.scene"] = """
+                    controls = "c.toml"
+
+                    [nodes.Anchor]
+                    type = "Node"
+                    """;
+                src["c.toml"] = """
+                    [Game.qwerty]
+                    Key_w = "Jump"
+
+                    [Game.dvorak]
+                    Key_comma = "Jump"
+
+                    [settings]
+                    layouts = ["qwerty", "dvorak"]
+                    """;
+                var (loader, root, _) = NewControllerLoader(src);
+                var pc = loader.Controller!;
+                var persisted = pc.Map.ActiveLayout == "dvorak"
+                    && pc.Map.Find("Game", "Jump")!.Bindings[0].Code == (long)Key.Comma;
+                persistence.Delete("controls.layout");
+                ok = persisted;
+                detail = $"persisted={persisted} (active={pc.Map.ActiveLayout})";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("the persisted layout choice applies at controls load", ok, detail);
+        }
+
         log($"[tests] {passed} passed, {failed} failed");
         return failed;
     }

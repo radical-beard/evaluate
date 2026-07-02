@@ -111,8 +111,15 @@ controller.capture_text(function(kind, char) ... end)
                                    -- kind = "char" (with the character) | "backspace";
                                    -- while capturing, printable keys stop firing mapped
                                    -- actions; capture_text(nil) stops
+controller.layout("dvorak")        -- select a declared keyboard layout (persisted in the
+                                   -- save DB, remaps live); controller.layout() reads it,
+                                   -- controller.layouts() lists the declared ones
 controller.joy_name()
 ```
+
+Subscription callbacks run **under the registering script's context**: anything a callback
+itself registers (another subscription, a `capture_text`) is owned by that script and its
+scene layer, so it is cleaned up on hot reload / scene teardown with everything else.
 
 Exactly **one scenario is active** at a time (plus the reserved `Always` section, active in
 every scenario). Switching scenarios fires synthetic **releases** for held actions, and a

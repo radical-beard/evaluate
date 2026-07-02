@@ -17,7 +17,9 @@ public sealed class Store
 {
     private readonly Dictionary<string, LuaValue> _values = new();
     private readonly List<Sub> _subs = new();
-    private readonly Action<LuaValue, LuaValue[]> _call;
+    // Calls a subscriber UNDER ITS REGISTRATION CONTEXT (owner script + scene-layer
+    // lifetime), so anything the callback registers inherits the right cleanup scope.
+    private readonly Action<LuaValue, LuaValue[], string, object?> _call;
 
     private sealed class Sub
     {
@@ -30,7 +32,7 @@ public sealed class Store
 
     private long _ids;
 
-    public Store(Action<LuaValue, LuaValue[]> call) => _call = call;
+    public Store(Action<LuaValue, LuaValue[], string, object?> call) => _call = call;
 
     public LuaValue Get(string key) => _values.TryGetValue(key, out var v) ? v : LuaValue.Nil;
 
@@ -72,7 +74,7 @@ public sealed class Store
             bool match = s.Pattern.EndsWith('.')
                 ? key.StartsWith(s.Pattern, StringComparison.Ordinal)
                 : key == s.Pattern;
-            if (match) _call(s.Fn, new[] { (LuaValue)key, value, old });
+            if (match) _call(s.Fn, new[] { (LuaValue)key, value, old }, s.Owner, s.Lifetime);
         }
     }
 }

@@ -1,5 +1,5 @@
 {
-  "evaluateVersion": "0.11.0\u002Be9ba25f5da9a203d84b0dca4d628f8eb39c2a79f",
+  "evaluateVersion": "0.11.1\u002B5635e73e2e2320ecac3efe5cacad2a5cc763c872",
   "godotVersion": "4.6-stable (official)",
   "safePrimitives": [
     "assert",
@@ -315,6 +315,8 @@
       "members": [
         "capture_text",
         "joy_name",
+        "layout",
+        "layouts",
         "overrides",
         "possess",
         "possessed",

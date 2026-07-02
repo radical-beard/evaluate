@@ -16,14 +16,21 @@ namespace Evaluate;
 //   Key_enter  = "Select"
 //   [Gameplay]
 //   Stick_left = "Move"          # paired axes -> a vector action
-//   Key_w      = "Move+y"        # a digital key feeding one vector axis
 //   Axis_trigger_right = "Block" # an analog axis (value 0..1; down past threshold)
+//   [Gameplay.qwerty]            # a LAYOUT sub-block: bindings active only while
+//   Key_w = "Move+y"             #   that keyboard layout is selected
+//   [Gameplay.dvorak]
+//   Key_comma = "Move+y"
 //   [settings]
 //   deadzone = 0.05
 //   axis_threshold = 0.3
+//   layouts = ["qwerty", "dvorak"]   # declared layouts; first = default. The active
+//                                    # one persists in the save DB (controller.layout).
 //
 // Token grammar (resolved against the Godot enums at parse time, snake_case of the
-// enum name; unknown tokens are load errors — the signature-is-the-contract stance):
+// enum name; unknown tokens are load errors — the signature-is-the-contract stance).
+// A `[Scenario.<layout>]` sub-block scopes its bindings to one declared layout;
+// top-level bindings are active in every layout.
 //   Button_<JoyButton>   e.g. Button_a, Button_dpad_up, Button_left_stick
 //                        (aliases: l3/r3 = left/right stick, lb/rb = shoulders)
 //   Key_<Key>            e.g. Key_space, Key_escape, Key_w, Key_kp_enter
@@ -40,39 +47,77 @@ public sealed class ControlsMap
     public readonly Dictionary<string, Dictionary<string, ActionDef>> Scenarios = new();
     public double Deadzone = 0.05;        // stick vector magnitude below this reads 0
     public double AxisThreshold = 0.3;    // analog axis counts as "down" past this
+    public readonly List<string> Layouts = new();   // declared keyboard layouts (first = default)
+    public string ActiveLayout = "";      // the layout this map was built FOR
 
     public ActionDef? Find(string scenario, string action) =>
         Scenarios.TryGetValue(scenario, out var acts) && acts.TryGetValue(action, out var a) ? a : null;
 
     // ---- parsing ---------------------------------------------------------------
 
-    // Parse the controls file, then apply the save-DB overrides (scenario, token,
-    // action) on top — an override with an empty action UNBINDS the token.
+    // Parse the controls file for `activeLayout` (bindings scoped to other layouts are
+    // skipped), then apply the save-DB overrides (scenario, token, action) on top — an
+    // override with an empty action UNBINDS the token. Settings parse FIRST regardless
+    // of file order, so `@layout` suffixes validate against the declared layouts.
     public static ControlsMap Parse(string toml,
-        IReadOnlyList<(string scenario, string token, string action)>? overrides = null)
+        IReadOnlyList<(string scenario, string token, string action)>? overrides = null,
+        string? activeLayout = null)
     {
         var map = new ControlsMap();
-        foreach (var section in Toml.Parse(toml))
-        {
-            if (section.Key.Length == 0) continue;
-            if (section.Key == SettingsSection)
+        var sections = Toml.Parse(toml);
+
+        if (sections.TryGetValue(SettingsSection, out var settings))
+            foreach (var kv in settings)
             {
-                foreach (var kv in section.Value)
-                {
-                    if (kv.Key == "deadzone" && kv.Value is double dz) map.Deadzone = dz;
-                    else if (kv.Key == "axis_threshold" && kv.Value is double th) map.AxisThreshold = th;
-                    else throw new EvaluateException(
-                        $"controls [{SettingsSection}]: unknown setting '{kv.Key}' " +
-                        "(valid: deadzone, axis_threshold)");
-                }
-                continue;
+                if (kv.Key == "deadzone" && kv.Value is double dz) map.Deadzone = dz;
+                else if (kv.Key == "axis_threshold" && kv.Value is double th) map.AxisThreshold = th;
+                else if (kv.Key == "layouts" && kv.Value is object[] list)
+                    foreach (var l in list)
+                    {
+                        var name = l?.ToString() ?? "";
+                        if (name.Length == 0 || map.Layouts.Contains(name))
+                            throw new EvaluateException(
+                                $"controls [{SettingsSection}]: layouts must be unique, non-empty names");
+                        map.Layouts.Add(name);
+                    }
+                else throw new EvaluateException(
+                    $"controls [{SettingsSection}]: unknown setting '{kv.Key}' " +
+                    "(valid: deadzone, axis_threshold, layouts)");
             }
+
+        // The active layout: the caller's persisted choice when it is still declared,
+        // else the file's first-declared layout ("" when the file declares none).
+        map.ActiveLayout = activeLayout is { Length: > 0 } al && map.Layouts.Contains(al)
+            ? al
+            : (map.Layouts.Count > 0 ? map.Layouts[0] : "");
+
+        foreach (var section in sections)
+        {
+            if (section.Key.Length == 0 || section.Key == SettingsSection) continue;
             // A binding-less section is still a real scenario — e.g. an empty
             // [Cutscene] that scripts switch to when ALL input should go quiet.
             if (!map.Scenarios.ContainsKey(section.Key))
                 map.Scenarios[section.Key] = new Dictionary<string, ActionDef>();
             foreach (var kv in section.Value)
             {
+                // `[Scenario.<layout>]` arrives as a nested table: a layout sub-block.
+                if (kv.Value is Dictionary<string, object> layoutBlock)
+                {
+                    if (!map.Layouts.Contains(kv.Key))
+                        throw new EvaluateException(
+                            $"controls [{section.Key}.{kv.Key}]: '{kv.Key}' is not a declared layout " +
+                            (map.Layouts.Count > 0
+                                ? $"(declared: {string.Join(", ", map.Layouts)})"
+                                : "(declare layouts under [settings]: layouts = [\"...\"])"));
+                    foreach (var lkv in layoutBlock)
+                    {
+                        if (lkv.Value is not string ltarget || ltarget.Length == 0)
+                            throw new EvaluateException(
+                                $"controls [{section.Key}.{kv.Key}]: '{lkv.Key}' must map to an action name string");
+                        map.Bind(section.Key, lkv.Key, ltarget, kv.Key);
+                    }
+                    continue;
+                }
                 if (kv.Value is not string target || target.Length == 0)
                     throw new EvaluateException(
                         $"controls [{section.Key}]: '{kv.Key}' must map to an action name string");
@@ -92,12 +137,16 @@ public sealed class ControlsMap
         return map;
     }
 
-    private void Bind(string scenario, string token, string target)
+    // Bind one token; `layout` scopes it to one keyboard layout ("" = every layout).
+    // Inactive-layout bindings are validated but NOT added — the action itself still
+    // registers, so subscriptions resolve no matter which layout is selected.
+    private void Bind(string scenario, string token, string target, string layout = "")
     {
         var (actionName, component) = SplitAxisSuffix(target);
         var binding = ParseToken(scenario, token);
         binding.Action = actionName;
         binding.Component = component;
+        binding.Layout = layout;
 
         if (!Scenarios.TryGetValue(scenario, out var actions))
             Scenarios[scenario] = actions = new Dictionary<string, ActionDef>();
@@ -110,7 +159,7 @@ public sealed class ControlsMap
                 $"controls [{scenario}]: '{actionName}' mixes vector and non-vector bindings " +
                 "(a Stick_/axis-suffixed action takes only Stick_ or '+x/-x/+y/-y' bindings)");
         def.IsVector = vector;
-        def.Bindings.Add(binding);
+        if (layout.Length == 0 || layout == ActiveLayout) def.Bindings.Add(binding);
     }
 
     private void Unbind(string scenario, string token)
@@ -205,6 +254,7 @@ public sealed class Binding
     public long Code;                  // JoyButton / Key / JoyAxis / MouseButton value; Stick: 0 = left, 1 = right
     public string Action = "";
     public AxisComponent Component = AxisComponent.Whole;
+    public string Layout = "";         // "" = active in every layout
 }
 
 // One action within one scenario: its bindings and whether it reads as a vector.

@@ -41,8 +41,8 @@ const BUNDLED: Omit<EvtSpec, "source"> = {
     sql: ["exec", "exec_async", "flush", "query", "query_row", "snapshot", "transaction"],
     actions: [],
     controller: [
-      "capture_text", "joy_name", "overrides", "possess", "possessed", "release",
-      "rebind", "reset_overrides", "rumble", "scenario",
+      "capture_text", "joy_name", "layout", "layouts", "overrides", "possess",
+      "possessed", "release", "rebind", "reset_overrides", "rumble", "scenario",
     ],
     store: ["delete", "get", "has", "keys", "set", "subscribe"],
   },

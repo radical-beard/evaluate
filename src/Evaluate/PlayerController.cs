@@ -34,6 +34,13 @@ public sealed partial class PlayerController : Node
 
     // Call a Lua closure on the main thread — injected by the loader.
     internal Action<LuaValue, LuaValue[]> CallLua = (_, _) => { };
+    // Call a subscriber's closure UNDER ITS REGISTRATION CONTEXT (owner script +
+    // scene-layer lifetime) — injected by the loader. Anything the callback itself
+    // registers (another subscription, a text capture) then inherits that context,
+    // so it is cleaned up with the right script/layer instead of leaking globally
+    // and firing against freed nodes.
+    internal Action<LuaValue, LuaValue[], string, object?> DispatchLua =
+        (_, _, _, _) => { };
     internal Action<string> Log = _ => { };
 
     // Device probes — the ONLY reads of raw input. Swappable so the enforcement
@@ -224,12 +231,13 @@ public sealed partial class PlayerController : Node
                 st.HeldFor += dt;
                 foreach (var s in st.Subs.ToArray())
                     if (s.On == "held" && !s.HeldFired && st.HeldFor >= s.After)
-                    { s.HeldFired = true; CallLua(s.Fn, Array.Empty<LuaValue>()); }
+                    { s.HeldFired = true; DispatchLua(s.Fn, Array.Empty<LuaValue>(), s.Owner, s.Lifetime); }
             }
             else if (!st.Down && st.PrevDown)
             {
                 foreach (var s in st.Subs.ToArray())
-                    if (s.On == "tap" && st.HeldFor < s.After) CallLua(s.Fn, Array.Empty<LuaValue>());
+                    if (s.On == "tap" && st.HeldFor < s.After)
+                        DispatchLua(s.Fn, Array.Empty<LuaValue>(), s.Owner, s.Lifetime);
                 FireSubs(st, "release");
                 st.HeldFor = 0;
             }
@@ -239,7 +247,7 @@ public sealed partial class PlayerController : Node
     private void FireSubs(ActionState st, string on)
     {
         foreach (var s in st.Subs.ToArray())
-            if (s.On == on) CallLua(s.Fn, Array.Empty<LuaValue>());
+            if (s.On == on) DispatchLua(s.Fn, Array.Empty<LuaValue>(), s.Owner, s.Lifetime);
     }
 
     // ---- raw device reads -------------------------------------------------------
@@ -329,9 +337,10 @@ public sealed partial class PlayerController : Node
     {
         if (!Capturing || @event is not InputEventKey k || !k.Pressed || k.Echo) return;
         if (k.Keycode == Key.Backspace)
-            CallLua(_textCapture, new LuaValue[] { "backspace" });
+            DispatchLua(_textCapture, new LuaValue[] { "backspace" }, _textOwner, _textLifetime);
         else if (k.Unicode is >= 32 and <= 126)
-            CallLua(_textCapture, new LuaValue[] { "char", char.ConvertFromUtf32((int)k.Unicode) });
+            DispatchLua(_textCapture, new LuaValue[] { "char", char.ConvertFromUtf32((int)k.Unicode) },
+                _textOwner, _textLifetime);
     }
 
     // ---- output -----------------------------------------------------------------

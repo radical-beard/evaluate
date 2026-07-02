@@ -109,18 +109,28 @@ Axis_trigger_right = "Block" # analog axis: .value 0..1, "down" past axis_thresh
 Button_a   = "Select"
 Key_escape = "Back"
 
+[Gameplay.qwerty]            # a LAYOUT sub-block: active only in that keyboard layout
+Key_w = "Move+y"
+[Gameplay.dvorak]
+Key_comma = "Move+y"
+
 [Always]                     # reserved: active in EVERY scenario (debug toggles)
 Key_h = "DebugOverlay"
 
 [settings]                   # reserved
 deadzone = 0.05
 axis_threshold = 0.3
+layouts = ["qwerty", "dvorak"]   # declared keyboard layouts; first = default
 ```
 
 Binding tokens: `Button_<JoyButton snake_case>` (aliases `l3`/`r3`/`lb`/`rb`),
 `Key_<Key snake_case>`, `Axis_<JoyAxis>`, `Stick_left` / `Stick_right`,
 `Mouse_<MouseButton>`. An **unknown token is a load error**. Keyboard reads are **physical
-key positions** (layout-independent). Exactly **one scenario is active** at a time (plus
+key positions**. A `[Scenario.<layout>]` sub-block scopes its bindings to one declared
+layout (undeclared names are load errors); top-level bindings are active in every layout,
+and an inactive layout's actions still register so subscriptions resolve regardless. The
+selected layout persists in the save DB — `controller.layout(name)` / `layout()` /
+`layouts()`. Exactly **one scenario is active** at a time (plus
 `Always`); switching fires synthetic releases for held actions and suppresses bindings
 physically held across the switch until they are first released. Per-user rebinds
 (`controller.rebind`) persist in the save DB and apply over this TOML.

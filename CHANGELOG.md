@@ -7,6 +7,28 @@ the version is `0.x`, minor bumps may include breaking changes.
 
 ## [Unreleased]
 
+## [0.11.1] — 2026-07-02
+
+### Fixed
+- **Callback-time registrations now inherit the subscriber's cleanup scope.** Action
+  subscriptions, store subscriptions, and text captures dispatch UNDER the registering
+  script's owner + scene-layer lifetime, so anything the callback itself registers
+  (another subscription, a `controller.capture_text`) is cleaned up with that script's
+  hot reload / that scene's teardown instead of leaking globally. Previously a capture
+  registered inside a Select-press callback survived the scene switch and fired
+  against freed nodes ("Cannot access a disposed object").
+  (`src/Evaluate/PlayerController.cs`, `src/Evaluate/Store.cs`, `src/Evaluate/Loader.cs`)
+
+### Added
+- **Keyboard layouts.** The controls TOML declares them under
+  `[settings] layouts = ["qwerty", "dvorak"]` (first = default) and scopes bindings
+  with `[Scenario.<layout>]` sub-blocks (`[Gameplay.dvorak]` → `Key_comma = "Move+y"`);
+  top-level bindings stay active in every layout, and inactive-layout bindings still
+  register their action so subscriptions resolve regardless of the selection. The
+  active layout persists in the save DB (`controls.layout`) and applies live —
+  **`controller.layout()`** gets, **`controller.layout(name)`** sets + persists +
+  remaps, **`controller.layouts()`** lists. (`src/Evaluate/Controls.cs`)
+
 ## [0.11.0] — 2026-07-02
 
 The native-input release: raw input becomes impossible for scripts and is replaced by a
