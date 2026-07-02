@@ -9,6 +9,13 @@ export interface EvtSpec {
   apis: string[];
   apiMembers: Record<string, string[]>;
   apiNotes: Record<string, string>;
+  // Never declarable in `apis:` (assets load via frontmatter `assets:`).
+  blockedApis: string[];
+  // Godot class / global-enum names from the live spec (0.10.0 apis-as-modules: each is
+  // declarable in `apis:` and injected as a bare global). Empty when bundled — validation
+  // accepts any PascalCase name without a list; these only power completion/hover.
+  godotClasses: string[];
+  godotEnums: string[];
   systemHooks: string[];
   nodeHooks: string[];
   frontmatterKeys: string[];
@@ -20,6 +27,10 @@ export interface EvtSpec {
 
 // Stable fallback (api/hook/key names rarely change; the live spec wins when found).
 const BUNDLED: Omit<EvtSpec, "source"> = {
+  // The five framework services. Since 0.10.0, `apis:` ALSO accepts any Godot class or
+  // global-enum name (PascalCase — `apis: [Input, Node3D, Key]` injects each as a bare
+  // global) and host-registered C# extension apis; those aren't enumerable here, so the
+  // validator accepts PascalCase entries and only the blocked names below are errors.
   apis: ["input", "world", "scene", "save", "sql"],
   apiMembers: {
     input: ["is_down"],
@@ -31,6 +42,9 @@ const BUNDLED: Omit<EvtSpec, "source"> = {
   apiNotes: {
     world: "The persistent global-root Node (a wrapped instance, not a table). Survives scene switches.",
   },
+  blockedApis: ["DirAccess", "FileAccess", "ResourceLoader", "ResourceSaver"],
+  godotClasses: [],
+  godotEnums: [],
   systemHooks: [
     "on_start", "on_load", "on_unload", "on_quit", "on_enter", "on_exit",
     "on_focus_in", "on_focus_out", "on_pause", "on_resume",
@@ -40,7 +54,11 @@ const BUNDLED: Omit<EvtSpec, "source"> = {
     "on_attach", "on_load", "on_unload", "on_update", "on_physics_update",
     "on_input", "on_exit", "on_quit", "on_focus_in", "on_focus_out", "on_pause", "on_resume",
   ],
-  frontmatterKeys: ["config", "apis", "register", "returns", "params", "require", "assets", "scenes"],
+  frontmatterKeys: [
+    "config", "apis", "register", "returns", "params", "require", "assets", "scenes",
+    "properties", "behaviors", "machines", "attributes", "abilities",
+    "name", "states", "initial", // *.statemachine.evt signature keys
+  ],
   returnsGrammar: "<name>  |  <name>: 'get set <type>'  (read-only omits 'set')",
 };
 
@@ -67,10 +85,15 @@ export function loadSpec(): EvtSpec {
       apiMembers[a.name] = a.members ?? [];
       if (a.note) apiNotes[a.name] = a.note;
     }
+    const names = (list: unknown): string[] =>
+      Array.isArray(list) ? list.map((e: any) => e?.name).filter((n: any) => typeof n === "string") : [];
     return {
       apis: apis.length ? apis : BUNDLED.apis,
       apiMembers: apis.length ? apiMembers : BUNDLED.apiMembers,
       apiNotes: Object.keys(apiNotes).length ? apiNotes : BUNDLED.apiNotes,
+      blockedApis: raw.blockedApis ?? BUNDLED.blockedApis,
+      godotClasses: names(raw.godot?.classes),
+      godotEnums: names(raw.godot?.globalEnums),
       systemHooks: raw.hooks?.system ?? BUNDLED.systemHooks,
       nodeHooks: raw.hooks?.node ?? BUNDLED.nodeHooks,
       frontmatterKeys: raw.frontmatter?.keys ?? BUNDLED.frontmatterKeys,

@@ -125,8 +125,9 @@ function libraryPaths(): string[] {
   return out;
 }
 
-// EvaLuate is Lua 5.2; the LuaCATS declare the ambient globals (godot/std/save/...). We add
-// self/config and silence the "global function" lint that hook definitions would trip.
+// EvaLuate is Lua 5.2; the LuaCATS declare `std` plus the declarable apis (services and, since
+// 0.10.0, Godot classes/enums as bare globals — no ambient `godot.*`). We add the contextual
+// self/config/params/assets and silence the "global function" lint hook definitions would trip.
 function luaSection(base: Record<string, unknown> | undefined): Record<string, unknown> {
   const lua = { ...(base ?? {}) } as Record<string, any>;
   lua.runtime = { ...(lua.runtime ?? {}), version: "Lua 5.2" };
@@ -137,7 +138,7 @@ function luaSection(base: Record<string, unknown> | undefined): Record<string, u
   };
   lua.diagnostics = {
     ...(lua.diagnostics ?? {}),
-    globals: [...((lua.diagnostics?.globals as string[]) ?? []), "self", "config"],
+    globals: [...((lua.diagnostics?.globals as string[]) ?? []), "self", "config", "params", "assets"],
     disable: [...((lua.diagnostics?.disable as string[]) ?? []), "lowercase-global"],
   };
   lua.telemetry = { ...(lua.telemetry ?? {}), enable: false };

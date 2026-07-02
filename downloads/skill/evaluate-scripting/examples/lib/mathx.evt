@@ -1,0 +1,13 @@
+---
+returns:
+ - clamp
+ - lerp
+---
+-- A tiny shared library, consumed via a frontmatter `require:` binding (see
+-- system-global.evt). Its `returns` contract is exactly what a consumer sees —
+-- the private `EPSILON` upvalue stays hidden behind the narrowed handle.
+local EPSILON = 1e-6
+local M = {}
+function M.clamp(x, lo, hi) return math.max(lo, math.min(hi, x)) end
+function M.lerp(a, b, t) return a + (b - a) * t end
+return M

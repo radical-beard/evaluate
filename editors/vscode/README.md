@@ -9,21 +9,26 @@ YAML-frontmatter-plus-sandboxed-Lua files you write to script a Godot game with
 - **Highlighting** — the leading `---` … `---` signature is highlighted as YAML; the body as
   Lua.
 - **Frontmatter IntelliSense** — completion, validation and hover for the signature block:
-  - `apis:` → the real capability list (`input`, `world`, `scene`, `save`, `sql`), with a
-    warning on anything undeclared/unknown;
-  - `register:` → the actual lifecycle hooks (system vs node hooks, picked by filename);
-  - top-level keys (`config`/`apis`/`register`/`returns`/`assets`/`scenes`).
+  - `apis:` → the framework services (`input`, `world`, `scene`, `save`, `sql`) plus — since
+    0.10.0 — every Godot class/enum by PascalCase name (each injected as a bare global);
+    unknown lowercase names warn, the removed `godot:` prefix and the blocked
+    `DirAccess`/`FileAccess`/`ResourceLoader`/`ResourceSaver` are errors;
+  - `register:` → the actual lifecycle hooks (system vs node hooks, picked by filename —
+    `*.behavior.evt`, `*.statemachine.evt` and the deprecated `*.node.evt` get node hooks);
+  - all top-level keys (`config`/`apis`/`register`/`returns`/`params`/`require`/`assets`/
+    `scenes`/`properties`/`behaviors`/`machines`/`attributes`/`abilities`/`name`/`states`/
+    `initial`).
   These are read from your project's generated `evaluate-api.json` when present, so they track
   your exact EvaLuate version (a small built-in fallback is used otherwise).
 - **Lua IntelliSense in the body** — completion, hover, signature help, go-to-definition and
   diagnostics over the **Lua part only** (the frontmatter is hidden from the analyzer), backed
   by [lua-language-server](https://luals.github.io/) and your generated LuaCATS types — so
-  `godot.*`, `std.*`, `save`, `scene`, etc. autocomplete.
+  declared Godot classes, `std.*`, `save`, `scene`, etc. autocomplete.
 - **Sandbox-aware completion** — the body only autocompletes the capability apis this file
   actually declared in `apis:`. If you didn't declare `save`, `save` won't be suggested, and
   using it anyway gets a warning (`'save' is used but not declared in 'apis:'`) — mirroring the
-  EvaLuate runtime, where an undeclared api is genuinely absent. `godot`/`std`/`self` are
-  ambient and always available.
+  EvaLuate runtime, where an undeclared api is genuinely absent. `std`/`self`/`config`/
+  `params`/`assets` are ambient.
 
 ## Requirements
 
@@ -35,8 +40,8 @@ server.)
 
 ## Get the most out of it — generate the type library
 
-The whole point is autocomplete over the *actual* `godot.*`/`std.*` API. Generate it from your
-project (EvaLuate ≥ the `--emit-api` release):
+The whole point is autocomplete over the *actual* Godot-class/`std.*`/capability API. Generate
+it from your project (EvaLuate ≥ the `--emit-api` release):
 
 ```
 godot --headless --path . -- --emit-api downloads/spec

@@ -1,6 +1,7 @@
-# Defaults for the player node script (player.node.evt).
-# Exposed to Lua as the `config.player` table.
+# Defaults for the player behavior (player.behavior.evt).
+# Exposed to Lua as the `config.player` table. Note what is NOT here anymore:
+# the start position is frontmatter `properties:` (static engine state), and
+# move speed is the `speed` attribute (sprint.behavior.evt) so effects can
+# modify it — config is for plain tunables shared by every instance.
 [player]
-start_pos = [0.0, 0.0, 0.0]   # x, y, z
 base_weapon_damage = 25.0
-move_speed = 4.5

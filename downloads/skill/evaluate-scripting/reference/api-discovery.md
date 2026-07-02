@@ -1,8 +1,9 @@
 # Discovering the API (don't guess names)
 
-The complete `godot.*` + `std.*` + capability surface is **generated** from the live engine
-and shipped alongside this skill. It is exact for the Godot + EvaLuate version it was built
-against — prefer it over memory or generic Godot docs.
+The complete surface a script can declare and call — every Godot class module, `std.*`, the
+capability apis — is **generated** from the live engine and shipped alongside this skill. It
+is exact for the Godot + EvaLuate version it was built against — prefer it over memory or
+generic Godot docs.
 
 ## The generated spec files
 
@@ -20,14 +21,14 @@ In an EvaLuate download these sit under `spec/` (next to this `skill/`):
 
 Point [lua-language-server](https://luals.github.io/) at the `luacats/` folder (e.g. add it
 to `Lua.workspace.library` in your editor settings, or drop the files in your workspace).
-You then get autocomplete and hover over the whole `godot.*` and `std.*` surface — typed
-methods, properties, signals, enums.
+You then get autocomplete and hover over the whole declared-class and `std.*` surface —
+typed methods, properties, signals, enums.
 
 ## Regenerating (it adapts automatically)
 
 The spec is produced by EvaLuate itself — nothing is hand-written or hard-coded — so it
-tracks new Godot versions, new engine classes (including GDExtension), and new EvaLuate
-features with no manual updating. Regenerate for your project:
+tracks new Godot versions, new engine classes (including GDExtension), host-registered
+apis, and new EvaLuate features with no manual updating. Regenerate for your project:
 
 ```
 godot --headless --path . -- --emit-api downloads/spec
@@ -37,12 +38,16 @@ Run it whenever you upgrade Godot or EvaLuate.
 
 ## Naming conventions (so a name resolves)
 
+- **Class tables are declared, then bare:** `apis: [Timer, Key, OS]` →
+  `Timer.new()`, `Key.Space`, `OS.GetName()`. There is no `godot.` prefix — an undeclared
+  class name is `nil` in the body, and an unknown name *in* `apis:` errors at load.
 - **Instance methods & properties → engine `snake_case`:** `node:get_node("X")`,
   `node.global_position`, `body:move_and_slide()`, `timer:emit_signal("timeout")`.
-  `node:GetNode()` (PascalCase) will **not** resolve on an instance.
-- **Constructors, enums, constants, static methods → C# `PascalCase`:**
-  `godot.Timer.new()`, `godot.Key.Space`, `godot.MouseButton.Left`,
-  `godot.Timer.TimerProcessCallback.Idle`, `godot.OS.GetName()`.
+  `node:GetNode()` (PascalCase) will **not** resolve on an instance. Instances expose their
+  members regardless of what their class's declaration status is.
+- **Constructors, enums, constants, static methods → C# `PascalCase`** on the declared class
+  table: `Timer.new()`, `Key.Space`, `MouseButton.Left`, `Timer.TimerProcessCallback.Idle`,
+  `OS.GetName()`.
 - **Signals:** connect from Lua with `obj:connect("signal_name", fn)` (0–6 args). The
   callback runs on the main thread.
 - **Structs cross as tables:** reading a `Vector3`/`Transform3D` gives a table

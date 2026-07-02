@@ -1112,8 +1112,902 @@ public static class EvaluateTests
                 before && after, $"before={before}, after={after}");
         }
 
+        // 67: the ambient `godot` table is GONE — a body sees nil (apis-as-modules)
+        {
+            var src = new Dictionary<string, string>
+            {
+                ["amb.evt"] = "---\nreturns:\n - r\n---\nreturn { r = godot == nil }\n",
+            };
+            var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+            var r = loader.Require("amb.evt").Read<LuaTable>()["r"];
+            Check("ambient godot table is gone", r.Type == LuaValueType.Boolean && r.Read<bool>());
+        }
+
+        // 68: a Godot class table is unreachable UNDECLARED, injected when DECLARED
+        {
+            bool gated, granted = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["undeclared_class.evt"] = "---\n---\nlocal n = Node3D.new()\nreturn {}\n",
+                ["declared_class.evt"] =
+                    "---\napis:\n - Node3D\nreturns:\n - ok\n---\n" +
+                    "local n = Node3D.new()\nlocal ok = n ~= nil\nn:free()\nreturn { ok = ok }\n",
+            };
+            Loader L() => new(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+            gated = Throws(() => L().Require("undeclared_class.evt"));
+            try
+            {
+                granted = L().Require("declared_class.evt").Read<LuaTable>()["ok"].Read<bool>();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("Godot class tables are gated by apis: declaration", gated && granted,
+                $"gated={gated}, granted={granted} {detail}");
+        }
+
+        // 69: a Godot ENUM declared in apis: injects its value table
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["enum_api.evt"] = "---\napis:\n - Key\nreturns:\n - r\n---\nreturn { r = Key.Space }\n",
+            };
+            try
+            {
+                var r = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { })
+                    .Require("enum_api.evt").Read<LuaTable>()["r"];
+                ok = r.Type == LuaValueType.Number && r.Read<double>() == (double)(long)Key.Space;
+                detail = $"Key.Space={r}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("a declared Godot enum injects its value table", ok, detail);
+        }
+
+        // 70: the legacy `godot:` prefix is rejected with a migration hint
+        Check("a 'godot:'-prefixed api is rejected", Throws(() =>
+        {
+            var src = new Dictionary<string, string>
+            {
+                ["prefixed.evt"] = "---\napis:\n - \"godot:Node3D\"\n---\nreturn {}\n",
+            };
+            new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { }).Require("prefixed.evt");
+        }));
+
+        // 71: imperative resource/file IO classes are NOT declarable capabilities
+        Check("ResourceLoader is blocked from apis:", Throws(() =>
+        {
+            var src = new Dictionary<string, string>
+            {
+                ["blocked.evt"] = "---\napis:\n - ResourceLoader\n---\nreturn {}\n",
+            };
+            new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { }).Require("blocked.evt");
+        }));
+
+        // 72: an unknown api name is a load error (typo-proofing), not a silent nil
+        Check("an unknown api name errors at load", Throws(() =>
+        {
+            var src = new Dictionary<string, string>
+            {
+                ["unknown.evt"] = "---\napis:\n - definitely_not_a_thing\n---\nreturn {}\n",
+            };
+            new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { }).Require("unknown.evt");
+        }));
+
+        // 73: a host-registered C# api is callable when declared, absent when not
+        {
+            bool ok = false, gated = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["uses_host.evt"] =
+                    "---\napis:\n - mathex\nreturns:\n - r\n---\n" +
+                    "return { r = string.format(\"%d-%s\", mathex.Add(2, 3), mathex.Tag()) }\n",
+                ["no_host.evt"] = "---\nreturns:\n - r\n---\nreturn { r = mathex == nil }\n",
+            };
+            try
+            {
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.RegisterApi("mathex", new HostMath());
+                var r = loader.Require("uses_host.evt").Read<LuaTable>()["r"];
+                ok = r.Type == LuaValueType.String && r.Read<string>() == "5-host";
+                gated = loader.Require("no_host.evt").Read<LuaTable>()["r"].Read<bool>();
+                detail = $"r={r}, gated={gated}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("a host api is callable when declared, absent when not", ok && gated, detail);
+        }
+
+        // 74: RegisterApi rejects reserved names, Godot-class collisions, and late registration
+        {
+            Loader L() => new(_ => "", _ => { });
+            var reserved = Throws(() => L().RegisterApi("scene", new HostMath()));
+            var collides = Throws(() => L().RegisterApi("Timer", new HostMath()));
+            var late = Throws(() =>
+            {
+                var src = new Dictionary<string, string> { ["m.evt"] = "return {}\n" };
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.Require("m.evt");
+                loader.RegisterApi("mathex", new HostMath());
+            });
+            Check("RegisterApi rejects reserved/colliding/late registrations",
+                reserved && collides && late, $"reserved={reserved}, collides={collides}, late={late}");
+        }
+
+        // 75: a declared asset loads eagerly and is injected under its bound name
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["uses_asset.evt"] =
+                    "---\nassets:\n  tint: \"tests/assets/tint.gdshader\"\nreturns:\n - r\n---\n" +
+                    "return { r = assets.tint:get_class() }\n",
+            };
+            try
+            {
+                var r = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { })
+                    .Require("uses_asset.evt").Read<LuaTable>()["r"];
+                ok = r.Type == LuaValueType.String && r.Read<string>() == "Shader";
+                detail = $"r={r}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("a declared asset loads and injects as assets.<name>", ok, detail);
+        }
+
+        // 76: a missing asset file is a LOAD error naming the binding, not a runtime nil
+        Check("a missing asset file errors at load", Throws(() =>
+        {
+            var src = new Dictionary<string, string>
+            {
+                ["missing_asset.evt"] =
+                    "---\nassets:\n  rig: \"tests/assets/nope.fbx\"\n---\nreturn {}\n",
+            };
+            new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { }).Require("missing_asset.evt");
+        }));
+
+        // 77: the pre-0.10 bare-list `assets:` form is rejected with a migration hint
+        Check("legacy bare-path assets: entries are rejected", Throws(() =>
+        {
+            var src = new Dictionary<string, string>
+            {
+                ["legacy_assets.evt"] = "---\nassets:\n - \"models/x.fbx\"\n---\nreturn {}\n",
+            };
+            new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { }).Require("legacy_assets.evt");
+        }));
+
+        // 78: a glob binds a stem-keyed table of loaded resources
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["glob_asset.evt"] =
+                    "---\nassets:\n  pack: \"tests/assets/glob_*.gdshader\"\nreturns:\n - r\n---\n" +
+                    "return { r = assets.pack.glob_a ~= nil and assets.pack.glob_b ~= nil " +
+                    "and assets.pack.glob_a:get_class() == \"Shader\" }\n",
+            };
+            try
+            {
+                var r = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { })
+                    .Require("glob_asset.evt").Read<LuaTable>()["r"];
+                ok = r.Type == LuaValueType.Boolean && r.Read<bool>();
+                detail = $"r={r}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("an asset glob binds a stem-keyed resource table", ok, detail);
+        }
+
+        // 79: a .gdshader edit hot-reloads IN PLACE — the same Shader instance (even one
+        // captured at load) carries the new code, so live materials recompile for free
+        {
+            bool ok = false; string detail = "";
+            var abs = ProjectSettings.GlobalizePath("res://tests/assets/hot.gdshader");
+            var original = System.IO.File.ReadAllText(abs);
+            try
+            {
+                var src = new Dictionary<string, string>
+                {
+                    ["hot_asset.evt"] =
+                        "---\nassets:\n  hot: \"tests/assets/hot.gdshader\"\nreturns:\n - sh\n---\n" +
+                        "return { sh = assets.hot }\n",
+                };
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                var handle = loader.Require("hot_asset.evt").Read<LuaTable>();
+                var shader = (Shader)handle["sh"].Read<GodotInstanceProxy>().Target;
+                var v1 = shader.Code.Contains("0.1");
+
+                System.IO.File.WriteAllText(abs, original.Replace("0.1", "0.9"));
+                loader.ReloadOnChange("tests/assets/hot.gdshader");
+                var v2 = shader.Code.Contains("0.9");   // SAME instance, new code
+
+                ok = v1 && v2;
+                detail = $"v1={v1}, v2={v2}";
+            }
+            catch (Exception e) { detail = e.Message; }
+            finally { System.IO.File.WriteAllText(abs, original); }
+            Check("a .gdshader edit hot-reloads the same Shader instance in place", ok, detail);
+        }
+
+        // 80: frontmatter `properties:` applies native engine state at attach, BEFORE on_attach
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] = "[nodes.P]\ntype = \"Node3D\"\nscript = \"props.node.evt\"\n",
+                ["props.node.evt"] =
+                    "---\nproperties:\n  position: [1, 2, 3]\n  visible: false\nregister:\n - on_attach\n---\n" +
+                    "function on_attach() self:set_meta(\"attach_x\", self.position.x) end\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var p = root.GetNodeOrNull<Node3D>("P");
+                ok = p is not null && p.Position == new Vector3(1, 2, 3) && !p.Visible
+                    && p.GetMeta("attach_x").AsDouble() == 1;    // visible to on_attach already
+                detail = $"pos={p?.Position}, visible={p?.Visible}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("properties: applies native props at attach (before on_attach)", ok, detail);
+        }
+
+        // 81: the scene's own property keys WIN over the script's `properties:`
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] =
+                    "[nodes.P]\ntype = \"Node3D\"\nscript = \"props2.node.evt\"\nposition = [9, 9, 9]\n",
+                ["props2.node.evt"] =
+                    "---\nproperties:\n  position: [1, 2, 3]\n  visible: false\nregister:\n - on_attach\n---\n" +
+                    "function on_attach() end\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var p = root.GetNodeOrNull<Node3D>("P");
+                ok = p is not null && p.Position == new Vector3(9, 9, 9) && !p.Visible;
+                detail = $"pos={p?.Position} (scene should win), visible={p?.Visible} (script should apply)";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("scene properties override the script's properties:", ok, detail);
+        }
+
+        // 82: an edited `properties:` block re-applies on script hot reload
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] = "[nodes.P]\ntype = \"Node3D\"\nscript = \"props3.node.evt\"\n",
+                ["props3.node.evt"] =
+                    "---\nproperties:\n  position: [1, 2, 3]\nregister:\n - on_attach\n---\nfunction on_attach() end\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var p = root.GetNodeOrNull<Node3D>("P");
+                var before = p is not null && p.Position == new Vector3(1, 2, 3);
+                src["props3.node.evt"] = src["props3.node.evt"].Replace("[1, 2, 3]", "[4, 5, 6]");
+                loader.ReloadOnChange("props3.node.evt");
+                var after = p is not null && p.Position == new Vector3(4, 5, 6);
+                ok = before && after;
+                detail = $"before={before}, after={after} (pos={p?.Position})";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("properties: re-applies on script hot reload", ok, detail);
+        }
+
+        // 83: properties: is node-only, and an unknown property name fails loudly
+        {
+            var onSystem = Throws(() =>
+            {
+                var src = new Dictionary<string, string>
+                {
+                    ["sysprops.evt"] =
+                        "---\nproperties:\n  visible: false\nregister:\n - on_start\n---\nfunction on_start() end\n",
+                };
+                new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { }).LoadSystem("sysprops.evt");
+            });
+            var unknown = ParamLoadThrows(
+                "[nodes.P]\ntype = \"Node3D\"\nscript = \"m.node.evt\"\n",
+                "---\nproperties:\n  bogus_prop: 1\nregister:\n - on_attach\n---\nfunction on_attach() end\n");
+            Check("properties: rejected on systems and for unknown property names",
+                onSystem && unknown, $"onSystem={onSystem}, unknown={unknown}");
+        }
+
+        // 84: multiple behaviors on one node — script= first, then behaviors= in list
+        // order; per-attachment params flow; all hooks fire
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] =
+                    "[nodes.N]\ntype = \"Node\"\nscript = \"a.node.evt\"\n" +
+                    "behaviors = [\"b.behavior.evt\", { script = \"c.behavior.evt\", params = { tag = \"cc\" } }]\n",
+                ["a.node.evt"] = "---\nregister:\n - on_attach\n---\n" +
+                    "function on_attach() self:set_meta(\"order\", self:get_meta(\"order\", \"\") .. \"a\") end\n",
+                ["b.behavior.evt"] = "---\nregister:\n - on_attach\n---\n" +
+                    "function on_attach() self:set_meta(\"order\", self:get_meta(\"order\", \"\") .. \"b\") end\n",
+                ["c.behavior.evt"] = "---\nparams:\n  tag: string\nregister:\n - on_attach\n---\n" +
+                    "function on_attach() self:set_meta(\"order\", self:get_meta(\"order\", \"\") .. \"c\") " +
+                    "self:set_meta(\"tag\", params.tag) end\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var node = root.GetNodeOrNull("N");
+                ok = node is not null && node.GetMeta("order").AsString() == "abc"
+                    && node.GetMeta("tag").AsString() == "cc";
+                detail = $"order={node?.GetMeta("order")}, tag={node?.GetMeta("tag")}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("multiple behaviors attach in order with per-attachment params", ok, detail);
+        }
+
+        // 85: one behavior file drives many nodes, each with its own params
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] =
+                    "[nodes.X]\ntype = \"Node\"\nbehaviors = [{ script = \"shared.behavior.evt\", params = { id = \"x\" } }]\n" +
+                    "[nodes.Y]\ntype = \"Node\"\nbehaviors = [{ script = \"shared.behavior.evt\", params = { id = \"y\" } }]\n",
+                ["shared.behavior.evt"] = "---\nparams:\n  id: string\nregister:\n - on_attach\n---\n" +
+                    "function on_attach() self:set_meta(\"id\", params.id) end\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                ok = root.GetNodeOrNull("X")?.GetMeta("id").AsString() == "x"
+                    && root.GetNodeOrNull("Y")?.GetMeta("id").AsString() == "y";
+                detail = $"x={root.GetNodeOrNull("X")?.GetMeta("id")}, y={root.GetNodeOrNull("Y")?.GetMeta("id")}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("one behavior file drives many nodes with per-node params", ok, detail);
+        }
+
+        // 86: frontmatter composition — a behavior's `behaviors:` list joins the node;
+        // a non-behavior extension in an attachment list is rejected
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] = "[nodes.N]\ntype = \"Node\"\nbehaviors = [\"outer.behavior.evt\"]\n",
+                ["outer.behavior.evt"] = "---\nbehaviors:\n - inner.behavior.evt\nregister:\n - on_attach\n---\n" +
+                    "function on_attach() self:set_meta(\"outer\", true) end\n",
+                ["inner.behavior.evt"] = "---\nregister:\n - on_attach\n---\n" +
+                    "function on_attach() self:set_meta(\"inner\", true) end\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var node = root.GetNodeOrNull("N");
+                var composed = node is not null && node.HasMeta("outer") && node.HasMeta("inner");
+                var badExt = ParamLoadThrows(
+                    "[nodes.N]\ntype = \"Node\"\nbehaviors = [\"m.evt\"]\n",
+                    "---\nregister:\n - on_attach\n---\nfunction on_attach() end\n");
+                ok = composed && badExt;
+                detail = $"composed={composed}, badExt={badExt}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("frontmatter behaviors: composes onto the node; wrong extension rejected", ok, detail);
+        }
+
+        // 87: a statemachine attaches, starts at initial, and takes `when`-guarded and
+        // `after`-timed transitions from the physics tick
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] =
+                    "[nodes.N]\ntype = \"Node\"\nbehaviors = [\"probe.behavior.evt\"]\nmachines = [\"m.statemachine.evt\"]\n",
+                ["probe.behavior.evt"] = "---\nregister:\n - on_update\n---\n" +
+                    "function on_update(dt) self:set_meta(\"st\", self.fsm.stance.state) end\n",
+                ["m.statemachine.evt"] =
+                    "---\nname: stance\nstates: [idle, alert]\ninitial: idle\n---\n" +
+                    "return {\n" +
+                    "  { from = \"idle\",  to = \"alert\", when = function(self) return self:get_meta(\"threat\", false) end },\n" +
+                    "  { from = \"alert\", to = \"idle\",  after = 0.5 },\n" +
+                    "}\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var node = root.GetNodeOrNull("N")!;
+                LuaValue Probe() { var ln = loader.ActiveNodes.First(x => x.Path == "probe.behavior.evt"); return ln.Hooks["on_update"]; }
+                loader.Call(Probe(), 0.0);
+                var initial = node.GetMeta("st").AsString() == "idle";
+                node.SetMeta("threat", true);
+                loader.TickMachines(1.0 / 60);
+                loader.Call(Probe(), 0.0);
+                var guarded = node.GetMeta("st").AsString() == "alert";
+                node.SetMeta("threat", false);            // so alert doesn't re-trigger after the timer
+                loader.TickMachines(0.3);
+                loader.Call(Probe(), 0.0);
+                var held = node.GetMeta("st").AsString() == "alert";     // 0.3s < 0.5s
+                loader.TickMachines(0.3);
+                loader.Call(Probe(), 0.0);
+                var timed = node.GetMeta("st").AsString() == "idle";     // 0.6s >= 0.5s
+                ok = initial && guarded && held && timed;
+                detail = $"initial={initial}, guarded={guarded}, held={held}, timed={timed}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("statemachine: initial + when-guard + after-timer transitions", ok, detail);
+        }
+
+        // 88: `on` events fire immediately, and the `self.fsm.<m>.<state> = fn` sugar
+        // appends enter listeners that receive the origin state
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] =
+                    "[nodes.N]\ntype = \"Node\"\nbehaviors = [\"sub.behavior.evt\"]\nmachines = [\"evm.statemachine.evt\"]\n",
+                ["sub.behavior.evt"] = "---\nregister:\n - on_attach\n - on_load\n---\n" +
+                    "function on_attach()\n" +
+                    "  self.fsm.gate.open = function(from) self:set_meta(\"heard_from\", from) end\n" +
+                    "  self.fsm.gate:on_exit(\"closed\", function(to) self:set_meta(\"exited_to\", to) end)\n" +
+                    "end\n" +
+                    "function on_load()\n" +
+                    "  self:set_meta(\"fired\", self.fsm.gate:fire(\"knock\"))\n" +
+                    "  self:set_meta(\"now\", self.fsm.gate.state)\n" +
+                    "  self:set_meta(\"isopen\", self.fsm.gate:is(\"open\"))\n" +
+                    "end\n",
+                ["evm.statemachine.evt"] =
+                    "---\nname: gate\nstates: [closed, open]\n---\n" +
+                    "return { { from = \"closed\", to = \"open\", on = \"knock\",\n" +
+                    "           run = function(self, from, to) self:set_meta(\"acted\", from .. \">\" .. to) end } }\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var node = root.GetNodeOrNull("N")!;
+                ok = node.GetMeta("fired").AsBool()
+                    && node.GetMeta("now").AsString() == "open"
+                    && node.GetMeta("isopen").AsBool()
+                    && node.GetMeta("heard_from").AsString() == "closed"
+                    && node.GetMeta("exited_to").AsString() == "open"
+                    && node.GetMeta("acted").AsString() == "closed>open";
+                detail = $"fired={node.GetMeta("fired")}, now={node.GetMeta("now")}, " +
+                         $"heard={node.GetMeta("heard_from")}, exited={node.GetMeta("exited_to")}, acted={node.GetMeta("acted")}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("statemachine: fire() + do action + enter/exit subscriptions", ok, detail);
+        }
+
+        // 89: a machine hot reload refreshes transitions but KEEPS state and listeners;
+        // a behavior hot reload DROPS its stale listeners (no double-fire)
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] =
+                    "[nodes.N]\ntype = \"Node\"\nbehaviors = [\"cnt.behavior.evt\"]\nmachines = [\"rm.statemachine.evt\"]\n",
+                ["cnt.behavior.evt"] = "---\nregister:\n - on_load\n---\n" +
+                    "function on_load()\n" +
+                    "  self.fsm.sw.on_state = function() self:set_meta(\"n\", self:get_meta(\"n\", 0) + 1) end\n" +
+                    "end\n",
+                ["rm.statemachine.evt"] =
+                    "---\nname: sw\nstates: [off_state, on_state]\n---\n" +
+                    "return {\n" +
+                    "  { from = \"off_state\", to = \"on_state\", on = \"toggle\" },\n" +
+                    "  { from = \"on_state\", to = \"off_state\", on = \"toggle\" },\n" +
+                    "}\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var node = root.GetNodeOrNull("N")!;
+
+                // toggle -> on_state: listener fires once
+                FireToggle(loader, src, node);
+                var once = node.GetMeta("n", 0).AsInt32() == 1;
+
+                // machine reload: state (on_state) + listener survive
+                src["rm.statemachine.evt"] = src["rm.statemachine.evt"].Replace("name: sw", "name: sw # v2");
+                loader.ReloadOnChange("rm.statemachine.evt");
+                FireToggle(loader, src, node);   // -> off_state (state was kept, so toggle flips off)
+                FireToggle(loader, src, node);   // -> on_state: kept listener fires again
+                var kept = node.GetMeta("n", 0).AsInt32() == 2;
+
+                // behavior reload: old listener dropped, on_load re-subscribes ONE fresh one
+                loader.ReloadOnChange("cnt.behavior.evt");
+                FireToggle(loader, src, node);   // -> off_state
+                FireToggle(loader, src, node);   // -> on_state: exactly one increment
+                var single = node.GetMeta("n", 0).AsInt32() == 3;
+
+                ok = once && kept && single;
+                detail = $"once={once}, kept={kept}, single={single} (n={node.GetMeta("n", 0).AsInt32()})";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("hot reload: machine keeps state+listeners; behavior drops stale listeners", ok, detail);
+        }
+
+        // 90: behaviors/machines lists round-trip through SceneWriter
+        {
+            bool ok = false; string detail = "";
+            try
+            {
+                var (a, b, text) = RoundTrip(
+                    "[nodes.Skiff]\ntype = \"Node3D\"\n" +
+                    "behaviors = [\"hull.behavior.evt\", { script = \"cannons.behavior.evt\", params = { count = 2 } }]\n" +
+                    "machines = [\"sail.statemachine.evt\"]\n");
+                var skiff = b.Nodes.FirstOrDefault(n => n.Name == "Skiff");
+                ok = SpecEquals(a, b) && skiff is not null
+                    && skiff.Behaviors.Count == 2 && skiff.Behaviors[0].Script == "hull.behavior.evt"
+                    && skiff.Behaviors[1].Params.Count == 1 && (double)skiff.Behaviors[1].Params["count"] == 2
+                    && skiff.Machines.Count == 1 && skiff.Machines[0].Script == "sail.statemachine.evt"
+                    && text.Contains("behaviors = [") && text.Contains("machines = [");
+                detail = $"equal={SpecEquals(a, b)}, text=<<{text}>>";
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("behaviors/machines round-trip through SceneWriter", ok, detail);
+        }
+
+        // 91: machine signature enforcement — no states, unknown transition state,
+        // register: on a machine, duplicate machine name on one node
+        {
+            bool noStates = MachineLoadThrows("---\nname: m\n---\nreturn { { from = \"a\", to = \"b\", after = 1 } }\n");
+            bool badState = MachineLoadThrows(
+                "---\nname: m\nstates: [a, b]\n---\nreturn { { from = \"a\", to = \"zzz\", after = 1 } }\n");
+            bool registers = MachineLoadThrows(
+                "---\nname: m\nstates: [a]\nregister:\n - on_update\n---\nreturn { { from = \"a\", to = \"a\", after = 1 } }\n");
+            bool twoTriggers = MachineLoadThrows(
+                "---\nname: m\nstates: [a, b]\n---\nreturn { { from = \"a\", to = \"b\", after = 1, on = \"x\" } }\n");
+            Check("machine signature is enforced (states/refs/register/triggers)",
+                noStates && badState && registers && twoTriggers,
+                $"noStates={noStates}, badState={badState}, registers={registers}, twoTriggers={twoTriggers}");
+        }
+
+        // 92: attributes + an instant-cost ability — declare, read, spend, cooldown, regen
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] = "[nodes.N]\ntype = \"Node\"\nbehaviors = [\"gas.behavior.evt\"]\n",
+                ["gas.behavior.evt"] =
+                    "---\nattributes:\n  water: { base: 100, min: 0, max: 100, regen: 20, regen_delay: 0.5 }\n" +
+                    "abilities:\n - spray.ability\nregister:\n - on_attach\n - on_update\n---\n" +
+                    "function on_attach()\n" +
+                    "  self:set_meta(\"w0\", self.attributes.water)\n" +
+                    "  self:set_meta(\"ok1\", self.abilities:activate(\"spray\"))\n" +
+                    "  self:set_meta(\"w1\", self.attributes.water)\n" +
+                    "  self:set_meta(\"ok2\", self.abilities:activate(\"spray\"))\n" +
+                    "end\n" +
+                    "function on_update(dt)\n" +
+                    "  self:set_meta(\"w\", self.attributes.water)\n" +
+                    "  self:set_meta(\"can\", self.abilities:can_activate(\"spray\"))\n" +
+                    "end\n",
+                ["spray.ability"] = "cooldown = 1.0\ncost = { attribute = \"water\", amount = 30.0 }\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var node = root.GetNodeOrNull("N")!;
+                var declared = node.GetMeta("w0").AsDouble() == 100;
+                var spent = node.GetMeta("ok1").AsBool() && node.GetMeta("w1").AsDouble() == 70;
+                var cooled = !node.GetMeta("ok2").AsBool();
+                loader.Tick(1.1);   // cooldown expires; regen kicks in after the 0.5s delay
+                var probe = loader.ActiveNodes.First(x => x.Path == "gas.behavior.evt").Hooks["on_update"];
+                loader.Call(probe, 0.0);
+                var regened = Math.Abs(node.GetMeta("w").AsDouble() - 92) < 1e-6;   // 70 + 20*1.1
+                var canAgain = node.GetMeta("can").AsBool();
+                ok = declared && spent && cooled && regened && canAgain;
+                detail = $"declared={declared}, spent={spent}, cooled={cooled}, " +
+                         $"regened={regened} (w={node.GetMeta("w").AsDouble()}), canAgain={canAgain}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("attributes + instant ability: cost, cooldown, delayed regen", ok, detail);
+        }
+
+        // 93: a channeled ability drains per second, holds grant_tags, auto-deactivates
+        // on exhaust (tag until recover), then recovers
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] = "[nodes.N]\ntype = \"Node\"\nbehaviors = [\"sprint.behavior.evt\"]\n",
+                ["sprint.behavior.evt"] =
+                    "---\nattributes:\n  water: { base: 10, min: 0, max: 100, regen: 50, regen_delay: 0.2, recover: 25 }\n" +
+                    "abilities:\n - sprint.ability\nregister:\n - on_attach\n - on_update\n---\n" +
+                    "function on_attach()\n" +
+                    "  self.abilities:on_ended(\"sprint\", function(name, reason) self:set_meta(\"why\", reason) end)\n" +
+                    "  self:set_meta(\"started\", self.abilities:activate(\"sprint\"))\n" +
+                    "end\n" +
+                    "function on_update(dt)\n" +
+                    "  self:set_meta(\"w\", self.attributes.water)\n" +
+                    "  self:set_meta(\"active\", self.abilities:is_active(\"sprint\"))\n" +
+                    "  self:set_meta(\"tag\", self.abilities:has_tag(\"sprinting\"))\n" +
+                    "  self:set_meta(\"exh\", self.abilities:has_tag(\"exhausted:water\"))\n" +
+                    "  self:set_meta(\"can\", self.abilities:can_activate(\"sprint\"))\n" +
+                    "end\n",
+                ["sprint.ability"] =
+                    "channeled = true\ncost = { attribute = \"water\", amount = 10.0 }\ngrant_tags = [\"sprinting\"]\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var node = root.GetNodeOrNull("N")!;
+                var probe = loader.ActiveNodes.First(x => x.Path == "sprint.behavior.evt").Hooks["on_update"];
+                void Snap() => loader.Call(probe, 0.0);
+
+                var started = node.GetMeta("started").AsBool();
+                loader.Tick(0.5); Snap();
+                var draining = Math.Abs(node.GetMeta("w").AsDouble() - 5) < 1e-6
+                    && node.GetMeta("active").AsBool() && node.GetMeta("tag").AsBool();
+                loader.Tick(0.5); Snap();
+                var exhausted = !node.GetMeta("active").AsBool() && !node.GetMeta("tag").AsBool()
+                    && node.GetMeta("exh").AsBool() && !node.GetMeta("can").AsBool()
+                    && node.GetMeta("why").AsString() == "exhausted";
+                loader.Tick(0.3); Snap();
+                var stillLocked = node.GetMeta("exh").AsBool();                  // 15 < recover 25
+                loader.Tick(0.3); Snap();
+                var recovered = !node.GetMeta("exh").AsBool() && node.GetMeta("can").AsBool();
+                ok = started && draining && exhausted && stillLocked && recovered;
+                detail = $"started={started}, draining={draining}, exhausted={exhausted}, " +
+                         $"stillLocked={stillLocked}, recovered={recovered}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("channeled ability: drain, tags, exhaust lockout, recovery", ok, detail);
+        }
+
+        // 94: effects — instant mutation, while-active modifier via a channel, periodic dot
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] = "[nodes.N]\ntype = \"Node\"\nbehaviors = [\"fx.behavior.evt\"]\n",
+                ["fx.behavior.evt"] =
+                    "---\nattributes:\n  hp: { base: 50, min: 0, max: 100 }\n  thrust: { base: 0, min: 0, max: 100 }\n" +
+                    "abilities:\n - boost.ability\nregister:\n - on_attach\n - on_update\n---\n" +
+                    "function on_attach()\n" +
+                    "  self.abilities:apply(\"heal.effect\")\n" +
+                    "  self:set_meta(\"hp_healed\", self.attributes.hp)\n" +
+                    "  self.abilities:activate(\"boost\")\n" +
+                    "  self:set_meta(\"thrust_on\", self.attributes.thrust)\n" +
+                    "  self.abilities:deactivate(\"boost\")\n" +
+                    "  self:set_meta(\"thrust_off\", self.attributes.thrust)\n" +
+                    "  self.abilities:apply(\"dot.effect\")\n" +
+                    "end\n" +
+                    "function on_update(dt) self:set_meta(\"hp\", self.attributes.hp) end\n",
+                ["boost.ability"] = "channeled = true\n[[effects]]\neffect = \"boost.effect\"\n",
+                ["boost.effect"] = "attribute = \"thrust\"\nop = \"add\"\nmagnitude = 30.0\nduration = -1\n",
+                ["heal.effect"] = "attribute = \"hp\"\nop = \"add\"\nmagnitude = 20.0\nduration = 0\n",
+                ["dot.effect"] = "attribute = \"hp\"\nop = \"add\"\nmagnitude = -5.0\nduration = 2.1\nperiod = 1.0\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var node = root.GetNodeOrNull("N")!;
+                var probe = loader.ActiveNodes.First(x => x.Path == "fx.behavior.evt").Hooks["on_update"];
+                var healed = node.GetMeta("hp_healed").AsDouble() == 70;
+                var modifier = node.GetMeta("thrust_on").AsDouble() == 30
+                    && node.GetMeta("thrust_off").AsDouble() == 0;
+                loader.Tick(1.0); loader.Tick(1.0); loader.Tick(0.2);
+                loader.Call(probe, 0.0);
+                var dotted = node.GetMeta("hp").AsDouble() == 60;   // two -5 ticks, then expiry
+                ok = healed && modifier && dotted;
+                detail = $"healed={healed}, modifier={modifier}, dotted={dotted} (hp={node.GetMeta("hp").AsDouble()})";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("effects: instant, while-active modifier, periodic with expiry", ok, detail);
+        }
+
+        // 95: an .ability edit hot-reloads live — the next activation uses the new cost
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] = "[nodes.N]\ntype = \"Node\"\nbehaviors = [\"hotgas.behavior.evt\"]\n",
+                ["hotgas.behavior.evt"] =
+                    "---\nattributes:\n  water: { base: 100, min: 0, max: 100 }\n" +
+                    "abilities:\n - zap.ability\nregister:\n - on_attach\n - on_update\n---\n" +
+                    "function on_attach() end\n" +
+                    "function on_update(dt)\n" +
+                    "  self.abilities:activate(\"zap\")\n" +
+                    "  self:set_meta(\"w\", self.attributes.water)\n" +
+                    "end\n",
+                ["zap.ability"] = "cost = { attribute = \"water\", amount = 10.0 }\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var node = root.GetNodeOrNull("N")!;
+                var probe = loader.ActiveNodes.First(x => x.Path == "hotgas.behavior.evt").Hooks["on_update"];
+                loader.Call(probe, 0.0);
+                var v1 = node.GetMeta("w").AsDouble() == 90;                  // -10
+                src["zap.ability"] = "cost = { attribute = \"water\", amount = 50.0 }\n";
+                loader.ReloadOnChange("zap.ability");
+                loader.Call(probe, 0.0);
+                var v2 = node.GetMeta("w").AsDouble() == 40;                  // -50, live
+                ok = v1 && v2;
+                detail = $"v1={v1}, v2={v2} (w={node.GetMeta("w").AsDouble()})";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("an .ability edit hot-reloads live (next activation uses new cost)", ok, detail);
+        }
+
+        // 96: GAS contract enforcement — unknown ability key, bad effect field,
+        // attributes on a system, apply to an attribute-less target
+        {
+            bool badKey = GasLoadThrows(new()
+            {
+                ["b.behavior.evt"] = "---\nabilities:\n - x.ability\nregister:\n - on_attach\n---\nfunction on_attach() end\n",
+                ["x.ability"] = "bogus = 1\n",
+            });
+            bool badField = GasLoadThrows(new()
+            {
+                ["b.behavior.evt"] =
+                    "---\nattributes:\n  hp: { base: 1 }\nregister:\n - on_attach\n---\n" +
+                    "function on_attach() self.abilities:apply(\"y.effect\") end\n",
+                ["y.effect"] = "attribute = \"hp.bogus\"\nmagnitude = 1.0\n",
+            });
+            bool onSystem = Throws(() =>
+            {
+                var src = new Dictionary<string, string>
+                {
+                    ["s.evt"] = "---\nattributes:\n  hp: { base: 1 }\nregister:\n - on_start\n---\nfunction on_start() end\n",
+                };
+                new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { }).LoadSystem("s.evt");
+            });
+            bool noAttrs = GasLoadThrows(new()
+            {
+                ["b.behavior.evt"] =
+                    "---\nregister:\n - on_attach\n---\n" +
+                    "function on_attach() self.abilities:apply(\"z.effect\") end\n",
+                ["z.effect"] = "attribute = \"hp\"\nmagnitude = 1.0\n",
+            });
+            Check("GAS contract enforced (keys/fields/system/attribute-less apply)",
+                badKey && badField && onSystem && noAttrs,
+                $"badKey={badKey}, badField={badField}, onSystem={onSystem}, noAttrs={noAttrs}");
+        }
+
+        // 97: the `dna` param type — hand-authored 16-hex-digit hash in, traits out
+        {
+            bool ok = false; string detail = "";
+            var src = new Dictionary<string, string>
+            {
+                ["global.scene"] =
+                    "[nodes.Grunt]\ntype = \"Node\"\nbehaviors = [{ script = \"dna.behavior.evt\", " +
+                    "params = { dna = \"0xa13f00c2d4e5b677\" } }]\n",
+                ["dna.behavior.evt"] =
+                    "---\nparams:\n  dna: dna\nregister:\n - on_attach\n---\n" +
+                    "function on_attach()\n" +
+                    "  self:set_meta(\"t1\", params.dna:trait(1))\n" +
+                    "  self:set_meta(\"t2\", params.dna:trait(2))\n" +
+                    "  self:set_meta(\"t16\", params.dna:trait(16))\n" +
+                    "  self:set_meta(\"hex\", params.dna:hex())\n" +
+                    "end\n",
+            };
+            try
+            {
+                var root = new Node();
+                var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+                loader.SetGlobalRoot(root);
+                loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"]));
+                var g = root.GetNodeOrNull("Grunt")!;
+                ok = g.GetMeta("t1").AsDouble() == 10        // 0xA, most-significant first
+                    && g.GetMeta("t2").AsDouble() == 1
+                    && g.GetMeta("t16").AsDouble() == 7
+                    && g.GetMeta("hex").AsString() == "0xA13F00C2D4E5B677";   // normalized upper
+                detail = $"t1={g.GetMeta("t1")}, t2={g.GetMeta("t2")}, t16={g.GetMeta("t16")}, hex={g.GetMeta("hex")}";
+                root.QueueFree();
+            }
+            catch (Exception e) { detail = e.Message; }
+            Check("dna param: 16 nibble trait slots, MSB-first, normalized hex", ok, detail);
+        }
+
+        // 98: malformed dna values are rejected (wrong length / no 0x / non-hex / wrong type)
+        {
+            bool Reject(string dnaToml) => ParamLoadThrows(
+                $"[nodes.G]\ntype = \"Node\"\nscript = \"m.node.evt\"\nparams = {{ dna = {dnaToml} }}\n",
+                "---\nparams:\n  dna: dna\nregister:\n - on_attach\n---\nfunction on_attach() end\n");
+            var tooShort = Reject("\"0xA13F\"");
+            var noPrefix = Reject("\"A13F00C2D4E5B677A\"");
+            var nonHex = Reject("\"0xZZZF00C2D4E5B677\"");
+            var wrongType = Reject("42");
+            var missing = ParamLoadThrows(
+                "[nodes.G]\ntype = \"Node\"\nscript = \"m.node.evt\"\n",
+                "---\nparams:\n  dna: dna\nregister:\n - on_attach\n---\nfunction on_attach() end\n");
+            Check("malformed / missing dna params are rejected",
+                tooShort && noPrefix && nonHex && wrongType && missing,
+                $"short={tooShort}, noPrefix={noPrefix}, nonHex={nonHex}, wrongType={wrongType}, missing={missing}");
+        }
+
         log($"[tests] {passed} passed, {failed} failed");
         return failed;
+    }
+
+    // Build a one-node layer attaching b.behavior.evt (plus the given extra files) and
+    // report whether the load throws — the GAS analogue of ParamLoadThrows.
+    private static bool GasLoadThrows(Dictionary<string, string> src)
+    {
+        src["global.scene"] = "[nodes.N]\ntype = \"Node\"\nbehaviors = [\"b.behavior.evt\"]\n";
+        var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+        var root = new Node();
+        loader.SetGlobalRoot(root);
+        var threw = Throws(() => loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"])));
+        root.QueueFree();
+        return threw;
+    }
+
+    // Fire the test machine's "toggle" event through the fsm surface (via a scratch
+    // behavior hook so the call goes through Lua like real gameplay code would).
+    private static void FireToggle(Loader loader, Dictionary<string, string> src, Node node)
+    {
+        src["__fire.evt"] = "---\nreturns:\n - go\n---\nreturn { go = function(n) n.fsm.sw:fire(\"toggle\") end }\n";
+        var go = loader.Require("__fire.evt").Read<LuaTable>()["go"];
+        loader.Call(go, loader.Wrap(node));
+    }
+
+    // Attach one machine (given source) to a fresh node and report whether it throws.
+    private static bool MachineLoadThrows(string machineSource)
+    {
+        var src = new Dictionary<string, string>
+        {
+            ["global.scene"] = "[nodes.N]\ntype = \"Node\"\nmachines = [\"t.statemachine.evt\"]\n",
+            ["t.statemachine.evt"] = machineSource,
+        };
+        var loader = new Loader(n => src.TryGetValue(n, out var s) ? s : "", _ => { });
+        var root = new Node();
+        loader.SetGlobalRoot(root);
+        var threw = Throws(() => loader.LoadGlobalLayer(SceneFile.Parse(src["global.scene"])));
+        root.QueueFree();
+        return threw;
+    }
+
+    // A tiny host api used by the RegisterApi cases: one instance method, one static.
+    private sealed class HostMath
+    {
+        public double Add(double a, double b) => a + b;
+        public static string Tag() => "host";
     }
 
     // Build a one-node global layer from (sceneToml, nodeScriptSource) and report whether
@@ -1163,6 +2057,7 @@ public static class EvaluateTests
         if (a.Name != b.Name || a.Type != b.Type || a.Script != b.Script
             || a.Instance != b.Instance || a.Unique != b.Unique) return false;
         if (!SetEquals(a.Groups, b.Groups)) return false;
+        if (!AttachEquals(a.Behaviors, b.Behaviors) || !AttachEquals(a.Machines, b.Machines)) return false;
         if (a.Connections.Count != b.Connections.Count) return false;
         for (int i = 0; i < a.Connections.Count; i++)
             if (a.Connections[i].Signal != b.Connections[i].Signal
@@ -1174,6 +2069,14 @@ public static class EvaluateTests
 
     private static bool SetEquals(List<string> a, List<string> b)
         => a.Count == b.Count && a.All(b.Contains);
+
+    private static bool AttachEquals(List<AttachSpec> a, List<AttachSpec> b)
+    {
+        if (a.Count != b.Count) return false;
+        for (int i = 0; i < a.Count; i++)
+            if (a[i].Script != b[i].Script || !MapEquals(a[i].Params, b[i].Params)) return false;
+        return true;
+    }
 
     private static bool MapEquals(Dictionary<string, object> a, Dictionary<string, object> b)
     {

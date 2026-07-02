@@ -13,18 +13,44 @@ hot-reloaded by default.
 
 - **Frontmatter → signature.** The leading `---` block is split off and parsed
   as real YAML (YamlDotNet) into `config:`, `apis:`, `register:`, `returns:`,
-  `params:`, `require:`, `assets:`, `scenes:`; the Lua body is handed to the VM verbatim (line numbers
-  preserved).
-  The signature *is* the C#↔Lua boundary contract — `returns` declares typed,
-  access-scoped members (no Lua type system). (`src/Evaluate/Frontmatter.cs`)
-- **Per-script sandbox.** Each body runs via `load(body, name, "t", env)` on a
-  shared `LuaState`, where `env` holds *only* the declared `config.*`, declared
-  `apis`, the always-available `std` and ambient `godot`, plus a few safe
-  primitives — including the metatable builtins (`setmetatable`/`getmetatable`/
-  `rawget`/`rawset`/`rawequal`/`rawlen`) so scripts can define classes the
-  idiomatic Lua way. Undeclared globals (`os`, `io`, …) are absent, and `pcall`
-  is intentionally withheld (errors surface rather than being swallowed).
+  `params:`, `require:`, `assets:`, `scenes:`, `properties:`, `behaviors:`,
+  `machines:`, `attributes:`, `abilities:` (plus the machine-only
+  `name:`/`states:`/`initial:`); the Lua body is handed to the VM verbatim (line
+  numbers preserved). The signature *is* the C#↔Lua boundary contract —
+  `returns` declares typed, access-scoped members (no Lua type system).
+  (`src/Evaluate/Frontmatter.cs`)
+- **Per-script sandbox — apis as modules.** Each body runs via
+  `load(body, name, "t", env)` on a shared `LuaState`, where `env` holds *only*
+  the declared `config.*`/`assets.*`, **each declared `apis:` entry as its own
+  bare global table**, the always-available `std`, plus a few safe primitives —
+  including the metatable builtins (`setmetatable`/`getmetatable`/`rawget`/
+  `rawset`/`rawequal`/`rawlen`) so scripts can define classes the idiomatic Lua
+  way. There is **no ambient `godot.*`**: an `apis:` name resolves **framework
+  service → host-registered extension → Godot class/enum** (memoized), so
+  `apis: [save, Input, Node3D, Key]` injects the `save` service next to
+  `Input.GetJoyAxis(...)`, `Node3D.new()` and `Key.Space`. Declaration gates the
+  **class table** only — instances reaching a script (`self`, `get_node`, signal
+  args, return values) expose members regardless. An unknown `apis:` name is a
+  load error (typo-proofing); a legacy `godot:`-prefixed entry errors with a
+  migration hint; `ResourceLoader`/`ResourceSaver`/`FileAccess`/`DirAccess` are
+  blocked from declaration (assets come from `assets:`, persistence from
+  `save`/`sql`). Undeclared globals (`os`, `io`, …) are absent, and `pcall` is
+  intentionally withheld (errors surface rather than being swallowed).
   (`src/Evaluate/Loader.cs`)
+- **Host extension apis.** The embedding game registers C# api modules with
+  `runtime.RegisterApi("combat_native", implObjectOrStaticType)` **before**
+  adding the runtime to the tree; scripts declare `apis: [combat_native]` and
+  call the public methods dot-style. Reserved names, collisions with Godot
+  classes, duplicate names, and post-load registrations are all rejected.
+- **Assets are declared, not loaded.** Frontmatter `assets:` is a **map**
+  (`name: "res-relative/path"`; a filename `*` glob binds a stem-keyed table),
+  **eagerly loaded at script load** (missing file = load error) and injected as
+  the ambient `assets` table — the *only* way a script gets an asset. Hot reload
+  is real: a `.gdshader` edit updates **in place** (the same `Shader` instance
+  carries the new code, so live `ShaderMaterial`s recompile for free — shaders
+  live in their own `.gdshader` files, never inline), while any other resource
+  re-loads with cache-replace and its declaring scripts re-run
+  `on_unload`/`on_load`.
 - **Custom `require`** narrows the returned module to its `returns` contract
   (get/set property → `get_`/`set_` accessors; plain method; read-only hides the
   setter; missing accessor errors). A script may also declare its modules in
@@ -33,20 +59,20 @@ hot-reloaded by default.
   resolving the same narrowed handle. A **require cycle** (direct or transitive,
   including self-require) is rejected with the offending chain rather than a stack
   overflow, and editing a required module **hot-reloads every consumer** that
-  requires it (transitively — systems re-run, live node scripts refresh).
+  requires it (transitively — systems re-run, live behaviors refresh).
 - **Data lives in the engine.** Game objects *are* Godot nodes — declared in scene
-  files or created via `godot.<Type>.new()` / `world` — so there is no separate
-  entity system. The Lua handle is a thin proxy whose metatable routes reads/writes
-  into the engine. (`src/Evaluate/GodotBinder.cs`)
+  files or created via a declared class module (`Node3D.new()`) / `world` — so
+  there is no separate entity system. The Lua handle is a thin proxy whose
+  metatable routes reads/writes into the engine. (`src/Evaluate/GodotBinder.cs`)
 - **Auto-discovery.** The runtime recursively scans `res://scripts`; any system
   `.evt` with a `register:` block is wired to the Godot lifecycle. A hook may be
   registered **once per scene** (see *Scenes & layers*) — so the same `on_update`
   can be registered in `menu`, `level1`, and globally, each by a different script.
 - **Hot reload (default).** A `FileSystemWatcher` watches scripts, scene files,
-  configs, and frontmatter-declared `assets:`; changes reload on the main thread.
-  A changed system or node script re-runs its body and refreshes its hook
-  closures while live nodes persist; a changed `*.scene` rebuilds the active
-  scene. (`src/Evaluate/EvaluateRuntime.cs`)
+  configs, frontmatter-declared `assets:`, and `.ability`/`.effect` files;
+  changes reload on the main thread. A changed system or behavior script re-runs
+  its body and refreshes its hook closures while live nodes persist; a changed
+  `*.scene` rebuilds the active scene. (`src/Evaluate/EvaluateRuntime.cs`)
 - **Scenes & layers.** Gameplay is split into a persistent **global layer** and a
   swappable **scene layer**, so one program holds many scenes, each with its own
   registered functions:
@@ -55,8 +81,9 @@ hot-reloaded by default.
     **Global root**.
   - **`*.scene`** files (TOML content) declare a node tree as keyed, nested tables —
     `[nodes.Player]` then `[nodes.Player.Camera]` makes Camera a child of Player.
-    A node's name is the table key; reserved keys `type`/`script`; a **sub-table is
-    a child node** and a **scalar/array is a property** (`position = [x, y, z]`). A
+    A node's name is the table key; reserved keys `type`/`behaviors`/`machines`
+    (/`script`, the deprecated alias); a **sub-table is a child node** and a
+    **scalar/array is a property** (`position = [x, y, z]`). A
     sub-table tagged with **`_type`** is a *property*, not a child — it names an inline
     resource (`mesh = { _type = "BoxMesh", size = [1,1,1] }`) **or a builtin struct**
     (`custom_aabb = { _type = "Aabb", position = [1,2,3], size = [4,5,6] }`), which is how
@@ -65,17 +92,55 @@ hot-reloaded by default.
     `"theme_override_colors/font_color" = [..]`). An optional top-level
     **`description = "…"`** holds scene docs as data. Parsed with Tomlyn; instantiated
     under a per-scene container that is **freed wholesale** on switch. The editor addon
-    can round-trip all of this back to the `.scene` (see below).
-  - **`*.node.evt`** is one node's behavior, attached via the scene file; its
-    hooks run with **`self`** bound to that node (no spawning in the script). It may
-    declare a **`params:`** block — typed, per-instance values the scene supplies via
-    `params = { … }` on the node and the body reads through the ambient **`params`**
-    table. The per-node analogue of `config` (which is shared): `params:` entries are
-    `name: <default>` (type inferred), `name: <type>` (required), or
-    `name: "<type> = <default>"`; the loader fills defaults, type-checks each supplied
-    value, and rejects an undeclared or missing-required param — the same
+    can round-trip all of this — including `behaviors`/`machines` lists — back to the
+    `.scene` (see below).
+  - **`*.behavior.evt`** is node behavior, attached via the scene's
+    `behaviors = ["path", { script = "path", params = {…} }]` list; its hooks run with
+    **`self`** bound to that node (no spawning in the script). A **node holds N
+    behaviors** (hooks fire in attachment order) and **one behavior file drives many
+    nodes**, each attachment with its own params. A behavior's own frontmatter
+    `behaviors:`/`machines:` lists compose further attachments onto the same node
+    (depth-first, deduped per node). `*.node.evt` + `script =` remain as the
+    single-behavior alias (deprecated; new code uses behaviors). A behavior may
+    declare a **`params:`** block — typed, per-instance values the scene supplies and
+    the body reads through the ambient **`params`** table; the per-node analogue of
+    `config` (which is shared). Entries are `name: <default>` (type inferred),
+    `name: <type>` (required), or `name: "<type> = <default>"`; types include **`dna`**
+    — a hand-authored 64-bit identity hash (`"0x"` + exactly 16 hex digits, never
+    framework-generated) the body reads as `params.<name>:trait(1..16)` (nibbles,
+    MSB-first) / `:hex()`. The loader fills defaults, type-checks each supplied value,
+    and rejects an undeclared or missing-required param — the same
     signature-is-the-contract stance as the sandbox. Stashed as `__evt_params` so the
-    editor round-trips it.
+    editor round-trips it. A behavior may also declare **`properties:`** — native Godot
+    properties applied to `self` at attach and re-applied on script hot reload; the
+    scene's own property keys always win, and an unknown property name is a load error.
+    Convention: static initial engine state lives in the frontmatter/scene, not the body.
+  - **`*.statemachine.evt`** is a declarative FSM attached via `machines = [...]` (or a
+    script's `machines:` frontmatter). Frontmatter `name:` (default file stem),
+    `states:` (required), `initial:` (default first); the body **returns the ordered
+    transition list** — `{ from, to, when = fn(self) | on = "event" | after = seconds
+    [, run = fn(self, from, to)] }` (`do` is a Lua keyword). Guards are polled per
+    physics tick in order (first match wins, max one transition/tick); `:fire("event")`
+    is immediate (reentrant fires defer a tick); `from = "*"` is a wildcard. Behaviors
+    react via the node surface `self.fsm.<name>` — `.state`, `:is(s)`, `:fire(evt)`,
+    `:on_exit(state, fn(to))`, and `self.fsm.<name>.<state> = fn(from)` *appends* an
+    enter listener. Hot reload: a machine edit keeps state + listeners; a behavior
+    reload drops that behavior's stale listeners (re-subscribe in `on_load`).
+    (`src/Evaluate/StateMachine.cs`)
+  - **GAS-lite** (`src/Evaluate/Abilities.cs`): node-attached scripts declare
+    **`attributes:`** — per-node pools (`base/min/max/regen/regen_delay/recover`) with
+    built-in stamina semantics: regen per second after `regen_delay` since the last
+    spend; a spend that drains to `min` **exhausts** the pool (tag `exhausted:<name>`)
+    until it regens back to `recover` — and **`abilities:`** — `*.ability` files (TOML:
+    `cooldown`, `channeled` with per-second cost, `cost = { attribute, amount }`,
+    `tags`/`block_tags`/`grant_tags`, `[[effects]]` blocks) granted at attach.
+    `*.effect` files (TOML: dotted `attribute` field targets like `"stamina.max"`,
+    `op = add|mul|set`, `magnitude`, `duration` 0 = instant / −1 = while-active / >0 =
+    timed, `period` for dots) mutate or modify pools. Lua surface:
+    `self.attributes.<name>` (modifier-aware clamped read; assignment = clamped hard
+    set), `:max(n)`, `:has(n)`; `self.abilities:grant/activate/deactivate/is_active/
+    can_activate/cooldown/has_tag/apply/on_ended`. `.ability`/`.effect` files
+    hot-reload live.
   - **`*.evt`** systems are conductors: no `scenes:` ⇒ **global** (always run);
     `scenes: [a, b]` ⇒ active only while `a`/`b` is current. The `scene` API does
     routing — `scene.change(name)` (applied at the next frame boundary, never
@@ -99,26 +164,30 @@ hot-reloaded by default.
   bare DLL — its `.cs` must live under `res://addons/` and compile with the game — so the zip
   carries the source; the stable `Evaluate.Editor` namespace means it drops in verbatim.
 - **Lifecycle hooks.** `register:` wires Godot's Node lifecycle. **System hooks:**
-  `on_start` (global, once), `on_enter`/`on_exit` (scene-scoped, per activation),
-  `on_update(dt)`, `on_physics_update(dt)`, `on_input(event)`. **Node hooks**
-  (`*.node.evt`, with `self`): `on_ready`, `on_update`, `on_physics_update`,
-  `on_input`, `on_exit`.
+  `on_start` (global, once), `on_load`/`on_unload` (every (re)load / before reload),
+  `on_enter`/`on_exit` (scene-scoped, per activation), `on_update(dt)`,
+  `on_physics_update(dt)`, `on_input(event)`, `on_focus_in`/`on_focus_out`,
+  `on_pause`/`on_resume`, `on_quit`. **Behavior hooks** (`*.behavior.evt` /
+  `*.node.evt`, with `self`): `on_attach` (once, at first attach),
+  `on_load`/`on_unload`, `on_update`, `on_physics_update`, `on_input`, `on_exit`,
+  `on_quit`, plus the same focus/pause pairs. Machines register no hooks — they
+  are polled data.
 - **`std.*` standard library.** Real C#-backed types via the `[LuaObject]` source
   generator — `std.vec3`, `std.vec2`, `std.color`, `std.vector`,
   `std.linked_list` (`src/Evaluate/Std.cs`).
 - **Persistence (`save`).** SQLite-backed runtime/player data in Godot's
   per-project `user://` directory (the platform-native, per-game path Steam Cloud
   syncs from) — `save.set/get/delete` (`src/Evaluate/Persistence.cs`).
-- **Godot binding (ambient, default).** `godot.<Type>` resolves any Godot type
-  on first use (`src/Evaluate/GodotBinder.cs`):
-  - **instances** — `godot.Node3D.new()` (Activator); member access routes
+- **Godot binding (declared class modules).** Any Godot class/enum name in
+  `apis:` resolves to a bound module table (`src/Evaluate/GodotBinder.cs`):
+  - **instances** — `Node3D.new()` (Activator); member access routes
     through the engine ClassDB (`GodotObject.Call/Get/Set`), not reflection.
     Instances are `ILuaUserData`, so they pass back into the engine
     (`world:add_child(node)`);
   - **properties** — `node.position = std.vec3(…)` / `node.position`;
   - **signals** — `node:connect("timeout", fn)` (0–6 args, dispatched on the
     main thread) and `node:emit_signal(...)`;
-  - **enums/constants** — `godot.Key.Space`, `godot.Timer.TimerProcessCallback.Idle`;
+  - **enums/constants** — `Key.Space`, `Timer.TimerProcessCallback.Idle`;
   - **marshalling** — exhaustive: primitives, strings, `NodePath`, objects,
     `Array`/`Dictionary`; rich C#-backed `Vector2/3` & `Color` (↔ `std.*`); and
     every other struct (`Vector4`, `Vector2I/3I`, `Quaternion`, `Rect2`, `Plane`,
@@ -132,14 +201,15 @@ hot-reloaded by default.
   Lua-convertible signatures. The binder prefers pre-baked bindings.
 - **API spec & agent skill (consumer onboarding).** `godot --headless --path . --
   --emit-api <dir>` dumps the *entire* Lua surface a script sees — read live, so nothing is
-  hand-written or hard-coded: `godot.*` classes/methods/properties/signals come from engine
-  `ClassDB` introspection, enums/constants/statics + the class set from GodotSharp reflection,
-  `std.*` from the `[LuaObject]` types, the capability apis by walking the tables `Loader`
-  builds, and hooks/frontmatter from the runtime's arrays (`src/Evaluate/EvaluateDocs.cs` —
-  the runtime analogue of the build-time generator). It emits `evaluate-api.json`, LuaCATS
-  `---@meta` files for IDE autocomplete (the whole `godot.*`/`std.*` surface), and a Markdown
-  reference. A pre-generated copy plus a drop-in **agent skill** (teaching an LLM the script
-  contract) live under `downloads/`; each release also ships `evaluate-downloads-<version>.zip`.
+  hand-written or hard-coded: the declarable Godot class modules (methods/properties/signals)
+  come from engine `ClassDB` introspection, enums/constants/statics + the class set from
+  GodotSharp reflection, `std.*` from the `[LuaObject]` types, the capability + host apis by
+  walking the tables `Loader` builds, and hooks/frontmatter from the runtime's arrays
+  (`src/Evaluate/EvaluateDocs.cs` — the runtime analogue of the build-time generator). It
+  emits `evaluate-api.json`, LuaCATS `---@meta` files for IDE autocomplete (the whole
+  class-module/`std.*` surface), and a Markdown reference. A pre-generated copy plus a
+  drop-in **agent skill** (teaching an LLM the script contract) live under `downloads/`;
+  each release also ships `evaluate-downloads-<version>.zip`.
 
 ## Base VM
 
@@ -151,8 +221,8 @@ custom dialect's `+=`.
 
 ## Run
 
-    godot --headless --path dev                       # demo: global layer, scene switch (menu -> level1), node script
-    godot --headless --path dev -- --test             # enforcement suite (18 tests)
+    godot --headless --path dev                       # demo: global layer, scene switch (menu -> level1), behaviors
+    godot --headless --path dev -- --test             # enforcement suite (98 tests)
     godot --headless --path dev -- --quit-after 8     # demo, then quit after 8 frames
     godot --headless --path dev -- --emit-api out/    # dump the full Lua API spec (json + LuaCATS + markdown)
 
@@ -160,8 +230,9 @@ custom dialect's `+=`.
 
     README.md  CHANGELOG.md  Directory.Build.props  Evaluate.slnx  global.json  LICENSE.md
     src/Evaluate/            Evaluate.csproj  EvaluateRuntime.cs  Loader.cs  Std.cs
-                             Frontmatter.cs  Toml.cs  SceneFile.cs  SceneBuilder.cs
-                             GodotBinder.cs  Persistence.cs  BindGodotAttribute.cs  Prebaked.cs  EvaluateTests.cs
+                             Frontmatter.cs  Toml.cs  SceneFile.cs  SceneBuilder.cs  SceneWriter.cs
+                             StateMachine.cs  Abilities.cs  Sql.cs  GodotBinder.cs  GodotStructCodec.cs
+                             Persistence.cs  BindGodotAttribute.cs  Prebaked.cs  EvaluateTests.cs
                              EvaluateDocs.cs  EvaluateDocsModel.cs  EvaluateDocsWriters.cs   (--emit-api spec generator)
     src/Evaluate.Generator/  Evaluate.Generator.csproj  BindGodotGenerator.cs   (Roslyn source generator)
     downloads/  drop-in resources for consumers: spec/ (generated Lua API spec — json + LuaCATS
@@ -173,11 +244,13 @@ custom dialect's `+=`.
     dev/        the demo / enforcement-test harness game (consumes the lib by project reference):
       project.godot  main.tscn  EvaluateHost.cs  Dev.csproj
       scripts/  global.scene  menu.scene  level1.scene
-                player.node.evt  enemy.node.evt (per-node params)  showcase.evt  menu.evt  level1.evt  game.toml  player.toml
+                player.node.evt  enemy.node.evt (per-node params)  showcase.evt  menu.evt  level1.evt
+                lib/mathx.evt  game.toml  player.toml
       addons/evaluate_scene/  editor import plugin (.scene -> PackedScene preview)
-      tests/    enforcement suite (.evt): forbidden_global / undeclared_api / missing_accessor /
-                system_a / system_b / readonly_module / metatable_oop / scene_a / scene_b /
-                scene_a_dup / global_update / self_node, + global.scene
+      tests/    enforcement-suite fixtures (.evt/.scene/.gdshader) used by EvaluateTests.cs:
+                forbidden_global / undeclared_api / missing_accessor / readonly_module /
+                metatable_oop / require_* / scene_* / system_* / self_node / sql_probe /
+                struct_read + assets/ (glob/hot-reload shaders), + global.scene
     artifacts/  packed .nupkgs (gitignored)
 
 ## Remaining work toward "full featured"
@@ -189,8 +262,9 @@ custom dialect's `+=`.
   (engine ClassDB `Call/Get/Set`). Remaining (perf only): extend the source-gen
   pre-bake to struct/packed static signatures so they too avoid reflection.
 - **Frontmatter LSP** (deferred): editor diagnostics for the signature block —
-  e.g. red-underline a non-existent `godot.*` API or missing config file. The
-  Lua body itself rides the standard Lua LSP.
+  e.g. red-underline an unknown `apis:` entry or missing config file *as you
+  type* (the loader already rejects both at load). The Lua body itself rides
+  the standard Lua LSP.
 - **AOT export & mod packaging/distribution**: not yet built.
 - Out of scope by decision: a Lua type system (signature contract is enough) and
   sandbox resource limits / DoS protection (modding is free).

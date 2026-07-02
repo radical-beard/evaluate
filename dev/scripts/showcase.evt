@@ -3,6 +3,9 @@ config:
  - game.toml
 apis:
  - save
+ - OS
+ - Timer
+ - Node3D
 require:
  - mathx: "lib/mathx.evt"
 register:
@@ -15,7 +18,7 @@ register:
 local ticks = 0
 
 function on_start()
-  print("running on " .. godot.OS.GetName())
+  print("running on " .. OS.GetName())
 
   -- SQLite persistence: a launch counter that survives across runs.
   local launches = save.get("launch_count", 0) + 1
@@ -24,7 +27,7 @@ function on_start()
   print(string.format("title=%q debug=%s", config.game.title, tostring(config.game.debug)))
 
   -- instance + signal: a real Godot Timer, property set/get, connect + fire.
-  local timer = godot.Timer.new()
+  local timer = Timer.new()
   timer.wait_time = 2.5
   timer:connect("timeout", function() print("timer 'timeout' -> lua callback fired") end)
   timer:emit_signal("timeout")
@@ -36,7 +39,7 @@ function on_start()
     mathx.clamp(12, 0, 10), mathx.lerp(0, 10, 0.5)))
 
   -- Vector3 marshalling: std.vec3 <-> Godot Vector3 across the boundary.
-  local node = godot.Node3D.new()
+  local node = Node3D.new()
   node.position = std.vec3(1, 2, 3)
   local p = node.position
   print(string.format("node3d.position = (%.0f, %.0f, %.0f)", p.x, p.y, p.z))

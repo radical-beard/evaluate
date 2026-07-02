@@ -1,0 +1,10 @@
+# An effect (*.effect, TOML): +4 speed while the sprint channel is active.
+#   duration = -1  -> while-source-active modifier (never mutates the stored value)
+#   duration = 0   -> instant permanent mutation
+#   duration > 0   -> timed; with period > 0 it re-applies every `period` seconds (dot/hot)
+# `attribute` may be dotted to target a spec field: "stamina.max", "stamina.regen",
+# "stamina.regen_delay", "stamina.min", "stamina.recover".
+attribute = "speed"
+op = "add"          # add | mul | set
+magnitude = 4.0
+duration = -1

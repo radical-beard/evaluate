@@ -28,15 +28,19 @@ scene. With `scenes: [menu, level1]` its hooks run only while one of those is ac
 same hook (e.g. `on_update`) can be registered by a global system *and* by each scene's
 system without clashing — a hook is registered once **per scene**.
 
-## Node hooks — `name.node.evt` (`self` bound)
+## Behavior hooks — `name.behavior.evt` / `name.node.evt` (`self` bound)
 
-`self` is the Godot node the script is attached to (via a `.scene` file's `script =`).
+`self` is the Godot node the behavior is attached to (via a `.scene` file's
+`behaviors = [...]` list, another script's `behaviors:` frontmatter, or the legacy
+`script =` key). A node holds **N behaviors**; each gets its own sandbox and its own hook
+closures. **Hooks fire in attachment order** — `script =` first, then the `behaviors` list
+in order, then frontmatter-composed behaviors (depth-first, deduped per node).
 
 | Hook | Args | Fires |
 |------|------|-------|
-| `on_attach` | — | Once, when the node + script first enter the tree. Never again. |
-| `on_load` | — | Every (re)load — right after `on_attach` on first load, and on each hot reload of the script or a declared `config`. Make it idempotent. |
-| `on_unload` | — | Before a reload tears the node's setup down. |
+| `on_attach` | — | Once, when the node + this behavior first enter the tree. Never again. Frontmatter `properties:` are already applied. |
+| `on_load` | — | Every (re)load — right after `on_attach` on first load, and on each hot reload of the script, a declared `config` TOML, or a declared (non-shader) `asset`. Make it idempotent. **Re-subscribe fsm listeners here** (a behavior reload drops its stale listeners). |
+| `on_unload` | — | Before a reload tears the behavior's setup down. |
 | `on_update` | `dt` | Every frame while the node is alive. |
 | `on_physics_update` | `delta` | Every physics tick while alive. |
 | `on_input` | `event` | On input events. |
@@ -45,5 +49,14 @@ system without clashing — a hook is registered once **per scene**.
 | `on_focus_in` / `on_focus_out` | — | Window focus changes. |
 | `on_pause` / `on_resume` | — | Tree paused / resumed. |
 
-Node scripts never spawn — they act on `self`. To create nodes, do it from a **system**
+Behaviors never spawn — they act on `self`. To create nodes, do it from a **system**
 script (`world:add_child(...)` / `scene.add(...)`) or declare them in a `.scene` file.
+
+## State machines have no hooks
+
+A `*.statemachine.evt` may not `register:` anything — it is data (states + transitions)
+that the framework ticks. Its `when`-guards are polled every **physics tick** (declaration
+order, first match wins, at most one transition per tick); `after`-timers count time in
+state; `on`-events run when fired. React to it from behaviors via the `self.fsm.<name>`
+surface (enter-listener sugar, `:on_exit`) — see
+[frontmatter-contract.md](frontmatter-contract.md) → "State machines".

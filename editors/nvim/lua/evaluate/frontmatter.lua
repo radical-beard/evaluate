@@ -46,8 +46,13 @@ local function listed_under(lines, fm, section)
   return out
 end
 
+-- Node-attached scripts (`self`-bound, node hooks): `*.behavior.evt` behaviors (`.node.evt`
+-- is its deprecated alias) and `*.statemachine.evt` state machines.
 local function is_node_script(bufnr)
-  return vim.api.nvim_buf_get_name(bufnr):match("%.node%.evt$") ~= nil
+  local name = vim.api.nvim_buf_get_name(bufnr)
+  return name:match("%.node%.evt$") ~= nil
+    or name:match("%.behavior%.evt$") ~= nil
+    or name:match("%.statemachine%.evt$") ~= nil
 end
 
 local function hooks_for(bufnr, spec)
@@ -96,6 +101,20 @@ function M.omnifunc(findstart, base)
           local info = spec.apiNotes[a]
             or ("Members: " .. (#members > 0 and (a .. "." .. table.concat(members, ", " .. a .. ".")) or "(node)"))
           table.insert(items, { word = a, kind = "api", menu = "capability", info = info })
+        end
+      end
+      -- 0.10.0 apis-as-modules: any Godot class/enum is declarable too, each injected as a
+      -- bare global (only known when the live spec is loaded).
+      local blocked = {}
+      for _, b in ipairs(spec.blockedApis or {}) do blocked[b] = true end
+      for _, cls in ipairs(spec.godotClasses or {}) do
+        if not used[cls] and not blocked[cls] then
+          table.insert(items, { word = cls, kind = "class", menu = "godot", info = "Godot class (injected as a bare global)" })
+        end
+      end
+      for _, en in ipairs(spec.godotEnums or {}) do
+        if not used[en] then
+          table.insert(items, { word = en, kind = "enum", menu = "godot", info = "Godot global enum (injected as a bare global)" })
         end
       end
     elseif section == "register" then
@@ -229,6 +248,8 @@ function M.validate(bufnr)
   for _, a in ipairs(spec.apis) do valid_apis[a] = true end
   local valid_keys = {}
   for _, k in ipairs(spec.frontmatterKeys) do valid_keys[k] = true end
+  local blocked_apis = {}
+  for _, b in ipairs(spec.blockedApis or {}) do blocked_apis[b] = true end
 
   local diags, section = {}, nil
   for i = fm.s + 1, fm.e - 1 do
@@ -246,17 +267,42 @@ function M.validate(bufnr)
       local lead, value = text:match("^(%s*%-%s*)([^:#%s]+)")
       if value then
         local col = #lead
-        if section == "apis" and not valid_apis[value] and not value:match("^godot:") then
-          table.insert(diags, {
-            lnum = i - 1, col = col, end_col = col + #value, severity = vim.diagnostic.severity.WARN, source = "evt",
-            message = ("Unknown api '%s'. Valid: %s. (It must be declared to be usable.)"):format(
-              value, table.concat(spec.apis, ", ")),
-          })
+        if section == "apis" then
+          -- The full token (incl. any ':'), to catch the removed `godot:Class` form.
+          local entry = text:match("^%s*%-%s*(%S+)") or value
+          if entry:match("^godot:") then
+            local bare = entry:sub(#"godot:" + 1)
+            table.insert(diags, {
+              lnum = i - 1, col = col, end_col = col + #entry, severity = vim.diagnostic.severity.ERROR, source = "evt",
+              message = ("'godot:'-prefixed entries were removed in 0.10.0 — declare the Godot class/enum "
+                .. "name directly (e.g. '%s'); it is injected as a bare global."):format(bare ~= "" and bare or "Node3D"),
+            })
+          elseif blocked_apis[value] then
+            table.insert(diags, {
+              lnum = i - 1, col = col, end_col = col + #value, severity = vim.diagnostic.severity.ERROR, source = "evt",
+              message = ("'%s' is blocked from declaration — assets load via frontmatter assets:"):format(value),
+            })
+          elseif not valid_apis[value] and not value:match("^%u") then
+            -- PascalCase entries are Godot classes/enums (or host extension apis) — accepted.
+            table.insert(diags, {
+              lnum = i - 1, col = col, end_col = col + #value, severity = vim.diagnostic.severity.WARN, source = "evt",
+              message = ("Unknown api '%s'. Framework services: %s; Godot classes/enums are declared by "
+                .. "their PascalCase name. (It must be declared to be usable.)"):format(
+                value, table.concat(spec.apis, ", ")),
+            })
+          end
         elseif section == "register" and not valid_hooks[value] then
           table.insert(diags, {
             lnum = i - 1, col = col, end_col = col + #value, severity = vim.diagnostic.severity.WARN, source = "evt",
             message = ("Unknown %s hook '%s'. Valid: %s."):format(
               is_node_script(bufnr) and "node" or "system", value, table.concat(hooks_for(bufnr, spec), ", ")),
+          })
+        elseif section == "assets" and not text:match("^%s*%-%s*[%a_][%w_]*%s*:") then
+          -- 0.10.0: assets are a name -> path map (or list of single-key maps); bare paths error.
+          table.insert(diags, {
+            lnum = i - 1, col = col, end_col = col + #value, severity = vim.diagnostic.severity.ERROR, source = "evt",
+            message = ("Bare-path 'assets:' entries are an error since 0.10.0 — name it ('<name>: \"%s\"'), "
+              .. "injected as 'assets.<name>'."):format(value),
           })
         end
       end
@@ -292,6 +338,15 @@ function M.hover_lines(bufnr)
     local detail = note
       or (#members > 0 and ("`" .. word .. "." .. table.concat(members, "`, `" .. word .. ".") .. "`") or "capability api")
     return { ("**%s** — %s"):format(word, detail) }
+  end
+  if vim.tbl_contains(spec.blockedApis or {}, word) then
+    return { ("**%s** — blocked from `apis:` — assets load via frontmatter `assets:`."):format(word) }
+  end
+  if vim.tbl_contains(spec.godotClasses or {}, word) then
+    return { ("**%s** — Godot class. Declared in `apis:`, injected as a bare global (`%s.new()`, statics, enums)."):format(word, word) }
+  end
+  if vim.tbl_contains(spec.godotEnums or {}, word) then
+    return { ("**%s** — Godot global enum. Declared in `apis:`, injected as a bare global (`%s.<Constant>`)."):format(word, word) }
   end
   return nil
 end

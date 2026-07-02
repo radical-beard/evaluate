@@ -38,6 +38,19 @@ public sealed class LoadedNode
     // Per-instance values the scene file supplied (`params = {..}`). Kept so a script
     // reload re-validates and re-exposes the SAME params (the scene didn't change).
     public IReadOnlyDictionary<string, object> Params = EmptyParams;
+    // Property keys the scene set on this node. The scene is the final owner of a
+    // property, so a script's frontmatter `properties:` never overwrites these —
+    // at attach or on reload.
+    public HashSet<string> ScenePropKeys = new();
+    // Frontmatter-composed attachments this script pulled onto the same node
+    // (`behaviors:` / `machines:` lists). Recorded for reference; composition is
+    // structural, so CHANGING these lists applies on scene rebuild, not hot reload.
+    public List<string> ComposedBehaviors = new();
+    public List<string> ComposedMachines = new();
+    // GAS-lite declarations this script carries (re-applied on hot reload for live
+    // attribute tuning).
+    public Dictionary<string, object> DeclaredAttributes = new();
+    public List<string> GrantedAbilities = new();
 
     internal static readonly Dictionary<string, object> EmptyParams = new();
 }
@@ -59,7 +72,8 @@ public sealed class Loader
     private Sql? _sql;                       // lazily opened full-SQL capability (game schema)
 
     private readonly LuaTable _std;
-    private readonly LuaTable _godot;     // ambient: godot.<Type> resolves lazily
+    private readonly Dictionary<string, LuaValue> _godotModules = new();   // memoized declared class/enum tables
+    private readonly Dictionary<string, LuaTable> _hostApis = new();       // host-registered C# extension apis
     private readonly LuaValue _loadFn;
     private readonly Dictionary<string, LuaValue> _requireCache = new();
     private readonly Dictionary<string, LuaTable> _tomlCache = new();
@@ -84,10 +98,18 @@ public sealed class Loader
     private readonly List<Node> _globalLayerRoots = new();               // manifest's instantiated root nodes (for reload)
     private SceneSpec? _globalManifest;                                  // last-loaded manifest (for live rebuild)
     private readonly List<LoadedNode> _sceneNodes = new();               // active-scene node scripts
+    private readonly List<MachineInstance> _globalMachines = new();     // machines on persistent nodes
+    private readonly List<MachineInstance> _sceneMachines = new();      // machines on active-scene nodes
+    private readonly List<NodeAbilityState> _globalAbilityStates = new();   // ability/attribute state, persistent nodes
+    private readonly List<NodeAbilityState> _sceneAbilityStates = new();    // ability/attribute state, scene nodes
+    private AbilityRuntime _abilities = null!;                           // set in ctor (needs binder)
+    private string? _hookOwner;                                          // script whose hook is executing (listener attribution)
     private readonly HashSet<string> _loadedScripts = new();             // every .evt Run so far
     private readonly HashSet<string> _configFiles = new();               // every declared toml
-    private readonly HashSet<string> _assetFiles = new();                // every declared asset
+    private readonly HashSet<string> _assetFiles = new();                // every declared asset file (res://-relative, post-glob)
     private readonly HashSet<string> _sceneFiles = new();               // every declared *.scene file
+    private readonly Dictionary<string, Resource> _assetCache = new();   // res-relative path -> loaded resource
+    private readonly Dictionary<string, HashSet<string>> _scriptAssets = new();   // script -> its declared asset files
 
     private const string GlobalNs = "<global>";
 
@@ -136,21 +158,51 @@ public sealed class Loader
 
         _std = Std.Build();
 
-        // Ambient `godot` namespace: godot.<Type> resolves & caches on first use.
-        _godot = new LuaTable();
-        var godotMt = new LuaTable();
-        godotMt["__index"] = new LuaFunction((ctx, ct) =>
-        {
-            var typeName = ctx.GetArgument(1).Read<string>();
-            var binding = _godotBinder.Resolve(typeName) ?? LuaValue.Nil;
-            if (binding.Type != LuaValueType.Nil) _godot[typeName] = binding;   // memoize
-            ctx.Return(binding);
-            return new(1);
-        });
-        _godot.Metatable = godotMt;
+        _abilities = new AbilityRuntime(_godotBinder, _readScript, _log,
+            () => _hookOwner, (fn, args) => Call(fn, args));
 
         _loadFn = _lua.Environment["load"];
     }
+
+    // ---- host extension apis ---------------------------------------------------
+
+    // Names a host api may not take: the framework capabilities, the sandbox's
+    // context-injected globals, and the attachment surfaces reserved on nodes.
+    private static readonly HashSet<string> ReservedApiNames = new()
+        { "std", "print", "self", "config", "params", "assets", "require", "godot",
+          "fsm", "attributes", "abilities" };
+
+    // Godot classes that are NOT declarable capabilities: imperative file/resource IO
+    // belongs to the C# layer — scripts get assets through frontmatter `assets:` and
+    // persistence through `save`/`sql`.
+    internal static readonly string[] BlockedApis =
+        { "ResourceLoader", "ResourceSaver", "FileAccess", "DirAccess" };
+
+    // Register a C#-side api module under `name`. Scripts reach it by declaring the
+    // name in `apis:` — it is then implicitly callable as a normal Lua table of
+    // functions. `impl` is either an object (public instance + static methods bind,
+    // with `impl` as the receiver) or a `System.Type` (public statics only). Must be
+    // called before any script loads, so every sandbox sees the same api set.
+    public void RegisterApi(string name, object impl)
+    {
+        if (string.IsNullOrEmpty(name))
+            throw new EvaluateException("RegisterApi: api name is empty");
+        if (_loadedScripts.Count > 0)
+            throw new EvaluateException(
+                $"RegisterApi('{name}'): apis must be registered before any script loads " +
+                "(call it before the runtime enters the tree)");
+        if (ApiNames.Contains(name) || ReservedApiNames.Contains(name) || SafeGlobals.Contains(name))
+            throw new EvaluateException($"RegisterApi('{name}'): the name is reserved");
+        if (_hostApis.ContainsKey(name))
+            throw new EvaluateException($"RegisterApi('{name}'): already registered");
+        if (_godotBinder.Resolve(name) is not null)
+            throw new EvaluateException(
+                $"RegisterApi('{name}'): the name collides with a Godot class/enum of the same name");
+        _hostApis[name] = _godotBinder.BindHost(impl);
+    }
+
+    // Host apis registered so far (docs emitter walks these like the built-in tables).
+    internal IReadOnlyDictionary<string, LuaTable> HostApis => _hostApis;
 
     // The persistent global-root node (set by the host). The `world` API wraps
     // it, and both global and scene nodes are parented beneath it.
@@ -164,7 +216,9 @@ public sealed class Loader
     {
         foreach (var file in scriptFiles)
         {
-            if (!file.EndsWith(".evt") || file.EndsWith(".node.evt")) continue;
+            // Node-attached types load through scenes, never as systems.
+            if (!file.EndsWith(".evt") || file.EndsWith(".node.evt")
+                || file.EndsWith(".behavior.evt") || file.EndsWith(".statemachine.evt")) continue;
             // One malformed script (or its malformed config) must not stop the rest
             // from loading — log it and move on.
             try
@@ -265,7 +319,7 @@ public sealed class Loader
     {
         if (_globalRoot is null) throw new EvaluateException("LoadGlobalLayer called before SetGlobalRoot");
         _globalManifest = manifest;
-        InstantiateTree(manifest, _globalRoot, _globalNodes, _globalLayerRoots);
+        InstantiateTree(manifest, _globalRoot, _globalNodes, _globalMachines, _globalLayerRoots);
         foreach (var n in _globalNodes) Fire(n, "on_attach");
         foreach (var n in _globalNodes) Fire(n, "on_load");
         return manifest.StartScene;
@@ -285,6 +339,8 @@ public sealed class Loader
             foreach (var s in SystemsFor(_activeScene)) FireSystem(s, "on_exit");
         }
         _sceneNodes.Clear();
+        _sceneMachines.Clear();
+        _sceneAbilityStates.Clear();
         if (_sceneContainer is not null)
         {
             _globalRoot.RemoveChild(_sceneContainer);   // free the name slot NOW, so a
@@ -300,7 +356,7 @@ public sealed class Loader
         _globalRoot.AddChild(container);
         _sceneContainer = container;
         _activeScene = name;
-        InstantiateTree(spec, container, _sceneNodes);
+        InstantiateTree(spec, container, _sceneNodes, _sceneMachines);
         foreach (var n in _sceneNodes) Fire(n, "on_attach");
         foreach (var n in _sceneNodes) Fire(n, "on_load");
         foreach (var s in SystemsFor(name)) FireSystem(s, "on_enter");
@@ -330,29 +386,46 @@ public sealed class Loader
     private IEnumerable<LoadedSystem> SystemsFor(string scene) =>
         _systems.Where(s => s.Scenes.Contains(scene));
 
+    // Hook dispatch sets `_hookOwner` so anything the hook subscribes (fsm state
+    // listeners) is attributed to the script — a hot reload of that script then
+    // drops its stale listeners before on_load re-subscribes fresh ones.
     private void Fire(LoadedNode n, string hook)
     {
-        if (n.Hooks.TryGetValue(hook, out var fn)) Call(fn);
+        if (!n.Hooks.TryGetValue(hook, out var fn)) return;
+        var prev = _hookOwner; _hookOwner = n.Path;
+        try { Call(fn); } finally { _hookOwner = prev; }
     }
     private void FireSystem(LoadedSystem s, string hook)
     {
-        if (s.Hooks.TryGetValue(hook, out var fn)) Call(fn);
+        if (!s.Hooks.TryGetValue(hook, out var fn)) return;
+        var prev = _hookOwner; _hookOwner = s.Path;
+        try { Call(fn); } finally { _hookOwner = prev; }
     }
 
     private static string SceneFileName(string name) => name + ".scene";
 
     // Instantiate a scene/manifest node tree under `container`: SceneBuilder builds
     // the visual tree (types, properties, hierarchy) and, via the visit callback,
-    // we attach each node's `*.node.evt` behavior script (bound to that node).
-    private void InstantiateTree(SceneSpec spec, Node container, List<LoadedNode> nodes, List<Node>? roots = null)
+    // we attach each node's behaviors and state machines (bound to that node).
+    private void InstantiateTree(SceneSpec spec, Node container, List<LoadedNode> nodes,
+        List<MachineInstance> machines, List<Node>? roots = null)
     {
         var conns = new List<(Node from, ConnectionSpec spec)>();
         IReadOnlyList<NodeSpec> Resolve(string name) => SceneFile.Parse(_readScript(SceneFileName(name))).Nodes;
 
         void Attach(NodeSpec ns, Node node)
         {
+            // One node, many attachments: the legacy single `script =` first, then the
+            // scene's `behaviors = [...]` and `machines = [...]` in list order; each
+            // attachment may compose more via ITS frontmatter (depth-first). Hooks fire
+            // in this attachment order. A repeated path attaches once.
+            var attached = new HashSet<string>();
             if (!string.IsNullOrEmpty(ns.Script))
-                nodes.Add(LoadNodeScript(ns.Script!, node, container, ns.Params));
+                AttachBehavior(ns.Script!, node, container, ns.Params, ns.Props.Keys, nodes, machines, attached);
+            foreach (var b in ns.Behaviors)
+                AttachBehavior(b.Script, node, container, b.Params, ns.Props.Keys, nodes, machines, attached);
+            foreach (var m in ns.Machines)
+                AttachMachine(m.Script, node, container, m.Params, machines, attached);
             foreach (var c in ns.Connections) conns.Add((node, c));
         }
         foreach (var ns in spec.Nodes)
@@ -380,12 +453,20 @@ public sealed class Loader
     }
 
     // Load a `*.node.evt` bound to one live node: fresh sandbox with `self` + the scene's
-    // per-instance `params`, then collect its registered node hooks.
+    // per-instance `params`, apply the script's declared `properties:` (the scene's own
+    // keys win), then collect its registered node hooks.
     private LoadedNode LoadNodeScript(string path, GodotObject self, Node container,
-        IReadOnlyDictionary<string, object> sceneParams)
+        IReadOnlyDictionary<string, object> sceneParams, IEnumerable<string>? scenePropKeys = null)
     {
         var (env, _, fm) = Run(path, new LoadContext(container, self, sceneParams));
-        var ln = new LoadedNode { Path = path, Node = self, Configs = fm.Configs, Params = sceneParams };
+        var ln = new LoadedNode
+        {
+            Path = path, Node = self, Configs = fm.Configs, Params = sceneParams,
+            ComposedBehaviors = fm.Behaviors, ComposedMachines = fm.Machines,
+            DeclaredAttributes = fm.Attributes, GrantedAbilities = fm.Abilities,
+        };
+        if (scenePropKeys is not null) ln.ScenePropKeys = new HashSet<string>(scenePropKeys);
+        ApplyFrontmatterProperties(path, fm, self, ln.ScenePropKeys);
         foreach (var name in fm.Register)
         {
             if (!NodeHooks.Contains(name))
@@ -398,18 +479,389 @@ public sealed class Loader
         return ln;
     }
 
+    // Apply a node-attached script's `properties:` block to its node. Runs at attach
+    // (before on_attach) and again on script hot reload (before on_load), skipping any
+    // key the scene set — the scene owns final placement/overrides. An unknown
+    // property is a load error: the signature is the contract, typos fail loudly.
+    private void ApplyFrontmatterProperties(string path, Frontmatter fm, GodotObject self,
+        HashSet<string> scenePropKeys)
+    {
+        foreach (var kv in fm.Properties)
+        {
+            if (scenePropKeys.Contains(kv.Key)) continue;
+            if (!_godotBinder.HasProperty(self, kv.Key))
+                throw new EvaluateException(
+                    $"{path}: properties: '{kv.Key}' is not a property of {self.GetClass()}");
+            _godotBinder.SetProperty(self, kv.Key, SceneBuilder.TomlToLua(kv.Value));
+        }
+    }
+
+    // ---- behaviors + state machines (the attachment pipeline) -----------------
+
+    // Attach one behavior (`*.behavior.evt`, or the legacy `*.node.evt` alias) to a
+    // node, then anything ITS frontmatter composes (`behaviors:`/`machines:` lists,
+    // depth-first). `attached` dedupes per node and breaks composition cycles.
+    private void AttachBehavior(string path, Node node, Node container,
+        IReadOnlyDictionary<string, object> sceneParams, IEnumerable<string> scenePropKeys,
+        List<LoadedNode> nodes, List<MachineInstance> machines, HashSet<string> attached)
+    {
+        if (!path.EndsWith(".behavior.evt") && !path.EndsWith(".node.evt"))
+            throw new EvaluateException(
+                $"'{path}' cannot attach as a behavior: expected *.behavior.evt (or the " +
+                "legacy *.node.evt)");
+        if (!attached.Add(path)) return;
+        var ln = LoadNodeScript(path, node, container, sceneParams, scenePropKeys);
+        nodes.Add(ln);
+        ApplyGasDeclarations(path, ln, nodes == _globalNodes ? _globalAbilityStates : _sceneAbilityStates);
+        foreach (var composed in ln.ComposedBehaviors)
+            AttachBehavior(composed, node, container, LoadedNode.EmptyParams, scenePropKeys,
+                nodes, machines, attached);
+        foreach (var composed in ln.ComposedMachines)
+            AttachMachine(composed, node, container, LoadedNode.EmptyParams, machines, attached);
+    }
+
+    // Wire a behavior's `attributes:` / `abilities:` declarations into its node's
+    // ability state (created on first declarer, surfaces installed once).
+    private void ApplyGasDeclarations(string path, LoadedNode ln, List<NodeAbilityState> states)
+    {
+        if (ln.DeclaredAttributes.Count == 0 && ln.GrantedAbilities.Count == 0) return;
+        var st = states.FirstOrDefault(s => s.Node == ln.Node);
+        if (st is null)
+        {
+            st = new NodeAbilityState { Node = ln.Node };
+            states.Add(st);
+            var aux = _godotBinder.Aux(ln.Node);
+            aux["attributes"] = _abilities.BuildAttributesSurface(st);
+            aux["abilities"] = _abilities.BuildAbilitiesSurface(st, StateOf);
+        }
+        _abilities.DeclareAttributes(path, ln.Node, st, ln.DeclaredAttributes);
+        foreach (var ability in ln.GrantedAbilities) _abilities.Grant(path, st, ability);
+    }
+
+    private NodeAbilityState? StateOf(GodotObject node) =>
+        _globalAbilityStates.FirstOrDefault(s => s.Node == node)
+        ?? _sceneAbilityStates.FirstOrDefault(s => s.Node == node);
+
+    // Attach one `*.statemachine.evt` to a node: run its body, parse the returned
+    // transition list against the frontmatter's states, and install the
+    // `self.fsm.<name>` surface.
+    private void AttachMachine(string path, Node node, Node container,
+        IReadOnlyDictionary<string, object> sceneParams, List<MachineInstance> machines,
+        HashSet<string> attached)
+    {
+        if (!path.EndsWith(".statemachine.evt"))
+            throw new EvaluateException(
+                $"'{path}' cannot attach as a machine: expected *.statemachine.evt");
+        if (!attached.Add(path)) return;
+
+        var (_, ret, fm) = Run(path, new LoadContext(container, node, sceneParams));
+        var def = ParseMachineDef(path, fm, ret);
+        foreach (var other in _globalMachines.Concat(_sceneMachines))
+            if (other.Node == node && other.Def.Name == def.Name)
+                throw new EvaluateException(
+                    $"{path}: node '{node.Name}' already has a machine named '{def.Name}' " +
+                    $"(from {other.Def.Path})");
+
+        var inst = new MachineInstance
+        {
+            Def = def, Node = node, Container = container,
+            SelfProxy = _godotBinder.WrapInstance(node),
+            Params = sceneParams, Current = def.Initial,
+        };
+        machines.Add(inst);
+        InstallMachineSurface(inst);
+    }
+
+    // Validate a machine's signature + returned transitions into a MachineDef.
+    private MachineDef ParseMachineDef(string path, Frontmatter fm, LuaValue ret)
+    {
+        if (fm.Register.Count > 0)
+            throw new EvaluateException(
+                $"{path}: a statemachine registers no hooks — the runtime ticks it; " +
+                "put per-frame logic in a behavior");
+        if (fm.Returns.Count > 0)
+            throw new EvaluateException(
+                $"{path}: a statemachine declares no 'returns:' — its return value IS " +
+                "the transition list");
+        if (fm.States.Count == 0)
+            throw new EvaluateException($"{path}: a statemachine declares its 'states:' in frontmatter");
+        if (fm.States.Distinct().Count() != fm.States.Count)
+            throw new EvaluateException($"{path}: duplicate state names in 'states:'");
+
+        var def = new MachineDef
+        {
+            Path = path,
+            Name = fm.MachineName ?? MachineNameFromPath(path),
+            States = fm.States,
+            Initial = fm.Initial ?? fm.States[0],
+        };
+        if (!def.States.Contains(def.Initial))
+            throw new EvaluateException(
+                $"{path}: initial state '{def.Initial}' is not in states: [{string.Join(", ", def.States)}]");
+
+        if (ret.Type != LuaValueType.Table)
+            throw new EvaluateException(
+                $"{path}: a statemachine's body returns its transition list " +
+                "(`return {{ {{ from = ..., to = ..., when|on|after = ... }}, ... }}`)");
+        var list = ret.Read<LuaTable>();
+        for (int i = 1; i <= list.ArrayLength; i++)
+        {
+            if (list[i].Type != LuaValueType.Table)
+                throw new EvaluateException($"{path}: transition #{i} is not a table");
+            var t = list[i].Read<LuaTable>();
+            var tr = new TransitionDef
+            {
+                From = t["from"].Type == LuaValueType.String ? t["from"].Read<string>() : "",
+                To = t["to"].Type == LuaValueType.String ? t["to"].Read<string>() : "",
+                When = t["when"],
+                On = t["on"].Type == LuaValueType.String ? t["on"].Read<string>() : null,
+                After = t["after"].Type == LuaValueType.Number ? t["after"].Read<double>() : -1,
+                Run = t["run"],
+            };
+            if (tr.From.Length == 0 || tr.To.Length == 0)
+                throw new EvaluateException($"{path}: transition #{i} needs 'from' and 'to' state names");
+            if (tr.From != "*" && !def.States.Contains(tr.From))
+                throw new EvaluateException($"{path}: transition #{i} 'from' names unknown state '{tr.From}'");
+            if (!def.States.Contains(tr.To))
+                throw new EvaluateException($"{path}: transition #{i} 'to' names unknown state '{tr.To}'");
+            int triggers = (tr.When.Type == LuaValueType.Function ? 1 : 0)
+                         + (tr.On is not null ? 1 : 0) + (tr.After >= 0 ? 1 : 0);
+            if (triggers != 1)
+                throw new EvaluateException(
+                    $"{path}: transition #{i} needs exactly ONE trigger — " +
+                    "when = fn(self), on = \"event\", or after = seconds");
+            if (tr.Run.Type is not (LuaValueType.Function or LuaValueType.Nil))
+                throw new EvaluateException($"{path}: transition #{i} 'run' must be a function");
+            def.Transitions.Add(tr);
+        }
+        if (def.Transitions.Count == 0)
+            throw new EvaluateException($"{path}: a statemachine returns at least one transition");
+        return def;
+    }
+
+    private static string MachineNameFromPath(string path)
+    {
+        var file = path.Contains('/') ? path[(path.LastIndexOf('/') + 1)..] : path;
+        return file.EndsWith(".statemachine.evt") ? file[..^".statemachine.evt".Length] : file;
+    }
+
+    // Install `self.fsm.<name>` on the node: `.state` (read), `:is(s)`, `:fire(evt)`,
+    // `:on_exit(state, fn)`, plus the approved sugar — assigning a state name APPENDS
+    // an enter-listener fn(from). Multiple subscribers stack; each is owned by the
+    // subscribing script for reload cleanup.
+    private void InstallMachineSurface(MachineInstance inst)
+    {
+        var aux = _godotBinder.Aux(inst.Node);
+        var fsmRoot = aux["fsm"].Type == LuaValueType.Table ? aux["fsm"].Read<LuaTable>() : new LuaTable();
+
+        var surface = new LuaTable();
+        var mt = new LuaTable();
+        mt["__index"] = new LuaFunction((c, ct) =>
+        {
+            var key = c.GetArgument(1);
+            if (key.Type != LuaValueType.String) { c.Return(LuaValue.Nil); return new(1); }
+            switch (key.Read<string>())
+            {
+                case "state":
+                    c.Return(inst.Current);
+                    break;
+                case "is":
+                    c.Return(new LuaFunction((c2, ct2) =>
+                    {
+                        var s = c2.GetArgument(c2.ArgumentCount - 1).Read<string>();
+                        c2.Return(inst.Current == s);
+                        return new(1);
+                    }));
+                    break;
+                case "fire":
+                    c.Return(new LuaFunction((c2, ct2) =>
+                    {
+                        var evt = c2.GetArgument(c2.ArgumentCount - 1).Read<string>();
+                        c2.Return(FireMachineEvent(inst, evt));
+                        return new(1);
+                    }));
+                    break;
+                case "on_exit":
+                    c.Return(new LuaFunction((c2, ct2) =>
+                    {
+                        var state = c2.GetArgument(c2.ArgumentCount - 2).Read<string>();
+                        var fn = c2.GetArgument(c2.ArgumentCount - 1);
+                        if (!inst.Def.States.Contains(state))
+                            throw new EvaluateException(
+                                $"fsm '{inst.Def.Name}': on_exit for unknown state '{state}'");
+                        if (fn.Type != LuaValueType.Function)
+                            throw new EvaluateException($"fsm '{inst.Def.Name}': on_exit expects a function");
+                        AddListener(inst.ExitListeners, state, _hookOwner ?? "<runtime>", fn);
+                        return new(0);
+                    }));
+                    break;
+                default:
+                    c.Return(LuaValue.Nil);
+                    break;
+            }
+            return new(1);
+        });
+        mt["__newindex"] = new LuaFunction((c, ct) =>
+        {
+            var key = c.GetArgument(1).Type == LuaValueType.String ? c.GetArgument(1).Read<string>() : "";
+            var val = c.GetArgument(2);
+            if (!inst.Def.States.Contains(key))
+                throw new EvaluateException(
+                    $"fsm '{inst.Def.Name}': cannot subscribe to unknown state '{key}' " +
+                    $"(states: {string.Join(", ", inst.Def.States)})");
+            if (val.Type != LuaValueType.Function)
+                throw new EvaluateException(
+                    $"fsm '{inst.Def.Name}'.{key} = <enter listener>: expected a function");
+            AddListener(inst.EnterListeners, key, _hookOwner ?? "<runtime>", val);
+            return new(0);
+        });
+        surface.Metatable = mt;
+
+        fsmRoot[inst.Def.Name] = surface;
+        aux["fsm"] = fsmRoot;
+    }
+
+    private static void AddListener(Dictionary<string, List<(string, LuaValue)>> map,
+        string state, string owner, LuaValue fn)
+    {
+        if (!map.TryGetValue(state, out var list)) map[state] = list = new();
+        list.Add((owner, fn));
+    }
+
+    // Fire an event NOW: the first `on`-triggered transition applicable from the
+    // current state is taken immediately. A fire from inside a listener/action
+    // defers one tick (reentrancy guard). Returns whether a transition was taken.
+    private bool FireMachineEvent(MachineInstance inst, string evt)
+    {
+        if (inst.Firing) { inst.DeferredEvents.Add(evt); return false; }
+        foreach (var tr in inst.Def.Transitions)
+            if (tr.On == evt && (tr.From == inst.Current || (tr.From == "*" && tr.To != inst.Current)))
+            {
+                TakeTransition(inst, tr);
+                return true;
+            }
+        return false;
+    }
+
+    // Take one transition: exit listeners (old state, arg = destination), the
+    // transition's own `run` action, then enter listeners (new state, arg = origin).
+    private void TakeTransition(MachineInstance inst, TransitionDef tr)
+    {
+        var from = inst.Current;
+        inst.Firing = true;
+        try
+        {
+            inst.Current = tr.To;
+            inst.TimeInState = 0;
+            if (inst.ExitListeners.TryGetValue(from, out var exits))
+                foreach (var (_, fn) in exits.ToArray()) Call(fn, tr.To);
+            if (tr.Run.Type == LuaValueType.Function) Call(tr.Run, inst.SelfProxy, from, tr.To);
+            if (inst.EnterListeners.TryGetValue(tr.To, out var enters))
+                foreach (var (_, fn) in enters.ToArray()) Call(fn, from);
+        }
+        finally { inst.Firing = false; }
+    }
+
+    // Advance the framework's ticking runtimes one physics tick: state machines,
+    // then abilities (channel drains, effect timelines, attribute regen).
+    public void Tick(double dt)
+    {
+        TickMachines(dt);
+        _abilities.Tick(_globalAbilityStates.Concat(_sceneAbilityStates), dt);
+    }
+
+    // Advance every active machine one physics tick: deferred events first, then the
+    // declared transitions in order — first applicable `when` guard or expired
+    // `after` timer wins. At most ONE transition per machine per tick (no cascades).
+    public void TickMachines(double dt)
+    {
+        foreach (var inst in _globalMachines.Concat(_sceneMachines).ToList())
+        {
+            inst.TimeInState += dt;
+
+            if (inst.DeferredEvents.Count > 0)
+            {
+                var events = inst.DeferredEvents.ToList();
+                inst.DeferredEvents.Clear();
+                bool moved = false;
+                foreach (var e in events)
+                    if (!moved) moved = FireMachineEvent(inst, e);
+                if (moved) continue;
+            }
+
+            foreach (var tr in inst.Def.Transitions)
+            {
+                bool applicable = tr.From == inst.Current
+                                  || (tr.From == "*" && tr.To != inst.Current);
+                if (!applicable) continue;
+                if (tr.When.Type == LuaValueType.Function)
+                {
+                    var r = CallRet(tr.When, inst.SelfProxy);
+                    if (r.Type != LuaValueType.Nil && !(r.Type == LuaValueType.Boolean && !r.Read<bool>()))
+                    {
+                        TakeTransition(inst, tr);
+                        break;
+                    }
+                }
+                else if (tr.After >= 0 && inst.TimeInState >= tr.After)
+                {
+                    TakeTransition(inst, tr);
+                    break;
+                }
+            }
+        }
+    }
+
+    // Re-run a changed machine's body on each live instance: fresh transitions, SAME
+    // listeners (they belong to behaviors), state kept when still declared, else
+    // reset to initial.
+    private int RefreshMachines(string path)
+    {
+        int count = 0;
+        foreach (var inst in _globalMachines.Concat(_sceneMachines).ToList())
+        {
+            if (inst.Def.Path != path) continue;
+            var (_, ret, fm) = Run(path, new LoadContext(inst.Container, inst.Node, inst.Params));
+            var def = ParseMachineDef(path, fm, ret);
+            var renamed = def.Name != inst.Def.Name;
+            inst.Def = def;
+            if (renamed) InstallMachineSurface(inst);   // republish under the new name
+            if (!def.States.Contains(inst.Current))
+            {
+                inst.Current = def.Initial;
+                inst.TimeInState = 0;
+            }
+            count++;
+        }
+        return count;
+    }
+
+    // Drop every fsm listener a script subscribed on this node (called before the
+    // script's body re-runs, so on_load re-subscribes fresh closures, not stale ones).
+    private void RemoveMachineListeners(GodotObject node, string ownerPath)
+    {
+        foreach (var inst in _globalMachines.Concat(_sceneMachines))
+        {
+            if (inst.Node != node) continue;
+            foreach (var list in inst.EnterListeners.Values) list.RemoveAll(l => l.Owner == ownerPath);
+            foreach (var list in inst.ExitListeners.Values) list.RemoveAll(l => l.Owner == ownerPath);
+        }
+    }
+
     // ---- hot reload + watch targets ------------------------------------------
 
-    // Files the host should watch: every loaded script, declared config, and
-    // declared asset. (Assets are declared in frontmatter precisely so we know
-    // to watch them.)
+    // Script-side files the host should watch (all under res://scripts): every
+    // loaded script, declared config, and scene file.
     public IEnumerable<string> WatchTargets()
     {
         foreach (var s in _loadedScripts) yield return s;   // .evt + .node.evt
         foreach (var c in _configFiles) yield return c;
-        foreach (var a in _assetFiles) yield return a;
         foreach (var sc in _sceneFiles) yield return sc;    // *.scene + manifest
     }
+
+    // Declared asset files (res://-relative, post-glob). They live OUTSIDE
+    // res://scripts, so the host stands up separate watchers for their directories.
+    public IEnumerable<string> AssetWatchTargets() => _assetFiles;
 
     // Apply a live change to `path`. Returns a short description of what happened.
     // Engine entities are preserved; a changed system re-runs its body to refresh
@@ -455,7 +907,17 @@ public sealed class Loader
                 return $"kept last-good config {path} ({e.Message})";
             }
         }
-        return $"noted change to asset {path} (would re-import)";
+
+        // Ability / effect definitions re-parse live into the def cache.
+        if (path.EndsWith(".ability") || path.EndsWith(".effect"))
+            return _abilities.ReloadDef(path);
+
+        // Anything else: a declared asset changed on disk. The scripts watcher hands
+        // scripts/-relative paths and the asset watchers res://-relative ones — try both.
+        var asset = _assetFiles.Contains(path) ? path
+                  : _assetFiles.Contains($"scripts/{path}") ? $"scripts/{path}" : null;
+        if (asset is null) return $"noted change to {path} (not a declared asset)";
+        return ReloadAsset(asset);
     }
 
     // Reload a changed `.evt` and everything that (transitively) requires it. All affected
@@ -471,12 +933,19 @@ public sealed class Loader
         var messages = new List<string>();
         foreach (var p in affected)
         {
-            if (p.EndsWith(".node.evt"))
+            if (p.EndsWith(".node.evt") || p.EndsWith(".behavior.evt"))
             {
                 int n = RefreshNodeScript(p);
                 messages.Add(n > 0
-                    ? $"reloaded node script {p} ({n} live instance(s) refreshed)"
-                    : $"invalidated node script {p} (no live instances)");
+                    ? $"reloaded behavior {p} ({n} live instance(s) refreshed)"
+                    : $"invalidated behavior {p} (no live instances)");
+            }
+            else if (p.EndsWith(".statemachine.evt"))
+            {
+                int n = RefreshMachines(p);
+                messages.Add(n > 0
+                    ? $"reloaded machine {p} ({n} live instance(s): transitions refreshed, state + listeners kept)"
+                    : $"invalidated machine {p} (no live instances)");
             }
             else if (_systems.Find(s => s.Path == p) is { } sys)
             {
@@ -504,9 +973,15 @@ public sealed class Loader
             {
                 if (ln.Path != path) continue;
                 Fire(ln, "on_unload");   // old closures still valid: tear down BEFORE the body re-runs
+                RemoveMachineListeners(ln.Node, path);   // stale fsm subscriptions die with the old body
+                if (StateOf(ln.Node) is { } gas) _abilities.RemoveListeners(gas, path);
                 var (env, _, fm) = Run(path, new LoadContext(container, ln.Node, ln.Params));
                 ln.Hooks.Clear();
                 ln.Configs = fm.Configs;
+                ln.DeclaredAttributes = fm.Attributes;
+                ln.GrantedAbilities = fm.Abilities;
+                ApplyFrontmatterProperties(path, fm, ln.Node, ln.ScenePropKeys);   // edits to properties: apply live
+                ApplyGasDeclarations(path, ln, list == _globalNodes ? _globalAbilityStates : _sceneAbilityStates);
                 foreach (var name in fm.Register)
                     if (NodeHooks.Contains(name) && env[name].Type == LuaValueType.Function)
                         ln.Hooks[name] = env[name];
@@ -532,6 +1007,8 @@ public sealed class Loader
 
         foreach (var n in _globalNodes) Fire(n, "on_exit");
         _globalNodes.Clear();
+        _globalMachines.Clear();
+        _globalAbilityStates.Clear();
         foreach (var root in _globalLayerRoots)
         {
             _globalRoot.RemoveChild(root);   // free the name slot now, before re-adding
@@ -541,13 +1018,20 @@ public sealed class Loader
 
         var manifest = SceneFile.Parse(_readScript(ManifestName));
         _globalManifest = manifest;
-        InstantiateTree(manifest, _globalRoot, _globalNodes, _globalLayerRoots);
+        InstantiateTree(manifest, _globalRoot, _globalNodes, _globalMachines, _globalLayerRoots);
         foreach (var n in _globalNodes) Fire(n, "on_attach");
         foreach (var n in _globalNodes) Fire(n, "on_load");
         return $"reloaded global manifest {ManifestName} (persistent layer rebuilt)";
     }
 
     public void Call(LuaValue fn, params LuaValue[] args) => Sync(_lua.CallAsync(fn, args));
+
+    // Call returning the first result (machine guards need the boolean back).
+    internal LuaValue CallRet(LuaValue fn, params LuaValue[] args)
+    {
+        var r = Sync(_lua.CallAsync(fn, args));
+        return r.Length > 0 ? r[0] : LuaValue.Nil;
+    }
 
     // ---- sandbox + require ----------------------------------------------------
 
@@ -571,10 +1055,10 @@ public sealed class Loader
         {
             var fm = Frontmatter.Parse(_readScript(path));
 
-            // Record watch targets: the script itself, its configs, its assets.
+            // Record watch targets: the script itself and its configs. (Declared
+            // assets record inside BuildAssetsView, post-glob-expansion.)
             _loadedScripts.Add(path);
             foreach (var c in fm.Configs) _configFiles.Add(c);
-            foreach (var a in fm.Assets) _assetFiles.Add(a);
 
             var env = BuildSandbox(path, fm, ctx);
 
@@ -600,12 +1084,16 @@ public sealed class Loader
         foreach (var name in SafeGlobals) env[name] = _lua.Environment[name];
         env["print"] = _lua.Environment["print"];
         env["std"] = _std;
-        env["godot"] = _godot;        // ambient: Godot types available by default
 
         // Node scripts drive one node, exposed as `self`.
         if (ctx.Self is not null) env["self"] = _godotBinder.WrapInstance(ctx.Self);
 
         env["config"] = BuildConfigView(fm.Configs);
+
+        // `assets`: the declared engine resources, loaded eagerly (a missing file is
+        // a load error, not a runtime nil) and read through a live view so a
+        // hot-reloaded asset is what the next access sees.
+        if (fm.Assets.Count > 0) env["assets"] = BuildAssetsView(path, fm.Assets);
 
         // `params`: per-instance values the scene supplied for this node, resolved against
         // the script's declared `params:` (defaults filled, types checked, undeclared/missing
@@ -619,10 +1107,33 @@ public sealed class Loader
                 $"{path} declares 'params:' but is not a node script; params are per-node " +
                 "(declare them in a '*.node.evt' attached via a scene, not a system script)");
 
+        // `properties:` is likewise node-only — a system has no `self` to apply them to.
+        if (ctx.Self is null && fm.Properties.Count > 0)
+            throw new EvaluateException(
+                $"{path} declares 'properties:' but is not a node script; native properties " +
+                "apply to the node a script is attached to");
+
+        // Composition lists are node-only too: a system has no node to attach onto.
+        if (ctx.Self is null && (fm.Behaviors.Count > 0 || fm.Machines.Count > 0))
+            throw new EvaluateException(
+                $"{path} declares 'behaviors:'/'machines:' but is not node-attached; " +
+                "composition adds attachments to the node carrying the script");
+
+        // As are GAS declarations — attributes/abilities live on a node.
+        if (ctx.Self is null && (fm.Attributes.Count > 0 || fm.Abilities.Count > 0))
+            throw new EvaluateException(
+                $"{path} declares 'attributes:'/'abilities:' but is not node-attached");
+
+        // Every capability is declared and injected as its own global table: framework
+        // services, host-registered extensions, and Godot classes/enums alike. There is
+        // no ambient `godot.*` — the Godot library IS the api, module by module.
         foreach (var api in fm.Apis)
         {
-            if (api.StartsWith("godot:")) continue;     // godot is ambient; declaration optional
-            env[api] = BuildApi(path, api, ctx);
+            if (api.StartsWith("godot:"))
+                throw new EvaluateException(
+                    $"{path} declares '{api}': the 'godot:' prefix is gone — declare the class " +
+                    $"itself (apis: [{api[6..]}]) and use it as a bare global");
+            env[api] = ResolveApi(path, api, ctx);
         }
 
         env["require"] = new LuaFunction((c, ct) =>
@@ -636,14 +1147,14 @@ public sealed class Loader
         // rather than restated as `local x = require("…")` boilerplate atop the body.
         // Resolved via the SAME custom require (cache + returns-narrowing) as an inline
         // call, so `require: { base: p }` yields exactly what `require(p)` would. Done
-        // last so a binding cannot silently shadow std/godot/config/params/self, a
-        // declared api, a language global, or the `require` function itself.
+        // last so a binding cannot silently shadow std/config/params/self, a declared
+        // api, a language global, or the `require` function itself.
         foreach (var req in fm.Requires)
         {
             if (env[req.Name].Type != LuaValueType.Nil)
                 throw new EvaluateException(
                     $"{path}: require binding '{req.Name}' collides with a reserved or declared " +
-                    "sandbox name (std/godot/config/params/self, an api, a language global, " +
+                    "sandbox name (std/config/params/self, an api, a language global, " +
                     "the require function, or another require binding)");
             env[req.Name] = Require(req.Path);
         }
@@ -738,10 +1249,33 @@ public sealed class Loader
 
     // ---- engine APIs ----------------------------------------------------------
 
-    // The capability APIs a script may declare in `apis:`. Single source of truth:
+    // The framework-service APIs a script may declare in `apis:`. Single source of truth:
     // the BuildApi switch dispatches on these names and the docs emitter walks them,
-    // so a newly-added api (a new switch arm + array entry) self-documents.
+    // so a newly-added api (a new switch arm + array entry) self-documents. `apis:` also
+    // accepts host-registered extension names and Godot class/enum names (ResolveApi).
     internal static readonly string[] ApiNames = { "input", "world", "scene", "save", "sql" };
+
+    // Resolve one declared `apis:` entry to the table the sandbox injects under that
+    // name. Precedence: framework service -> host extension -> Godot class/enum
+    // (memoized). Anything else — including the blocked file/resource-IO classes — is
+    // a load error, so a typo or an undeclared capability fails at load, not at play.
+    private LuaValue ResolveApi(string path, string name, LoadContext ctx)
+    {
+        if (BlockedApis.Contains(name))
+            throw new EvaluateException(
+                $"{path} requests '{name}', which is not a script capability: assets load " +
+                "through frontmatter 'assets:', persistence through 'save'/'sql'");
+        if (ApiNames.Contains(name)) return BuildApi(path, name, ctx);
+        if (_hostApis.TryGetValue(name, out var host)) return host;
+        if (_godotModules.TryGetValue(name, out var cached)) return cached;
+        var resolved = _godotBinder.Resolve(name);
+        if (resolved is null || resolved.Value.Type == LuaValueType.Nil)
+            throw new EvaluateException(
+                $"{path} requests unknown api '{name}' (not a framework api " +
+                $"[{string.Join(", ", ApiNames)}], a registered host api, or a Godot class/enum)");
+        _godotModules[name] = resolved.Value;
+        return resolved.Value;
+    }
 
     private LuaValue BuildApi(string path, string name, LoadContext ctx) => name switch
     {
@@ -1013,6 +1547,125 @@ public sealed class Loader
         return root;
     }
 
+    // ---- assets ---------------------------------------------------------------
+
+    // Resolve a script's `assets:` block: expand globs, eagerly load every file into
+    // the shared cache (missing = load error naming the script and binding), record
+    // watch targets, and hand back a LIVE view — each access re-reads the cache, so
+    // a hot-reloaded asset is what the body sees next. A glob binds a sub-table
+    // keyed by file stem; the file set is fixed at (re)load time.
+    private LuaTable BuildAssetsView(string path, List<AssetSpec> specs)
+    {
+        var single = new Dictionary<string, string>();
+        var globs = new Dictionary<string, List<(string stem, string file)>>();
+        if (!_scriptAssets.TryGetValue(path, out var declared))
+            declared = _scriptAssets[path] = new HashSet<string>();
+        declared.Clear();
+
+        foreach (var spec in specs)
+        {
+            if (spec.Path.Contains('*'))
+            {
+                var files = ExpandGlob(spec.Path).ToList();
+                if (files.Count == 0)
+                    throw new EvaluateException(
+                        $"{path}: asset '{spec.Name}' glob '{spec.Path}' matches no files");
+                var list = new List<(string, string)>();
+                foreach (var f in files)
+                {
+                    LoadAssetFile(path, spec.Name, f);
+                    declared.Add(f); _assetFiles.Add(f);
+                    list.Add((System.IO.Path.GetFileNameWithoutExtension(f), f));
+                }
+                globs[spec.Name] = list;
+            }
+            else
+            {
+                LoadAssetFile(path, spec.Name, spec.Path);
+                declared.Add(spec.Path); _assetFiles.Add(spec.Path);
+                single[spec.Name] = spec.Path;
+            }
+        }
+
+        var view = new LuaTable();
+        var mt = new LuaTable();
+        mt["__index"] = new LuaFunction((c, ct) =>
+        {
+            var key = c.GetArgument(1);
+            if (key.Type == LuaValueType.String)
+            {
+                var k = key.Read<string>();
+                if (single.TryGetValue(k, out var p))
+                {
+                    c.Return(_godotBinder.WrapInstance(_assetCache[p]));
+                    return new(1);
+                }
+                if (globs.TryGetValue(k, out var files))
+                {
+                    var t = new LuaTable();
+                    foreach (var (stem, f) in files) t[stem] = _godotBinder.WrapInstance(_assetCache[f]);
+                    c.Return(t);
+                    return new(1);
+                }
+            }
+            c.Return(LuaValue.Nil);
+            return new(1);
+        });
+        view.Metatable = mt;
+        return view;
+    }
+
+    private void LoadAssetFile(string scriptPath, string name, string resRelative)
+    {
+        if (_assetCache.ContainsKey(resRelative)) return;
+        var res = ResourceLoader.Load($"res://{resRelative}");
+        if (res is null)
+            throw new EvaluateException(
+                $"{scriptPath}: asset '{name}' -> '{resRelative}' failed to load " +
+                "(missing file, or a resource type that needs a Godot import first)");
+        _assetCache[resRelative] = res;
+    }
+
+    // Expand a `dir/pattern*.ext` glob (filename position only) against the project
+    // filesystem. `.import` sidecars are skipped; results sort for determinism.
+    private static IEnumerable<string> ExpandGlob(string resRelative)
+    {
+        var slash = resRelative.LastIndexOf('/');
+        var dir = slash >= 0 ? resRelative[..slash] : "";
+        var pattern = slash >= 0 ? resRelative[(slash + 1)..] : resRelative;
+        var abs = ProjectSettings.GlobalizePath($"res://{dir}");
+        if (!System.IO.Directory.Exists(abs)) yield break;
+        foreach (var f in System.IO.Directory.GetFiles(abs, pattern).OrderBy(x => x))
+        {
+            if (f.EndsWith(".import")) continue;
+            var file = System.IO.Path.GetFileName(f);
+            yield return dir.Length > 0 ? $"{dir}/{file}" : file;
+        }
+    }
+
+    // Apply an on-disk change to a declared asset. A `.gdshader` updates IN PLACE —
+    // the same Shader instance gets the new code, so every live ShaderMaterial
+    // recompiles with no rebuild (even one captured in on_attach). Anything else
+    // re-loads with Replace semantics, then every declaring script reloads through
+    // the module graph so on_load rebuilds against the fresh resource.
+    private string ReloadAsset(string path)
+    {
+        if (path.EndsWith(".gdshader") && _assetCache.TryGetValue(path, out var cached) && cached is Shader sh)
+        {
+            var text = Godot.FileAccess.GetFileAsString($"res://{path}");
+            if (!string.IsNullOrEmpty(text)) sh.Code = text;
+            return $"reloaded shader {path} in place (live materials recompiled)";
+        }
+        if (_assetCache.ContainsKey(path))
+        {
+            var fresh = ResourceLoader.Load($"res://{path}", null, ResourceLoader.CacheMode.Replace);
+            if (fresh is not null) _assetCache[path] = fresh;
+        }
+        var consumers = _scriptAssets.Where(kv => kv.Value.Contains(path)).Select(kv => kv.Key).ToList();
+        foreach (var c in consumers) ReloadModuleGraph(c);
+        return $"reloaded asset {path} ({consumers.Count} declaring script(s) refreshed)";
+    }
+
     // Build the `config` table as a LIVE view over the declared TOML files. A
     // metatable resolves config.<section> to a section-view whose keys read the
     // CURRENT TOML cache on each access — so a saved .toml edit (re-read into the
@@ -1092,17 +1745,56 @@ public sealed class Loader
         var t = new LuaTable();
         foreach (var p in declared)
         {
+            object? value;
             if (supplied.TryGetValue(p.Name, out var v))
             {
                 CheckParamType(path, p, v);
-                t[p.Name] = SceneBuilder.TomlToLua(v);
+                value = v;
             }
             else if (p.HasDefault)
-                t[p.Name] = SceneBuilder.TomlToLua(p.Default!);
+                value = p.Default!;
             else
                 throw new EvaluateException(
                     $"{path}: required param '{p.Name}' ({TypeLabel(p.Type)}) was not supplied by the scene");
+
+            t[p.Name] = p.Type == "dna"
+                ? BuildDnaValue(path, p.Name, value)
+                : SceneBuilder.TomlToLua(value);
         }
+        return t;
+    }
+
+    // A `dna` param: 64 bits, written as "0x" + EXACTLY 16 hex digits — strict, so
+    // every trait slot is visibly hand-authored (the same hash always produces the
+    // same behavior; nothing in the framework generates or derives one). The body
+    // reads slots with `params.<name>:trait(i)` (1..16, most-significant first,
+    // each 0..15) and the raw string with `:hex()`.
+    private static readonly System.Text.RegularExpressions.Regex DnaPattern =
+        new("^0x[0-9a-fA-F]{16}$", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    private static LuaValue BuildDnaValue(string path, string name, object? v)
+    {
+        if (v is not string s || !DnaPattern.IsMatch(s))
+            throw new EvaluateException(
+                $"{path}: param '{name}' (dna) must be \"0x\" + exactly 16 hex digits " +
+                "(e.g. \"0xA13F00C2D4E5B677\" — one hand-chosen digit per trait slot); " +
+                $"got '{v}'");
+        var norm = "0x" + s[2..].ToUpperInvariant();
+        var nibbles = new int[16];
+        for (int i = 0; i < 16; i++)
+            nibbles[i] = System.Convert.ToInt32(s[2 + i].ToString(), 16);
+
+        var t = new LuaTable();
+        t["hex"] = new LuaFunction((c, ct) => { c.Return(norm); return new(1); });
+        t["trait"] = new LuaFunction((c, ct) =>
+        {
+            var arg = c.GetArgument(c.ArgumentCount - 1);
+            var idx = arg.Type == LuaValueType.Number ? (int)arg.Read<double>() : -1;
+            if (idx < 1 || idx > 16)
+                throw new EvaluateException($"dna:trait(i): slot {idx} is out of range 1..16");
+            c.Return((double)nibbles[idx - 1]);
+            return new(1);
+        });
         return t;
     }
 
@@ -1118,6 +1810,7 @@ public sealed class Loader
             "bool" => v is bool,
             "list" => v is object[],
             "table" => v is Dictionary<string, object>,
+            "dna" => v is string,                           // format checked in BuildDnaValue
             _ => true,
         };
         if (!ok)

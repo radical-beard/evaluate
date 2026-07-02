@@ -1,11 +1,13 @@
 # The GLOBAL layer (reserved manifest, TOML content): nodes here persist across
 # every scene switch, and `start_scene` is entered once startup finishes. A
-# node's name is the table key; nesting is the tree (Camera is a child of Player).
+# node's name is the table key; nesting is the tree (Camera is a child of
+# Player). `behaviors` attaches N behavior scripts in list order — sprint first,
+# so its attribute pools exist before player.behavior.evt reads them.
 start_scene = "menu"
 
 [nodes.Player]
 type = "Node3D"
-script = "player.node.evt"
+behaviors = ["sprint.behavior.evt", "player.behavior.evt"]
 
 [nodes.Player.Camera]
 type = "Camera3D"

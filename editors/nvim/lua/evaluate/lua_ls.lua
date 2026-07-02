@@ -39,9 +39,10 @@ local function lua_settings(libdirs)
     Lua = {
       runtime = { version = "Lua 5.2" }, -- Evaluate's VM (Lua-CSharp, Lua 5.2)
       workspace = { library = libdirs, checkThirdParty = false },
-      -- LuaCATS declare the ambient globals (godot/std/save/…); self+config are contextual,
-      -- and hook definitions are intentional "lowercase globals".
-      diagnostics = { globals = { "self", "config" }, disable = { "lowercase-global" } },
+      -- LuaCATS declare `std` plus the declarable apis (services and, since 0.10.0, Godot
+      -- classes/enums as bare globals — no ambient `godot.*`); self/config/params/assets are
+      -- contextual, and hook definitions are intentional "lowercase globals".
+      diagnostics = { globals = { "self", "config", "params", "assets" }, disable = { "lowercase-global" } },
       telemetry = { enable = false },
     },
   }

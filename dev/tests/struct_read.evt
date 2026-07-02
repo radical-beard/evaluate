@@ -1,21 +1,25 @@
 ---
+apis:
+ - Sprite2D
+ - MeshInstance3D
+ - Node3D
 returns:
  - result
 ---
 -- Regression guard: the runtime/script struct API must be NAMED-field, so reading a
 -- struct property by name works (.size.x, .basis.z), not just positional indices. Sets
 -- each property with a named table and reads it back by name.
-local s = godot.Sprite2D.new()
+local s = Sprite2D.new()
 s.region_rect = { position = { x = 1, y = 2 }, size = { x = 3, y = 4 } }
 local rr = s.region_rect
 local rect_ok = rr.size.x == 3 and rr.position.y == 2
 
-local m = godot.MeshInstance3D.new()
+local m = MeshInstance3D.new()
 m.custom_aabb = { position = { x = 1, y = 2, z = 3 }, size = { x = 4, y = 5, z = 6 } }
 local ab = m.custom_aabb
 local aabb_ok = ab.size.z == 6 and ab.position.x == 1
 
-local n = godot.Node3D.new()
+local n = Node3D.new()
 n.transform = { basis = { x = { x = 2, y = 0, z = 0 }, y = { x = 0, y = 2, z = 0 }, z = { x = 0, y = 0, z = 2 } }, origin = { x = 5, y = 6, z = 7 } }
 local t = n.transform
 local basis_ok = t.basis.z.z == 2 and t.origin.x == 5

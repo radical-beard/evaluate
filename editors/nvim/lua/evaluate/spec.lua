@@ -7,6 +7,10 @@ local M = {}
 
 -- Stable fallback (mirrors editors/vscode/src/spec.ts BUNDLED). The live spec wins.
 local BUNDLED = {
+  -- The five framework services. Since 0.10.0, `apis:` ALSO accepts any Godot class or
+  -- global-enum name (PascalCase — `apis: [Input, Node3D, Key]` injects each as a bare
+  -- global) and host-registered C# extension apis; those aren't enumerable here, so
+  -- validation accepts PascalCase entries and only the blocked names below are errors.
   apis = { "input", "world", "scene", "save", "sql" },
   apiMembers = {
     input = { "is_down" },
@@ -18,6 +22,12 @@ local BUNDLED = {
   apiNotes = {
     world = "The persistent global-root Node (a wrapped instance, not a table). Survives scene switches.",
   },
+  -- Never declarable in `apis:` (assets load via frontmatter `assets:`).
+  blockedApis = { "DirAccess", "FileAccess", "ResourceLoader", "ResourceSaver" },
+  -- Godot class / global-enum names come from the live spec (empty when bundled); they only
+  -- power completion/hover — validation accepts any PascalCase name without a list.
+  godotClasses = {},
+  godotEnums = {},
   systemHooks = {
     "on_start", "on_load", "on_unload", "on_quit", "on_enter", "on_exit",
     "on_focus_in", "on_focus_out", "on_pause", "on_resume",
@@ -27,27 +37,60 @@ local BUNDLED = {
     "on_attach", "on_load", "on_unload", "on_update", "on_physics_update",
     "on_input", "on_exit", "on_quit", "on_focus_in", "on_focus_out", "on_pause", "on_resume",
   },
-  frontmatterKeys = { "config", "apis", "register", "returns", "params", "require", "assets", "scenes" },
+  frontmatterKeys = {
+    "config", "apis", "register", "returns", "params", "require", "assets", "scenes",
+    "properties", "behaviors", "machines", "attributes", "abilities",
+    "name", "states", "initial", -- *.statemachine.evt signature keys
+  },
   returnsGrammar = "<name>  |  <name>: 'get set <type>'  (read-only omits 'set')",
-  paramsGrammar = "<name>: <type> | <name>: <default> | <name>: '<type> = <default>'",
+  paramsGrammar = "<name>: <type> | <name>: <default> | <name>: '<type> = <default>'  (types: number/string/bool/list/table/any/dna)",
   requireGrammar = "<name>: \"<path.evt>\"  (a list of single-key maps or a map)",
+  assetsGrammar = "<name>: \"<res-relative path>\"  (map or list of single-key maps; injected as assets.<name>)",
+  propertiesGrammar = "<property>: <value>  (node-attached scripts only; applied to self at attach + reload)",
+  attributesGrammar = "<name>: { base: n, min: n, max: n, regen: n/s, regen_delay: s, recover: n }",
+  machineGrammar = "*.statemachine.evt: frontmatter name:/states:/initial:; body returns ordered transitions",
 }
 
 -- Hover docs for the frontmatter keys (hand-authored — mirrors editors/vscode/src/frontmatter.ts).
 M.KEY_DOCS = {
   config = "TOML files exposed as `config.<section>.*` (read live; hot-reloads).",
-  apis = "Capability apis added to the sandbox. Only what you list here is reachable.",
+  apis = "Everything the sandbox exposes, each injected as its own bare global: framework "
+    .. "services (`input`, `world`, `scene`, `save`, `sql`), host-registered extension apis, "
+    .. "and Godot classes/enums (`apis: [Input, Node3D, Key]` → `Input.GetJoyAxis(...)`, "
+    .. "`Node3D.new()`, `Key.Space`). The ambient `godot.*` table is gone (0.10.0) and "
+    .. "`godot:`-prefixed entries are a load error. Blocked: `DirAccess`, `FileAccess`, "
+    .. "`ResourceLoader`, `ResourceSaver` — assets load via frontmatter `assets:`.",
   register = "Lifecycle hooks this script handles — each needs a matching global `function`.",
   returns = "The narrowed module contract for `require` consumers.",
-  params = "Node scripts only: typed per-instance values the scene supplies via `params = {..}`, "
-    .. "read through the `params` global. `name: <type>` (required) / `name: <default>` / "
-    .. "`name: '<type> = <default>'`. Types: number/string/bool/list/table/any.",
+  params = "Node-attached scripts only: typed per-instance values the scene supplies via "
+    .. "`params = {..}`, read through the `params` global. `name: <type>` (required) / "
+    .. "`name: <default>` / `name: '<type> = <default>'`. Types: number/string/bool/list/"
+    .. "table/any/dna (dna = `\"0x\"` + exactly 16 hex digits; read `params.<name>:trait(1..16)` "
+    .. "and `:hex()`).",
   require = "Bind modules to sandbox locals up front — `name: \"path/to/module.evt\"` — so the "
     .. "body uses `name` with no `local name = require(...)` line. Each binds the same "
     .. "returns-narrowed handle `require(path)` would. Accepts a list of `- name: \"path\"` "
     .. "or a `params:`-style map.",
-  assets = "Files watched for hot-reload alongside the script.",
+  assets = "Map of `<name>: \"res-relative/path.ext\"` (or a list of single-key maps) — the ONLY "
+    .. "way a script gets an asset. Loaded eagerly, injected as the ambient `assets` table "
+    .. "(`assets.<name>`), hot-reloaded; a filename `*` glob binds a stem-keyed table; "
+    .. "`.gdshader` updates in place. Bare-path list entries are an error.",
   scenes = "System scripts only: restrict hooks to these scenes (omit ⇒ global).",
+  properties = "Node-attached scripts only: map of native Godot property → value, applied to "
+    .. "`self` at attach and on script reload (scene-set keys win). Same value grammar as "
+    .. "`.scene` properties, incl. `[x, y, z]` lists and `_type` tables.",
+  behaviors = "List of `*.behavior.evt` paths composed onto the same node — each runs against "
+    .. "the shared `self` (`.node.evt` is the deprecated single-behavior alias).",
+  machines = "List of `*.statemachine.evt` paths attached to the node. Each surfaces "
+    .. "`self.fsm.<name>` — `.state`, `:is(s)`, `:fire(evt)`, `:on_exit(state, fn)`, and "
+    .. "`self.fsm.<name>.<state> = fn` appends an enter listener `fn(from)`.",
+  attributes = "Node-attached: map of `<name>: { base, min, max, regen, regen_delay, recover }`. "
+    .. "Read `self.attributes.<name>`; spent by abilities; exhausts at min until it recovers.",
+  abilities = "List of `*.ability` files (TOML) granted to the node at attach.",
+  name = "State machines (`*.statemachine.evt`): the machine's name — surfaced as `self.fsm.<name>`.",
+  states = "State machines: the list of state names. The body returns ordered transitions "
+    .. "`{ from=, to=, when=fn|on=\"event\"|after=seconds [, run=fn] }`.",
+  initial = "State machines: the starting state (one of `states:`).",
 }
 
 local function exists(p)
@@ -114,6 +157,19 @@ function M.load(bufnr, config)
         spec.apis, spec.apiMembers = apis, apiMembers
         if next(apiNotes) then spec.apiNotes = apiNotes end
       end
+      spec.blockedApis = raw.blockedApis or spec.blockedApis
+      -- 0.10.0 apis-as-modules: Godot classes/global enums are declarable in `apis:` too.
+      if raw.godot then
+        local function names(list)
+          local out = {}
+          for _, e in ipairs(list or {}) do
+            if type(e) == "table" and type(e.name) == "string" then table.insert(out, e.name) end
+          end
+          return out
+        end
+        spec.godotClasses = names(raw.godot.classes)
+        spec.godotEnums = names(raw.godot.globalEnums)
+      end
       spec.systemHooks = (raw.hooks and raw.hooks.system) or spec.systemHooks
       spec.nodeHooks = (raw.hooks and raw.hooks.node) or spec.nodeHooks
       if raw.frontmatter then
@@ -121,6 +177,10 @@ function M.load(bufnr, config)
         spec.returnsGrammar = raw.frontmatter.returnsGrammar or spec.returnsGrammar
         spec.paramsGrammar = raw.frontmatter.paramsGrammar or spec.paramsGrammar
         spec.requireGrammar = raw.frontmatter.requireGrammar or spec.requireGrammar
+        spec.assetsGrammar = raw.frontmatter.assetsGrammar or spec.assetsGrammar
+        spec.propertiesGrammar = raw.frontmatter.propertiesGrammar or spec.propertiesGrammar
+        spec.attributesGrammar = raw.frontmatter.attributesGrammar or spec.attributesGrammar
+        spec.machineGrammar = raw.frontmatter.machineGrammar or spec.machineGrammar
       end
       spec.evaluateVersion, spec.godotVersion = raw.evaluateVersion, raw.godotVersion
       spec.source = "workspace"

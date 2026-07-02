@@ -1,12 +1,24 @@
-# A second swappable scene. Entering it frees the menu's container and builds
+# A swappable scene. Entering it frees the previous scene's container and builds
 # this tree fresh — while the global Player (and its Camera) carries straight over.
 [nodes.Level]
 type = "Node3D"
 
-[nodes.Level.Enemy]
+# One node, one behavior + one state machine. The behavior takes a per-instance
+# `params` table — including a hand-authored `dna` hash (16 trait slots); a
+# second Sentry could share both files with a different dna and stand apart.
+[nodes.Level.Sentry]
 type = "Node3D"
 position = [3, 0, 0]
+behaviors = [{ script = "sentry.behavior.evt", params = { dna = "0xA13F00C2D4E5B677" } }]
+machines = ["stance.statemachine.evt"]
 
-[nodes.Level.Enemy.Weapon]
+[nodes.Level.Sentry.Weapon]
 type = "Node3D"
 position = [0, 0, 1]
+
+# An inline `_type` resource (a property, not a child node) plus a behavior that
+# drives its material from a declared shader asset.
+[nodes.Level.Crate]
+type = "MeshInstance3D"
+mesh = { _type = "BoxMesh", size = [1, 1, 1] }
+behaviors = ["tint.behavior.evt"]

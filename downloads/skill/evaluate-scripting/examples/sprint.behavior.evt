@@ -1,0 +1,32 @@
+---
+apis:
+ - input
+attributes:
+  stamina: { base: 100, min: 0, max: 100, regen: 20, regen_delay: 0.5, recover: 25 }
+  speed:   { base: 4, min: 0, max: 12 }
+abilities:
+ - sprint.ability
+register:
+ - on_attach
+ - on_update
+---
+-- GAS-lite: attribute pools + granted abilities, declared in the signature.
+-- Built-in stamina semantics: `regen`/second after `regen_delay` since the last
+-- spend; draining to `min` via a spend EXHAUSTS the attribute (tag
+-- `exhausted:stamina`) until it regens back to `recover` — classic stamina
+-- lockout, no code. The channeled sprint.ability drains 25 stamina/second and
+-- applies haste.effect (+speed) while it is active.
+function on_attach()
+  self.abilities:on_ended("sprint", function(name, reason)
+    print("sprint ended: " .. reason)        -- "deactivated" | "exhausted"
+  end)
+end
+
+function on_update(dt)
+  local held = input.is_down("sprint")
+  if held and self.abilities:can_activate("sprint") then
+    self.abilities:activate("sprint")        -- channeled: stays active until deactivated
+  elseif not held and self.abilities:is_active("sprint") then
+    self.abilities:deactivate("sprint")
+  end
+end

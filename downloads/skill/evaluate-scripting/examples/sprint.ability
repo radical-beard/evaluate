@@ -1,0 +1,11 @@
+# A channeled ability (*.ability, TOML): active until deactivated, or until its
+# cost attribute exhausts. For a channel, `cost.amount` drains PER SECOND while
+# active (an instant ability spends it once per activation). Hot-reloads live —
+# the next activation uses the edited values.
+channeled = true
+cost = { attribute = "stamina", amount = 25.0 }
+grant_tags = ["sprinting"]      # held while the channel is active
+
+[[effects]]
+effect = "haste.effect"         # applied while active (its duration is -1)
+target = "self"

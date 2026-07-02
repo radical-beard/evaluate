@@ -7,10 +7,11 @@ using Lua;
 
 namespace Evaluate;
 
-// Capability story note: per project decision, Godot types are AMBIENT (default,
-// not opt-in). A script reaches any type via `godot.<Type>`; the binder resolves
-// it lazily by reflection over GodotSharp. (config/entity/world/input remain
-// declared capabilities.)
+// Capability story: the Godot library IS the api. A script declares each class/
+// enum it names in frontmatter `apis:` (e.g. `apis: [Input, Node3D]`) and gets it
+// as its own bare global table; the binder resolves the name by reflection over
+// GodotSharp. Declaration gates the CLASS TABLE (constructor/statics/enums) —
+// instances returned by calls marshal and expose members regardless.
 //
 // Member access on an instance routes through the engine ClassDB
 // (GodotObject.Call/Get/Set, snake_case names) rather than System.Reflection —
@@ -21,9 +22,19 @@ public sealed class GodotBinder
 
     private readonly LuaState _lua;
     private readonly Dictionary<string, Dictionary<string, Variant.Type>> _propTypes = new();
+    // Framework-attached Lua surfaces per node (`self.fsm`, `self.attributes`,
+    // `self.abilities`). Keyed by the GodotObject so EVERY wrap of the same node
+    // resolves them; weak so freed nodes drop their entries.
+    private readonly System.Runtime.CompilerServices.ConditionalWeakTable<GodotObject, LuaTable> _aux = new();
     public GodotBinder(LuaState lua) => _lua = lua;
 
-    // godot.<TypeName> -> a "type handle": `new` constructor + Lua-convertible statics.
+    // The per-node auxiliary table (created on first use). The loader installs the
+    // framework surfaces here; instance `__index` consults it before engine lookup
+    // falls through to a nil property read.
+    internal LuaTable Aux(GodotObject obj) => _aux.GetValue(obj, _ => new LuaTable());
+
+    // A declared Godot class/enum name -> a "type handle": `new` constructor +
+    // Lua-convertible statics (classes), or a value table (enums).
     public LuaValue? Resolve(string typeName)
     {
         var type = GodotAssembly.GetType($"Godot.{typeName}");
@@ -83,15 +94,42 @@ public sealed class GodotBinder
         // type set (structs, packed arrays, objects, collections), so any method
         // whose whole signature we can marshal is bound. Names already provided by
         // a pre-baked binding are kept (the generator's zero-reflection versions win).
-        foreach (var group in type.GetMethods(BindingFlags.Public | BindingFlags.Static)
-                                   .Where(m => !m.IsSpecialName && !m.IsGenericMethod)
-                                   .Where(m => m.GetParameters().All(p => CanMarshal(p.ParameterType))
-                                            && (m.ReturnType == typeof(void) || CanMarshal(m.ReturnType)))
-                                   .GroupBy(m => m.Name))
+        BindMethodGroups(handle, type.GetMethods(BindingFlags.Public | BindingFlags.Static), null);
+        return handle;
+    }
+
+    // Bind a host-registered C# api module: an object (public instance + static
+    // methods, the object as receiver) or a System.Type (public statics only).
+    // Same marshalling and overload rules as the Godot static bindings; calls are
+    // dot-style (`api.Method(args)`), like every other api table.
+    internal LuaTable BindHost(object impl)
+    {
+        var table = new LuaTable();
+        var (type, receiver) = impl is Type t ? (t, (object?)null) : (impl.GetType(), impl);
+        var flags = BindingFlags.Public | BindingFlags.Static
+                  | (receiver is null ? 0 : BindingFlags.Instance);
+        BindMethodGroups(table, type.GetMethods(flags), receiver);
+        if (table.HashMapCount == 0)
+            throw new EvaluateException(
+                $"host api '{type.Name}' exposes no bindable public methods " +
+                "(a method binds when its whole signature marshals to/from Lua)");
+        return table;
+    }
+
+    // Bind every Lua-marshallable method group as an overload-picking Lua function.
+    // `receiver` is the instance for non-static methods (null = statics only).
+    private void BindMethodGroups(LuaTable into, IEnumerable<MethodInfo> methods, object? receiver)
+    {
+        foreach (var group in methods
+                     .Where(m => !m.IsSpecialName && !m.IsGenericMethod
+                              && m.DeclaringType != typeof(object))
+                     .Where(m => m.GetParameters().All(p => CanMarshal(p.ParameterType))
+                              && (m.ReturnType == typeof(void) || CanMarshal(m.ReturnType)))
+                     .GroupBy(m => m.Name))
         {
-            if (handle[group.Key].Type != LuaValueType.Nil) continue;   // pre-baked wins
+            if (into[group.Key].Type != LuaValueType.Nil) continue;   // pre-baked wins
             var overloads = group.ToArray();
-            handle[group.Key] = new LuaFunction((ctx, ct) =>
+            into[group.Key] = new LuaFunction((ctx, ct) =>
             {
                 var n = ctx.ArgumentCount;
                 // Pick an overload whose required..total param count brackets the arg count.
@@ -107,11 +145,10 @@ public sealed class GodotBinder
                     args[i] = i < n ? ToClr(ctx.GetArgument(i), ps[i].ParameterType)
                                     : ps[i].HasDefaultValue ? ps[i].DefaultValue
                                     : ToClr(LuaValue.Nil, ps[i].ParameterType);
-                ctx.Return(FromClr(method.Invoke(null, args)));
+                ctx.Return(FromClr(method.Invoke(method.IsStatic ? null : receiver, args)));
                 return new(1);
             });
         }
-        return handle;
     }
 
     // A live Godot object exposed to Lua as userdata (so it can pass back into
@@ -126,6 +163,12 @@ public sealed class GodotBinder
         {
             var key = ctx.GetArgument(1).Read<string>();
             if (key == "connect") { ctx.Return(MakeConnect(obj)); return new(1); }
+            // Framework surfaces attached to this node (fsm/attributes/abilities).
+            if (_aux.TryGetValue(obj, out var aux) && aux[key].Type != LuaValueType.Nil)
+            {
+                ctx.Return(aux[key]);
+                return new(1);
+            }
             if (obj.HasMethod(key)) { ctx.Return(MakeMethod(obj, key)); return new(1); }
             ctx.Return(ToLua(obj.Get(key)));
             return new(1);
@@ -155,6 +198,10 @@ public sealed class GodotBinder
     // a Vector3). Routes through the engine, not reflection.
     public void SetProperty(GodotObject obj, string key, LuaValue val) =>
         obj.Set(key, ToSetValue(obj, key, val));
+
+    // Whether the engine reports `key` as a property of obj's class (Object.Set on an
+    // unknown key is a silent no-op, so strict callers check first and error loudly).
+    internal bool HasProperty(GodotObject obj, string key) => PropertyType(obj, key) is not null;
 
     private LuaValue MakeMethod(GodotObject obj, string name) => new LuaFunction((ctx, ct) =>
     {

@@ -1,975 +1,1940 @@
 ---@meta
--- EvaLuate godot.* — the engine surface for this Godot build.
+-- EvaLuate Godot modules — the engine surface for this Godot build.
+-- Each class/enum is its own bare global, injected ONLY when the script
+-- declares it in frontmatter `apis:` (apis: [Input, Node3D, Key]).
 -- Instance members are engine snake_case (node:get_node(), node.position);
--- enums/constants/new are C# PascalCase (godot.Timer.new(), godot.Key.Space).
+-- enums/constants/new are C# PascalCase (Timer.new(), Key.Space).
 
----@class godot
----@field AcceptDialog Godot.AcceptDialog.__type
----@field AesContext Godot.AesContext.__type
----@field AimModifier3D Godot.AimModifier3D.__type
----@field AnimatableBody2D Godot.AnimatableBody2D.__type
----@field AnimatableBody3D Godot.AnimatableBody3D.__type
----@field AnimatedSprite2D Godot.AnimatedSprite2D.__type
----@field AnimatedSprite3D Godot.AnimatedSprite3D.__type
----@field AnimatedTexture Godot.AnimatedTexture.__type
----@field Animation Godot.Animation.__type
----@field AnimationLibrary Godot.AnimationLibrary.__type
----@field AnimationMixer Godot.AnimationMixer.__type
----@field AnimationNode Godot.AnimationNode.__type
----@field AnimationNodeAdd2 Godot.AnimationNodeAdd2.__type
----@field AnimationNodeAdd3 Godot.AnimationNodeAdd3.__type
----@field AnimationNodeAnimation Godot.AnimationNodeAnimation.__type
----@field AnimationNodeBlend2 Godot.AnimationNodeBlend2.__type
----@field AnimationNodeBlend3 Godot.AnimationNodeBlend3.__type
----@field AnimationNodeBlendSpace1D Godot.AnimationNodeBlendSpace1D.__type
----@field AnimationNodeBlendSpace2D Godot.AnimationNodeBlendSpace2D.__type
----@field AnimationNodeBlendTree Godot.AnimationNodeBlendTree.__type
----@field AnimationNodeExtension Godot.AnimationNodeExtension.__type
----@field AnimationNodeOneShot Godot.AnimationNodeOneShot.__type
----@field AnimationNodeOutput Godot.AnimationNodeOutput.__type
----@field AnimationNodeStateMachine Godot.AnimationNodeStateMachine.__type
----@field AnimationNodeStateMachinePlayback Godot.AnimationNodeStateMachinePlayback.__type
----@field AnimationNodeStateMachineTransition Godot.AnimationNodeStateMachineTransition.__type
----@field AnimationNodeSub2 Godot.AnimationNodeSub2.__type
----@field AnimationNodeSync Godot.AnimationNodeSync.__type
----@field AnimationNodeTimeScale Godot.AnimationNodeTimeScale.__type
----@field AnimationNodeTimeSeek Godot.AnimationNodeTimeSeek.__type
----@field AnimationNodeTransition Godot.AnimationNodeTransition.__type
----@field AnimationPlayer Godot.AnimationPlayer.__type
----@field AnimationRootNode Godot.AnimationRootNode.__type
----@field AnimationTree Godot.AnimationTree.__type
----@field Area2D Godot.Area2D.__type
----@field Area3D Godot.Area3D.__type
----@field ArrayMesh Godot.ArrayMesh.__type
----@field ArrayOccluder3D Godot.ArrayOccluder3D.__type
----@field AspectRatioContainer Godot.AspectRatioContainer.__type
----@field AStar2D Godot.AStar2D.__type
----@field AStar3D Godot.AStar3D.__type
----@field AStarGrid2D Godot.AStarGrid2D.__type
----@field AtlasTexture Godot.AtlasTexture.__type
----@field AudioBusLayout Godot.AudioBusLayout.__type
----@field AudioEffect Godot.AudioEffect.__type
----@field AudioEffectAmplify Godot.AudioEffectAmplify.__type
----@field AudioEffectBandLimitFilter Godot.AudioEffectBandLimitFilter.__type
----@field AudioEffectBandPassFilter Godot.AudioEffectBandPassFilter.__type
----@field AudioEffectCapture Godot.AudioEffectCapture.__type
----@field AudioEffectChorus Godot.AudioEffectChorus.__type
----@field AudioEffectCompressor Godot.AudioEffectCompressor.__type
----@field AudioEffectDelay Godot.AudioEffectDelay.__type
----@field AudioEffectDistortion Godot.AudioEffectDistortion.__type
----@field AudioEffectEQ Godot.AudioEffectEQ.__type
----@field AudioEffectEQ10 Godot.AudioEffectEQ10.__type
----@field AudioEffectEQ21 Godot.AudioEffectEQ21.__type
----@field AudioEffectEQ6 Godot.AudioEffectEQ6.__type
----@field AudioEffectFilter Godot.AudioEffectFilter.__type
----@field AudioEffectHardLimiter Godot.AudioEffectHardLimiter.__type
----@field AudioEffectHighPassFilter Godot.AudioEffectHighPassFilter.__type
----@field AudioEffectHighShelfFilter Godot.AudioEffectHighShelfFilter.__type
----@field AudioEffectInstance Godot.AudioEffectInstance.__type
----@field AudioEffectLimiter Godot.AudioEffectLimiter.__type
----@field AudioEffectLowPassFilter Godot.AudioEffectLowPassFilter.__type
----@field AudioEffectLowShelfFilter Godot.AudioEffectLowShelfFilter.__type
----@field AudioEffectNotchFilter Godot.AudioEffectNotchFilter.__type
----@field AudioEffectPanner Godot.AudioEffectPanner.__type
----@field AudioEffectPhaser Godot.AudioEffectPhaser.__type
----@field AudioEffectPitchShift Godot.AudioEffectPitchShift.__type
----@field AudioEffectRecord Godot.AudioEffectRecord.__type
----@field AudioEffectReverb Godot.AudioEffectReverb.__type
----@field AudioEffectSpectrumAnalyzer Godot.AudioEffectSpectrumAnalyzer.__type
----@field AudioEffectSpectrumAnalyzerInstance Godot.AudioEffectSpectrumAnalyzerInstance.__type
----@field AudioEffectStereoEnhance Godot.AudioEffectStereoEnhance.__type
----@field AudioListener2D Godot.AudioListener2D.__type
----@field AudioListener3D Godot.AudioListener3D.__type
----@field AudioSample Godot.AudioSample.__type
----@field AudioSamplePlayback Godot.AudioSamplePlayback.__type
----@field AudioServerInstance Godot.AudioServerInstance.__type
----@field AudioStream Godot.AudioStream.__type
----@field AudioStreamGenerator Godot.AudioStreamGenerator.__type
----@field AudioStreamGeneratorPlayback Godot.AudioStreamGeneratorPlayback.__type
----@field AudioStreamInteractive Godot.AudioStreamInteractive.__type
----@field AudioStreamMicrophone Godot.AudioStreamMicrophone.__type
----@field AudioStreamMP3 Godot.AudioStreamMP3.__type
----@field AudioStreamOggVorbis Godot.AudioStreamOggVorbis.__type
----@field AudioStreamPlayback Godot.AudioStreamPlayback.__type
----@field AudioStreamPlaybackInteractive Godot.AudioStreamPlaybackInteractive.__type
----@field AudioStreamPlaybackOggVorbis Godot.AudioStreamPlaybackOggVorbis.__type
----@field AudioStreamPlaybackPlaylist Godot.AudioStreamPlaybackPlaylist.__type
----@field AudioStreamPlaybackPolyphonic Godot.AudioStreamPlaybackPolyphonic.__type
----@field AudioStreamPlaybackResampled Godot.AudioStreamPlaybackResampled.__type
----@field AudioStreamPlaybackSynchronized Godot.AudioStreamPlaybackSynchronized.__type
----@field AudioStreamPlayer Godot.AudioStreamPlayer.__type
----@field AudioStreamPlayer2D Godot.AudioStreamPlayer2D.__type
----@field AudioStreamPlayer3D Godot.AudioStreamPlayer3D.__type
----@field AudioStreamPlaylist Godot.AudioStreamPlaylist.__type
----@field AudioStreamPolyphonic Godot.AudioStreamPolyphonic.__type
----@field AudioStreamRandomizer Godot.AudioStreamRandomizer.__type
----@field AudioStreamSynchronized Godot.AudioStreamSynchronized.__type
----@field AudioStreamWav Godot.AudioStreamWav.__type
----@field BackBufferCopy Godot.BackBufferCopy.__type
----@field BaseButton Godot.BaseButton.__type
----@field BaseMaterial3D Godot.BaseMaterial3D.__type
----@field Bitmap Godot.Bitmap.__type
----@field Bone2D Godot.Bone2D.__type
----@field BoneAttachment3D Godot.BoneAttachment3D.__type
----@field BoneConstraint3D Godot.BoneConstraint3D.__type
----@field BoneMap Godot.BoneMap.__type
----@field BoneTwistDisperser3D Godot.BoneTwistDisperser3D.__type
----@field BoxContainer Godot.BoxContainer.__type
----@field BoxMesh Godot.BoxMesh.__type
----@field BoxOccluder3D Godot.BoxOccluder3D.__type
----@field BoxShape3D Godot.BoxShape3D.__type
----@field Button Godot.Button.__type
----@field ButtonGroup Godot.ButtonGroup.__type
----@field CallbackTweener Godot.CallbackTweener.__type
----@field Camera2D Godot.Camera2D.__type
----@field Camera3D Godot.Camera3D.__type
----@field CameraAttributes Godot.CameraAttributes.__type
----@field CameraAttributesPhysical Godot.CameraAttributesPhysical.__type
----@field CameraAttributesPractical Godot.CameraAttributesPractical.__type
----@field CameraFeed Godot.CameraFeed.__type
----@field CameraServerInstance Godot.CameraServerInstance.__type
----@field CameraTexture Godot.CameraTexture.__type
----@field CanvasGroup Godot.CanvasGroup.__type
----@field CanvasItem Godot.CanvasItem.__type
----@field CanvasItemMaterial Godot.CanvasItemMaterial.__type
----@field CanvasLayer Godot.CanvasLayer.__type
----@field CanvasModulate Godot.CanvasModulate.__type
----@field CanvasTexture Godot.CanvasTexture.__type
----@field CapsuleMesh Godot.CapsuleMesh.__type
----@field CapsuleShape2D Godot.CapsuleShape2D.__type
----@field CapsuleShape3D Godot.CapsuleShape3D.__type
----@field Ccdik3D Godot.Ccdik3D.__type
----@field CenterContainer Godot.CenterContainer.__type
----@field ChainIK3D Godot.ChainIK3D.__type
----@field CharacterBody2D Godot.CharacterBody2D.__type
----@field CharacterBody3D Godot.CharacterBody3D.__type
----@field CharFXTransform Godot.CharFXTransform.__type
----@field CheckBox Godot.CheckBox.__type
----@field CheckButton Godot.CheckButton.__type
----@field CircleShape2D Godot.CircleShape2D.__type
----@field ClassDBInstance Godot.ClassDBInstance.__type
----@field CodeEdit Godot.CodeEdit.__type
----@field CodeHighlighter Godot.CodeHighlighter.__type
----@field CollisionObject2D Godot.CollisionObject2D.__type
----@field CollisionObject3D Godot.CollisionObject3D.__type
----@field CollisionPolygon2D Godot.CollisionPolygon2D.__type
----@field CollisionPolygon3D Godot.CollisionPolygon3D.__type
----@field CollisionShape2D Godot.CollisionShape2D.__type
----@field CollisionShape3D Godot.CollisionShape3D.__type
----@field ColorPalette Godot.ColorPalette.__type
----@field ColorPicker Godot.ColorPicker.__type
----@field ColorPickerButton Godot.ColorPickerButton.__type
----@field ColorRect Godot.ColorRect.__type
----@field Compositor Godot.Compositor.__type
----@field CompositorEffect Godot.CompositorEffect.__type
----@field CompressedCubemap Godot.CompressedCubemap.__type
----@field CompressedCubemapArray Godot.CompressedCubemapArray.__type
----@field CompressedTexture2D Godot.CompressedTexture2D.__type
----@field CompressedTexture2DArray Godot.CompressedTexture2DArray.__type
----@field CompressedTexture3D Godot.CompressedTexture3D.__type
----@field CompressedTextureLayered Godot.CompressedTextureLayered.__type
----@field ConcavePolygonShape2D Godot.ConcavePolygonShape2D.__type
----@field ConcavePolygonShape3D Godot.ConcavePolygonShape3D.__type
----@field ConeTwistJoint3D Godot.ConeTwistJoint3D.__type
----@field ConfigFile Godot.ConfigFile.__type
----@field ConfirmationDialog Godot.ConfirmationDialog.__type
----@field Container Godot.Container.__type
----@field Control Godot.Control.__type
----@field ConvertTransformModifier3D Godot.ConvertTransformModifier3D.__type
----@field ConvexPolygonShape2D Godot.ConvexPolygonShape2D.__type
----@field ConvexPolygonShape3D Godot.ConvexPolygonShape3D.__type
----@field CopyTransformModifier3D Godot.CopyTransformModifier3D.__type
----@field CpuParticles2D Godot.CpuParticles2D.__type
----@field CpuParticles3D Godot.CpuParticles3D.__type
----@field Crypto Godot.Crypto.__type
----@field CryptoKey Godot.CryptoKey.__type
----@field CsgBox3D Godot.CsgBox3D.__type
----@field CsgCombiner3D Godot.CsgCombiner3D.__type
----@field CsgCylinder3D Godot.CsgCylinder3D.__type
----@field CsgMesh3D Godot.CsgMesh3D.__type
----@field CsgPolygon3D Godot.CsgPolygon3D.__type
----@field CsgPrimitive3D Godot.CsgPrimitive3D.__type
----@field CsgShape3D Godot.CsgShape3D.__type
----@field CsgSphere3D Godot.CsgSphere3D.__type
----@field CsgTorus3D Godot.CsgTorus3D.__type
----@field CSharpScript Godot.CSharpScript.__type
----@field Cubemap Godot.Cubemap.__type
----@field CubemapArray Godot.CubemapArray.__type
----@field Curve Godot.Curve.__type
----@field Curve2D Godot.Curve2D.__type
----@field Curve3D Godot.Curve3D.__type
----@field CurveTexture Godot.CurveTexture.__type
----@field CurveXyzTexture Godot.CurveXyzTexture.__type
----@field CylinderMesh Godot.CylinderMesh.__type
----@field CylinderShape3D Godot.CylinderShape3D.__type
----@field DampedSpringJoint2D Godot.DampedSpringJoint2D.__type
----@field Decal Godot.Decal.__type
----@field DirAccess Godot.DirAccess.__type
----@field DirectionalLight2D Godot.DirectionalLight2D.__type
----@field DirectionalLight3D Godot.DirectionalLight3D.__type
----@field DisplayServerInstance Godot.DisplayServerInstance.__type
----@field DpiTexture Godot.DpiTexture.__type
----@field DtlsServer Godot.DtlsServer.__type
----@field EncodedObjectAsId Godot.EncodedObjectAsId.__type
----@field ENetConnection Godot.ENetConnection.__type
----@field ENetMultiplayerPeer Godot.ENetMultiplayerPeer.__type
----@field ENetPacketPeer Godot.ENetPacketPeer.__type
----@field EngineDebuggerInstance Godot.EngineDebuggerInstance.__type
----@field EngineInstance Godot.EngineInstance.__type
----@field EngineProfiler Godot.EngineProfiler.__type
----@field Environment Godot.Environment.__type
----@field Expression Godot.Expression.__type
----@field ExternalTexture Godot.ExternalTexture.__type
----@field Fabrik3D Godot.Fabrik3D.__type
----@field FastNoiseLite Godot.FastNoiseLite.__type
----@field FbxDocument Godot.FbxDocument.__type
----@field FbxState Godot.FbxState.__type
----@field FileAccess Godot.FileAccess.__type
----@field FileDialog Godot.FileDialog.__type
----@field FlowContainer Godot.FlowContainer.__type
----@field FogMaterial Godot.FogMaterial.__type
----@field FogVolume Godot.FogVolume.__type
----@field FoldableContainer Godot.FoldableContainer.__type
----@field FoldableGroup Godot.FoldableGroup.__type
----@field Font Godot.Font.__type
----@field FontFile Godot.FontFile.__type
----@field FontVariation Godot.FontVariation.__type
----@field FramebufferCacheRD Godot.FramebufferCacheRD.__type
----@field GDExtension Godot.GDExtension.__type
----@field GDExtensionManagerInstance Godot.GDExtensionManagerInstance.__type
----@field GDScript Godot.GDScript.__type
----@field Generic6DofJoint3D Godot.Generic6DofJoint3D.__type
----@field Geometry2DInstance Godot.Geometry2DInstance.__type
----@field Geometry3DInstance Godot.Geometry3DInstance.__type
----@field GeometryInstance3D Godot.GeometryInstance3D.__type
----@field GltfAccessor Godot.GltfAccessor.__type
----@field GltfAnimation Godot.GltfAnimation.__type
----@field GltfBufferView Godot.GltfBufferView.__type
----@field GltfCamera Godot.GltfCamera.__type
----@field GltfDocument Godot.GltfDocument.__type
----@field GltfDocumentExtension Godot.GltfDocumentExtension.__type
----@field GltfDocumentExtensionConvertImporterMesh Godot.GltfDocumentExtensionConvertImporterMesh.__type
----@field GltfLight Godot.GltfLight.__type
----@field GltfMesh Godot.GltfMesh.__type
----@field GltfNode Godot.GltfNode.__type
----@field GltfObjectModelProperty Godot.GltfObjectModelProperty.__type
----@field GltfPhysicsBody Godot.GltfPhysicsBody.__type
----@field GltfPhysicsShape Godot.GltfPhysicsShape.__type
----@field GltfSkeleton Godot.GltfSkeleton.__type
----@field GltfSkin Godot.GltfSkin.__type
----@field GltfSpecGloss Godot.GltfSpecGloss.__type
----@field GltfState Godot.GltfState.__type
----@field GltfTexture Godot.GltfTexture.__type
----@field GltfTextureSampler Godot.GltfTextureSampler.__type
----@field GodotInstance Godot.GodotInstance.__type
----@field GodotObject Godot.GodotObject.__type
----@field GodotThread Godot.GodotThread.__type
----@field GpuParticles2D Godot.GpuParticles2D.__type
----@field GpuParticles3D Godot.GpuParticles3D.__type
----@field GpuParticlesAttractor3D Godot.GpuParticlesAttractor3D.__type
----@field GpuParticlesAttractorBox3D Godot.GpuParticlesAttractorBox3D.__type
----@field GpuParticlesAttractorSphere3D Godot.GpuParticlesAttractorSphere3D.__type
----@field GpuParticlesAttractorVectorField3D Godot.GpuParticlesAttractorVectorField3D.__type
----@field GpuParticlesCollision3D Godot.GpuParticlesCollision3D.__type
----@field GpuParticlesCollisionBox3D Godot.GpuParticlesCollisionBox3D.__type
----@field GpuParticlesCollisionHeightField3D Godot.GpuParticlesCollisionHeightField3D.__type
----@field GpuParticlesCollisionSdf3D Godot.GpuParticlesCollisionSdf3D.__type
----@field GpuParticlesCollisionSphere3D Godot.GpuParticlesCollisionSphere3D.__type
----@field Gradient Godot.Gradient.__type
----@field GradientTexture1D Godot.GradientTexture1D.__type
----@field GradientTexture2D Godot.GradientTexture2D.__type
----@field GraphEdit Godot.GraphEdit.__type
----@field GraphElement Godot.GraphElement.__type
----@field GraphFrame Godot.GraphFrame.__type
----@field GraphNode Godot.GraphNode.__type
----@field GridContainer Godot.GridContainer.__type
----@field GridMap Godot.GridMap.__type
----@field GrooveJoint2D Godot.GrooveJoint2D.__type
----@field HashingContext Godot.HashingContext.__type
----@field HBoxContainer Godot.HBoxContainer.__type
----@field HeightMapShape3D Godot.HeightMapShape3D.__type
----@field HFlowContainer Godot.HFlowContainer.__type
----@field HingeJoint3D Godot.HingeJoint3D.__type
----@field HmacContext Godot.HmacContext.__type
----@field HScrollBar Godot.HScrollBar.__type
----@field HSeparator Godot.HSeparator.__type
----@field HSlider Godot.HSlider.__type
----@field HSplitContainer Godot.HSplitContainer.__type
----@field HttpClient Godot.HttpClient.__type
----@field HttpRequest Godot.HttpRequest.__type
----@field IKModifier3D Godot.IKModifier3D.__type
----@field Image Godot.Image.__type
----@field ImageFormatLoader Godot.ImageFormatLoader.__type
----@field ImageFormatLoaderExtension Godot.ImageFormatLoaderExtension.__type
----@field ImageTexture Godot.ImageTexture.__type
----@field ImageTexture3D Godot.ImageTexture3D.__type
----@field ImageTextureLayered Godot.ImageTextureLayered.__type
----@field ImmediateMesh Godot.ImmediateMesh.__type
----@field ImporterMesh Godot.ImporterMesh.__type
----@field ImporterMeshInstance3D Godot.ImporterMeshInstance3D.__type
----@field InputEvent Godot.InputEvent.__type
----@field InputEventAction Godot.InputEventAction.__type
----@field InputEventFromWindow Godot.InputEventFromWindow.__type
----@field InputEventGesture Godot.InputEventGesture.__type
----@field InputEventJoypadButton Godot.InputEventJoypadButton.__type
----@field InputEventJoypadMotion Godot.InputEventJoypadMotion.__type
----@field InputEventKey Godot.InputEventKey.__type
----@field InputEventMagnifyGesture Godot.InputEventMagnifyGesture.__type
----@field InputEventMidi Godot.InputEventMidi.__type
----@field InputEventMouse Godot.InputEventMouse.__type
----@field InputEventMouseButton Godot.InputEventMouseButton.__type
----@field InputEventMouseMotion Godot.InputEventMouseMotion.__type
----@field InputEventPanGesture Godot.InputEventPanGesture.__type
----@field InputEventScreenDrag Godot.InputEventScreenDrag.__type
----@field InputEventScreenTouch Godot.InputEventScreenTouch.__type
----@field InputEventShortcut Godot.InputEventShortcut.__type
----@field InputEventWithModifiers Godot.InputEventWithModifiers.__type
----@field InputInstance Godot.InputInstance.__type
----@field InputMapInstance Godot.InputMapInstance.__type
----@field InstancePlaceholder Godot.InstancePlaceholder.__type
----@field IntervalTweener Godot.IntervalTweener.__type
----@field IPInstance Godot.IPInstance.__type
----@field ItemList Godot.ItemList.__type
----@field IterateIK3D Godot.IterateIK3D.__type
----@field JacobianIK3D Godot.JacobianIK3D.__type
----@field JavaClass Godot.JavaClass.__type
----@field JavaClassWrapperInstance Godot.JavaClassWrapperInstance.__type
----@field JavaObject Godot.JavaObject.__type
----@field JavaScriptBridgeInstance Godot.JavaScriptBridgeInstance.__type
----@field JavaScriptObject Godot.JavaScriptObject.__type
----@field JniSingleton Godot.JniSingleton.__type
----@field Joint2D Godot.Joint2D.__type
----@field Joint3D Godot.Joint3D.__type
----@field JointLimitation3D Godot.JointLimitation3D.__type
----@field JointLimitationCone3D Godot.JointLimitationCone3D.__type
----@field Json Godot.Json.__type
----@field JsonRpc Godot.JsonRpc.__type
----@field KinematicCollision2D Godot.KinematicCollision2D.__type
----@field KinematicCollision3D Godot.KinematicCollision3D.__type
----@field Label Godot.Label.__type
----@field Label3D Godot.Label3D.__type
----@field LabelSettings Godot.LabelSettings.__type
----@field Light2D Godot.Light2D.__type
----@field Light3D Godot.Light3D.__type
----@field LightmapGI Godot.LightmapGI.__type
----@field LightmapGIData Godot.LightmapGIData.__type
----@field Lightmapper Godot.Lightmapper.__type
----@field LightmapperRD Godot.LightmapperRD.__type
----@field LightmapProbe Godot.LightmapProbe.__type
----@field LightOccluder2D Godot.LightOccluder2D.__type
----@field LimitAngularVelocityModifier3D Godot.LimitAngularVelocityModifier3D.__type
----@field Line2D Godot.Line2D.__type
----@field LineEdit Godot.LineEdit.__type
----@field LinkButton Godot.LinkButton.__type
----@field Logger Godot.Logger.__type
----@field LookAtModifier3D Godot.LookAtModifier3D.__type
----@field MainLoop Godot.MainLoop.__type
----@field MarginContainer Godot.MarginContainer.__type
----@field Marker2D Godot.Marker2D.__type
----@field Marker3D Godot.Marker3D.__type
----@field MarshallsInstance Godot.MarshallsInstance.__type
----@field Material Godot.Material.__type
----@field MenuBar Godot.MenuBar.__type
----@field MenuButton Godot.MenuButton.__type
----@field Mesh Godot.Mesh.__type
----@field MeshConvexDecompositionSettings Godot.MeshConvexDecompositionSettings.__type
----@field MeshDataTool Godot.MeshDataTool.__type
----@field MeshInstance2D Godot.MeshInstance2D.__type
----@field MeshInstance3D Godot.MeshInstance3D.__type
----@field MeshLibrary Godot.MeshLibrary.__type
----@field MeshTexture Godot.MeshTexture.__type
----@field MethodTweener Godot.MethodTweener.__type
----@field MissingNode Godot.MissingNode.__type
----@field MissingResource Godot.MissingResource.__type
----@field MobileVRInterface Godot.MobileVRInterface.__type
----@field ModifierBoneTarget3D Godot.ModifierBoneTarget3D.__type
----@field MovieWriter Godot.MovieWriter.__type
----@field MultiMesh Godot.MultiMesh.__type
----@field MultiMeshInstance2D Godot.MultiMeshInstance2D.__type
----@field MultiMeshInstance3D Godot.MultiMeshInstance3D.__type
----@field MultiplayerApi Godot.MultiplayerApi.__type
----@field MultiplayerApiExtension Godot.MultiplayerApiExtension.__type
----@field MultiplayerPeer Godot.MultiplayerPeer.__type
----@field MultiplayerPeerExtension Godot.MultiplayerPeerExtension.__type
----@field MultiplayerSpawner Godot.MultiplayerSpawner.__type
----@field MultiplayerSynchronizer Godot.MultiplayerSynchronizer.__type
----@field Mutex Godot.Mutex.__type
----@field NativeMenuInstance Godot.NativeMenuInstance.__type
----@field NavigationAgent2D Godot.NavigationAgent2D.__type
----@field NavigationAgent3D Godot.NavigationAgent3D.__type
----@field NavigationLink2D Godot.NavigationLink2D.__type
----@field NavigationLink3D Godot.NavigationLink3D.__type
----@field NavigationMesh Godot.NavigationMesh.__type
----@field NavigationMeshGeneratorInstance Godot.NavigationMeshGeneratorInstance.__type
----@field NavigationMeshSourceGeometryData2D Godot.NavigationMeshSourceGeometryData2D.__type
----@field NavigationMeshSourceGeometryData3D Godot.NavigationMeshSourceGeometryData3D.__type
----@field NavigationObstacle2D Godot.NavigationObstacle2D.__type
----@field NavigationObstacle3D Godot.NavigationObstacle3D.__type
----@field NavigationPathQueryParameters2D Godot.NavigationPathQueryParameters2D.__type
----@field NavigationPathQueryParameters3D Godot.NavigationPathQueryParameters3D.__type
----@field NavigationPathQueryResult2D Godot.NavigationPathQueryResult2D.__type
----@field NavigationPathQueryResult3D Godot.NavigationPathQueryResult3D.__type
----@field NavigationPolygon Godot.NavigationPolygon.__type
----@field NavigationRegion2D Godot.NavigationRegion2D.__type
----@field NavigationRegion3D Godot.NavigationRegion3D.__type
----@field NavigationServer2DInstance Godot.NavigationServer2DInstance.__type
----@field NavigationServer2DManagerInstance Godot.NavigationServer2DManagerInstance.__type
----@field NavigationServer3DInstance Godot.NavigationServer3DInstance.__type
----@field NavigationServer3DManagerInstance Godot.NavigationServer3DManagerInstance.__type
----@field NinePatchRect Godot.NinePatchRect.__type
----@field Node Godot.Node.__type
----@field Node2D Godot.Node2D.__type
----@field Node3D Godot.Node3D.__type
----@field Node3DGizmo Godot.Node3DGizmo.__type
----@field Noise Godot.Noise.__type
----@field NoiseTexture2D Godot.NoiseTexture2D.__type
----@field NoiseTexture3D Godot.NoiseTexture3D.__type
----@field Occluder3D Godot.Occluder3D.__type
----@field OccluderInstance3D Godot.OccluderInstance3D.__type
----@field OccluderPolygon2D Godot.OccluderPolygon2D.__type
----@field OfflineMultiplayerPeer Godot.OfflineMultiplayerPeer.__type
----@field OggPacketSequence Godot.OggPacketSequence.__type
----@field OggPacketSequencePlayback Godot.OggPacketSequencePlayback.__type
----@field OmniLight3D Godot.OmniLight3D.__type
----@field OpenXRAction Godot.OpenXRAction.__type
----@field OpenXRActionBindingModifier Godot.OpenXRActionBindingModifier.__type
----@field OpenXRActionMap Godot.OpenXRActionMap.__type
----@field OpenXRActionSet Godot.OpenXRActionSet.__type
----@field OpenXRAnalogThresholdModifier Godot.OpenXRAnalogThresholdModifier.__type
----@field OpenXRAnchorTracker Godot.OpenXRAnchorTracker.__type
----@field OpenXRAndroidThreadSettingsExtension Godot.OpenXRAndroidThreadSettingsExtension.__type
----@field OpenXRApiExtension Godot.OpenXRApiExtension.__type
----@field OpenXRBindingModifier Godot.OpenXRBindingModifier.__type
----@field OpenXRCompositionLayer Godot.OpenXRCompositionLayer.__type
----@field OpenXRCompositionLayerCylinder Godot.OpenXRCompositionLayerCylinder.__type
----@field OpenXRCompositionLayerEquirect Godot.OpenXRCompositionLayerEquirect.__type
----@field OpenXRCompositionLayerQuad Godot.OpenXRCompositionLayerQuad.__type
----@field OpenXRDpadBindingModifier Godot.OpenXRDpadBindingModifier.__type
----@field OpenXRExtensionWrapper Godot.OpenXRExtensionWrapper.__type
----@field OpenXRExtensionWrapperExtension Godot.OpenXRExtensionWrapperExtension.__type
----@field OpenXRFrameSynthesisExtension Godot.OpenXRFrameSynthesisExtension.__type
----@field OpenXRFutureExtension Godot.OpenXRFutureExtension.__type
----@field OpenXRFutureResult Godot.OpenXRFutureResult.__type
----@field OpenXRHand Godot.OpenXRHand.__type
----@field OpenXRHapticBase Godot.OpenXRHapticBase.__type
----@field OpenXRHapticVibration Godot.OpenXRHapticVibration.__type
----@field OpenXRInteractionProfile Godot.OpenXRInteractionProfile.__type
----@field OpenXRInteractionProfileMetadata Godot.OpenXRInteractionProfileMetadata.__type
----@field OpenXRInterface Godot.OpenXRInterface.__type
----@field OpenXRIPBinding Godot.OpenXRIPBinding.__type
----@field OpenXripBindingModifier Godot.OpenXripBindingModifier.__type
----@field OpenXRMarkerTracker Godot.OpenXRMarkerTracker.__type
----@field OpenXRPlaneTracker Godot.OpenXRPlaneTracker.__type
----@field OpenXRRenderModel Godot.OpenXRRenderModel.__type
----@field OpenXRRenderModelExtension Godot.OpenXRRenderModelExtension.__type
----@field OpenXRRenderModelManager Godot.OpenXRRenderModelManager.__type
----@field OpenXRSpatialAnchorCapability Godot.OpenXRSpatialAnchorCapability.__type
----@field OpenXRSpatialCapabilityConfigurationAnchor Godot.OpenXRSpatialCapabilityConfigurationAnchor.__type
----@field OpenXRSpatialCapabilityConfigurationAprilTag Godot.OpenXRSpatialCapabilityConfigurationAprilTag.__type
----@field OpenXRSpatialCapabilityConfigurationAruco Godot.OpenXRSpatialCapabilityConfigurationAruco.__type
----@field OpenXRSpatialCapabilityConfigurationBaseHeader Godot.OpenXRSpatialCapabilityConfigurationBaseHeader.__type
----@field OpenXRSpatialCapabilityConfigurationMicroQrCode Godot.OpenXRSpatialCapabilityConfigurationMicroQrCode.__type
----@field OpenXRSpatialCapabilityConfigurationPlaneTracking Godot.OpenXRSpatialCapabilityConfigurationPlaneTracking.__type
----@field OpenXRSpatialCapabilityConfigurationQrCode Godot.OpenXRSpatialCapabilityConfigurationQrCode.__type
----@field OpenXRSpatialComponentAnchorList Godot.OpenXRSpatialComponentAnchorList.__type
----@field OpenXRSpatialComponentBounded2DList Godot.OpenXRSpatialComponentBounded2DList.__type
----@field OpenXRSpatialComponentBounded3DList Godot.OpenXRSpatialComponentBounded3DList.__type
----@field OpenXRSpatialComponentData Godot.OpenXRSpatialComponentData.__type
----@field OpenXRSpatialComponentMarkerList Godot.OpenXRSpatialComponentMarkerList.__type
----@field OpenXRSpatialComponentMesh2DList Godot.OpenXRSpatialComponentMesh2DList.__type
----@field OpenXRSpatialComponentMesh3DList Godot.OpenXRSpatialComponentMesh3DList.__type
----@field OpenXRSpatialComponentParentList Godot.OpenXRSpatialComponentParentList.__type
----@field OpenXRSpatialComponentPersistenceList Godot.OpenXRSpatialComponentPersistenceList.__type
----@field OpenXRSpatialComponentPlaneAlignmentList Godot.OpenXRSpatialComponentPlaneAlignmentList.__type
----@field OpenXRSpatialComponentPlaneSemanticLabelList Godot.OpenXRSpatialComponentPlaneSemanticLabelList.__type
----@field OpenXRSpatialComponentPolygon2DList Godot.OpenXRSpatialComponentPolygon2DList.__type
----@field OpenXRSpatialContextPersistenceConfig Godot.OpenXRSpatialContextPersistenceConfig.__type
----@field OpenXRSpatialEntityExtension Godot.OpenXRSpatialEntityExtension.__type
----@field OpenXRSpatialEntityTracker Godot.OpenXRSpatialEntityTracker.__type
----@field OpenXRSpatialMarkerTrackingCapability Godot.OpenXRSpatialMarkerTrackingCapability.__type
----@field OpenXRSpatialPlaneTrackingCapability Godot.OpenXRSpatialPlaneTrackingCapability.__type
----@field OpenXRSpatialQueryResultData Godot.OpenXRSpatialQueryResultData.__type
----@field OpenXRStructureBase Godot.OpenXRStructureBase.__type
----@field OpenXRVisibilityMask Godot.OpenXRVisibilityMask.__type
----@field OptimizedTranslation Godot.OptimizedTranslation.__type
----@field OptionButton Godot.OptionButton.__type
----@field OrmMaterial3D Godot.OrmMaterial3D.__type
----@field OSInstance Godot.OSInstance.__type
----@field PackedDataContainer Godot.PackedDataContainer.__type
----@field PackedDataContainerRef Godot.PackedDataContainerRef.__type
----@field PackedScene Godot.PackedScene.__type
----@field PacketPeer Godot.PacketPeer.__type
----@field PacketPeerDtls Godot.PacketPeerDtls.__type
----@field PacketPeerExtension Godot.PacketPeerExtension.__type
----@field PacketPeerStream Godot.PacketPeerStream.__type
----@field PacketPeerUdp Godot.PacketPeerUdp.__type
----@field Panel Godot.Panel.__type
----@field PanelContainer Godot.PanelContainer.__type
----@field PanoramaSkyMaterial Godot.PanoramaSkyMaterial.__type
----@field Parallax2D Godot.Parallax2D.__type
----@field ParallaxBackground Godot.ParallaxBackground.__type
----@field ParallaxLayer Godot.ParallaxLayer.__type
----@field ParticleProcessMaterial Godot.ParticleProcessMaterial.__type
----@field Path2D Godot.Path2D.__type
----@field Path3D Godot.Path3D.__type
----@field PathFollow2D Godot.PathFollow2D.__type
----@field PathFollow3D Godot.PathFollow3D.__type
----@field PckPacker Godot.PckPacker.__type
----@field PerformanceInstance Godot.PerformanceInstance.__type
----@field PhysicalBone2D Godot.PhysicalBone2D.__type
----@field PhysicalBone3D Godot.PhysicalBone3D.__type
----@field PhysicalBoneSimulator3D Godot.PhysicalBoneSimulator3D.__type
----@field PhysicalSkyMaterial Godot.PhysicalSkyMaterial.__type
----@field PhysicsBody2D Godot.PhysicsBody2D.__type
----@field PhysicsBody3D Godot.PhysicsBody3D.__type
----@field PhysicsDirectBodyState2D Godot.PhysicsDirectBodyState2D.__type
----@field PhysicsDirectBodyState2DExtension Godot.PhysicsDirectBodyState2DExtension.__type
----@field PhysicsDirectBodyState3D Godot.PhysicsDirectBodyState3D.__type
----@field PhysicsDirectBodyState3DExtension Godot.PhysicsDirectBodyState3DExtension.__type
----@field PhysicsDirectSpaceState2D Godot.PhysicsDirectSpaceState2D.__type
----@field PhysicsDirectSpaceState2DExtension Godot.PhysicsDirectSpaceState2DExtension.__type
----@field PhysicsDirectSpaceState3D Godot.PhysicsDirectSpaceState3D.__type
----@field PhysicsDirectSpaceState3DExtension Godot.PhysicsDirectSpaceState3DExtension.__type
----@field PhysicsMaterial Godot.PhysicsMaterial.__type
----@field PhysicsPointQueryParameters2D Godot.PhysicsPointQueryParameters2D.__type
----@field PhysicsPointQueryParameters3D Godot.PhysicsPointQueryParameters3D.__type
----@field PhysicsRayQueryParameters2D Godot.PhysicsRayQueryParameters2D.__type
----@field PhysicsRayQueryParameters3D Godot.PhysicsRayQueryParameters3D.__type
----@field PhysicsServer2DExtension Godot.PhysicsServer2DExtension.__type
----@field PhysicsServer2DInstance Godot.PhysicsServer2DInstance.__type
----@field PhysicsServer2DManagerInstance Godot.PhysicsServer2DManagerInstance.__type
----@field PhysicsServer3DExtension Godot.PhysicsServer3DExtension.__type
----@field PhysicsServer3DInstance Godot.PhysicsServer3DInstance.__type
----@field PhysicsServer3DManagerInstance Godot.PhysicsServer3DManagerInstance.__type
----@field PhysicsServer3DRenderingServerHandler Godot.PhysicsServer3DRenderingServerHandler.__type
----@field PhysicsShapeQueryParameters2D Godot.PhysicsShapeQueryParameters2D.__type
----@field PhysicsShapeQueryParameters3D Godot.PhysicsShapeQueryParameters3D.__type
----@field PhysicsTestMotionParameters2D Godot.PhysicsTestMotionParameters2D.__type
----@field PhysicsTestMotionParameters3D Godot.PhysicsTestMotionParameters3D.__type
----@field PhysicsTestMotionResult2D Godot.PhysicsTestMotionResult2D.__type
----@field PhysicsTestMotionResult3D Godot.PhysicsTestMotionResult3D.__type
----@field PinJoint2D Godot.PinJoint2D.__type
----@field PinJoint3D Godot.PinJoint3D.__type
----@field PlaceholderCubemap Godot.PlaceholderCubemap.__type
----@field PlaceholderCubemapArray Godot.PlaceholderCubemapArray.__type
----@field PlaceholderMaterial Godot.PlaceholderMaterial.__type
----@field PlaceholderMesh Godot.PlaceholderMesh.__type
----@field PlaceholderTexture2D Godot.PlaceholderTexture2D.__type
----@field PlaceholderTexture2DArray Godot.PlaceholderTexture2DArray.__type
----@field PlaceholderTexture3D Godot.PlaceholderTexture3D.__type
----@field PlaceholderTextureLayered Godot.PlaceholderTextureLayered.__type
----@field PlaneMesh Godot.PlaneMesh.__type
----@field PointLight2D Godot.PointLight2D.__type
----@field PointMesh Godot.PointMesh.__type
----@field Polygon2D Godot.Polygon2D.__type
----@field PolygonOccluder3D Godot.PolygonOccluder3D.__type
----@field PolygonPathFinder Godot.PolygonPathFinder.__type
----@field Popup Godot.Popup.__type
----@field PopupMenu Godot.PopupMenu.__type
----@field PopupPanel Godot.PopupPanel.__type
----@field PortableCompressedTexture2D Godot.PortableCompressedTexture2D.__type
----@field PrimitiveMesh Godot.PrimitiveMesh.__type
----@field PrismMesh Godot.PrismMesh.__type
----@field ProceduralSkyMaterial Godot.ProceduralSkyMaterial.__type
----@field ProgressBar Godot.ProgressBar.__type
----@field ProjectSettingsInstance Godot.ProjectSettingsInstance.__type
----@field PropertyTweener Godot.PropertyTweener.__type
----@field QuadMesh Godot.QuadMesh.__type
----@field QuadOccluder3D Godot.QuadOccluder3D.__type
----@field RandomNumberGenerator Godot.RandomNumberGenerator.__type
----@field Range Godot.Range.__type
----@field RayCast2D Godot.RayCast2D.__type
----@field RayCast3D Godot.RayCast3D.__type
----@field RDAttachmentFormat Godot.RDAttachmentFormat.__type
----@field RDFramebufferPass Godot.RDFramebufferPass.__type
----@field RDPipelineColorBlendState Godot.RDPipelineColorBlendState.__type
----@field RDPipelineColorBlendStateAttachment Godot.RDPipelineColorBlendStateAttachment.__type
----@field RDPipelineDepthStencilState Godot.RDPipelineDepthStencilState.__type
----@field RDPipelineMultisampleState Godot.RDPipelineMultisampleState.__type
----@field RDPipelineRasterizationState Godot.RDPipelineRasterizationState.__type
----@field RDPipelineSpecializationConstant Godot.RDPipelineSpecializationConstant.__type
----@field RDSamplerState Godot.RDSamplerState.__type
----@field RDShaderFile Godot.RDShaderFile.__type
----@field RDShaderSource Godot.RDShaderSource.__type
----@field RDShaderSpirV Godot.RDShaderSpirV.__type
----@field RDTextureFormat Godot.RDTextureFormat.__type
----@field RDTextureView Godot.RDTextureView.__type
----@field RDUniform Godot.RDUniform.__type
----@field RDVertexAttribute Godot.RDVertexAttribute.__type
----@field RectangleShape2D Godot.RectangleShape2D.__type
----@field RefCounted Godot.RefCounted.__type
----@field ReferenceRect Godot.ReferenceRect.__type
----@field ReflectionProbe Godot.ReflectionProbe.__type
----@field RegEx Godot.RegEx.__type
----@field RegExMatch Godot.RegExMatch.__type
----@field RemoteTransform2D Godot.RemoteTransform2D.__type
----@field RemoteTransform3D Godot.RemoteTransform3D.__type
----@field RenderData Godot.RenderData.__type
----@field RenderDataExtension Godot.RenderDataExtension.__type
----@field RenderDataRD Godot.RenderDataRD.__type
----@field RenderingDevice Godot.RenderingDevice.__type
----@field RenderingServerInstance Godot.RenderingServerInstance.__type
----@field RenderSceneBuffers Godot.RenderSceneBuffers.__type
----@field RenderSceneBuffersConfiguration Godot.RenderSceneBuffersConfiguration.__type
----@field RenderSceneBuffersExtension Godot.RenderSceneBuffersExtension.__type
----@field RenderSceneBuffersRD Godot.RenderSceneBuffersRD.__type
----@field RenderSceneData Godot.RenderSceneData.__type
----@field RenderSceneDataExtension Godot.RenderSceneDataExtension.__type
----@field RenderSceneDataRD Godot.RenderSceneDataRD.__type
----@field Resource Godot.Resource.__type
----@field ResourceFormatLoader Godot.ResourceFormatLoader.__type
----@field ResourceFormatSaver Godot.ResourceFormatSaver.__type
----@field ResourceImporter Godot.ResourceImporter.__type
----@field ResourceLoaderInstance Godot.ResourceLoaderInstance.__type
----@field ResourcePreloader Godot.ResourcePreloader.__type
----@field ResourceSaverInstance Godot.ResourceSaverInstance.__type
----@field ResourceUidInstance Godot.ResourceUidInstance.__type
----@field RetargetModifier3D Godot.RetargetModifier3D.__type
----@field RibbonTrailMesh Godot.RibbonTrailMesh.__type
----@field RichTextEffect Godot.RichTextEffect.__type
----@field RichTextLabel Godot.RichTextLabel.__type
----@field RigidBody2D Godot.RigidBody2D.__type
----@field RigidBody3D Godot.RigidBody3D.__type
----@field RootMotionView Godot.RootMotionView.__type
----@field SceneMultiplayer Godot.SceneMultiplayer.__type
----@field SceneReplicationConfig Godot.SceneReplicationConfig.__type
----@field SceneState Godot.SceneState.__type
----@field SceneTree Godot.SceneTree.__type
----@field SceneTreeTimer Godot.SceneTreeTimer.__type
----@field Script Godot.Script.__type
----@field ScriptBacktrace Godot.ScriptBacktrace.__type
----@field ScriptExtension Godot.ScriptExtension.__type
----@field ScriptLanguage Godot.ScriptLanguage.__type
----@field ScriptLanguageExtension Godot.ScriptLanguageExtension.__type
----@field ScrollBar Godot.ScrollBar.__type
----@field ScrollContainer Godot.ScrollContainer.__type
----@field SegmentShape2D Godot.SegmentShape2D.__type
----@field Semaphore Godot.Semaphore.__type
----@field SeparationRayShape2D Godot.SeparationRayShape2D.__type
----@field SeparationRayShape3D Godot.SeparationRayShape3D.__type
----@field Separator Godot.Separator.__type
----@field Shader Godot.Shader.__type
----@field ShaderGlobalsOverride Godot.ShaderGlobalsOverride.__type
----@field ShaderInclude Godot.ShaderInclude.__type
----@field ShaderIncludeDB Godot.ShaderIncludeDB.__type
----@field ShaderMaterial Godot.ShaderMaterial.__type
----@field Shape2D Godot.Shape2D.__type
----@field Shape3D Godot.Shape3D.__type
----@field ShapeCast2D Godot.ShapeCast2D.__type
----@field ShapeCast3D Godot.ShapeCast3D.__type
----@field Shortcut Godot.Shortcut.__type
----@field Skeleton2D Godot.Skeleton2D.__type
----@field Skeleton3D Godot.Skeleton3D.__type
----@field SkeletonIK3D Godot.SkeletonIK3D.__type
----@field SkeletonModification2D Godot.SkeletonModification2D.__type
----@field SkeletonModification2DCcdik Godot.SkeletonModification2DCcdik.__type
----@field SkeletonModification2DFabrik Godot.SkeletonModification2DFabrik.__type
----@field SkeletonModification2DJiggle Godot.SkeletonModification2DJiggle.__type
----@field SkeletonModification2DLookAt Godot.SkeletonModification2DLookAt.__type
----@field SkeletonModification2DPhysicalBones Godot.SkeletonModification2DPhysicalBones.__type
----@field SkeletonModification2DStackHolder Godot.SkeletonModification2DStackHolder.__type
----@field SkeletonModification2DTwoBoneIK Godot.SkeletonModification2DTwoBoneIK.__type
----@field SkeletonModificationStack2D Godot.SkeletonModificationStack2D.__type
----@field SkeletonModifier3D Godot.SkeletonModifier3D.__type
----@field SkeletonProfile Godot.SkeletonProfile.__type
----@field SkeletonProfileHumanoid Godot.SkeletonProfileHumanoid.__type
----@field Skin Godot.Skin.__type
----@field SkinReference Godot.SkinReference.__type
----@field Sky Godot.Sky.__type
----@field Slider Godot.Slider.__type
----@field SliderJoint3D Godot.SliderJoint3D.__type
----@field SocketServer Godot.SocketServer.__type
----@field SoftBody3D Godot.SoftBody3D.__type
----@field SphereMesh Godot.SphereMesh.__type
----@field SphereOccluder3D Godot.SphereOccluder3D.__type
----@field SphereShape3D Godot.SphereShape3D.__type
----@field SpinBox Godot.SpinBox.__type
----@field SplineIK3D Godot.SplineIK3D.__type
----@field SplitContainer Godot.SplitContainer.__type
----@field SpotLight3D Godot.SpotLight3D.__type
----@field SpringArm3D Godot.SpringArm3D.__type
----@field SpringBoneCollision3D Godot.SpringBoneCollision3D.__type
----@field SpringBoneCollisionCapsule3D Godot.SpringBoneCollisionCapsule3D.__type
----@field SpringBoneCollisionPlane3D Godot.SpringBoneCollisionPlane3D.__type
----@field SpringBoneCollisionSphere3D Godot.SpringBoneCollisionSphere3D.__type
----@field SpringBoneSimulator3D Godot.SpringBoneSimulator3D.__type
----@field Sprite2D Godot.Sprite2D.__type
----@field Sprite3D Godot.Sprite3D.__type
----@field SpriteBase3D Godot.SpriteBase3D.__type
----@field SpriteFrames Godot.SpriteFrames.__type
----@field StandardMaterial3D Godot.StandardMaterial3D.__type
----@field StaticBody2D Godot.StaticBody2D.__type
----@field StaticBody3D Godot.StaticBody3D.__type
----@field StatusIndicator Godot.StatusIndicator.__type
----@field StreamPeer Godot.StreamPeer.__type
----@field StreamPeerBuffer Godot.StreamPeerBuffer.__type
----@field StreamPeerExtension Godot.StreamPeerExtension.__type
----@field StreamPeerGZip Godot.StreamPeerGZip.__type
----@field StreamPeerSocket Godot.StreamPeerSocket.__type
----@field StreamPeerTcp Godot.StreamPeerTcp.__type
----@field StreamPeerTls Godot.StreamPeerTls.__type
----@field StreamPeerUds Godot.StreamPeerUds.__type
----@field StyleBox Godot.StyleBox.__type
----@field StyleBoxEmpty Godot.StyleBoxEmpty.__type
----@field StyleBoxFlat Godot.StyleBoxFlat.__type
----@field StyleBoxLine Godot.StyleBoxLine.__type
----@field StyleBoxTexture Godot.StyleBoxTexture.__type
----@field SubtweenTweener Godot.SubtweenTweener.__type
----@field SubViewport Godot.SubViewport.__type
----@field SubViewportContainer Godot.SubViewportContainer.__type
----@field SurfaceTool Godot.SurfaceTool.__type
----@field SyntaxHighlighter Godot.SyntaxHighlighter.__type
----@field SystemFont Godot.SystemFont.__type
----@field TabBar Godot.TabBar.__type
----@field TabContainer Godot.TabContainer.__type
----@field TcpServer Godot.TcpServer.__type
----@field TextEdit Godot.TextEdit.__type
----@field TextLine Godot.TextLine.__type
----@field TextMesh Godot.TextMesh.__type
----@field TextParagraph Godot.TextParagraph.__type
----@field TextServer Godot.TextServer.__type
----@field TextServerAdvanced Godot.TextServerAdvanced.__type
----@field TextServerDummy Godot.TextServerDummy.__type
----@field TextServerExtension Godot.TextServerExtension.__type
----@field TextServerManagerInstance Godot.TextServerManagerInstance.__type
----@field Texture Godot.Texture.__type
----@field Texture2D Godot.Texture2D.__type
----@field Texture2DArray Godot.Texture2DArray.__type
----@field Texture2DArrayRD Godot.Texture2DArrayRD.__type
----@field Texture2Drd Godot.Texture2Drd.__type
----@field Texture3D Godot.Texture3D.__type
----@field Texture3Drd Godot.Texture3Drd.__type
----@field TextureButton Godot.TextureButton.__type
----@field TextureCubemapArrayRD Godot.TextureCubemapArrayRD.__type
----@field TextureCubemapRD Godot.TextureCubemapRD.__type
----@field TextureLayered Godot.TextureLayered.__type
----@field TextureLayeredRD Godot.TextureLayeredRD.__type
----@field TextureProgressBar Godot.TextureProgressBar.__type
----@field TextureRect Godot.TextureRect.__type
----@field Theme Godot.Theme.__type
----@field ThemeDBInstance Godot.ThemeDBInstance.__type
----@field TileData Godot.TileData.__type
----@field TileMap Godot.TileMap.__type
----@field TileMapLayer Godot.TileMapLayer.__type
----@field TileMapPattern Godot.TileMapPattern.__type
----@field TileSet Godot.TileSet.__type
----@field TileSetAtlasSource Godot.TileSetAtlasSource.__type
----@field TileSetScenesCollectionSource Godot.TileSetScenesCollectionSource.__type
----@field TileSetSource Godot.TileSetSource.__type
----@field TimeInstance Godot.TimeInstance.__type
----@field Timer Godot.Timer.__type
----@field TlsOptions Godot.TlsOptions.__type
----@field TorusMesh Godot.TorusMesh.__type
----@field TouchScreenButton Godot.TouchScreenButton.__type
----@field Translation Godot.Translation.__type
----@field TranslationDomain Godot.TranslationDomain.__type
----@field TranslationServerInstance Godot.TranslationServerInstance.__type
----@field Tree Godot.Tree.__type
----@field TreeItem Godot.TreeItem.__type
----@field TriangleMesh Godot.TriangleMesh.__type
----@field TubeTrailMesh Godot.TubeTrailMesh.__type
----@field Tween Godot.Tween.__type
----@field Tweener Godot.Tweener.__type
----@field TwoBoneIK3D Godot.TwoBoneIK3D.__type
----@field UdpServer Godot.UdpServer.__type
----@field UdsServer Godot.UdsServer.__type
----@field UndoRedo Godot.UndoRedo.__type
----@field UniformSetCacheRD Godot.UniformSetCacheRD.__type
----@field Upnp Godot.Upnp.__type
----@field UpnpDevice Godot.UpnpDevice.__type
----@field VBoxContainer Godot.VBoxContainer.__type
----@field VehicleBody3D Godot.VehicleBody3D.__type
----@field VehicleWheel3D Godot.VehicleWheel3D.__type
----@field VFlowContainer Godot.VFlowContainer.__type
----@field VideoStream Godot.VideoStream.__type
----@field VideoStreamPlayback Godot.VideoStreamPlayback.__type
----@field VideoStreamPlayer Godot.VideoStreamPlayer.__type
----@field VideoStreamTheora Godot.VideoStreamTheora.__type
----@field Viewport Godot.Viewport.__type
----@field ViewportTexture Godot.ViewportTexture.__type
----@field VisibleOnScreenEnabler2D Godot.VisibleOnScreenEnabler2D.__type
----@field VisibleOnScreenEnabler3D Godot.VisibleOnScreenEnabler3D.__type
----@field VisibleOnScreenNotifier2D Godot.VisibleOnScreenNotifier2D.__type
----@field VisibleOnScreenNotifier3D Godot.VisibleOnScreenNotifier3D.__type
----@field VisualInstance3D Godot.VisualInstance3D.__type
----@field VisualShader Godot.VisualShader.__type
----@field VisualShaderNode Godot.VisualShaderNode.__type
----@field VisualShaderNodeBillboard Godot.VisualShaderNodeBillboard.__type
----@field VisualShaderNodeBooleanConstant Godot.VisualShaderNodeBooleanConstant.__type
----@field VisualShaderNodeBooleanParameter Godot.VisualShaderNodeBooleanParameter.__type
----@field VisualShaderNodeClamp Godot.VisualShaderNodeClamp.__type
----@field VisualShaderNodeColorConstant Godot.VisualShaderNodeColorConstant.__type
----@field VisualShaderNodeColorFunc Godot.VisualShaderNodeColorFunc.__type
----@field VisualShaderNodeColorOp Godot.VisualShaderNodeColorOp.__type
----@field VisualShaderNodeColorParameter Godot.VisualShaderNodeColorParameter.__type
----@field VisualShaderNodeComment Godot.VisualShaderNodeComment.__type
----@field VisualShaderNodeCompare Godot.VisualShaderNodeCompare.__type
----@field VisualShaderNodeConstant Godot.VisualShaderNodeConstant.__type
----@field VisualShaderNodeCubemap Godot.VisualShaderNodeCubemap.__type
----@field VisualShaderNodeCubemapParameter Godot.VisualShaderNodeCubemapParameter.__type
----@field VisualShaderNodeCurveTexture Godot.VisualShaderNodeCurveTexture.__type
----@field VisualShaderNodeCurveXyzTexture Godot.VisualShaderNodeCurveXyzTexture.__type
----@field VisualShaderNodeCustom Godot.VisualShaderNodeCustom.__type
----@field VisualShaderNodeDerivativeFunc Godot.VisualShaderNodeDerivativeFunc.__type
----@field VisualShaderNodeDeterminant Godot.VisualShaderNodeDeterminant.__type
----@field VisualShaderNodeDistanceFade Godot.VisualShaderNodeDistanceFade.__type
----@field VisualShaderNodeDotProduct Godot.VisualShaderNodeDotProduct.__type
----@field VisualShaderNodeExpression Godot.VisualShaderNodeExpression.__type
----@field VisualShaderNodeFaceForward Godot.VisualShaderNodeFaceForward.__type
----@field VisualShaderNodeFloatConstant Godot.VisualShaderNodeFloatConstant.__type
----@field VisualShaderNodeFloatFunc Godot.VisualShaderNodeFloatFunc.__type
----@field VisualShaderNodeFloatOp Godot.VisualShaderNodeFloatOp.__type
----@field VisualShaderNodeFloatParameter Godot.VisualShaderNodeFloatParameter.__type
----@field VisualShaderNodeFrame Godot.VisualShaderNodeFrame.__type
----@field VisualShaderNodeFresnel Godot.VisualShaderNodeFresnel.__type
----@field VisualShaderNodeGlobalExpression Godot.VisualShaderNodeGlobalExpression.__type
----@field VisualShaderNodeGroupBase Godot.VisualShaderNodeGroupBase.__type
----@field VisualShaderNodeIf Godot.VisualShaderNodeIf.__type
----@field VisualShaderNodeInput Godot.VisualShaderNodeInput.__type
----@field VisualShaderNodeIntConstant Godot.VisualShaderNodeIntConstant.__type
----@field VisualShaderNodeIntFunc Godot.VisualShaderNodeIntFunc.__type
----@field VisualShaderNodeIntOp Godot.VisualShaderNodeIntOp.__type
----@field VisualShaderNodeIntParameter Godot.VisualShaderNodeIntParameter.__type
----@field VisualShaderNodeIs Godot.VisualShaderNodeIs.__type
----@field VisualShaderNodeLinearSceneDepth Godot.VisualShaderNodeLinearSceneDepth.__type
----@field VisualShaderNodeMix Godot.VisualShaderNodeMix.__type
----@field VisualShaderNodeMultiplyAdd Godot.VisualShaderNodeMultiplyAdd.__type
----@field VisualShaderNodeOuterProduct Godot.VisualShaderNodeOuterProduct.__type
----@field VisualShaderNodeOutput Godot.VisualShaderNodeOutput.__type
----@field VisualShaderNodeParameter Godot.VisualShaderNodeParameter.__type
----@field VisualShaderNodeParameterRef Godot.VisualShaderNodeParameterRef.__type
----@field VisualShaderNodeParticleAccelerator Godot.VisualShaderNodeParticleAccelerator.__type
----@field VisualShaderNodeParticleBoxEmitter Godot.VisualShaderNodeParticleBoxEmitter.__type
----@field VisualShaderNodeParticleConeVelocity Godot.VisualShaderNodeParticleConeVelocity.__type
----@field VisualShaderNodeParticleEmit Godot.VisualShaderNodeParticleEmit.__type
----@field VisualShaderNodeParticleEmitter Godot.VisualShaderNodeParticleEmitter.__type
----@field VisualShaderNodeParticleMeshEmitter Godot.VisualShaderNodeParticleMeshEmitter.__type
----@field VisualShaderNodeParticleMultiplyByAxisAngle Godot.VisualShaderNodeParticleMultiplyByAxisAngle.__type
----@field VisualShaderNodeParticleOutput Godot.VisualShaderNodeParticleOutput.__type
----@field VisualShaderNodeParticleRandomness Godot.VisualShaderNodeParticleRandomness.__type
----@field VisualShaderNodeParticleRingEmitter Godot.VisualShaderNodeParticleRingEmitter.__type
----@field VisualShaderNodeParticleSphereEmitter Godot.VisualShaderNodeParticleSphereEmitter.__type
----@field VisualShaderNodeProximityFade Godot.VisualShaderNodeProximityFade.__type
----@field VisualShaderNodeRandomRange Godot.VisualShaderNodeRandomRange.__type
----@field VisualShaderNodeRemap Godot.VisualShaderNodeRemap.__type
----@field VisualShaderNodeReroute Godot.VisualShaderNodeReroute.__type
----@field VisualShaderNodeResizableBase Godot.VisualShaderNodeResizableBase.__type
----@field VisualShaderNodeRotationByAxis Godot.VisualShaderNodeRotationByAxis.__type
----@field VisualShaderNodeSample3D Godot.VisualShaderNodeSample3D.__type
----@field VisualShaderNodeScreenNormalWorldSpace Godot.VisualShaderNodeScreenNormalWorldSpace.__type
----@field VisualShaderNodeScreenUVToSdf Godot.VisualShaderNodeScreenUVToSdf.__type
----@field VisualShaderNodeSdfRaymarch Godot.VisualShaderNodeSdfRaymarch.__type
----@field VisualShaderNodeSdfToScreenUV Godot.VisualShaderNodeSdfToScreenUV.__type
----@field VisualShaderNodeSmoothStep Godot.VisualShaderNodeSmoothStep.__type
----@field VisualShaderNodeStep Godot.VisualShaderNodeStep.__type
----@field VisualShaderNodeSwitch Godot.VisualShaderNodeSwitch.__type
----@field VisualShaderNodeTexture Godot.VisualShaderNodeTexture.__type
----@field VisualShaderNodeTexture2DArray Godot.VisualShaderNodeTexture2DArray.__type
----@field VisualShaderNodeTexture2DArrayParameter Godot.VisualShaderNodeTexture2DArrayParameter.__type
----@field VisualShaderNodeTexture2DParameter Godot.VisualShaderNodeTexture2DParameter.__type
----@field VisualShaderNodeTexture3D Godot.VisualShaderNodeTexture3D.__type
----@field VisualShaderNodeTexture3DParameter Godot.VisualShaderNodeTexture3DParameter.__type
----@field VisualShaderNodeTextureParameter Godot.VisualShaderNodeTextureParameter.__type
----@field VisualShaderNodeTextureParameterTriplanar Godot.VisualShaderNodeTextureParameterTriplanar.__type
----@field VisualShaderNodeTextureSdf Godot.VisualShaderNodeTextureSdf.__type
----@field VisualShaderNodeTextureSdfNormal Godot.VisualShaderNodeTextureSdfNormal.__type
----@field VisualShaderNodeTransformCompose Godot.VisualShaderNodeTransformCompose.__type
----@field VisualShaderNodeTransformConstant Godot.VisualShaderNodeTransformConstant.__type
----@field VisualShaderNodeTransformDecompose Godot.VisualShaderNodeTransformDecompose.__type
----@field VisualShaderNodeTransformFunc Godot.VisualShaderNodeTransformFunc.__type
----@field VisualShaderNodeTransformOp Godot.VisualShaderNodeTransformOp.__type
----@field VisualShaderNodeTransformParameter Godot.VisualShaderNodeTransformParameter.__type
----@field VisualShaderNodeTransformVecMult Godot.VisualShaderNodeTransformVecMult.__type
----@field VisualShaderNodeUIntConstant Godot.VisualShaderNodeUIntConstant.__type
----@field VisualShaderNodeUIntFunc Godot.VisualShaderNodeUIntFunc.__type
----@field VisualShaderNodeUIntOp Godot.VisualShaderNodeUIntOp.__type
----@field VisualShaderNodeUIntParameter Godot.VisualShaderNodeUIntParameter.__type
----@field VisualShaderNodeUVFunc Godot.VisualShaderNodeUVFunc.__type
----@field VisualShaderNodeUVPolarCoord Godot.VisualShaderNodeUVPolarCoord.__type
----@field VisualShaderNodeVarying Godot.VisualShaderNodeVarying.__type
----@field VisualShaderNodeVaryingGetter Godot.VisualShaderNodeVaryingGetter.__type
----@field VisualShaderNodeVaryingSetter Godot.VisualShaderNodeVaryingSetter.__type
----@field VisualShaderNodeVec2Constant Godot.VisualShaderNodeVec2Constant.__type
----@field VisualShaderNodeVec2Parameter Godot.VisualShaderNodeVec2Parameter.__type
----@field VisualShaderNodeVec3Constant Godot.VisualShaderNodeVec3Constant.__type
----@field VisualShaderNodeVec3Parameter Godot.VisualShaderNodeVec3Parameter.__type
----@field VisualShaderNodeVec4Constant Godot.VisualShaderNodeVec4Constant.__type
----@field VisualShaderNodeVec4Parameter Godot.VisualShaderNodeVec4Parameter.__type
----@field VisualShaderNodeVectorBase Godot.VisualShaderNodeVectorBase.__type
----@field VisualShaderNodeVectorCompose Godot.VisualShaderNodeVectorCompose.__type
----@field VisualShaderNodeVectorDecompose Godot.VisualShaderNodeVectorDecompose.__type
----@field VisualShaderNodeVectorDistance Godot.VisualShaderNodeVectorDistance.__type
----@field VisualShaderNodeVectorFunc Godot.VisualShaderNodeVectorFunc.__type
----@field VisualShaderNodeVectorLen Godot.VisualShaderNodeVectorLen.__type
----@field VisualShaderNodeVectorOp Godot.VisualShaderNodeVectorOp.__type
----@field VisualShaderNodeVectorRefract Godot.VisualShaderNodeVectorRefract.__type
----@field VisualShaderNodeWorldPositionFromDepth Godot.VisualShaderNodeWorldPositionFromDepth.__type
----@field VoxelGI Godot.VoxelGI.__type
----@field VoxelGIData Godot.VoxelGIData.__type
----@field VScrollBar Godot.VScrollBar.__type
----@field VSeparator Godot.VSeparator.__type
----@field VSlider Godot.VSlider.__type
----@field VSplitContainer Godot.VSplitContainer.__type
----@field WeakRef Godot.WeakRef.__type
----@field WebRtcDataChannel Godot.WebRtcDataChannel.__type
----@field WebRtcDataChannelExtension Godot.WebRtcDataChannelExtension.__type
----@field WebRtcMultiplayerPeer Godot.WebRtcMultiplayerPeer.__type
----@field WebRtcPeerConnection Godot.WebRtcPeerConnection.__type
----@field WebRtcPeerConnectionExtension Godot.WebRtcPeerConnectionExtension.__type
----@field WebSocketMultiplayerPeer Godot.WebSocketMultiplayerPeer.__type
----@field WebSocketPeer Godot.WebSocketPeer.__type
----@field WebXRInterface Godot.WebXRInterface.__type
----@field Window Godot.Window.__type
----@field WorkerThreadPoolInstance Godot.WorkerThreadPoolInstance.__type
----@field World2D Godot.World2D.__type
----@field World3D Godot.World3D.__type
----@field WorldBoundaryShape2D Godot.WorldBoundaryShape2D.__type
----@field WorldBoundaryShape3D Godot.WorldBoundaryShape3D.__type
----@field WorldEnvironment Godot.WorldEnvironment.__type
----@field X509Certificate Godot.X509Certificate.__type
----@field XmlParser Godot.XmlParser.__type
----@field XRAnchor3D Godot.XRAnchor3D.__type
----@field XRBodyModifier3D Godot.XRBodyModifier3D.__type
----@field XRBodyTracker Godot.XRBodyTracker.__type
----@field XRCamera3D Godot.XRCamera3D.__type
----@field XRController3D Godot.XRController3D.__type
----@field XRControllerTracker Godot.XRControllerTracker.__type
----@field XRFaceModifier3D Godot.XRFaceModifier3D.__type
----@field XRFaceTracker Godot.XRFaceTracker.__type
----@field XRHandModifier3D Godot.XRHandModifier3D.__type
----@field XRHandTracker Godot.XRHandTracker.__type
----@field XRInterface Godot.XRInterface.__type
----@field XRInterfaceExtension Godot.XRInterfaceExtension.__type
----@field XRNode3D Godot.XRNode3D.__type
----@field XROrigin3D Godot.XROrigin3D.__type
----@field XRPose Godot.XRPose.__type
----@field XRPositionalTracker Godot.XRPositionalTracker.__type
----@field XRServerInstance Godot.XRServerInstance.__type
----@field XRTracker Godot.XRTracker.__type
----@field Xrvrs Godot.Xrvrs.__type
----@field ZipPacker Godot.ZipPacker.__type
----@field ZipReader Godot.ZipReader.__type
----@field ClockDirection Godot.ClockDirection
----@field Corner Godot.Corner
----@field Error Godot.Error
----@field EulerOrder Godot.EulerOrder
----@field HorizontalAlignment Godot.HorizontalAlignment
----@field InlineAlignment Godot.InlineAlignment
----@field JoyAxis Godot.JoyAxis
----@field JoyButton Godot.JoyButton
----@field Key Godot.Key
----@field KeyLocation Godot.KeyLocation
----@field KeyModifierMask Godot.KeyModifierMask
----@field MethodFlags Godot.MethodFlags
----@field MidiMessage Godot.MidiMessage
----@field MouseButton Godot.MouseButton
----@field MouseButtonMask Godot.MouseButtonMask
----@field Orientation Godot.Orientation
----@field PropertyHint Godot.PropertyHint
----@field PropertyUsageFlags Godot.PropertyUsageFlags
----@field Side Godot.Side
----@field VerticalAlignment Godot.VerticalAlignment
-godot = {}
+---@type Godot.AcceptDialog.__type
+AcceptDialog = {}
+---@type Godot.AesContext.__type
+AesContext = {}
+---@type Godot.AimModifier3D.__type
+AimModifier3D = {}
+---@type Godot.AnimatableBody2D.__type
+AnimatableBody2D = {}
+---@type Godot.AnimatableBody3D.__type
+AnimatableBody3D = {}
+---@type Godot.AnimatedSprite2D.__type
+AnimatedSprite2D = {}
+---@type Godot.AnimatedSprite3D.__type
+AnimatedSprite3D = {}
+---@type Godot.AnimatedTexture.__type
+AnimatedTexture = {}
+---@type Godot.Animation.__type
+Animation = {}
+---@type Godot.AnimationLibrary.__type
+AnimationLibrary = {}
+---@type Godot.AnimationMixer.__type
+AnimationMixer = {}
+---@type Godot.AnimationNode.__type
+AnimationNode = {}
+---@type Godot.AnimationNodeAdd2.__type
+AnimationNodeAdd2 = {}
+---@type Godot.AnimationNodeAdd3.__type
+AnimationNodeAdd3 = {}
+---@type Godot.AnimationNodeAnimation.__type
+AnimationNodeAnimation = {}
+---@type Godot.AnimationNodeBlend2.__type
+AnimationNodeBlend2 = {}
+---@type Godot.AnimationNodeBlend3.__type
+AnimationNodeBlend3 = {}
+---@type Godot.AnimationNodeBlendSpace1D.__type
+AnimationNodeBlendSpace1D = {}
+---@type Godot.AnimationNodeBlendSpace2D.__type
+AnimationNodeBlendSpace2D = {}
+---@type Godot.AnimationNodeBlendTree.__type
+AnimationNodeBlendTree = {}
+---@type Godot.AnimationNodeExtension.__type
+AnimationNodeExtension = {}
+---@type Godot.AnimationNodeOneShot.__type
+AnimationNodeOneShot = {}
+---@type Godot.AnimationNodeOutput.__type
+AnimationNodeOutput = {}
+---@type Godot.AnimationNodeStateMachine.__type
+AnimationNodeStateMachine = {}
+---@type Godot.AnimationNodeStateMachinePlayback.__type
+AnimationNodeStateMachinePlayback = {}
+---@type Godot.AnimationNodeStateMachineTransition.__type
+AnimationNodeStateMachineTransition = {}
+---@type Godot.AnimationNodeSub2.__type
+AnimationNodeSub2 = {}
+---@type Godot.AnimationNodeSync.__type
+AnimationNodeSync = {}
+---@type Godot.AnimationNodeTimeScale.__type
+AnimationNodeTimeScale = {}
+---@type Godot.AnimationNodeTimeSeek.__type
+AnimationNodeTimeSeek = {}
+---@type Godot.AnimationNodeTransition.__type
+AnimationNodeTransition = {}
+---@type Godot.AnimationPlayer.__type
+AnimationPlayer = {}
+---@type Godot.AnimationRootNode.__type
+AnimationRootNode = {}
+---@type Godot.AnimationTree.__type
+AnimationTree = {}
+---@type Godot.Area2D.__type
+Area2D = {}
+---@type Godot.Area3D.__type
+Area3D = {}
+---@type Godot.ArrayMesh.__type
+ArrayMesh = {}
+---@type Godot.ArrayOccluder3D.__type
+ArrayOccluder3D = {}
+---@type Godot.AspectRatioContainer.__type
+AspectRatioContainer = {}
+---@type Godot.AStar2D.__type
+AStar2D = {}
+---@type Godot.AStar3D.__type
+AStar3D = {}
+---@type Godot.AStarGrid2D.__type
+AStarGrid2D = {}
+---@type Godot.AtlasTexture.__type
+AtlasTexture = {}
+---@type Godot.AudioBusLayout.__type
+AudioBusLayout = {}
+---@type Godot.AudioEffect.__type
+AudioEffect = {}
+---@type Godot.AudioEffectAmplify.__type
+AudioEffectAmplify = {}
+---@type Godot.AudioEffectBandLimitFilter.__type
+AudioEffectBandLimitFilter = {}
+---@type Godot.AudioEffectBandPassFilter.__type
+AudioEffectBandPassFilter = {}
+---@type Godot.AudioEffectCapture.__type
+AudioEffectCapture = {}
+---@type Godot.AudioEffectChorus.__type
+AudioEffectChorus = {}
+---@type Godot.AudioEffectCompressor.__type
+AudioEffectCompressor = {}
+---@type Godot.AudioEffectDelay.__type
+AudioEffectDelay = {}
+---@type Godot.AudioEffectDistortion.__type
+AudioEffectDistortion = {}
+---@type Godot.AudioEffectEQ.__type
+AudioEffectEQ = {}
+---@type Godot.AudioEffectEQ10.__type
+AudioEffectEQ10 = {}
+---@type Godot.AudioEffectEQ21.__type
+AudioEffectEQ21 = {}
+---@type Godot.AudioEffectEQ6.__type
+AudioEffectEQ6 = {}
+---@type Godot.AudioEffectFilter.__type
+AudioEffectFilter = {}
+---@type Godot.AudioEffectHardLimiter.__type
+AudioEffectHardLimiter = {}
+---@type Godot.AudioEffectHighPassFilter.__type
+AudioEffectHighPassFilter = {}
+---@type Godot.AudioEffectHighShelfFilter.__type
+AudioEffectHighShelfFilter = {}
+---@type Godot.AudioEffectInstance.__type
+AudioEffectInstance = {}
+---@type Godot.AudioEffectLimiter.__type
+AudioEffectLimiter = {}
+---@type Godot.AudioEffectLowPassFilter.__type
+AudioEffectLowPassFilter = {}
+---@type Godot.AudioEffectLowShelfFilter.__type
+AudioEffectLowShelfFilter = {}
+---@type Godot.AudioEffectNotchFilter.__type
+AudioEffectNotchFilter = {}
+---@type Godot.AudioEffectPanner.__type
+AudioEffectPanner = {}
+---@type Godot.AudioEffectPhaser.__type
+AudioEffectPhaser = {}
+---@type Godot.AudioEffectPitchShift.__type
+AudioEffectPitchShift = {}
+---@type Godot.AudioEffectRecord.__type
+AudioEffectRecord = {}
+---@type Godot.AudioEffectReverb.__type
+AudioEffectReverb = {}
+---@type Godot.AudioEffectSpectrumAnalyzer.__type
+AudioEffectSpectrumAnalyzer = {}
+---@type Godot.AudioEffectSpectrumAnalyzerInstance.__type
+AudioEffectSpectrumAnalyzerInstance = {}
+---@type Godot.AudioEffectStereoEnhance.__type
+AudioEffectStereoEnhance = {}
+---@type Godot.AudioListener2D.__type
+AudioListener2D = {}
+---@type Godot.AudioListener3D.__type
+AudioListener3D = {}
+---@type Godot.AudioSample.__type
+AudioSample = {}
+---@type Godot.AudioSamplePlayback.__type
+AudioSamplePlayback = {}
+---@type Godot.AudioServerInstance.__type
+AudioServerInstance = {}
+---@type Godot.AudioStream.__type
+AudioStream = {}
+---@type Godot.AudioStreamGenerator.__type
+AudioStreamGenerator = {}
+---@type Godot.AudioStreamGeneratorPlayback.__type
+AudioStreamGeneratorPlayback = {}
+---@type Godot.AudioStreamInteractive.__type
+AudioStreamInteractive = {}
+---@type Godot.AudioStreamMicrophone.__type
+AudioStreamMicrophone = {}
+---@type Godot.AudioStreamMP3.__type
+AudioStreamMP3 = {}
+---@type Godot.AudioStreamOggVorbis.__type
+AudioStreamOggVorbis = {}
+---@type Godot.AudioStreamPlayback.__type
+AudioStreamPlayback = {}
+---@type Godot.AudioStreamPlaybackInteractive.__type
+AudioStreamPlaybackInteractive = {}
+---@type Godot.AudioStreamPlaybackOggVorbis.__type
+AudioStreamPlaybackOggVorbis = {}
+---@type Godot.AudioStreamPlaybackPlaylist.__type
+AudioStreamPlaybackPlaylist = {}
+---@type Godot.AudioStreamPlaybackPolyphonic.__type
+AudioStreamPlaybackPolyphonic = {}
+---@type Godot.AudioStreamPlaybackResampled.__type
+AudioStreamPlaybackResampled = {}
+---@type Godot.AudioStreamPlaybackSynchronized.__type
+AudioStreamPlaybackSynchronized = {}
+---@type Godot.AudioStreamPlayer.__type
+AudioStreamPlayer = {}
+---@type Godot.AudioStreamPlayer2D.__type
+AudioStreamPlayer2D = {}
+---@type Godot.AudioStreamPlayer3D.__type
+AudioStreamPlayer3D = {}
+---@type Godot.AudioStreamPlaylist.__type
+AudioStreamPlaylist = {}
+---@type Godot.AudioStreamPolyphonic.__type
+AudioStreamPolyphonic = {}
+---@type Godot.AudioStreamRandomizer.__type
+AudioStreamRandomizer = {}
+---@type Godot.AudioStreamSynchronized.__type
+AudioStreamSynchronized = {}
+---@type Godot.AudioStreamWav.__type
+AudioStreamWav = {}
+---@type Godot.BackBufferCopy.__type
+BackBufferCopy = {}
+---@type Godot.BaseButton.__type
+BaseButton = {}
+---@type Godot.BaseMaterial3D.__type
+BaseMaterial3D = {}
+---@type Godot.Bitmap.__type
+Bitmap = {}
+---@type Godot.Bone2D.__type
+Bone2D = {}
+---@type Godot.BoneAttachment3D.__type
+BoneAttachment3D = {}
+---@type Godot.BoneConstraint3D.__type
+BoneConstraint3D = {}
+---@type Godot.BoneMap.__type
+BoneMap = {}
+---@type Godot.BoneTwistDisperser3D.__type
+BoneTwistDisperser3D = {}
+---@type Godot.BoxContainer.__type
+BoxContainer = {}
+---@type Godot.BoxMesh.__type
+BoxMesh = {}
+---@type Godot.BoxOccluder3D.__type
+BoxOccluder3D = {}
+---@type Godot.BoxShape3D.__type
+BoxShape3D = {}
+---@type Godot.Button.__type
+Button = {}
+---@type Godot.ButtonGroup.__type
+ButtonGroup = {}
+---@type Godot.CallbackTweener.__type
+CallbackTweener = {}
+---@type Godot.Camera2D.__type
+Camera2D = {}
+---@type Godot.Camera3D.__type
+Camera3D = {}
+---@type Godot.CameraAttributes.__type
+CameraAttributes = {}
+---@type Godot.CameraAttributesPhysical.__type
+CameraAttributesPhysical = {}
+---@type Godot.CameraAttributesPractical.__type
+CameraAttributesPractical = {}
+---@type Godot.CameraFeed.__type
+CameraFeed = {}
+---@type Godot.CameraServerInstance.__type
+CameraServerInstance = {}
+---@type Godot.CameraTexture.__type
+CameraTexture = {}
+---@type Godot.CanvasGroup.__type
+CanvasGroup = {}
+---@type Godot.CanvasItem.__type
+CanvasItem = {}
+---@type Godot.CanvasItemMaterial.__type
+CanvasItemMaterial = {}
+---@type Godot.CanvasLayer.__type
+CanvasLayer = {}
+---@type Godot.CanvasModulate.__type
+CanvasModulate = {}
+---@type Godot.CanvasTexture.__type
+CanvasTexture = {}
+---@type Godot.CapsuleMesh.__type
+CapsuleMesh = {}
+---@type Godot.CapsuleShape2D.__type
+CapsuleShape2D = {}
+---@type Godot.CapsuleShape3D.__type
+CapsuleShape3D = {}
+---@type Godot.Ccdik3D.__type
+Ccdik3D = {}
+---@type Godot.CenterContainer.__type
+CenterContainer = {}
+---@type Godot.ChainIK3D.__type
+ChainIK3D = {}
+---@type Godot.CharacterBody2D.__type
+CharacterBody2D = {}
+---@type Godot.CharacterBody3D.__type
+CharacterBody3D = {}
+---@type Godot.CharFXTransform.__type
+CharFXTransform = {}
+---@type Godot.CheckBox.__type
+CheckBox = {}
+---@type Godot.CheckButton.__type
+CheckButton = {}
+---@type Godot.CircleShape2D.__type
+CircleShape2D = {}
+---@type Godot.ClassDBInstance.__type
+ClassDBInstance = {}
+---@type Godot.CodeEdit.__type
+CodeEdit = {}
+---@type Godot.CodeHighlighter.__type
+CodeHighlighter = {}
+---@type Godot.CollisionObject2D.__type
+CollisionObject2D = {}
+---@type Godot.CollisionObject3D.__type
+CollisionObject3D = {}
+---@type Godot.CollisionPolygon2D.__type
+CollisionPolygon2D = {}
+---@type Godot.CollisionPolygon3D.__type
+CollisionPolygon3D = {}
+---@type Godot.CollisionShape2D.__type
+CollisionShape2D = {}
+---@type Godot.CollisionShape3D.__type
+CollisionShape3D = {}
+---@type Godot.ColorPalette.__type
+ColorPalette = {}
+---@type Godot.ColorPicker.__type
+ColorPicker = {}
+---@type Godot.ColorPickerButton.__type
+ColorPickerButton = {}
+---@type Godot.ColorRect.__type
+ColorRect = {}
+---@type Godot.Compositor.__type
+Compositor = {}
+---@type Godot.CompositorEffect.__type
+CompositorEffect = {}
+---@type Godot.CompressedCubemap.__type
+CompressedCubemap = {}
+---@type Godot.CompressedCubemapArray.__type
+CompressedCubemapArray = {}
+---@type Godot.CompressedTexture2D.__type
+CompressedTexture2D = {}
+---@type Godot.CompressedTexture2DArray.__type
+CompressedTexture2DArray = {}
+---@type Godot.CompressedTexture3D.__type
+CompressedTexture3D = {}
+---@type Godot.CompressedTextureLayered.__type
+CompressedTextureLayered = {}
+---@type Godot.ConcavePolygonShape2D.__type
+ConcavePolygonShape2D = {}
+---@type Godot.ConcavePolygonShape3D.__type
+ConcavePolygonShape3D = {}
+---@type Godot.ConeTwistJoint3D.__type
+ConeTwistJoint3D = {}
+---@type Godot.ConfigFile.__type
+ConfigFile = {}
+---@type Godot.ConfirmationDialog.__type
+ConfirmationDialog = {}
+---@type Godot.Container.__type
+Container = {}
+---@type Godot.Control.__type
+Control = {}
+---@type Godot.ConvertTransformModifier3D.__type
+ConvertTransformModifier3D = {}
+---@type Godot.ConvexPolygonShape2D.__type
+ConvexPolygonShape2D = {}
+---@type Godot.ConvexPolygonShape3D.__type
+ConvexPolygonShape3D = {}
+---@type Godot.CopyTransformModifier3D.__type
+CopyTransformModifier3D = {}
+---@type Godot.CpuParticles2D.__type
+CpuParticles2D = {}
+---@type Godot.CpuParticles3D.__type
+CpuParticles3D = {}
+---@type Godot.Crypto.__type
+Crypto = {}
+---@type Godot.CryptoKey.__type
+CryptoKey = {}
+---@type Godot.CsgBox3D.__type
+CsgBox3D = {}
+---@type Godot.CsgCombiner3D.__type
+CsgCombiner3D = {}
+---@type Godot.CsgCylinder3D.__type
+CsgCylinder3D = {}
+---@type Godot.CsgMesh3D.__type
+CsgMesh3D = {}
+---@type Godot.CsgPolygon3D.__type
+CsgPolygon3D = {}
+---@type Godot.CsgPrimitive3D.__type
+CsgPrimitive3D = {}
+---@type Godot.CsgShape3D.__type
+CsgShape3D = {}
+---@type Godot.CsgSphere3D.__type
+CsgSphere3D = {}
+---@type Godot.CsgTorus3D.__type
+CsgTorus3D = {}
+---@type Godot.CSharpScript.__type
+CSharpScript = {}
+---@type Godot.Cubemap.__type
+Cubemap = {}
+---@type Godot.CubemapArray.__type
+CubemapArray = {}
+---@type Godot.Curve.__type
+Curve = {}
+---@type Godot.Curve2D.__type
+Curve2D = {}
+---@type Godot.Curve3D.__type
+Curve3D = {}
+---@type Godot.CurveTexture.__type
+CurveTexture = {}
+---@type Godot.CurveXyzTexture.__type
+CurveXyzTexture = {}
+---@type Godot.CylinderMesh.__type
+CylinderMesh = {}
+---@type Godot.CylinderShape3D.__type
+CylinderShape3D = {}
+---@type Godot.DampedSpringJoint2D.__type
+DampedSpringJoint2D = {}
+---@type Godot.Decal.__type
+Decal = {}
+---@type Godot.DirAccess.__type
+DirAccess = {}
+---@type Godot.DirectionalLight2D.__type
+DirectionalLight2D = {}
+---@type Godot.DirectionalLight3D.__type
+DirectionalLight3D = {}
+---@type Godot.DisplayServerInstance.__type
+DisplayServerInstance = {}
+---@type Godot.DpiTexture.__type
+DpiTexture = {}
+---@type Godot.DtlsServer.__type
+DtlsServer = {}
+---@type Godot.EncodedObjectAsId.__type
+EncodedObjectAsId = {}
+---@type Godot.ENetConnection.__type
+ENetConnection = {}
+---@type Godot.ENetMultiplayerPeer.__type
+ENetMultiplayerPeer = {}
+---@type Godot.ENetPacketPeer.__type
+ENetPacketPeer = {}
+---@type Godot.EngineDebuggerInstance.__type
+EngineDebuggerInstance = {}
+---@type Godot.EngineInstance.__type
+EngineInstance = {}
+---@type Godot.EngineProfiler.__type
+EngineProfiler = {}
+---@type Godot.Environment.__type
+Environment = {}
+---@type Godot.Expression.__type
+Expression = {}
+---@type Godot.ExternalTexture.__type
+ExternalTexture = {}
+---@type Godot.Fabrik3D.__type
+Fabrik3D = {}
+---@type Godot.FastNoiseLite.__type
+FastNoiseLite = {}
+---@type Godot.FbxDocument.__type
+FbxDocument = {}
+---@type Godot.FbxState.__type
+FbxState = {}
+---@type Godot.FileAccess.__type
+FileAccess = {}
+---@type Godot.FileDialog.__type
+FileDialog = {}
+---@type Godot.FlowContainer.__type
+FlowContainer = {}
+---@type Godot.FogMaterial.__type
+FogMaterial = {}
+---@type Godot.FogVolume.__type
+FogVolume = {}
+---@type Godot.FoldableContainer.__type
+FoldableContainer = {}
+---@type Godot.FoldableGroup.__type
+FoldableGroup = {}
+---@type Godot.Font.__type
+Font = {}
+---@type Godot.FontFile.__type
+FontFile = {}
+---@type Godot.FontVariation.__type
+FontVariation = {}
+---@type Godot.FramebufferCacheRD.__type
+FramebufferCacheRD = {}
+---@type Godot.GDExtension.__type
+GDExtension = {}
+---@type Godot.GDExtensionManagerInstance.__type
+GDExtensionManagerInstance = {}
+---@type Godot.GDScript.__type
+GDScript = {}
+---@type Godot.Generic6DofJoint3D.__type
+Generic6DofJoint3D = {}
+---@type Godot.Geometry2DInstance.__type
+Geometry2DInstance = {}
+---@type Godot.Geometry3DInstance.__type
+Geometry3DInstance = {}
+---@type Godot.GeometryInstance3D.__type
+GeometryInstance3D = {}
+---@type Godot.GltfAccessor.__type
+GltfAccessor = {}
+---@type Godot.GltfAnimation.__type
+GltfAnimation = {}
+---@type Godot.GltfBufferView.__type
+GltfBufferView = {}
+---@type Godot.GltfCamera.__type
+GltfCamera = {}
+---@type Godot.GltfDocument.__type
+GltfDocument = {}
+---@type Godot.GltfDocumentExtension.__type
+GltfDocumentExtension = {}
+---@type Godot.GltfDocumentExtensionConvertImporterMesh.__type
+GltfDocumentExtensionConvertImporterMesh = {}
+---@type Godot.GltfLight.__type
+GltfLight = {}
+---@type Godot.GltfMesh.__type
+GltfMesh = {}
+---@type Godot.GltfNode.__type
+GltfNode = {}
+---@type Godot.GltfObjectModelProperty.__type
+GltfObjectModelProperty = {}
+---@type Godot.GltfPhysicsBody.__type
+GltfPhysicsBody = {}
+---@type Godot.GltfPhysicsShape.__type
+GltfPhysicsShape = {}
+---@type Godot.GltfSkeleton.__type
+GltfSkeleton = {}
+---@type Godot.GltfSkin.__type
+GltfSkin = {}
+---@type Godot.GltfSpecGloss.__type
+GltfSpecGloss = {}
+---@type Godot.GltfState.__type
+GltfState = {}
+---@type Godot.GltfTexture.__type
+GltfTexture = {}
+---@type Godot.GltfTextureSampler.__type
+GltfTextureSampler = {}
+---@type Godot.GodotInstance.__type
+GodotInstance = {}
+---@type Godot.GodotObject.__type
+GodotObject = {}
+---@type Godot.GodotThread.__type
+GodotThread = {}
+---@type Godot.GpuParticles2D.__type
+GpuParticles2D = {}
+---@type Godot.GpuParticles3D.__type
+GpuParticles3D = {}
+---@type Godot.GpuParticlesAttractor3D.__type
+GpuParticlesAttractor3D = {}
+---@type Godot.GpuParticlesAttractorBox3D.__type
+GpuParticlesAttractorBox3D = {}
+---@type Godot.GpuParticlesAttractorSphere3D.__type
+GpuParticlesAttractorSphere3D = {}
+---@type Godot.GpuParticlesAttractorVectorField3D.__type
+GpuParticlesAttractorVectorField3D = {}
+---@type Godot.GpuParticlesCollision3D.__type
+GpuParticlesCollision3D = {}
+---@type Godot.GpuParticlesCollisionBox3D.__type
+GpuParticlesCollisionBox3D = {}
+---@type Godot.GpuParticlesCollisionHeightField3D.__type
+GpuParticlesCollisionHeightField3D = {}
+---@type Godot.GpuParticlesCollisionSdf3D.__type
+GpuParticlesCollisionSdf3D = {}
+---@type Godot.GpuParticlesCollisionSphere3D.__type
+GpuParticlesCollisionSphere3D = {}
+---@type Godot.Gradient.__type
+Gradient = {}
+---@type Godot.GradientTexture1D.__type
+GradientTexture1D = {}
+---@type Godot.GradientTexture2D.__type
+GradientTexture2D = {}
+---@type Godot.GraphEdit.__type
+GraphEdit = {}
+---@type Godot.GraphElement.__type
+GraphElement = {}
+---@type Godot.GraphFrame.__type
+GraphFrame = {}
+---@type Godot.GraphNode.__type
+GraphNode = {}
+---@type Godot.GridContainer.__type
+GridContainer = {}
+---@type Godot.GridMap.__type
+GridMap = {}
+---@type Godot.GrooveJoint2D.__type
+GrooveJoint2D = {}
+---@type Godot.HashingContext.__type
+HashingContext = {}
+---@type Godot.HBoxContainer.__type
+HBoxContainer = {}
+---@type Godot.HeightMapShape3D.__type
+HeightMapShape3D = {}
+---@type Godot.HFlowContainer.__type
+HFlowContainer = {}
+---@type Godot.HingeJoint3D.__type
+HingeJoint3D = {}
+---@type Godot.HmacContext.__type
+HmacContext = {}
+---@type Godot.HScrollBar.__type
+HScrollBar = {}
+---@type Godot.HSeparator.__type
+HSeparator = {}
+---@type Godot.HSlider.__type
+HSlider = {}
+---@type Godot.HSplitContainer.__type
+HSplitContainer = {}
+---@type Godot.HttpClient.__type
+HttpClient = {}
+---@type Godot.HttpRequest.__type
+HttpRequest = {}
+---@type Godot.IKModifier3D.__type
+IKModifier3D = {}
+---@type Godot.Image.__type
+Image = {}
+---@type Godot.ImageFormatLoader.__type
+ImageFormatLoader = {}
+---@type Godot.ImageFormatLoaderExtension.__type
+ImageFormatLoaderExtension = {}
+---@type Godot.ImageTexture.__type
+ImageTexture = {}
+---@type Godot.ImageTexture3D.__type
+ImageTexture3D = {}
+---@type Godot.ImageTextureLayered.__type
+ImageTextureLayered = {}
+---@type Godot.ImmediateMesh.__type
+ImmediateMesh = {}
+---@type Godot.ImporterMesh.__type
+ImporterMesh = {}
+---@type Godot.ImporterMeshInstance3D.__type
+ImporterMeshInstance3D = {}
+---@type Godot.InputEvent.__type
+InputEvent = {}
+---@type Godot.InputEventAction.__type
+InputEventAction = {}
+---@type Godot.InputEventFromWindow.__type
+InputEventFromWindow = {}
+---@type Godot.InputEventGesture.__type
+InputEventGesture = {}
+---@type Godot.InputEventJoypadButton.__type
+InputEventJoypadButton = {}
+---@type Godot.InputEventJoypadMotion.__type
+InputEventJoypadMotion = {}
+---@type Godot.InputEventKey.__type
+InputEventKey = {}
+---@type Godot.InputEventMagnifyGesture.__type
+InputEventMagnifyGesture = {}
+---@type Godot.InputEventMidi.__type
+InputEventMidi = {}
+---@type Godot.InputEventMouse.__type
+InputEventMouse = {}
+---@type Godot.InputEventMouseButton.__type
+InputEventMouseButton = {}
+---@type Godot.InputEventMouseMotion.__type
+InputEventMouseMotion = {}
+---@type Godot.InputEventPanGesture.__type
+InputEventPanGesture = {}
+---@type Godot.InputEventScreenDrag.__type
+InputEventScreenDrag = {}
+---@type Godot.InputEventScreenTouch.__type
+InputEventScreenTouch = {}
+---@type Godot.InputEventShortcut.__type
+InputEventShortcut = {}
+---@type Godot.InputEventWithModifiers.__type
+InputEventWithModifiers = {}
+---@type Godot.InputInstance.__type
+InputInstance = {}
+---@type Godot.InputMapInstance.__type
+InputMapInstance = {}
+---@type Godot.InstancePlaceholder.__type
+InstancePlaceholder = {}
+---@type Godot.IntervalTweener.__type
+IntervalTweener = {}
+---@type Godot.IPInstance.__type
+IPInstance = {}
+---@type Godot.ItemList.__type
+ItemList = {}
+---@type Godot.IterateIK3D.__type
+IterateIK3D = {}
+---@type Godot.JacobianIK3D.__type
+JacobianIK3D = {}
+---@type Godot.JavaClass.__type
+JavaClass = {}
+---@type Godot.JavaClassWrapperInstance.__type
+JavaClassWrapperInstance = {}
+---@type Godot.JavaObject.__type
+JavaObject = {}
+---@type Godot.JavaScriptBridgeInstance.__type
+JavaScriptBridgeInstance = {}
+---@type Godot.JavaScriptObject.__type
+JavaScriptObject = {}
+---@type Godot.JniSingleton.__type
+JniSingleton = {}
+---@type Godot.Joint2D.__type
+Joint2D = {}
+---@type Godot.Joint3D.__type
+Joint3D = {}
+---@type Godot.JointLimitation3D.__type
+JointLimitation3D = {}
+---@type Godot.JointLimitationCone3D.__type
+JointLimitationCone3D = {}
+---@type Godot.Json.__type
+Json = {}
+---@type Godot.JsonRpc.__type
+JsonRpc = {}
+---@type Godot.KinematicCollision2D.__type
+KinematicCollision2D = {}
+---@type Godot.KinematicCollision3D.__type
+KinematicCollision3D = {}
+---@type Godot.Label.__type
+Label = {}
+---@type Godot.Label3D.__type
+Label3D = {}
+---@type Godot.LabelSettings.__type
+LabelSettings = {}
+---@type Godot.Light2D.__type
+Light2D = {}
+---@type Godot.Light3D.__type
+Light3D = {}
+---@type Godot.LightmapGI.__type
+LightmapGI = {}
+---@type Godot.LightmapGIData.__type
+LightmapGIData = {}
+---@type Godot.Lightmapper.__type
+Lightmapper = {}
+---@type Godot.LightmapperRD.__type
+LightmapperRD = {}
+---@type Godot.LightmapProbe.__type
+LightmapProbe = {}
+---@type Godot.LightOccluder2D.__type
+LightOccluder2D = {}
+---@type Godot.LimitAngularVelocityModifier3D.__type
+LimitAngularVelocityModifier3D = {}
+---@type Godot.Line2D.__type
+Line2D = {}
+---@type Godot.LineEdit.__type
+LineEdit = {}
+---@type Godot.LinkButton.__type
+LinkButton = {}
+---@type Godot.Logger.__type
+Logger = {}
+---@type Godot.LookAtModifier3D.__type
+LookAtModifier3D = {}
+---@type Godot.MainLoop.__type
+MainLoop = {}
+---@type Godot.MarginContainer.__type
+MarginContainer = {}
+---@type Godot.Marker2D.__type
+Marker2D = {}
+---@type Godot.Marker3D.__type
+Marker3D = {}
+---@type Godot.MarshallsInstance.__type
+MarshallsInstance = {}
+---@type Godot.Material.__type
+Material = {}
+---@type Godot.MenuBar.__type
+MenuBar = {}
+---@type Godot.MenuButton.__type
+MenuButton = {}
+---@type Godot.Mesh.__type
+Mesh = {}
+---@type Godot.MeshConvexDecompositionSettings.__type
+MeshConvexDecompositionSettings = {}
+---@type Godot.MeshDataTool.__type
+MeshDataTool = {}
+---@type Godot.MeshInstance2D.__type
+MeshInstance2D = {}
+---@type Godot.MeshInstance3D.__type
+MeshInstance3D = {}
+---@type Godot.MeshLibrary.__type
+MeshLibrary = {}
+---@type Godot.MeshTexture.__type
+MeshTexture = {}
+---@type Godot.MethodTweener.__type
+MethodTweener = {}
+---@type Godot.MissingNode.__type
+MissingNode = {}
+---@type Godot.MissingResource.__type
+MissingResource = {}
+---@type Godot.MobileVRInterface.__type
+MobileVRInterface = {}
+---@type Godot.ModifierBoneTarget3D.__type
+ModifierBoneTarget3D = {}
+---@type Godot.MovieWriter.__type
+MovieWriter = {}
+---@type Godot.MultiMesh.__type
+MultiMesh = {}
+---@type Godot.MultiMeshInstance2D.__type
+MultiMeshInstance2D = {}
+---@type Godot.MultiMeshInstance3D.__type
+MultiMeshInstance3D = {}
+---@type Godot.MultiplayerApi.__type
+MultiplayerApi = {}
+---@type Godot.MultiplayerApiExtension.__type
+MultiplayerApiExtension = {}
+---@type Godot.MultiplayerPeer.__type
+MultiplayerPeer = {}
+---@type Godot.MultiplayerPeerExtension.__type
+MultiplayerPeerExtension = {}
+---@type Godot.MultiplayerSpawner.__type
+MultiplayerSpawner = {}
+---@type Godot.MultiplayerSynchronizer.__type
+MultiplayerSynchronizer = {}
+---@type Godot.Mutex.__type
+Mutex = {}
+---@type Godot.NativeMenuInstance.__type
+NativeMenuInstance = {}
+---@type Godot.NavigationAgent2D.__type
+NavigationAgent2D = {}
+---@type Godot.NavigationAgent3D.__type
+NavigationAgent3D = {}
+---@type Godot.NavigationLink2D.__type
+NavigationLink2D = {}
+---@type Godot.NavigationLink3D.__type
+NavigationLink3D = {}
+---@type Godot.NavigationMesh.__type
+NavigationMesh = {}
+---@type Godot.NavigationMeshGeneratorInstance.__type
+NavigationMeshGeneratorInstance = {}
+---@type Godot.NavigationMeshSourceGeometryData2D.__type
+NavigationMeshSourceGeometryData2D = {}
+---@type Godot.NavigationMeshSourceGeometryData3D.__type
+NavigationMeshSourceGeometryData3D = {}
+---@type Godot.NavigationObstacle2D.__type
+NavigationObstacle2D = {}
+---@type Godot.NavigationObstacle3D.__type
+NavigationObstacle3D = {}
+---@type Godot.NavigationPathQueryParameters2D.__type
+NavigationPathQueryParameters2D = {}
+---@type Godot.NavigationPathQueryParameters3D.__type
+NavigationPathQueryParameters3D = {}
+---@type Godot.NavigationPathQueryResult2D.__type
+NavigationPathQueryResult2D = {}
+---@type Godot.NavigationPathQueryResult3D.__type
+NavigationPathQueryResult3D = {}
+---@type Godot.NavigationPolygon.__type
+NavigationPolygon = {}
+---@type Godot.NavigationRegion2D.__type
+NavigationRegion2D = {}
+---@type Godot.NavigationRegion3D.__type
+NavigationRegion3D = {}
+---@type Godot.NavigationServer2DInstance.__type
+NavigationServer2DInstance = {}
+---@type Godot.NavigationServer2DManagerInstance.__type
+NavigationServer2DManagerInstance = {}
+---@type Godot.NavigationServer3DInstance.__type
+NavigationServer3DInstance = {}
+---@type Godot.NavigationServer3DManagerInstance.__type
+NavigationServer3DManagerInstance = {}
+---@type Godot.NinePatchRect.__type
+NinePatchRect = {}
+---@type Godot.Node.__type
+Node = {}
+---@type Godot.Node2D.__type
+Node2D = {}
+---@type Godot.Node3D.__type
+Node3D = {}
+---@type Godot.Node3DGizmo.__type
+Node3DGizmo = {}
+---@type Godot.Noise.__type
+Noise = {}
+---@type Godot.NoiseTexture2D.__type
+NoiseTexture2D = {}
+---@type Godot.NoiseTexture3D.__type
+NoiseTexture3D = {}
+---@type Godot.Occluder3D.__type
+Occluder3D = {}
+---@type Godot.OccluderInstance3D.__type
+OccluderInstance3D = {}
+---@type Godot.OccluderPolygon2D.__type
+OccluderPolygon2D = {}
+---@type Godot.OfflineMultiplayerPeer.__type
+OfflineMultiplayerPeer = {}
+---@type Godot.OggPacketSequence.__type
+OggPacketSequence = {}
+---@type Godot.OggPacketSequencePlayback.__type
+OggPacketSequencePlayback = {}
+---@type Godot.OmniLight3D.__type
+OmniLight3D = {}
+---@type Godot.OpenXRAction.__type
+OpenXRAction = {}
+---@type Godot.OpenXRActionBindingModifier.__type
+OpenXRActionBindingModifier = {}
+---@type Godot.OpenXRActionMap.__type
+OpenXRActionMap = {}
+---@type Godot.OpenXRActionSet.__type
+OpenXRActionSet = {}
+---@type Godot.OpenXRAnalogThresholdModifier.__type
+OpenXRAnalogThresholdModifier = {}
+---@type Godot.OpenXRAnchorTracker.__type
+OpenXRAnchorTracker = {}
+---@type Godot.OpenXRAndroidThreadSettingsExtension.__type
+OpenXRAndroidThreadSettingsExtension = {}
+---@type Godot.OpenXRApiExtension.__type
+OpenXRApiExtension = {}
+---@type Godot.OpenXRBindingModifier.__type
+OpenXRBindingModifier = {}
+---@type Godot.OpenXRCompositionLayer.__type
+OpenXRCompositionLayer = {}
+---@type Godot.OpenXRCompositionLayerCylinder.__type
+OpenXRCompositionLayerCylinder = {}
+---@type Godot.OpenXRCompositionLayerEquirect.__type
+OpenXRCompositionLayerEquirect = {}
+---@type Godot.OpenXRCompositionLayerQuad.__type
+OpenXRCompositionLayerQuad = {}
+---@type Godot.OpenXRDpadBindingModifier.__type
+OpenXRDpadBindingModifier = {}
+---@type Godot.OpenXRExtensionWrapper.__type
+OpenXRExtensionWrapper = {}
+---@type Godot.OpenXRExtensionWrapperExtension.__type
+OpenXRExtensionWrapperExtension = {}
+---@type Godot.OpenXRFrameSynthesisExtension.__type
+OpenXRFrameSynthesisExtension = {}
+---@type Godot.OpenXRFutureExtension.__type
+OpenXRFutureExtension = {}
+---@type Godot.OpenXRFutureResult.__type
+OpenXRFutureResult = {}
+---@type Godot.OpenXRHand.__type
+OpenXRHand = {}
+---@type Godot.OpenXRHapticBase.__type
+OpenXRHapticBase = {}
+---@type Godot.OpenXRHapticVibration.__type
+OpenXRHapticVibration = {}
+---@type Godot.OpenXRInteractionProfile.__type
+OpenXRInteractionProfile = {}
+---@type Godot.OpenXRInteractionProfileMetadata.__type
+OpenXRInteractionProfileMetadata = {}
+---@type Godot.OpenXRInterface.__type
+OpenXRInterface = {}
+---@type Godot.OpenXRIPBinding.__type
+OpenXRIPBinding = {}
+---@type Godot.OpenXripBindingModifier.__type
+OpenXripBindingModifier = {}
+---@type Godot.OpenXRMarkerTracker.__type
+OpenXRMarkerTracker = {}
+---@type Godot.OpenXRPlaneTracker.__type
+OpenXRPlaneTracker = {}
+---@type Godot.OpenXRRenderModel.__type
+OpenXRRenderModel = {}
+---@type Godot.OpenXRRenderModelExtension.__type
+OpenXRRenderModelExtension = {}
+---@type Godot.OpenXRRenderModelManager.__type
+OpenXRRenderModelManager = {}
+---@type Godot.OpenXRSpatialAnchorCapability.__type
+OpenXRSpatialAnchorCapability = {}
+---@type Godot.OpenXRSpatialCapabilityConfigurationAnchor.__type
+OpenXRSpatialCapabilityConfigurationAnchor = {}
+---@type Godot.OpenXRSpatialCapabilityConfigurationAprilTag.__type
+OpenXRSpatialCapabilityConfigurationAprilTag = {}
+---@type Godot.OpenXRSpatialCapabilityConfigurationAruco.__type
+OpenXRSpatialCapabilityConfigurationAruco = {}
+---@type Godot.OpenXRSpatialCapabilityConfigurationBaseHeader.__type
+OpenXRSpatialCapabilityConfigurationBaseHeader = {}
+---@type Godot.OpenXRSpatialCapabilityConfigurationMicroQrCode.__type
+OpenXRSpatialCapabilityConfigurationMicroQrCode = {}
+---@type Godot.OpenXRSpatialCapabilityConfigurationPlaneTracking.__type
+OpenXRSpatialCapabilityConfigurationPlaneTracking = {}
+---@type Godot.OpenXRSpatialCapabilityConfigurationQrCode.__type
+OpenXRSpatialCapabilityConfigurationQrCode = {}
+---@type Godot.OpenXRSpatialComponentAnchorList.__type
+OpenXRSpatialComponentAnchorList = {}
+---@type Godot.OpenXRSpatialComponentBounded2DList.__type
+OpenXRSpatialComponentBounded2DList = {}
+---@type Godot.OpenXRSpatialComponentBounded3DList.__type
+OpenXRSpatialComponentBounded3DList = {}
+---@type Godot.OpenXRSpatialComponentData.__type
+OpenXRSpatialComponentData = {}
+---@type Godot.OpenXRSpatialComponentMarkerList.__type
+OpenXRSpatialComponentMarkerList = {}
+---@type Godot.OpenXRSpatialComponentMesh2DList.__type
+OpenXRSpatialComponentMesh2DList = {}
+---@type Godot.OpenXRSpatialComponentMesh3DList.__type
+OpenXRSpatialComponentMesh3DList = {}
+---@type Godot.OpenXRSpatialComponentParentList.__type
+OpenXRSpatialComponentParentList = {}
+---@type Godot.OpenXRSpatialComponentPersistenceList.__type
+OpenXRSpatialComponentPersistenceList = {}
+---@type Godot.OpenXRSpatialComponentPlaneAlignmentList.__type
+OpenXRSpatialComponentPlaneAlignmentList = {}
+---@type Godot.OpenXRSpatialComponentPlaneSemanticLabelList.__type
+OpenXRSpatialComponentPlaneSemanticLabelList = {}
+---@type Godot.OpenXRSpatialComponentPolygon2DList.__type
+OpenXRSpatialComponentPolygon2DList = {}
+---@type Godot.OpenXRSpatialContextPersistenceConfig.__type
+OpenXRSpatialContextPersistenceConfig = {}
+---@type Godot.OpenXRSpatialEntityExtension.__type
+OpenXRSpatialEntityExtension = {}
+---@type Godot.OpenXRSpatialEntityTracker.__type
+OpenXRSpatialEntityTracker = {}
+---@type Godot.OpenXRSpatialMarkerTrackingCapability.__type
+OpenXRSpatialMarkerTrackingCapability = {}
+---@type Godot.OpenXRSpatialPlaneTrackingCapability.__type
+OpenXRSpatialPlaneTrackingCapability = {}
+---@type Godot.OpenXRSpatialQueryResultData.__type
+OpenXRSpatialQueryResultData = {}
+---@type Godot.OpenXRStructureBase.__type
+OpenXRStructureBase = {}
+---@type Godot.OpenXRVisibilityMask.__type
+OpenXRVisibilityMask = {}
+---@type Godot.OptimizedTranslation.__type
+OptimizedTranslation = {}
+---@type Godot.OptionButton.__type
+OptionButton = {}
+---@type Godot.OrmMaterial3D.__type
+OrmMaterial3D = {}
+---@type Godot.OSInstance.__type
+OSInstance = {}
+---@type Godot.PackedDataContainer.__type
+PackedDataContainer = {}
+---@type Godot.PackedDataContainerRef.__type
+PackedDataContainerRef = {}
+---@type Godot.PackedScene.__type
+PackedScene = {}
+---@type Godot.PacketPeer.__type
+PacketPeer = {}
+---@type Godot.PacketPeerDtls.__type
+PacketPeerDtls = {}
+---@type Godot.PacketPeerExtension.__type
+PacketPeerExtension = {}
+---@type Godot.PacketPeerStream.__type
+PacketPeerStream = {}
+---@type Godot.PacketPeerUdp.__type
+PacketPeerUdp = {}
+---@type Godot.Panel.__type
+Panel = {}
+---@type Godot.PanelContainer.__type
+PanelContainer = {}
+---@type Godot.PanoramaSkyMaterial.__type
+PanoramaSkyMaterial = {}
+---@type Godot.Parallax2D.__type
+Parallax2D = {}
+---@type Godot.ParallaxBackground.__type
+ParallaxBackground = {}
+---@type Godot.ParallaxLayer.__type
+ParallaxLayer = {}
+---@type Godot.ParticleProcessMaterial.__type
+ParticleProcessMaterial = {}
+---@type Godot.Path2D.__type
+Path2D = {}
+---@type Godot.Path3D.__type
+Path3D = {}
+---@type Godot.PathFollow2D.__type
+PathFollow2D = {}
+---@type Godot.PathFollow3D.__type
+PathFollow3D = {}
+---@type Godot.PckPacker.__type
+PckPacker = {}
+---@type Godot.PerformanceInstance.__type
+PerformanceInstance = {}
+---@type Godot.PhysicalBone2D.__type
+PhysicalBone2D = {}
+---@type Godot.PhysicalBone3D.__type
+PhysicalBone3D = {}
+---@type Godot.PhysicalBoneSimulator3D.__type
+PhysicalBoneSimulator3D = {}
+---@type Godot.PhysicalSkyMaterial.__type
+PhysicalSkyMaterial = {}
+---@type Godot.PhysicsBody2D.__type
+PhysicsBody2D = {}
+---@type Godot.PhysicsBody3D.__type
+PhysicsBody3D = {}
+---@type Godot.PhysicsDirectBodyState2D.__type
+PhysicsDirectBodyState2D = {}
+---@type Godot.PhysicsDirectBodyState2DExtension.__type
+PhysicsDirectBodyState2DExtension = {}
+---@type Godot.PhysicsDirectBodyState3D.__type
+PhysicsDirectBodyState3D = {}
+---@type Godot.PhysicsDirectBodyState3DExtension.__type
+PhysicsDirectBodyState3DExtension = {}
+---@type Godot.PhysicsDirectSpaceState2D.__type
+PhysicsDirectSpaceState2D = {}
+---@type Godot.PhysicsDirectSpaceState2DExtension.__type
+PhysicsDirectSpaceState2DExtension = {}
+---@type Godot.PhysicsDirectSpaceState3D.__type
+PhysicsDirectSpaceState3D = {}
+---@type Godot.PhysicsDirectSpaceState3DExtension.__type
+PhysicsDirectSpaceState3DExtension = {}
+---@type Godot.PhysicsMaterial.__type
+PhysicsMaterial = {}
+---@type Godot.PhysicsPointQueryParameters2D.__type
+PhysicsPointQueryParameters2D = {}
+---@type Godot.PhysicsPointQueryParameters3D.__type
+PhysicsPointQueryParameters3D = {}
+---@type Godot.PhysicsRayQueryParameters2D.__type
+PhysicsRayQueryParameters2D = {}
+---@type Godot.PhysicsRayQueryParameters3D.__type
+PhysicsRayQueryParameters3D = {}
+---@type Godot.PhysicsServer2DExtension.__type
+PhysicsServer2DExtension = {}
+---@type Godot.PhysicsServer2DInstance.__type
+PhysicsServer2DInstance = {}
+---@type Godot.PhysicsServer2DManagerInstance.__type
+PhysicsServer2DManagerInstance = {}
+---@type Godot.PhysicsServer3DExtension.__type
+PhysicsServer3DExtension = {}
+---@type Godot.PhysicsServer3DInstance.__type
+PhysicsServer3DInstance = {}
+---@type Godot.PhysicsServer3DManagerInstance.__type
+PhysicsServer3DManagerInstance = {}
+---@type Godot.PhysicsServer3DRenderingServerHandler.__type
+PhysicsServer3DRenderingServerHandler = {}
+---@type Godot.PhysicsShapeQueryParameters2D.__type
+PhysicsShapeQueryParameters2D = {}
+---@type Godot.PhysicsShapeQueryParameters3D.__type
+PhysicsShapeQueryParameters3D = {}
+---@type Godot.PhysicsTestMotionParameters2D.__type
+PhysicsTestMotionParameters2D = {}
+---@type Godot.PhysicsTestMotionParameters3D.__type
+PhysicsTestMotionParameters3D = {}
+---@type Godot.PhysicsTestMotionResult2D.__type
+PhysicsTestMotionResult2D = {}
+---@type Godot.PhysicsTestMotionResult3D.__type
+PhysicsTestMotionResult3D = {}
+---@type Godot.PinJoint2D.__type
+PinJoint2D = {}
+---@type Godot.PinJoint3D.__type
+PinJoint3D = {}
+---@type Godot.PlaceholderCubemap.__type
+PlaceholderCubemap = {}
+---@type Godot.PlaceholderCubemapArray.__type
+PlaceholderCubemapArray = {}
+---@type Godot.PlaceholderMaterial.__type
+PlaceholderMaterial = {}
+---@type Godot.PlaceholderMesh.__type
+PlaceholderMesh = {}
+---@type Godot.PlaceholderTexture2D.__type
+PlaceholderTexture2D = {}
+---@type Godot.PlaceholderTexture2DArray.__type
+PlaceholderTexture2DArray = {}
+---@type Godot.PlaceholderTexture3D.__type
+PlaceholderTexture3D = {}
+---@type Godot.PlaceholderTextureLayered.__type
+PlaceholderTextureLayered = {}
+---@type Godot.PlaneMesh.__type
+PlaneMesh = {}
+---@type Godot.PointLight2D.__type
+PointLight2D = {}
+---@type Godot.PointMesh.__type
+PointMesh = {}
+---@type Godot.Polygon2D.__type
+Polygon2D = {}
+---@type Godot.PolygonOccluder3D.__type
+PolygonOccluder3D = {}
+---@type Godot.PolygonPathFinder.__type
+PolygonPathFinder = {}
+---@type Godot.Popup.__type
+Popup = {}
+---@type Godot.PopupMenu.__type
+PopupMenu = {}
+---@type Godot.PopupPanel.__type
+PopupPanel = {}
+---@type Godot.PortableCompressedTexture2D.__type
+PortableCompressedTexture2D = {}
+---@type Godot.PrimitiveMesh.__type
+PrimitiveMesh = {}
+---@type Godot.PrismMesh.__type
+PrismMesh = {}
+---@type Godot.ProceduralSkyMaterial.__type
+ProceduralSkyMaterial = {}
+---@type Godot.ProgressBar.__type
+ProgressBar = {}
+---@type Godot.ProjectSettingsInstance.__type
+ProjectSettingsInstance = {}
+---@type Godot.PropertyTweener.__type
+PropertyTweener = {}
+---@type Godot.QuadMesh.__type
+QuadMesh = {}
+---@type Godot.QuadOccluder3D.__type
+QuadOccluder3D = {}
+---@type Godot.RandomNumberGenerator.__type
+RandomNumberGenerator = {}
+---@type Godot.Range.__type
+Range = {}
+---@type Godot.RayCast2D.__type
+RayCast2D = {}
+---@type Godot.RayCast3D.__type
+RayCast3D = {}
+---@type Godot.RDAttachmentFormat.__type
+RDAttachmentFormat = {}
+---@type Godot.RDFramebufferPass.__type
+RDFramebufferPass = {}
+---@type Godot.RDPipelineColorBlendState.__type
+RDPipelineColorBlendState = {}
+---@type Godot.RDPipelineColorBlendStateAttachment.__type
+RDPipelineColorBlendStateAttachment = {}
+---@type Godot.RDPipelineDepthStencilState.__type
+RDPipelineDepthStencilState = {}
+---@type Godot.RDPipelineMultisampleState.__type
+RDPipelineMultisampleState = {}
+---@type Godot.RDPipelineRasterizationState.__type
+RDPipelineRasterizationState = {}
+---@type Godot.RDPipelineSpecializationConstant.__type
+RDPipelineSpecializationConstant = {}
+---@type Godot.RDSamplerState.__type
+RDSamplerState = {}
+---@type Godot.RDShaderFile.__type
+RDShaderFile = {}
+---@type Godot.RDShaderSource.__type
+RDShaderSource = {}
+---@type Godot.RDShaderSpirV.__type
+RDShaderSpirV = {}
+---@type Godot.RDTextureFormat.__type
+RDTextureFormat = {}
+---@type Godot.RDTextureView.__type
+RDTextureView = {}
+---@type Godot.RDUniform.__type
+RDUniform = {}
+---@type Godot.RDVertexAttribute.__type
+RDVertexAttribute = {}
+---@type Godot.RectangleShape2D.__type
+RectangleShape2D = {}
+---@type Godot.RefCounted.__type
+RefCounted = {}
+---@type Godot.ReferenceRect.__type
+ReferenceRect = {}
+---@type Godot.ReflectionProbe.__type
+ReflectionProbe = {}
+---@type Godot.RegEx.__type
+RegEx = {}
+---@type Godot.RegExMatch.__type
+RegExMatch = {}
+---@type Godot.RemoteTransform2D.__type
+RemoteTransform2D = {}
+---@type Godot.RemoteTransform3D.__type
+RemoteTransform3D = {}
+---@type Godot.RenderData.__type
+RenderData = {}
+---@type Godot.RenderDataExtension.__type
+RenderDataExtension = {}
+---@type Godot.RenderDataRD.__type
+RenderDataRD = {}
+---@type Godot.RenderingDevice.__type
+RenderingDevice = {}
+---@type Godot.RenderingServerInstance.__type
+RenderingServerInstance = {}
+---@type Godot.RenderSceneBuffers.__type
+RenderSceneBuffers = {}
+---@type Godot.RenderSceneBuffersConfiguration.__type
+RenderSceneBuffersConfiguration = {}
+---@type Godot.RenderSceneBuffersExtension.__type
+RenderSceneBuffersExtension = {}
+---@type Godot.RenderSceneBuffersRD.__type
+RenderSceneBuffersRD = {}
+---@type Godot.RenderSceneData.__type
+RenderSceneData = {}
+---@type Godot.RenderSceneDataExtension.__type
+RenderSceneDataExtension = {}
+---@type Godot.RenderSceneDataRD.__type
+RenderSceneDataRD = {}
+---@type Godot.Resource.__type
+Resource = {}
+---@type Godot.ResourceFormatLoader.__type
+ResourceFormatLoader = {}
+---@type Godot.ResourceFormatSaver.__type
+ResourceFormatSaver = {}
+---@type Godot.ResourceImporter.__type
+ResourceImporter = {}
+---@type Godot.ResourceLoaderInstance.__type
+ResourceLoaderInstance = {}
+---@type Godot.ResourcePreloader.__type
+ResourcePreloader = {}
+---@type Godot.ResourceSaverInstance.__type
+ResourceSaverInstance = {}
+---@type Godot.ResourceUidInstance.__type
+ResourceUidInstance = {}
+---@type Godot.RetargetModifier3D.__type
+RetargetModifier3D = {}
+---@type Godot.RibbonTrailMesh.__type
+RibbonTrailMesh = {}
+---@type Godot.RichTextEffect.__type
+RichTextEffect = {}
+---@type Godot.RichTextLabel.__type
+RichTextLabel = {}
+---@type Godot.RigidBody2D.__type
+RigidBody2D = {}
+---@type Godot.RigidBody3D.__type
+RigidBody3D = {}
+---@type Godot.RootMotionView.__type
+RootMotionView = {}
+---@type Godot.SceneMultiplayer.__type
+SceneMultiplayer = {}
+---@type Godot.SceneReplicationConfig.__type
+SceneReplicationConfig = {}
+---@type Godot.SceneState.__type
+SceneState = {}
+---@type Godot.SceneTree.__type
+SceneTree = {}
+---@type Godot.SceneTreeTimer.__type
+SceneTreeTimer = {}
+---@type Godot.Script.__type
+Script = {}
+---@type Godot.ScriptBacktrace.__type
+ScriptBacktrace = {}
+---@type Godot.ScriptExtension.__type
+ScriptExtension = {}
+---@type Godot.ScriptLanguage.__type
+ScriptLanguage = {}
+---@type Godot.ScriptLanguageExtension.__type
+ScriptLanguageExtension = {}
+---@type Godot.ScrollBar.__type
+ScrollBar = {}
+---@type Godot.ScrollContainer.__type
+ScrollContainer = {}
+---@type Godot.SegmentShape2D.__type
+SegmentShape2D = {}
+---@type Godot.Semaphore.__type
+Semaphore = {}
+---@type Godot.SeparationRayShape2D.__type
+SeparationRayShape2D = {}
+---@type Godot.SeparationRayShape3D.__type
+SeparationRayShape3D = {}
+---@type Godot.Separator.__type
+Separator = {}
+---@type Godot.Shader.__type
+Shader = {}
+---@type Godot.ShaderGlobalsOverride.__type
+ShaderGlobalsOverride = {}
+---@type Godot.ShaderInclude.__type
+ShaderInclude = {}
+---@type Godot.ShaderIncludeDB.__type
+ShaderIncludeDB = {}
+---@type Godot.ShaderMaterial.__type
+ShaderMaterial = {}
+---@type Godot.Shape2D.__type
+Shape2D = {}
+---@type Godot.Shape3D.__type
+Shape3D = {}
+---@type Godot.ShapeCast2D.__type
+ShapeCast2D = {}
+---@type Godot.ShapeCast3D.__type
+ShapeCast3D = {}
+---@type Godot.Shortcut.__type
+Shortcut = {}
+---@type Godot.Skeleton2D.__type
+Skeleton2D = {}
+---@type Godot.Skeleton3D.__type
+Skeleton3D = {}
+---@type Godot.SkeletonIK3D.__type
+SkeletonIK3D = {}
+---@type Godot.SkeletonModification2D.__type
+SkeletonModification2D = {}
+---@type Godot.SkeletonModification2DCcdik.__type
+SkeletonModification2DCcdik = {}
+---@type Godot.SkeletonModification2DFabrik.__type
+SkeletonModification2DFabrik = {}
+---@type Godot.SkeletonModification2DJiggle.__type
+SkeletonModification2DJiggle = {}
+---@type Godot.SkeletonModification2DLookAt.__type
+SkeletonModification2DLookAt = {}
+---@type Godot.SkeletonModification2DPhysicalBones.__type
+SkeletonModification2DPhysicalBones = {}
+---@type Godot.SkeletonModification2DStackHolder.__type
+SkeletonModification2DStackHolder = {}
+---@type Godot.SkeletonModification2DTwoBoneIK.__type
+SkeletonModification2DTwoBoneIK = {}
+---@type Godot.SkeletonModificationStack2D.__type
+SkeletonModificationStack2D = {}
+---@type Godot.SkeletonModifier3D.__type
+SkeletonModifier3D = {}
+---@type Godot.SkeletonProfile.__type
+SkeletonProfile = {}
+---@type Godot.SkeletonProfileHumanoid.__type
+SkeletonProfileHumanoid = {}
+---@type Godot.Skin.__type
+Skin = {}
+---@type Godot.SkinReference.__type
+SkinReference = {}
+---@type Godot.Sky.__type
+Sky = {}
+---@type Godot.Slider.__type
+Slider = {}
+---@type Godot.SliderJoint3D.__type
+SliderJoint3D = {}
+---@type Godot.SocketServer.__type
+SocketServer = {}
+---@type Godot.SoftBody3D.__type
+SoftBody3D = {}
+---@type Godot.SphereMesh.__type
+SphereMesh = {}
+---@type Godot.SphereOccluder3D.__type
+SphereOccluder3D = {}
+---@type Godot.SphereShape3D.__type
+SphereShape3D = {}
+---@type Godot.SpinBox.__type
+SpinBox = {}
+---@type Godot.SplineIK3D.__type
+SplineIK3D = {}
+---@type Godot.SplitContainer.__type
+SplitContainer = {}
+---@type Godot.SpotLight3D.__type
+SpotLight3D = {}
+---@type Godot.SpringArm3D.__type
+SpringArm3D = {}
+---@type Godot.SpringBoneCollision3D.__type
+SpringBoneCollision3D = {}
+---@type Godot.SpringBoneCollisionCapsule3D.__type
+SpringBoneCollisionCapsule3D = {}
+---@type Godot.SpringBoneCollisionPlane3D.__type
+SpringBoneCollisionPlane3D = {}
+---@type Godot.SpringBoneCollisionSphere3D.__type
+SpringBoneCollisionSphere3D = {}
+---@type Godot.SpringBoneSimulator3D.__type
+SpringBoneSimulator3D = {}
+---@type Godot.Sprite2D.__type
+Sprite2D = {}
+---@type Godot.Sprite3D.__type
+Sprite3D = {}
+---@type Godot.SpriteBase3D.__type
+SpriteBase3D = {}
+---@type Godot.SpriteFrames.__type
+SpriteFrames = {}
+---@type Godot.StandardMaterial3D.__type
+StandardMaterial3D = {}
+---@type Godot.StaticBody2D.__type
+StaticBody2D = {}
+---@type Godot.StaticBody3D.__type
+StaticBody3D = {}
+---@type Godot.StatusIndicator.__type
+StatusIndicator = {}
+---@type Godot.StreamPeer.__type
+StreamPeer = {}
+---@type Godot.StreamPeerBuffer.__type
+StreamPeerBuffer = {}
+---@type Godot.StreamPeerExtension.__type
+StreamPeerExtension = {}
+---@type Godot.StreamPeerGZip.__type
+StreamPeerGZip = {}
+---@type Godot.StreamPeerSocket.__type
+StreamPeerSocket = {}
+---@type Godot.StreamPeerTcp.__type
+StreamPeerTcp = {}
+---@type Godot.StreamPeerTls.__type
+StreamPeerTls = {}
+---@type Godot.StreamPeerUds.__type
+StreamPeerUds = {}
+---@type Godot.StyleBox.__type
+StyleBox = {}
+---@type Godot.StyleBoxEmpty.__type
+StyleBoxEmpty = {}
+---@type Godot.StyleBoxFlat.__type
+StyleBoxFlat = {}
+---@type Godot.StyleBoxLine.__type
+StyleBoxLine = {}
+---@type Godot.StyleBoxTexture.__type
+StyleBoxTexture = {}
+---@type Godot.SubtweenTweener.__type
+SubtweenTweener = {}
+---@type Godot.SubViewport.__type
+SubViewport = {}
+---@type Godot.SubViewportContainer.__type
+SubViewportContainer = {}
+---@type Godot.SurfaceTool.__type
+SurfaceTool = {}
+---@type Godot.SyntaxHighlighter.__type
+SyntaxHighlighter = {}
+---@type Godot.SystemFont.__type
+SystemFont = {}
+---@type Godot.TabBar.__type
+TabBar = {}
+---@type Godot.TabContainer.__type
+TabContainer = {}
+---@type Godot.TcpServer.__type
+TcpServer = {}
+---@type Godot.TextEdit.__type
+TextEdit = {}
+---@type Godot.TextLine.__type
+TextLine = {}
+---@type Godot.TextMesh.__type
+TextMesh = {}
+---@type Godot.TextParagraph.__type
+TextParagraph = {}
+---@type Godot.TextServer.__type
+TextServer = {}
+---@type Godot.TextServerAdvanced.__type
+TextServerAdvanced = {}
+---@type Godot.TextServerDummy.__type
+TextServerDummy = {}
+---@type Godot.TextServerExtension.__type
+TextServerExtension = {}
+---@type Godot.TextServerManagerInstance.__type
+TextServerManagerInstance = {}
+---@type Godot.Texture.__type
+Texture = {}
+---@type Godot.Texture2D.__type
+Texture2D = {}
+---@type Godot.Texture2DArray.__type
+Texture2DArray = {}
+---@type Godot.Texture2DArrayRD.__type
+Texture2DArrayRD = {}
+---@type Godot.Texture2Drd.__type
+Texture2Drd = {}
+---@type Godot.Texture3D.__type
+Texture3D = {}
+---@type Godot.Texture3Drd.__type
+Texture3Drd = {}
+---@type Godot.TextureButton.__type
+TextureButton = {}
+---@type Godot.TextureCubemapArrayRD.__type
+TextureCubemapArrayRD = {}
+---@type Godot.TextureCubemapRD.__type
+TextureCubemapRD = {}
+---@type Godot.TextureLayered.__type
+TextureLayered = {}
+---@type Godot.TextureLayeredRD.__type
+TextureLayeredRD = {}
+---@type Godot.TextureProgressBar.__type
+TextureProgressBar = {}
+---@type Godot.TextureRect.__type
+TextureRect = {}
+---@type Godot.Theme.__type
+Theme = {}
+---@type Godot.ThemeDBInstance.__type
+ThemeDBInstance = {}
+---@type Godot.TileData.__type
+TileData = {}
+---@type Godot.TileMap.__type
+TileMap = {}
+---@type Godot.TileMapLayer.__type
+TileMapLayer = {}
+---@type Godot.TileMapPattern.__type
+TileMapPattern = {}
+---@type Godot.TileSet.__type
+TileSet = {}
+---@type Godot.TileSetAtlasSource.__type
+TileSetAtlasSource = {}
+---@type Godot.TileSetScenesCollectionSource.__type
+TileSetScenesCollectionSource = {}
+---@type Godot.TileSetSource.__type
+TileSetSource = {}
+---@type Godot.TimeInstance.__type
+TimeInstance = {}
+---@type Godot.Timer.__type
+Timer = {}
+---@type Godot.TlsOptions.__type
+TlsOptions = {}
+---@type Godot.TorusMesh.__type
+TorusMesh = {}
+---@type Godot.TouchScreenButton.__type
+TouchScreenButton = {}
+---@type Godot.Translation.__type
+Translation = {}
+---@type Godot.TranslationDomain.__type
+TranslationDomain = {}
+---@type Godot.TranslationServerInstance.__type
+TranslationServerInstance = {}
+---@type Godot.Tree.__type
+Tree = {}
+---@type Godot.TreeItem.__type
+TreeItem = {}
+---@type Godot.TriangleMesh.__type
+TriangleMesh = {}
+---@type Godot.TubeTrailMesh.__type
+TubeTrailMesh = {}
+---@type Godot.Tween.__type
+Tween = {}
+---@type Godot.Tweener.__type
+Tweener = {}
+---@type Godot.TwoBoneIK3D.__type
+TwoBoneIK3D = {}
+---@type Godot.UdpServer.__type
+UdpServer = {}
+---@type Godot.UdsServer.__type
+UdsServer = {}
+---@type Godot.UndoRedo.__type
+UndoRedo = {}
+---@type Godot.UniformSetCacheRD.__type
+UniformSetCacheRD = {}
+---@type Godot.Upnp.__type
+Upnp = {}
+---@type Godot.UpnpDevice.__type
+UpnpDevice = {}
+---@type Godot.VBoxContainer.__type
+VBoxContainer = {}
+---@type Godot.VehicleBody3D.__type
+VehicleBody3D = {}
+---@type Godot.VehicleWheel3D.__type
+VehicleWheel3D = {}
+---@type Godot.VFlowContainer.__type
+VFlowContainer = {}
+---@type Godot.VideoStream.__type
+VideoStream = {}
+---@type Godot.VideoStreamPlayback.__type
+VideoStreamPlayback = {}
+---@type Godot.VideoStreamPlayer.__type
+VideoStreamPlayer = {}
+---@type Godot.VideoStreamTheora.__type
+VideoStreamTheora = {}
+---@type Godot.Viewport.__type
+Viewport = {}
+---@type Godot.ViewportTexture.__type
+ViewportTexture = {}
+---@type Godot.VisibleOnScreenEnabler2D.__type
+VisibleOnScreenEnabler2D = {}
+---@type Godot.VisibleOnScreenEnabler3D.__type
+VisibleOnScreenEnabler3D = {}
+---@type Godot.VisibleOnScreenNotifier2D.__type
+VisibleOnScreenNotifier2D = {}
+---@type Godot.VisibleOnScreenNotifier3D.__type
+VisibleOnScreenNotifier3D = {}
+---@type Godot.VisualInstance3D.__type
+VisualInstance3D = {}
+---@type Godot.VisualShader.__type
+VisualShader = {}
+---@type Godot.VisualShaderNode.__type
+VisualShaderNode = {}
+---@type Godot.VisualShaderNodeBillboard.__type
+VisualShaderNodeBillboard = {}
+---@type Godot.VisualShaderNodeBooleanConstant.__type
+VisualShaderNodeBooleanConstant = {}
+---@type Godot.VisualShaderNodeBooleanParameter.__type
+VisualShaderNodeBooleanParameter = {}
+---@type Godot.VisualShaderNodeClamp.__type
+VisualShaderNodeClamp = {}
+---@type Godot.VisualShaderNodeColorConstant.__type
+VisualShaderNodeColorConstant = {}
+---@type Godot.VisualShaderNodeColorFunc.__type
+VisualShaderNodeColorFunc = {}
+---@type Godot.VisualShaderNodeColorOp.__type
+VisualShaderNodeColorOp = {}
+---@type Godot.VisualShaderNodeColorParameter.__type
+VisualShaderNodeColorParameter = {}
+---@type Godot.VisualShaderNodeComment.__type
+VisualShaderNodeComment = {}
+---@type Godot.VisualShaderNodeCompare.__type
+VisualShaderNodeCompare = {}
+---@type Godot.VisualShaderNodeConstant.__type
+VisualShaderNodeConstant = {}
+---@type Godot.VisualShaderNodeCubemap.__type
+VisualShaderNodeCubemap = {}
+---@type Godot.VisualShaderNodeCubemapParameter.__type
+VisualShaderNodeCubemapParameter = {}
+---@type Godot.VisualShaderNodeCurveTexture.__type
+VisualShaderNodeCurveTexture = {}
+---@type Godot.VisualShaderNodeCurveXyzTexture.__type
+VisualShaderNodeCurveXyzTexture = {}
+---@type Godot.VisualShaderNodeCustom.__type
+VisualShaderNodeCustom = {}
+---@type Godot.VisualShaderNodeDerivativeFunc.__type
+VisualShaderNodeDerivativeFunc = {}
+---@type Godot.VisualShaderNodeDeterminant.__type
+VisualShaderNodeDeterminant = {}
+---@type Godot.VisualShaderNodeDistanceFade.__type
+VisualShaderNodeDistanceFade = {}
+---@type Godot.VisualShaderNodeDotProduct.__type
+VisualShaderNodeDotProduct = {}
+---@type Godot.VisualShaderNodeExpression.__type
+VisualShaderNodeExpression = {}
+---@type Godot.VisualShaderNodeFaceForward.__type
+VisualShaderNodeFaceForward = {}
+---@type Godot.VisualShaderNodeFloatConstant.__type
+VisualShaderNodeFloatConstant = {}
+---@type Godot.VisualShaderNodeFloatFunc.__type
+VisualShaderNodeFloatFunc = {}
+---@type Godot.VisualShaderNodeFloatOp.__type
+VisualShaderNodeFloatOp = {}
+---@type Godot.VisualShaderNodeFloatParameter.__type
+VisualShaderNodeFloatParameter = {}
+---@type Godot.VisualShaderNodeFrame.__type
+VisualShaderNodeFrame = {}
+---@type Godot.VisualShaderNodeFresnel.__type
+VisualShaderNodeFresnel = {}
+---@type Godot.VisualShaderNodeGlobalExpression.__type
+VisualShaderNodeGlobalExpression = {}
+---@type Godot.VisualShaderNodeGroupBase.__type
+VisualShaderNodeGroupBase = {}
+---@type Godot.VisualShaderNodeIf.__type
+VisualShaderNodeIf = {}
+---@type Godot.VisualShaderNodeInput.__type
+VisualShaderNodeInput = {}
+---@type Godot.VisualShaderNodeIntConstant.__type
+VisualShaderNodeIntConstant = {}
+---@type Godot.VisualShaderNodeIntFunc.__type
+VisualShaderNodeIntFunc = {}
+---@type Godot.VisualShaderNodeIntOp.__type
+VisualShaderNodeIntOp = {}
+---@type Godot.VisualShaderNodeIntParameter.__type
+VisualShaderNodeIntParameter = {}
+---@type Godot.VisualShaderNodeIs.__type
+VisualShaderNodeIs = {}
+---@type Godot.VisualShaderNodeLinearSceneDepth.__type
+VisualShaderNodeLinearSceneDepth = {}
+---@type Godot.VisualShaderNodeMix.__type
+VisualShaderNodeMix = {}
+---@type Godot.VisualShaderNodeMultiplyAdd.__type
+VisualShaderNodeMultiplyAdd = {}
+---@type Godot.VisualShaderNodeOuterProduct.__type
+VisualShaderNodeOuterProduct = {}
+---@type Godot.VisualShaderNodeOutput.__type
+VisualShaderNodeOutput = {}
+---@type Godot.VisualShaderNodeParameter.__type
+VisualShaderNodeParameter = {}
+---@type Godot.VisualShaderNodeParameterRef.__type
+VisualShaderNodeParameterRef = {}
+---@type Godot.VisualShaderNodeParticleAccelerator.__type
+VisualShaderNodeParticleAccelerator = {}
+---@type Godot.VisualShaderNodeParticleBoxEmitter.__type
+VisualShaderNodeParticleBoxEmitter = {}
+---@type Godot.VisualShaderNodeParticleConeVelocity.__type
+VisualShaderNodeParticleConeVelocity = {}
+---@type Godot.VisualShaderNodeParticleEmit.__type
+VisualShaderNodeParticleEmit = {}
+---@type Godot.VisualShaderNodeParticleEmitter.__type
+VisualShaderNodeParticleEmitter = {}
+---@type Godot.VisualShaderNodeParticleMeshEmitter.__type
+VisualShaderNodeParticleMeshEmitter = {}
+---@type Godot.VisualShaderNodeParticleMultiplyByAxisAngle.__type
+VisualShaderNodeParticleMultiplyByAxisAngle = {}
+---@type Godot.VisualShaderNodeParticleOutput.__type
+VisualShaderNodeParticleOutput = {}
+---@type Godot.VisualShaderNodeParticleRandomness.__type
+VisualShaderNodeParticleRandomness = {}
+---@type Godot.VisualShaderNodeParticleRingEmitter.__type
+VisualShaderNodeParticleRingEmitter = {}
+---@type Godot.VisualShaderNodeParticleSphereEmitter.__type
+VisualShaderNodeParticleSphereEmitter = {}
+---@type Godot.VisualShaderNodeProximityFade.__type
+VisualShaderNodeProximityFade = {}
+---@type Godot.VisualShaderNodeRandomRange.__type
+VisualShaderNodeRandomRange = {}
+---@type Godot.VisualShaderNodeRemap.__type
+VisualShaderNodeRemap = {}
+---@type Godot.VisualShaderNodeReroute.__type
+VisualShaderNodeReroute = {}
+---@type Godot.VisualShaderNodeResizableBase.__type
+VisualShaderNodeResizableBase = {}
+---@type Godot.VisualShaderNodeRotationByAxis.__type
+VisualShaderNodeRotationByAxis = {}
+---@type Godot.VisualShaderNodeSample3D.__type
+VisualShaderNodeSample3D = {}
+---@type Godot.VisualShaderNodeScreenNormalWorldSpace.__type
+VisualShaderNodeScreenNormalWorldSpace = {}
+---@type Godot.VisualShaderNodeScreenUVToSdf.__type
+VisualShaderNodeScreenUVToSdf = {}
+---@type Godot.VisualShaderNodeSdfRaymarch.__type
+VisualShaderNodeSdfRaymarch = {}
+---@type Godot.VisualShaderNodeSdfToScreenUV.__type
+VisualShaderNodeSdfToScreenUV = {}
+---@type Godot.VisualShaderNodeSmoothStep.__type
+VisualShaderNodeSmoothStep = {}
+---@type Godot.VisualShaderNodeStep.__type
+VisualShaderNodeStep = {}
+---@type Godot.VisualShaderNodeSwitch.__type
+VisualShaderNodeSwitch = {}
+---@type Godot.VisualShaderNodeTexture.__type
+VisualShaderNodeTexture = {}
+---@type Godot.VisualShaderNodeTexture2DArray.__type
+VisualShaderNodeTexture2DArray = {}
+---@type Godot.VisualShaderNodeTexture2DArrayParameter.__type
+VisualShaderNodeTexture2DArrayParameter = {}
+---@type Godot.VisualShaderNodeTexture2DParameter.__type
+VisualShaderNodeTexture2DParameter = {}
+---@type Godot.VisualShaderNodeTexture3D.__type
+VisualShaderNodeTexture3D = {}
+---@type Godot.VisualShaderNodeTexture3DParameter.__type
+VisualShaderNodeTexture3DParameter = {}
+---@type Godot.VisualShaderNodeTextureParameter.__type
+VisualShaderNodeTextureParameter = {}
+---@type Godot.VisualShaderNodeTextureParameterTriplanar.__type
+VisualShaderNodeTextureParameterTriplanar = {}
+---@type Godot.VisualShaderNodeTextureSdf.__type
+VisualShaderNodeTextureSdf = {}
+---@type Godot.VisualShaderNodeTextureSdfNormal.__type
+VisualShaderNodeTextureSdfNormal = {}
+---@type Godot.VisualShaderNodeTransformCompose.__type
+VisualShaderNodeTransformCompose = {}
+---@type Godot.VisualShaderNodeTransformConstant.__type
+VisualShaderNodeTransformConstant = {}
+---@type Godot.VisualShaderNodeTransformDecompose.__type
+VisualShaderNodeTransformDecompose = {}
+---@type Godot.VisualShaderNodeTransformFunc.__type
+VisualShaderNodeTransformFunc = {}
+---@type Godot.VisualShaderNodeTransformOp.__type
+VisualShaderNodeTransformOp = {}
+---@type Godot.VisualShaderNodeTransformParameter.__type
+VisualShaderNodeTransformParameter = {}
+---@type Godot.VisualShaderNodeTransformVecMult.__type
+VisualShaderNodeTransformVecMult = {}
+---@type Godot.VisualShaderNodeUIntConstant.__type
+VisualShaderNodeUIntConstant = {}
+---@type Godot.VisualShaderNodeUIntFunc.__type
+VisualShaderNodeUIntFunc = {}
+---@type Godot.VisualShaderNodeUIntOp.__type
+VisualShaderNodeUIntOp = {}
+---@type Godot.VisualShaderNodeUIntParameter.__type
+VisualShaderNodeUIntParameter = {}
+---@type Godot.VisualShaderNodeUVFunc.__type
+VisualShaderNodeUVFunc = {}
+---@type Godot.VisualShaderNodeUVPolarCoord.__type
+VisualShaderNodeUVPolarCoord = {}
+---@type Godot.VisualShaderNodeVarying.__type
+VisualShaderNodeVarying = {}
+---@type Godot.VisualShaderNodeVaryingGetter.__type
+VisualShaderNodeVaryingGetter = {}
+---@type Godot.VisualShaderNodeVaryingSetter.__type
+VisualShaderNodeVaryingSetter = {}
+---@type Godot.VisualShaderNodeVec2Constant.__type
+VisualShaderNodeVec2Constant = {}
+---@type Godot.VisualShaderNodeVec2Parameter.__type
+VisualShaderNodeVec2Parameter = {}
+---@type Godot.VisualShaderNodeVec3Constant.__type
+VisualShaderNodeVec3Constant = {}
+---@type Godot.VisualShaderNodeVec3Parameter.__type
+VisualShaderNodeVec3Parameter = {}
+---@type Godot.VisualShaderNodeVec4Constant.__type
+VisualShaderNodeVec4Constant = {}
+---@type Godot.VisualShaderNodeVec4Parameter.__type
+VisualShaderNodeVec4Parameter = {}
+---@type Godot.VisualShaderNodeVectorBase.__type
+VisualShaderNodeVectorBase = {}
+---@type Godot.VisualShaderNodeVectorCompose.__type
+VisualShaderNodeVectorCompose = {}
+---@type Godot.VisualShaderNodeVectorDecompose.__type
+VisualShaderNodeVectorDecompose = {}
+---@type Godot.VisualShaderNodeVectorDistance.__type
+VisualShaderNodeVectorDistance = {}
+---@type Godot.VisualShaderNodeVectorFunc.__type
+VisualShaderNodeVectorFunc = {}
+---@type Godot.VisualShaderNodeVectorLen.__type
+VisualShaderNodeVectorLen = {}
+---@type Godot.VisualShaderNodeVectorOp.__type
+VisualShaderNodeVectorOp = {}
+---@type Godot.VisualShaderNodeVectorRefract.__type
+VisualShaderNodeVectorRefract = {}
+---@type Godot.VisualShaderNodeWorldPositionFromDepth.__type
+VisualShaderNodeWorldPositionFromDepth = {}
+---@type Godot.VoxelGI.__type
+VoxelGI = {}
+---@type Godot.VoxelGIData.__type
+VoxelGIData = {}
+---@type Godot.VScrollBar.__type
+VScrollBar = {}
+---@type Godot.VSeparator.__type
+VSeparator = {}
+---@type Godot.VSlider.__type
+VSlider = {}
+---@type Godot.VSplitContainer.__type
+VSplitContainer = {}
+---@type Godot.WeakRef.__type
+WeakRef = {}
+---@type Godot.WebRtcDataChannel.__type
+WebRtcDataChannel = {}
+---@type Godot.WebRtcDataChannelExtension.__type
+WebRtcDataChannelExtension = {}
+---@type Godot.WebRtcMultiplayerPeer.__type
+WebRtcMultiplayerPeer = {}
+---@type Godot.WebRtcPeerConnection.__type
+WebRtcPeerConnection = {}
+---@type Godot.WebRtcPeerConnectionExtension.__type
+WebRtcPeerConnectionExtension = {}
+---@type Godot.WebSocketMultiplayerPeer.__type
+WebSocketMultiplayerPeer = {}
+---@type Godot.WebSocketPeer.__type
+WebSocketPeer = {}
+---@type Godot.WebXRInterface.__type
+WebXRInterface = {}
+---@type Godot.Window.__type
+Window = {}
+---@type Godot.WorkerThreadPoolInstance.__type
+WorkerThreadPoolInstance = {}
+---@type Godot.World2D.__type
+World2D = {}
+---@type Godot.World3D.__type
+World3D = {}
+---@type Godot.WorldBoundaryShape2D.__type
+WorldBoundaryShape2D = {}
+---@type Godot.WorldBoundaryShape3D.__type
+WorldBoundaryShape3D = {}
+---@type Godot.WorldEnvironment.__type
+WorldEnvironment = {}
+---@type Godot.X509Certificate.__type
+X509Certificate = {}
+---@type Godot.XmlParser.__type
+XmlParser = {}
+---@type Godot.XRAnchor3D.__type
+XRAnchor3D = {}
+---@type Godot.XRBodyModifier3D.__type
+XRBodyModifier3D = {}
+---@type Godot.XRBodyTracker.__type
+XRBodyTracker = {}
+---@type Godot.XRCamera3D.__type
+XRCamera3D = {}
+---@type Godot.XRController3D.__type
+XRController3D = {}
+---@type Godot.XRControllerTracker.__type
+XRControllerTracker = {}
+---@type Godot.XRFaceModifier3D.__type
+XRFaceModifier3D = {}
+---@type Godot.XRFaceTracker.__type
+XRFaceTracker = {}
+---@type Godot.XRHandModifier3D.__type
+XRHandModifier3D = {}
+---@type Godot.XRHandTracker.__type
+XRHandTracker = {}
+---@type Godot.XRInterface.__type
+XRInterface = {}
+---@type Godot.XRInterfaceExtension.__type
+XRInterfaceExtension = {}
+---@type Godot.XRNode3D.__type
+XRNode3D = {}
+---@type Godot.XROrigin3D.__type
+XROrigin3D = {}
+---@type Godot.XRPose.__type
+XRPose = {}
+---@type Godot.XRPositionalTracker.__type
+XRPositionalTracker = {}
+---@type Godot.XRServerInstance.__type
+XRServerInstance = {}
+---@type Godot.XRTracker.__type
+XRTracker = {}
+---@type Godot.Xrvrs.__type
+Xrvrs = {}
+---@type Godot.ZipPacker.__type
+ZipPacker = {}
+---@type Godot.ZipReader.__type
+ZipReader = {}
+---@type Godot.ClockDirection
+ClockDirection = {}
+---@type Godot.Corner
+Corner = {}
+---@type Godot.Error
+Error = {}
+---@type Godot.EulerOrder
+EulerOrder = {}
+---@type Godot.HorizontalAlignment
+HorizontalAlignment = {}
+---@type Godot.InlineAlignment
+InlineAlignment = {}
+---@type Godot.JoyAxis
+JoyAxis = {}
+---@type Godot.JoyButton
+JoyButton = {}
+---@type Godot.Key
+Key = {}
+---@type Godot.KeyLocation
+KeyLocation = {}
+---@type Godot.KeyModifierMask
+KeyModifierMask = {}
+---@type Godot.MethodFlags
+MethodFlags = {}
+---@type Godot.MidiMessage
+MidiMessage = {}
+---@type Godot.MouseButton
+MouseButton = {}
+---@type Godot.MouseButtonMask
+MouseButtonMask = {}
+---@type Godot.Orientation
+Orientation = {}
+---@type Godot.PropertyHint
+PropertyHint = {}
+---@type Godot.PropertyUsageFlags
+PropertyUsageFlags = {}
+---@type Godot.Side
+Side = {}
+---@type Godot.VerticalAlignment
+VerticalAlignment = {}
 
 ---@class Godot.AcceptDialog : Godot.Window
 ---@field dialog_autowrap boolean

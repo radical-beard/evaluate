@@ -37,7 +37,10 @@
           "evt"
         ],
         "extensions": [
-          ".evt"
+          ".evt",
+          ".node.evt",
+          ".behavior.evt",
+          ".statemachine.evt"
         ],
         "configuration": "./language-configuration.json",
         "icon": {
@@ -78,7 +81,7 @@
           "default": [
             "downloads/spec/luacats"
           ],
-          "markdownDescription": "Folders of LuaCATS (`---@meta`) definitions to load as the type library (relative to the workspace folder, or absolute). Point these at the `luacats/` produced by `--emit-api` so the body knows the whole `godot.*`/`std.*` surface."
+          "markdownDescription": "Folders of LuaCATS (`---@meta`) definitions to load as the type library (relative to the workspace folder, or absolute). Point these at the `luacats/` produced by `--emit-api` (`downloads/spec/luacats`) so the body knows the whole Godot-class + `std.*` + capability-api surface."
         },
         "evt.spec.path": {
           "type": "string",

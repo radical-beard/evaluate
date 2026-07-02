@@ -63,6 +63,7 @@ public static class EvaluateDocs
             GodotVersion = GodotVersionString(),
             SafePrimitives = Loader.SafeGlobals.Concat(new[] { "print" }).OrderBy(s => s).ToList(),
             WithheldGlobals = new() { "os", "io", "pcall" },
+            BlockedApis = Loader.BlockedApis.OrderBy(s => s).ToList(),
             Hooks = new Hooks { System = Loader.SystemHooks.ToList(), Node = Loader.NodeHooks.ToList() },
             Frontmatter = FrontmatterDoc(),
             Std = CollectStd(log),
@@ -89,15 +90,37 @@ public static class EvaluateDocs
     {
         // The authoring grammar (the one inherently-static part: it is syntax, not API
         // surface). The *values* these keys accept are the dynamic surface above:
-        // `apis:` <- Apis, `register:` <- Hooks, `returns:` <- the get/set grammar.
-        Keys = new() { "config", "apis", "register", "returns", "params", "require", "assets", "scenes" },
+        // `apis:` <- Apis + Godot classes + host extensions, `register:` <- Hooks,
+        // `returns:` <- the get/set grammar. `name`/`states`/`initial` are the
+        // *.statemachine.evt signature; `behaviors`/`machines` compose attachments;
+        // `attributes`/`abilities` are the GAS-lite declarations.
+        Keys = new()
+        {
+            "config", "apis", "register", "returns", "params", "require", "assets", "scenes",
+            "properties", "behaviors", "machines", "attributes", "abilities",
+            "name", "states", "initial",
+        },
         ReturnsGrammar = "<name>  |  <name>: 'get set <type>'  (read-only omits 'set')",
         ParamsGrammar = "<name>: <type> | <name>: <default> | <name>: '<type> = <default>'  " +
-                        "(node scripts only; types: number/string/bool/list/table/any; no default = required; " +
-                        "the scene supplies values via `params = {..}` on the node)",
+                        "(node-attached scripts only; types: number/string/bool/list/table/any/dna; no default = required; " +
+                        "the scene supplies values via `params = {..}`; dna = \"0x\" + exactly 16 hex digits, " +
+                        "read as params.<name>:trait(1..16) / :hex())",
         RequireGrammar = "<name>: \"<path.evt>\"  (a list of single-key maps or a map; each binds the " +
                          "returns-narrowed module at <path> — resolved relative to the scripts root — to a " +
                          "sandbox local <name>, so the body uses it with no `local <name> = require(...)` line)",
+        AssetsGrammar = "<name>: \"<res-relative path>\"  (map or list of single-key maps; the ONLY way a " +
+                        "script gets an asset — loaded eagerly, injected as `assets.<name>`, hot-reloaded; a " +
+                        "filename `*` glob binds a stem-keyed table; `.gdshader` updates in place)",
+        PropertiesGrammar = "<property>: <value>  (node-attached scripts only; native Godot properties applied " +
+                            "to self at attach + on script reload; scene-set keys win; same value grammar as " +
+                            ".scene properties incl. [x, y, z] lists and _type tables)",
+        AttributesGrammar = "<name>: { base: n, min: n, max: n, regen: n/s, regen_delay: s, recover: n }  " +
+                            "(node-attached; read self.attributes.<name>, spend via abilities; exhaust at min " +
+                            "until recover; `abilities:` lists *.ability files granted at attach)",
+        MachineGrammar = "*.statemachine.evt: frontmatter name:/states:/initial:; body returns ordered " +
+                         "transitions { from=, to=, when=fn|on=\"event\"|after=s [, run=fn] }; surface " +
+                         "self.fsm.<name> — .state, :is(s), :fire(evt), :on_exit(s, fn), and " +
+                         "`self.fsm.<name>.<state> = fn` appends an enter listener fn(from)",
     };
 
     // ---- std (Evaluate-authored [LuaObject] types) ----------------------------

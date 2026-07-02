@@ -50,6 +50,18 @@ public sealed class RequireSpec
     public string Path = "";
 }
 
+// One `assets:` binding, e.g. `rig: "models/pirate.fbx"`. Binds a name in the
+// ambient `assets` table to a loaded engine resource. Paths are res://-relative
+// (NOT scripts/-relative — assets are project files, not scripts) and may carry a
+// `*` glob in the filename, which binds a table of resources keyed by file stem.
+// This is the ONLY way a script gets an asset: the imperative loaders
+// (ResourceLoader & co.) are not declarable capabilities.
+public sealed class AssetSpec
+{
+    public string Name = "";
+    public string Path = "";
+}
+
 // A script's `---` YAML signature plus the Lua body that follows it. The body is
 // split off and handed to Lua-CSharp verbatim; the signature is parsed as real
 // YAML. (The `returns` access spec — "get set vec3" — and the `params` spec —
@@ -63,7 +75,28 @@ public sealed class Frontmatter
     public List<ReturnSpec> Returns = new();
     public List<ParamSpec> Params = new();
     public List<RequireSpec> Requires = new();
-    public List<string> Assets = new();
+    public List<AssetSpec> Assets = new();
+    // `properties:` — native Godot properties applied to `self` at attach (and
+    // re-applied when the script hot-reloads). Same value grammar as a `.scene`
+    // node's properties: scalars, positional lists ([x, y, z]), `_type` tables.
+    // The convention: STATIC initial engine state lives here or in the scene, not
+    // as assignments in the body. Node-attached scripts only.
+    public Dictionary<string, object> Properties = new();
+    // Composition: more behaviors / state machines this node-attached script pulls
+    // onto the SAME node (paths, scripts/-relative). The scene's `behaviors = [...]`
+    // / `machines = [...]` lists are the other attachment channel.
+    public List<string> Behaviors = new();
+    public List<string> Machines = new();
+    // Statemachine signature (`*.statemachine.evt` only): the machine's name (default:
+    // file stem), its full state list, and the initial state (default: first listed).
+    public string? MachineName;
+    public List<string> States = new();
+    public string? Initial;
+    // GAS-lite: attributes this node-attached script declares on its node
+    // (name -> { base, min, max, regen, regen_delay, recover }) and the `*.ability`
+    // files granted at attach.
+    public Dictionary<string, object> Attributes = new();
+    public List<string> Abilities = new();
     // Scenes this system participates in. Empty = global (runs in every scene).
     // Only meaningful for system `.evt` scripts; node scripts get their scene
     // membership implicitly from the scene file that references them.
@@ -98,8 +131,26 @@ public sealed class Frontmatter
         fm.Configs = StringList(root, "config");
         fm.Apis = StringList(root, "apis");
         fm.Register = StringList(root, "register");
-        fm.Assets = StringList(root, "assets");
         fm.Scenes = StringList(root, "scenes");
+        fm.Behaviors = StringList(root, "behaviors");
+        fm.Machines = StringList(root, "machines");
+        fm.States = StringList(root, "states");
+        fm.Abilities = StringList(root, "abilities");
+        if (root.TryGetValue("name", out var mn)) fm.MachineName = mn?.ToString();
+        if (root.TryGetValue("initial", out var init)) fm.Initial = init?.ToString();
+
+        // `attributes:` — a YAML map of maps; values coerce like params defaults.
+        if (root.TryGetValue("attributes", out var attrs))
+        {
+            if (attrs is not IDictionary<object, object> am)
+                throw new EvaluateException(
+                    "attributes: expected a map of `name: { base: n, max: n, regen: n, ... }`");
+            foreach (var kv in am)
+                fm.Attributes[kv.Key?.ToString() ?? ""] = DefaultFromYaml(kv.Value);
+        }
+
+        if (root.TryGetValue("assets", out var assets))
+            ParseAssets(assets, fm.Assets);
 
         if (root.TryGetValue("returns", out var r) && r is IEnumerable<object> items)
             foreach (var item in items)
@@ -113,6 +164,17 @@ public sealed class Frontmatter
 
         if (root.TryGetValue("require", out var rq))
             ParseRequires(rq, fm.Requires);
+
+        // `properties:` is a YAML map (property -> value); values coerce through the
+        // same literal rules as params defaults, landing in the TOML object model the
+        // scene builder already applies (so `position: [0, 1.5, 0]` becomes a Vector3).
+        if (root.TryGetValue("properties", out var props))
+        {
+            if (props is not IDictionary<object, object> pm)
+                throw new EvaluateException("properties: expected a map of `property: value`");
+            foreach (var kv in pm)
+                fm.Properties[kv.Key?.ToString() ?? ""] = DefaultFromYaml(kv.Value);
+        }
 
         return fm;
     }
@@ -165,10 +227,55 @@ public sealed class Frontmatter
         }
     }
 
+    // `assets:` binds names to res://-relative file paths. Accepts the same two shapes
+    // as `require:` — a YAML map or a sequence of single-key maps. A bare path entry
+    // (the pre-0.10 watch-list form) is rejected with a migration hint: assets are now
+    // loaded and injected, so each needs the name the body reads it by.
+    private static void ParseAssets(object? node, List<AssetSpec> into)
+    {
+        void Add(string name, object? path)
+        {
+            var p = path?.ToString() ?? "";
+            if (p.StartsWith("res://")) p = p["res://".Length..];
+            if (name.Length == 0 || p.Length == 0)
+                throw new EvaluateException(
+                    $"assets: each entry binds a name to a res://-relative path (got '{name}: {p}')");
+            if (into.Any(a => a.Name == name))
+                throw new EvaluateException($"assets: duplicate binding '{name}'");
+            into.Add(new AssetSpec { Name = name, Path = p });
+        }
+
+        switch (node)
+        {
+            case IDictionary<object, object> map:
+                foreach (var kv in map) Add(kv.Key?.ToString() ?? "", kv.Value);
+                break;
+            case IEnumerable<object> seq:
+                foreach (var item in seq)
+                {
+                    if (item is IDictionary<object, object> m && m.Count == 1)
+                    {
+                        var kv = m.Cast<KeyValuePair<object, object>>().First();
+                        Add(kv.Key?.ToString() ?? "", kv.Value);
+                    }
+                    else
+                        throw new EvaluateException(
+                            "assets: entries bind a name to a path (`- rig: \"models/x.fbx\"`); " +
+                            "a bare path has no name for the body to read it by");
+                }
+                break;
+            default:
+                throw new EvaluateException(
+                    "assets: expected a map or a list of `name: \"path\"` bindings");
+        }
+    }
+
     // The param type tokens the grammar recognizes. Anything else in type position is
-    // an error (caught here, at parse time, not deep inside a hook).
+    // an error (caught here, at parse time, not deep inside a hook). `dna` is a
+    // 64-bit behavior hash: a hand-authored "0x" + 16-hex-digit string in the scene,
+    // exposed to the body as an object with nibble accessors (:trait(1..16), :hex()).
     private static readonly HashSet<string> TypeTokens =
-        new() { "number", "string", "bool", "list", "table", "any" };
+        new() { "number", "string", "bool", "list", "table", "any", "dna" };
 
     // Parse one `name: <spec>` entry. The YAML value is either a scalar string carrying
     // the `<type> [= default]` grammar (`number`, `100`, `number = 5`, `"neutral"`), or a

@@ -17,6 +17,9 @@ public partial class EvaluateRuntime : Node
 {
     private Loader _loader = null!;
     private FileSystemWatcher? _watcher;
+    private readonly List<FileSystemWatcher> _assetWatchers = new();
+    private readonly HashSet<string> _assetRootsWatched = new();
+    private readonly List<(string name, object impl)> _pendingApis = new();
     private readonly ConcurrentQueue<string> _changes = new();
     private int _frame;
     private int _quitAfter = -1;          // -1 = run forever (a real game)
@@ -53,6 +56,11 @@ public partial class EvaluateRuntime : Node
         GetTree().AutoAcceptQuit = false;
 
         _loader = new Loader(ReadScript, msg => GD.Print($"[evt] {msg}"));
+
+        // Host extension apis registered before the runtime entered the tree — apply
+        // them now, before any script loads, so every sandbox sees the same api set.
+        foreach (var (name, impl) in _pendingApis) _loader.RegisterApi(name, impl);
+        _pendingApis.Clear();
 
         // Persistent global root: holds the player and other never-cleared nodes,
         // and parents the swappable per-scene container.
@@ -98,15 +106,25 @@ public partial class EvaluateRuntime : Node
         StartHotReload();
     }
 
+    // Register a C#-side api module for scripts (gated by `apis:` declaration). Call
+    // BEFORE adding the runtime to the tree — registrations buffer until the loader
+    // exists and must precede script discovery.
+    public void RegisterApi(string name, object impl)
+    {
+        if (_loader is null) { _pendingApis.Add((name, impl)); return; }
+        _loader.RegisterApi(name, impl);
+    }
+
     public override void _Process(double delta)
     {
         if (_loader is null) return;     // test mode already quit
 
         // Apply any pending hot-reloads on the main thread. A bad edit (e.g. a
         // half-saved, malformed .scene/.toml) is logged and skipped, never crashes.
+        bool loadedNew = false;
         while (_changes.TryDequeue(out var changed))
         {
-            try { GD.Print($"[evaluate] hot reload: {_loader.ReloadOnChange(changed)}"); }
+            try { GD.Print($"[evaluate] hot reload: {_loader.ReloadOnChange(changed)}"); loadedNew = true; }
             catch (System.Exception e) { GD.PushError($"[evaluate] hot reload failed for {changed}: {e.Message}"); }
         }
 
@@ -115,9 +133,10 @@ public partial class EvaluateRuntime : Node
         // malformed/unknown target is logged; the current scene keeps running.
         if (_loader.TakePendingScene() is { } next)
         {
-            try { GD.Print($"[evaluate] scene change -> '{next}'"); _loader.GotoScene(next); }
+            try { GD.Print($"[evaluate] scene change -> '{next}'"); _loader.GotoScene(next); loadedNew = true; }
             catch (System.Exception e) { GD.PushError($"[evaluate] failed to enter scene '{next}': {e.Message}"); }
         }
+        if (loadedNew && _watcher is not null) RefreshAssetWatchers();
 
         CallHook("on_update", delta);
         _frame++;
@@ -127,14 +146,14 @@ public partial class EvaluateRuntime : Node
         {
             GetViewport().GetTexture().GetImage().SavePng(_screenshot);
             GD.Print($"[evaluate] screenshot -> {_screenshot}");
-            _watcher?.Dispose();
+            DisposeWatchers();
             GetTree().Quit();
             return;
         }
 
         if (_quitAfter >= 0 && _frame >= _quitAfter)
         {
-            _watcher?.Dispose();
+            DisposeWatchers();
             GetTree().Quit();
         }
     }
@@ -145,7 +164,13 @@ public partial class EvaluateRuntime : Node
         return i >= 0 && i + 1 < args.Length ? args[i + 1] : null;
     }
 
-    public override void _PhysicsProcess(double delta) => CallHook("on_physics_update", delta);
+    public override void _PhysicsProcess(double delta)
+    {
+        CallHook("on_physics_update", delta);
+        // Machines + abilities tick after behaviors, so guards and channel drains
+        // see this tick's final state.
+        _loader?.Tick(delta);
+    }
 
     public override void _Input(InputEvent @event)
     {
@@ -176,7 +201,7 @@ public partial class EvaluateRuntime : Node
         if (_quitFired || _loader is null) return;
         _quitFired = true;
         CallHook("on_quit");
-        _watcher?.Dispose();
+        DisposeWatchers();
     }
 
     // Drive a registered lifecycle hook across everything active this frame:
@@ -213,6 +238,46 @@ public partial class EvaluateRuntime : Node
         _watcher.Created += Enqueue;
         _watcher.Renamed += (_, e) =>
             _changes.Enqueue(Path.GetRelativePath(dir, e.FullPath).Replace('\\', '/'));
+
+        RefreshAssetWatchers();
+    }
+
+    // Declared assets live OUTSIDE res://scripts (models/, shaders/, …), so each
+    // top-level directory holding one gets its own watcher, enqueueing
+    // res://-relative paths. Re-checked after scene changes/hot reloads, since a
+    // newly loaded script may declare assets under a directory not yet watched.
+    private void RefreshAssetWatchers()
+    {
+        foreach (var rootDir in _loader.AssetWatchTargets()
+                     .Where(t => !t.StartsWith("scripts/"))
+                     .Select(t => t.Split('/')[0])
+                     .Where(d => d.Length > 0)
+                     .Distinct())
+        {
+            if (!_assetRootsWatched.Add(rootDir)) continue;
+            var abs = ProjectSettings.GlobalizePath($"res://{rootDir}");
+            if (!Directory.Exists(abs)) continue;
+            var w = new FileSystemWatcher(abs)
+            {
+                IncludeSubdirectories = true,
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
+                EnableRaisingEvents = true,
+            };
+            void Enq(object _, FileSystemEventArgs e) =>
+                _changes.Enqueue($"{rootDir}/" + Path.GetRelativePath(abs, e.FullPath).Replace('\\', '/'));
+            w.Changed += Enq;
+            w.Created += Enq;
+            w.Renamed += (_, e) =>
+                _changes.Enqueue($"{rootDir}/" + Path.GetRelativePath(abs, e.FullPath).Replace('\\', '/'));
+            _assetWatchers.Add(w);
+        }
+    }
+
+    private void DisposeWatchers()
+    {
+        _watcher?.Dispose();
+        foreach (var w in _assetWatchers) w.Dispose();
+        _assetWatchers.Clear();
     }
 
     // ---- discovery ------------------------------------------------------------

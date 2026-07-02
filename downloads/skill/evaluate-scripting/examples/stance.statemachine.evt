@@ -1,0 +1,18 @@
+---
+name: stance          # optional — defaults to the file stem ("stance")
+states: [idle, alert, attack]
+initial: idle         # optional — defaults to the first state
+---
+-- A STATE MACHINE (*.statemachine.evt): the frontmatter is the state list, the
+-- body RETURNS the ordered transition list. Guards are polled every physics
+-- tick in declaration order — first match wins, at most one transition per
+-- tick. Exactly one trigger per transition: `when` (guard fn), `on` (an event
+-- fired via self.fsm.stance:fire("...")), or `after` (seconds in the state).
+-- `run` is an optional action on the transition (`do` is a Lua keyword).
+return {
+  { from = "idle",  to = "alert",  when = function(self) return self:get_meta("threat", false) end },
+  { from = "alert", to = "attack", on = "provoked",
+    run = function(self, from, to) print("stance: " .. from .. " -> " .. to) end },
+  { from = "alert", to = "idle",   after = 3.0 },   -- calm down after 3s
+  { from = "*",     to = "idle",   on = "calm" },   -- wildcard: from any state
+}

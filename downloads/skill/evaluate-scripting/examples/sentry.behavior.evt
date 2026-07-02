@@ -1,0 +1,31 @@
+---
+params:
+  dna: dna              # "0x" + EXACTLY 16 hex digits, hand-authored in the scene
+register:
+ - on_attach
+ - on_load
+ - on_update
+---
+-- Drives the node that also carries stance.statemachine.evt (see
+-- scene-swappable.scene). `self.fsm.stance` is that machine's node surface.
+function on_attach()
+  -- dna: 16 trait slots, most-significant digit first, each 0..15. The same
+  -- hash always produces the same sentry — authored, not random.
+  self:set_meta("aggro_range", 4 + params.dna:trait(1))
+  self:set_meta("patience", 1 + params.dna:trait(2) * 0.5)
+  print("sentry dna " .. params.dna:hex())          -- normalized uppercase
+end
+
+function on_load()
+  -- (Re)subscribe fsm listeners HERE: a behavior hot reload drops the
+  -- behavior's stale listeners, and on_load re-fires — so they never double up.
+  -- `self.fsm.stance.alert = fn` APPENDS an enter listener (fn gets the origin).
+  self.fsm.stance.alert = function(from) print("sentry alerted (from " .. from .. ")") end
+  self.fsm.stance:on_exit("attack", function(to) print("sentry disengaging to " .. to) end)
+end
+
+function on_update(dt)
+  if self.fsm.stance:is("alert") and self:get_meta("provoke_me", false) then
+    self.fsm.stance:fire("provoked")   -- immediate; returns true if a transition ran
+  end
+end

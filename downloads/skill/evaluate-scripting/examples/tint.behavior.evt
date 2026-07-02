@@ -1,0 +1,23 @@
+---
+apis:
+ - ShaderMaterial
+assets:
+  tint: "shaders/tint.gdshader"    # res-relative; a missing file is a LOAD error
+register:
+ - on_load
+ - on_unload
+---
+-- `assets:` is a MAP (name -> path) and the ONLY way a script gets an asset —
+-- eagerly loaded, injected as the ambient `assets` table. A .gdshader edit
+-- updates THIS Shader instance IN PLACE, so the live material recompiles with
+-- no re-wiring. (A filename glob — pack: "shaders/*.gdshader" — would bind a
+-- stem-keyed table instead: assets.pack.tint.)
+function on_load()
+  local mat = ShaderMaterial.new()
+  mat.shader = assets.tint
+  self.material_override = mat
+end
+
+function on_unload()
+  self.material_override = nil     -- free what on_load built; reloads don't stack
+end

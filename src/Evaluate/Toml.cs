@@ -63,8 +63,16 @@ public static class Toml
         string s => s,
         TomlArray arr => ArrayFromToml(arr),
         TomlTable tbl => TableFromToml(tbl),
+        TomlTableArray tarr => TableArrayFromToml(tarr),   // [[section]] blocks -> object[]
         _ => v.ToString() ?? "",   // dates / other scalars -> string
     };
+
+    private static object[] TableArrayFromToml(TomlTableArray arr)
+    {
+        var list = new object[arr.Count];
+        for (int i = 0; i < arr.Count; i++) list[i] = TableFromToml(arr[i]);
+        return list;
+    }
 
     private static object[] ArrayFromToml(TomlArray arr)
     {

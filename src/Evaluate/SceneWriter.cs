@@ -72,6 +72,8 @@ public static class SceneWriter
 
             if (node.HasMeta(SceneBuilder.MetaScript)) spec.Script = node.GetMeta(SceneBuilder.MetaScript).AsString();
             if (node.HasMeta(SceneBuilder.MetaInstance)) spec.Instance = node.GetMeta(SceneBuilder.MetaInstance).AsString();
+            if (node.HasMeta(SceneBuilder.MetaBehaviors)) ReadAttachList(node, SceneBuilder.MetaBehaviors, spec.Behaviors);
+            if (node.HasMeta(SceneBuilder.MetaMachines)) ReadAttachList(node, SceneBuilder.MetaMachines, spec.Machines);
             spec.Unique = node.UniqueNameInOwner;
 
             if (node.HasMeta(SceneBuilder.MetaParams))
@@ -116,6 +118,22 @@ public static class SceneWriter
                     spec.Children.Add(ToSpec(child));
 
             return spec;
+        }
+
+        private void ReadAttachList(Node node, string metaKey, List<AttachSpec> into)
+        {
+            foreach (var item in node.GetMeta(metaKey).AsGodotArray())
+            {
+                var d = item.AsGodotDictionary();
+                var spec = new AttachSpec { Script = d["script"].AsString() };
+                if (d.ContainsKey("params"))
+                    foreach (var kv in d["params"].AsGodotDictionary())
+                    {
+                        var val = ToToml(kv.Value);
+                        if (val is not null) spec.Params[kv.Key.AsString()] = val;
+                    }
+                into.Add(spec);
+            }
         }
 
         // Decide which of a node's hundreds of properties to write: only those that
@@ -310,6 +328,8 @@ public static class SceneWriter
         sb.Append('[').Append(path).Append("]\n");
         sb.Append("type = ").Append(Quote(n.Type)).Append('\n');
         if (n.Script is not null) sb.Append("script = ").Append(Quote(n.Script)).Append('\n');
+        EmitAttachList(sb, "behaviors", n.Behaviors);
+        EmitAttachList(sb, "machines", n.Machines);
         foreach (var kv in n.Props) sb.Append(EmitKey(kv.Key)).Append(" = ").Append(EmitValue(kv.Value)).Append('\n');
         if (n.Groups.Count > 0)
             sb.Append("groups = [").Append(string.Join(", ", n.Groups.Select(Quote))).Append("]\n");
@@ -323,6 +343,18 @@ public static class SceneWriter
         if (n.Instance is not null) sb.Append("instance = ").Append(Quote(n.Instance)).Append('\n');
 
         foreach (var c in n.Children) EmitNode(sb, c, path + "." + c.Name);
+    }
+
+    // `behaviors = [...]` / `machines = [...]`: a param-less entry emits as its bare
+    // path string; one with params as `{ script = "...", params = {..} }`.
+    private static void EmitAttachList(StringBuilder sb, string key, List<AttachSpec> list)
+    {
+        if (list.Count == 0) return;
+        sb.Append(key).Append(" = [").Append(string.Join(", ", list.Select(a =>
+            a.Params.Count == 0
+                ? Quote(a.Script)
+                : "{ script = " + Quote(a.Script) + ", params = " + EmitInline(a.Params) + " }")))
+          .Append("]\n");
     }
 
     private static string EmitValue(object? v) => v switch

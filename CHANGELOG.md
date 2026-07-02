@@ -7,6 +7,118 @@ the version is `0.x`, minor bumps may include breaking changes.
 
 ## [Unreleased]
 
+## [0.10.0] — 2026-07-01
+
+The apis-as-modules release: the whole engine surface becomes declared capabilities,
+assets become signature data, and nodes gain composable behaviors, declarative state
+machines, and a GAS-lite ability system. Enforcement suite: 98 tests.
+
+### Changed
+- **Breaking — apis as modules: the ambient `godot.*` table is GONE.** Every capability a
+  body touches is declared in frontmatter `apis:` and injected as its own bare global
+  table — framework services (`input`, `world`, `scene`, `save`, `sql`), host-registered
+  C# extension apis, and **Godot classes/enums** alike: `apis: [Input, Node3D, Key]` →
+  `Input.GetJoyAxis(...)`, `Node3D.new()`, `Key.Space`,
+  `Timer.TimerProcessCallback.Idle`. Resolution precedence is framework service → host
+  extension → Godot class/enum (memoized). Declaration gates the **class table** only —
+  instances that reach a script another way (`self`, `get_node`, signal args, return
+  values) expose their members regardless. An unknown `apis:` name is a **load error**
+  (typo-proofing), not a silent `nil`; a legacy `godot:`-prefixed entry errors with a
+  migration hint. Blocked from declaration: `ResourceLoader`, `ResourceSaver`,
+  `FileAccess`, `DirAccess` — assets come from frontmatter `assets:`, persistence from
+  `save`/`sql`. Migration: add each class you construct / take statics, enums or
+  constants from to `apis:` and drop the `godot.` prefix. (`src/Evaluate/Loader.cs`,
+  `src/Evaluate/GodotBinder.cs`)
+- **Breaking — `assets:` is now a map, eagerly loaded, and the only way scripts get
+  assets.** Each entry is `name: "res-relative/path"`; every file loads **at script
+  load** (a missing file is a load error naming the binding) and the set is injected as
+  the ambient **`assets`** table (`assets.tint`). A filename `*` glob
+  (`pack: "shaders/fx_*.gdshader"`) binds a stem-keyed table of resources. Hot reload is
+  real: a **`.gdshader` edit updates in place** — the *same* `Shader` instance carries
+  the new code, so live `ShaderMaterial`s recompile with no re-wiring (shaders therefore
+  live in their own `.gdshader` files, never inline) — while any other resource re-loads
+  with cache-replace and its declaring scripts re-run `on_unload`/`on_load`. The pre-0.10
+  bare-list form (paths without binding names) is rejected with a migration hint.
+
+### Added
+- **`*.behavior.evt` — N behaviors per node, one behavior file across many nodes.** The
+  scene attaches them with a node-level `behaviors = ["path", { script = "path",
+  params = {…} }]` list (per-attachment `params`); hooks fire in attachment order. A
+  behavior's own frontmatter `behaviors:`/`machines:` lists compose further attachments
+  onto the same node (depth-first, deduped per node); a non-behavior extension in an
+  attachment list is rejected. `*.node.evt` + `script =` remain as the single-behavior
+  alias (deprecated; new code uses behaviors).
+- **`*.statemachine.evt` — declarative, hot-reloadable state machines.** Frontmatter:
+  `name:` (default = file stem), `states:` (required), `initial:` (default = first). The
+  body **returns the ordered transition list**: `{ from = "a", to = "b" }` plus exactly
+  one trigger — `when = fn(self)` (guard, polled per physics tick in declaration order,
+  first match wins, max one transition per tick), `on = "event"` (fired via
+  `self.fsm.<name>:fire("event")`, immediate; reentrant fires defer a tick), or
+  `after = seconds` — and an optional `run = fn(self, from, to)` action (`do` is a Lua
+  keyword). `from = "*"` is a wildcard. Node surface: `self.fsm.<name>.state`, `:is(s)`,
+  `:fire(evt)` → bool, `:on_exit(state, fn(to))`, and the sugar
+  `self.fsm.<name>.<state> = fn(from)` **appends** an enter listener. Attach via the
+  scene's `machines = [...]` or a script's `machines:` frontmatter. Hot reload: a machine
+  edit refreshes transitions but **keeps state and listeners**; a behavior reload drops
+  that behavior's stale listeners (re-subscribe in `on_load`/`on_attach` — no
+  double-fires). Signature enforcement: missing `states:`, a transition naming an unknown
+  state, two triggers on one transition, and `register:` on a machine are all load
+  errors. (`src/Evaluate/StateMachine.cs`)
+- **GAS-lite — attribute pools, abilities, and effects.** Frontmatter **`attributes:`**
+  (node-attached only) declares per-node pools —
+  `name: { base, min, max, regen, regen_delay, recover }` — with built-in stamina
+  semantics: regen per second resumes `regen_delay` after the last spend, and a spend
+  that drains to `min` **exhausts** the pool (the node holds the tag `exhausted:<name>`,
+  the ability can't re-activate) until it regens back to `recover`. **`abilities:`**
+  lists `*.ability` files granted at attach. `*.ability` (TOML): `cooldown`, `channeled`
+  (true = active until deactivated, cost drains per **second**),
+  `cost = { attribute, amount }`, `tags`/`block_tags`/`grant_tags` (grant_tags held while
+  a channel is active), and `[[effects]]` blocks (`effect = "path.effect"`,
+  `target = "self"`). `*.effect` (TOML): `attribute` (dotted field targets —
+  `"stamina.max"`, `".regen"`, `".regen_delay"`, `".min"`, `".recover"`),
+  `op = add|mul|set`, `magnitude`, `duration` (`0` instant mutation, `-1`
+  while-source-active modifier, `> 0` seconds), `period` (`> 0` = re-apply every period
+  seconds — dot/hot). Lua surface: `self.attributes.<name>` (modifier-aware clamped read;
+  assignment sets the stored value clamped — a hard set does not exhaust),
+  `self.attributes:max(n)` / `:has(n)`, and `self.abilities:grant(path)` /
+  `:activate(name)` → bool / `:deactivate(name)` / `:is_active` / `:can_activate` /
+  `:cooldown(name)` / `:has_tag(tag)` / `:apply(effect_path[, target_node])` /
+  `:on_ended(name, fn(name, reason))` (reason `"deactivated"` | `"exhausted"`).
+  `.ability`/`.effect` files **hot-reload live** (the next activation uses the new
+  values); re-declaring an attribute re-tunes its spec and keeps the current value.
+  Contract enforcement: unknown ability/effect/attribute keys, a bad effect field target,
+  `attributes:`/`abilities:` on a system script, and `apply` on an attribute-less node
+  are load/runtime errors. (`src/Evaluate/Abilities.cs`)
+- **Frontmatter `properties:` — native engine state in the signature.** A node-attached
+  script's `properties:` map (same value grammar as `.scene` properties, incl.
+  `[x, y, z]` arrays and `_type` tables) is applied to `self` at attach — before
+  `on_attach` — and **re-applied on script hot reload**, so initial engine state is
+  tunable live. The scene's own property keys always win; an unknown property name and
+  `properties:` on a system script are load errors. Convention: static initial engine
+  state lives in the frontmatter/scene, not in the body.
+- **The `dna` param type — hand-authored 64-bit identity.** `params: { dna: dna }`; the
+  scene supplies `params = { dna = "0xA13F00C2D4E5B677" }` — `"0x"` + **exactly** 16 hex
+  digits, so every trait slot is visibly hand-chosen (the framework never generates one;
+  the same hash always produces the same character). The body reads
+  `params.dna:trait(i)` (slots 1..16, most-significant first, each 0..15) and
+  `params.dna:hex()` (normalized uppercase). Wrong length / missing `0x` / non-hex /
+  non-string values are rejected at load.
+- **Host extension apis — `runtime.RegisterApi(name, impl)`.** The embedding game
+  registers C# api modules (an object — public instance + static methods bind — or a
+  `System.Type` for statics only) **before** adding the runtime to the tree; scripts
+  declare the name in `apis:` and call methods dot-style
+  (`apis: [combat_native]` → `combat_native.SweepArc(...)`). Reserved names, collisions
+  with Godot classes, duplicates, and post-load registrations are rejected. The
+  `--emit-api` spec generator documents registered host apis alongside the built-ins.
+- **Scene grammar: node-level `behaviors = [...]` and `machines = [...]` keys** (string
+  or `{ script, params }` entries), both round-tripping through `SceneWriter` and the
+  editor addon.
+
+### Notes
+- Version 0.10.0; enforcement suite grew from 66 to 98 tests (apis-as-modules gating,
+  assets eager-load/glob/shader-in-place reload, properties, behaviors, machines, GAS,
+  dna, RegisterApi).
+
 ## [0.9.0] — 2026-07-01
 
 ### Added

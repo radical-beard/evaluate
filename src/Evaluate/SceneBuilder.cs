@@ -71,11 +71,15 @@ public static class SceneBuilder
     public const string MetaParams     = MetaPrefix + "params";       // -> `params = {...}` (node-script instance params)
     public const string MetaConnections = MetaPrefix + "connections"; // -> `connections = [{...}]`
     public const string MetaInstanced  = MetaPrefix + "instanced";    // a root pulled in by `instance=`
+    public const string MetaBehaviors  = MetaPrefix + "behaviors";    // -> `behaviors = [...]`
+    public const string MetaMachines   = MetaPrefix + "machines";     // -> `machines = [...]`
 
     private static void StashRoundtripMeta(Node node, NodeSpec spec)
     {
         if (!string.IsNullOrEmpty(spec.Script)) node.SetMeta(MetaScript, spec.Script);
         if (spec.Instance is { } inst) node.SetMeta(MetaInstance, inst);
+        if (spec.Behaviors.Count > 0) node.SetMeta(MetaBehaviors, AttachListToVariant(spec.Behaviors));
+        if (spec.Machines.Count > 0) node.SetMeta(MetaMachines, AttachListToVariant(spec.Machines));
         if (spec.Params.Count > 0)
         {
             var d = new Godot.Collections.Dictionary();
@@ -98,6 +102,25 @@ public static class SceneBuilder
                 });
             node.SetMeta(MetaConnections, arr);
         }
+    }
+
+    // `behaviors`/`machines` stash as an Array of {script, params} dictionaries so
+    // SceneWriter can reverse them (params omitted when empty).
+    private static Godot.Collections.Array AttachListToVariant(List<AttachSpec> list)
+    {
+        var arr = new Godot.Collections.Array();
+        foreach (var a in list)
+        {
+            var d = new Godot.Collections.Dictionary { ["script"] = a.Script };
+            if (a.Params.Count > 0)
+            {
+                var pd = new Godot.Collections.Dictionary();
+                foreach (var kv in a.Params) pd[kv.Key] = TomlToVariant(kv.Value);
+                d["params"] = pd;
+            }
+            arr.Add(d);
+        }
+        return arr;
     }
 
     // Pack a scene's node tree into a PackedScene (editor preview). No scripts run.

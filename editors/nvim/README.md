@@ -3,13 +3,18 @@
 Neovim support for **Evaluate** `.evt` scripts — YAML-frontmatter + sandboxed-Lua-body files
 that run inside Godot. The Neovim counterpart of `editors/vscode`.
 
-- **Filetype + embedded highlighting.** `*.evt` / `*.node.evt` → the `evt` filetype; the
-  frontmatter highlights as YAML, the body as Lua.
+- **Filetype + embedded highlighting.** `*.evt` / `*.node.evt` / `*.behavior.evt` /
+  `*.statemachine.evt` → the `evt` filetype; the frontmatter highlights as YAML, the body as
+  Lua.
 - **Frontmatter IntelliSense** (no external server):
-  - **Completion** (via `omnifunc`) — frontmatter keys at the top level, capability `apis:` and
-    lifecycle `register:` hooks under their sections (already-listed values are filtered out).
-  - **Diagnostics** — unknown key / api / hook, and a capability used in the body but not
-    declared in `apis:` (nil at runtime, since the sandbox only exposes declared apis).
+  - **Completion** (via `omnifunc`) — frontmatter keys at the top level; under `apis:` the
+    framework services plus (with the generated spec) every Godot class/enum, each injected
+    as a bare global; lifecycle `register:` hooks under their section (already-listed values
+    are filtered out).
+  - **Diagnostics** — unknown key / api / hook, the removed `godot:` prefix and the blocked
+    `DirAccess`/`FileAccess`/`ResourceLoader`/`ResourceSaver` names under `apis:`, bare-path
+    `assets:` entries, and a capability used in the body but not declared in `apis:` (nil at
+    runtime, since the sandbox only exposes declared apis).
   - **Hover** — docs for a frontmatter key or api under the cursor.
   All of it reads the generated `downloads/spec/evaluate-api.json` (auto-discovered), so it
   tracks the exact Godot + Evaluate in your project; a bundled fallback covers the stable names.
@@ -17,7 +22,7 @@ that run inside Godot. The Neovim counterpart of `editors/vscode`.
   but **blanks the frontmatter** in the text it sends — line-for-line, exactly what the runtime
   loader does — so the Lua body keeps its real line/columns and completion/hover/diagnostics map
   1:1. The generated LuaCATS library (`downloads/spec/luacats/`) is loaded automatically, so
-  `godot.*`, `std.*`, `save`, `scene`, … all resolve.
+  declared Godot classes, `std.*`, `save`, `scene`, … all resolve.
 
 ## Requirements
 

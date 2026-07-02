@@ -12,6 +12,8 @@ public sealed class NodeSpec
     public string Name = "";
     public string Type = "";
     public string? Script;
+    public List<AttachSpec> Behaviors = new();        // `behaviors = [..]` -> *.behavior.evt attachments
+    public List<AttachSpec> Machines = new();         // `machines = [..]` -> *.statemachine.evt attachments
     public Dictionary<string, object> Props = new();
     public Dictionary<string, object> Params = new();  // `params = {..}` -> the script's `params` global
     public Dictionary<string, object> Meta = new();   // `meta = {..}` -> node.set_meta
@@ -30,6 +32,15 @@ public sealed class ConnectionSpec
     public string Signal = "";
     public string To = "";
     public string Method = "";
+}
+
+// One entry of a node's `behaviors = [...]` / `machines = [...]` list: the script
+// to attach plus optional per-attachment `params`. A bare string entry is a script
+// with no params; a table entry is `{ script = "...", params = { ... } }`.
+public sealed class AttachSpec
+{
+    public string Script = "";
+    public Dictionary<string, object> Params = new();
 }
 
 // A parsed `*.scene` file: a node tree, plus (for the reserved `global.scene`
@@ -117,6 +128,20 @@ public static class SceneFile
             }
             if (kv.Key == "instance") { node.Instance = kv.Value?.ToString(); continue; }
             if (kv.Key == "unique") { node.Unique = kv.Value is bool ub && ub; continue; }
+            // `behaviors` / `machines` are attachment lists: string entries or
+            // `{ script = "...", params = { ... } }` tables.
+            if (kv.Key is "behaviors" or "machines")
+            {
+                var into = kv.Key == "behaviors" ? node.Behaviors : node.Machines;
+                if (kv.Value is TomlArray ba)
+                    foreach (var item in ba)
+                        into.Add(ParseAttach(name, kv.Key, item));
+                else
+                    throw new EvaluateException(
+                        $"scene node '{name}': '{kv.Key}' must be an array of script paths " +
+                        "or { script = \"...\", params = {..} } tables");
+                continue;
+            }
             if (kv.Key == "connections")
             {
                 if (kv.Value is TomlArray ca)
@@ -155,5 +180,40 @@ public static class SceneFile
                 $"scene node '{name}' has no 'type'. (A sub-table is always a child node; " +
                 "vector/struct properties must be lists like [x, y, z], not tables.)");
         return node;
+    }
+
+    private static AttachSpec ParseAttach(string nodeName, string listKey, object? item)
+    {
+        switch (item)
+        {
+            case string s when s.Length > 0:
+                return new AttachSpec { Script = s };
+            case TomlTable t:
+            {
+                var spec = new AttachSpec();
+                if (t.TryGetValue("script", out var sc)) spec.Script = sc?.ToString() ?? "";
+                if (spec.Script.Length == 0)
+                    throw new EvaluateException(
+                        $"scene node '{nodeName}': a '{listKey}' table entry needs a 'script'");
+                if (t.TryGetValue("params", out var ps))
+                {
+                    if (ps is not TomlTable pt)
+                        throw new EvaluateException(
+                            $"scene node '{nodeName}': '{listKey}' entry '{spec.Script}': " +
+                            "'params' must be a table of key = value");
+                    foreach (var pk in pt) spec.Params[pk.Key] = Toml.FromToml(pk.Value);
+                }
+                foreach (var k in t.Keys)
+                    if (k is not ("script" or "params"))
+                        throw new EvaluateException(
+                            $"scene node '{nodeName}': '{listKey}' entry '{spec.Script}' has " +
+                            $"unknown key '{k}' (only 'script' and 'params')");
+                return spec;
+            }
+            default:
+                throw new EvaluateException(
+                    $"scene node '{nodeName}': each '{listKey}' entry is a script path string " +
+                    "or a { script = \"...\", params = {..} } table");
+        }
     }
 }

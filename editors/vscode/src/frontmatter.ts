@@ -33,8 +33,10 @@ function sectionAt(doc: vscode.TextDocument, fm: Frontmatter, line: number): str
   return null;
 }
 
+// Node-attached scripts (`self`-bound, node hooks): `*.behavior.evt` behaviors (`.node.evt`
+// is its deprecated alias) and `*.statemachine.evt` state machines.
 function isNodeScript(doc: vscode.TextDocument): boolean {
-  return doc.fileName.endsWith(".node.evt");
+  return /\.(node|behavior|statemachine)\.evt$/.test(doc.fileName);
 }
 
 // The capability apis this file declared in `apis:` (what the sandbox actually exposes).
@@ -64,6 +66,11 @@ function listedUnder(doc: vscode.TextDocument, fm: Frontmatter, section: string)
 
 // ---- completion -----------------------------------------------------------
 
+// Frontmatter keys whose value is a YAML map (`name: value` entries) or a single scalar;
+// everything else completes as a `- item` list.
+const MAP_KEYS = new Set(["params", "assets", "properties", "attributes"]);
+const SCALAR_KEYS = new Set(["name", "initial"]);
+
 function completionProvider(spec: () => EvtSpec): vscode.CompletionItemProvider {
   return {
     provideCompletionItems(doc, pos) {
@@ -78,7 +85,8 @@ function completionProvider(spec: () => EvtSpec): vscode.CompletionItemProvider 
         const section = sectionAt(doc, fm, pos.line);
         if (section === "apis") {
           const used = listedUnder(doc, fm, "apis");
-          return s.apis.filter((a) => !used.has(a)).map((a) => {
+          const blocked = new Set(s.blockedApis);
+          const out = s.apis.filter((a) => !used.has(a)).map((a) => {
             const c = new vscode.CompletionItem(a, vscode.CompletionItemKind.Module);
             c.detail = "EvaLuate capability api";
             c.documentation = new vscode.MarkdownString(
@@ -86,6 +94,21 @@ function completionProvider(spec: () => EvtSpec): vscode.CompletionItemProvider 
             );
             return c;
           });
+          // 0.10.0 apis-as-modules: any Godot class/enum is declarable too, each injected
+          // as a bare global (only known when the live spec is loaded).
+          for (const cls of s.godotClasses) {
+            if (used.has(cls) || blocked.has(cls)) continue;
+            const c = new vscode.CompletionItem(cls, vscode.CompletionItemKind.Class);
+            c.detail = "Godot class (injected as a bare global)";
+            out.push(c);
+          }
+          for (const en of s.godotEnums) {
+            if (used.has(en)) continue;
+            const c = new vscode.CompletionItem(en, vscode.CompletionItemKind.Enum);
+            c.detail = "Godot global enum (injected as a bare global)";
+            out.push(c);
+          }
+          return out;
         }
         if (section === "register") {
           const used = listedUnder(doc, fm, "register");
@@ -107,8 +130,10 @@ function completionProvider(spec: () => EvtSpec): vscode.CompletionItemProvider 
         }
         return s.frontmatterKeys.filter((k) => !present.has(k)).map((k) => {
           const c = new vscode.CompletionItem(k, vscode.CompletionItemKind.Property);
-          // `params:` is a YAML map (name: spec); every other key is a `- item` list.
-          c.insertText = new vscode.SnippetString(k === "params" ? `${k}:\n  $0` : `${k}:\n - $0`);
+          // YAML-map keys (name: value) vs scalar keys vs `- item` lists.
+          c.insertText = new vscode.SnippetString(
+            MAP_KEYS.has(k) ? `${k}:\n  $0` : SCALAR_KEYS.has(k) ? `${k}: $0` : `${k}:\n - $0`,
+          );
           c.detail = "frontmatter key";
           return c;
         });
@@ -129,6 +154,7 @@ function validate(doc: vscode.TextDocument, s: EvtSpec, sink: vscode.DiagnosticC
   const validHooks = new Set(hooksFor(doc, s));
   const validApis = new Set(s.apis);
   const validKeys = new Set(s.frontmatterKeys);
+  const blocked = new Set(s.blockedApis);
   let section: string | null = null;
 
   for (let i = fm.startLine + 1; i < fm.endLine; i++) {
@@ -146,13 +172,32 @@ function validate(doc: vscode.TextDocument, s: EvtSpec, sink: vscode.DiagnosticC
     if (!item) continue;
     const value = item[2];
     const col = item[1].length;
-    if (section === "apis" && !validApis.has(value) && !value.startsWith("godot:")) {
-      diags.push(diag(i, value, col, `Unknown api '${value}'. Valid: ${[...validApis].join(", ")}. (It must be declared to be usable.)`,
-        vscode.DiagnosticSeverity.Warning));
+    if (section === "apis") {
+      // The full token (incl. any ':'), to catch the removed `godot:Class` form.
+      const entry = /^\s*-\s*(\S+)/.exec(text)![1];
+      if (entry.startsWith("godot:")) {
+        diags.push(diag(i, entry, col,
+          `'godot:'-prefixed entries were removed in 0.10.0 — declare the Godot class/enum name directly ` +
+          `(e.g. '${entry.slice("godot:".length) || "Node3D"}'); it is injected as a bare global.`,
+          vscode.DiagnosticSeverity.Error));
+      } else if (blocked.has(value)) {
+        diags.push(diag(i, value, col, `'${value}' is blocked from declaration — assets load via frontmatter assets:`,
+          vscode.DiagnosticSeverity.Error));
+      } else if (!validApis.has(value) && !/^[A-Z]/.test(value)) {
+        // PascalCase entries are Godot classes/enums (or host extension apis) — accepted.
+        diags.push(diag(i, value, col, `Unknown api '${value}'. Framework services: ${[...validApis].join(", ")}; ` +
+          `Godot classes/enums are declared by their PascalCase name. (It must be declared to be usable.)`,
+          vscode.DiagnosticSeverity.Warning));
+      }
     } else if (section === "register" && !validHooks.has(value)) {
       diags.push(diag(i, value, col,
         `Unknown ${isNodeScript(doc) ? "node" : "system"} hook '${value}'. Valid: ${[...validHooks].join(", ")}.`,
         vscode.DiagnosticSeverity.Warning));
+    } else if (section === "assets" && !/^\s*-\s*[A-Za-z_]\w*\s*:/.test(text)) {
+      // 0.10.0: assets are a name -> path map (or list of single-key maps); bare paths error.
+      diags.push(diag(i, value, col,
+        `Bare-path 'assets:' entries are an error since 0.10.0 — name it ('<name>: "${value}"'), injected as 'assets.<name>'.`,
+        vscode.DiagnosticSeverity.Error));
     }
   }
 
@@ -210,20 +255,52 @@ function diag(line: number, token: string, col: number, message: string, severit
 function hoverProvider(spec: () => EvtSpec): vscode.HoverProvider {
   const keyDocs: Record<string, string> = {
     config: "TOML files exposed as `config.<section>.*` (read live; hot-reloads).",
-    apis: "Capability apis added to the sandbox. Only what you list here is reachable.",
+    apis:
+      "Everything the sandbox exposes, each injected as its own bare global: framework " +
+      "services (`input`, `world`, `scene`, `save`, `sql`), host-registered extension apis, " +
+      "and Godot classes/enums (`apis: [Input, Node3D, Key]` → `Input.GetJoyAxis(...)`, " +
+      "`Node3D.new()`, `Key.Space`). The ambient `godot.*` table is gone (0.10.0) and " +
+      "`godot:`-prefixed entries are a load error. Blocked: `DirAccess`, `FileAccess`, " +
+      "`ResourceLoader`, `ResourceSaver` — assets load via frontmatter `assets:`.",
     register: "Lifecycle hooks this script handles — each needs a matching global `function`.",
     returns: "The narrowed module contract for `require` consumers.",
     params:
-      "Node scripts only: typed per-instance values the scene supplies via `params = {..}`, " +
-      "read through the `params` global. `name: <type>` (required) / `name: <default>` / " +
-      "`name: '<type> = <default>'`. Types: number/string/bool/list/table/any.",
+      "Node-attached scripts only: typed per-instance values the scene supplies via " +
+      "`params = {..}`, read through the `params` global. `name: <type>` (required) / " +
+      "`name: <default>` / `name: '<type> = <default>'`. Types: number/string/bool/list/" +
+      "table/any/dna (dna = `\"0x\"` + exactly 16 hex digits; read `params.<name>:trait(1..16)` " +
+      "and `:hex()`).",
     require:
       "Bind modules to sandbox locals up front — `name: \"path/to/module.evt\"` — so the " +
       "body uses `name` with no `local name = require(...)` line. Each binds the same " +
       "returns-narrowed handle `require(path)` would. Accepts a list of `- name: \"path\"` " +
       "or a `params:`-style map.",
-    assets: "Files watched for hot-reload alongside the script.",
+    assets:
+      "Map of `<name>: \"res-relative/path.ext\"` (or a list of single-key maps) — the ONLY " +
+      "way a script gets an asset. Loaded eagerly, injected as the ambient `assets` table " +
+      "(`assets.<name>`), hot-reloaded; a filename `*` glob binds a stem-keyed table; " +
+      "`.gdshader` updates in place. Bare-path list entries are an error.",
     scenes: "System scripts only: restrict hooks to these scenes (omit ⇒ global).",
+    properties:
+      "Node-attached scripts only: map of native Godot property → value, applied to `self` " +
+      "at attach and on script reload (scene-set keys win). Same value grammar as `.scene` " +
+      "properties, incl. `[x, y, z]` lists and `_type` tables.",
+    behaviors:
+      "List of `*.behavior.evt` paths composed onto the same node — each runs against the " +
+      "shared `self` (`.node.evt` is the deprecated single-behavior alias).",
+    machines:
+      "List of `*.statemachine.evt` paths attached to the node. Each surfaces " +
+      "`self.fsm.<name>` — `.state`, `:is(s)`, `:fire(evt)`, `:on_exit(state, fn)`, and " +
+      "`self.fsm.<name>.<state> = fn` appends an enter listener `fn(from)`.",
+    attributes:
+      "Node-attached: map of `<name>: { base, min, max, regen, regen_delay, recover }`. " +
+      "Read `self.attributes.<name>`; spent by abilities; exhausts at min until it recovers.",
+    abilities: "List of `*.ability` files (TOML) granted to the node at attach.",
+    name: "State machines (`*.statemachine.evt`): the machine's name — surfaced as `self.fsm.<name>`.",
+    states:
+      "State machines: the list of state names. The body returns ordered transitions " +
+      "`{ from=, to=, when=fn|on=\"event\"|after=seconds [, run=fn] }`.",
+    initial: "State machines: the starting state (one of `states:`).",
   };
   return {
     provideHover(doc, pos) {
@@ -240,6 +317,18 @@ function hoverProvider(spec: () => EvtSpec): vscode.HoverProvider {
         const note = s.apiNotes[word];
         const members = (s.apiMembers[word] ?? []).map((m) => `\`${word}.${m}\``).join(", ");
         return new vscode.Hover(new vscode.MarkdownString(`**${word}** — ${note ?? (members || "capability api")}`), range);
+      }
+      if (s.blockedApis.includes(word)) {
+        return new vscode.Hover(new vscode.MarkdownString(
+          `**${word}** — blocked from \`apis:\` — assets load via frontmatter \`assets:\`.`), range);
+      }
+      if (s.godotClasses.includes(word)) {
+        return new vscode.Hover(new vscode.MarkdownString(
+          `**${word}** — Godot class. Declared in \`apis:\`, injected as a bare global (\`${word}.new()\`, statics, enums).`), range);
+      }
+      if (s.godotEnums.includes(word)) {
+        return new vscode.Hover(new vscode.MarkdownString(
+          `**${word}** — Godot global enum. Declared in \`apis:\`, injected as a bare global (\`${word}.<Constant>\`).`), range);
       }
       return undefined;
     },

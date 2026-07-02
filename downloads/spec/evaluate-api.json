@@ -1,5 +1,5 @@
 {
-  "evaluateVersion": "0.9.0\u002B8a6f68d8ed953a79da288257acdbc797d78ee4a4",
+  "evaluateVersion": "0.10.0\u002B7a70e8dec369fe7090a023475c7b5c6601da71ab",
   "godotVersion": "4.6-stable (official)",
   "safePrimitives": [
     "assert",
@@ -26,6 +26,12 @@
     "os",
     "io",
     "pcall"
+  ],
+  "blockedApis": [
+    "DirAccess",
+    "FileAccess",
+    "ResourceLoader",
+    "ResourceSaver"
   ],
   "hooks": {
     "system": [
@@ -67,11 +73,23 @@
       "params",
       "require",
       "assets",
-      "scenes"
+      "scenes",
+      "properties",
+      "behaviors",
+      "machines",
+      "attributes",
+      "abilities",
+      "name",
+      "states",
+      "initial"
     ],
     "returnsGrammar": "\u003Cname\u003E  |  \u003Cname\u003E: \u0027get set \u003Ctype\u003E\u0027  (read-only omits \u0027set\u0027)",
-    "paramsGrammar": "\u003Cname\u003E: \u003Ctype\u003E | \u003Cname\u003E: \u003Cdefault\u003E | \u003Cname\u003E: \u0027\u003Ctype\u003E = \u003Cdefault\u003E\u0027  (node scripts only; types: number/string/bool/list/table/any; no default = required; the scene supplies values via \u0060params = {..}\u0060 on the node)",
-    "requireGrammar": "\u003Cname\u003E: \u0022\u003Cpath.evt\u003E\u0022  (a list of single-key maps or a map; each binds the returns-narrowed module at \u003Cpath\u003E \u2014 resolved relative to the scripts root \u2014 to a sandbox local \u003Cname\u003E, so the body uses it with no \u0060local \u003Cname\u003E = require(...)\u0060 line)"
+    "paramsGrammar": "\u003Cname\u003E: \u003Ctype\u003E | \u003Cname\u003E: \u003Cdefault\u003E | \u003Cname\u003E: \u0027\u003Ctype\u003E = \u003Cdefault\u003E\u0027  (node-attached scripts only; types: number/string/bool/list/table/any/dna; no default = required; the scene supplies values via \u0060params = {..}\u0060; dna = \u00220x\u0022 \u002B exactly 16 hex digits, read as params.\u003Cname\u003E:trait(1..16) / :hex())",
+    "requireGrammar": "\u003Cname\u003E: \u0022\u003Cpath.evt\u003E\u0022  (a list of single-key maps or a map; each binds the returns-narrowed module at \u003Cpath\u003E \u2014 resolved relative to the scripts root \u2014 to a sandbox local \u003Cname\u003E, so the body uses it with no \u0060local \u003Cname\u003E = require(...)\u0060 line)",
+    "assetsGrammar": "\u003Cname\u003E: \u0022\u003Cres-relative path\u003E\u0022  (map or list of single-key maps; the ONLY way a script gets an asset \u2014 loaded eagerly, injected as \u0060assets.\u003Cname\u003E\u0060, hot-reloaded; a filename \u0060*\u0060 glob binds a stem-keyed table; \u0060.gdshader\u0060 updates in place)",
+    "propertiesGrammar": "\u003Cproperty\u003E: \u003Cvalue\u003E  (node-attached scripts only; native Godot properties applied to self at attach \u002B on script reload; scene-set keys win; same value grammar as .scene properties incl. [x, y, z] lists and _type tables)",
+    "attributesGrammar": "\u003Cname\u003E: { base: n, min: n, max: n, regen: n/s, regen_delay: s, recover: n }  (node-attached; read self.attributes.\u003Cname\u003E, spend via abilities; exhaust at min until recover; \u0060abilities:\u0060 lists *.ability files granted at attach)",
+    "machineGrammar": "*.statemachine.evt: frontmatter name:/states:/initial:; body returns ordered transitions { from=, to=, when=fn|on=\u0022event\u0022|after=s [, run=fn] }; surface self.fsm.\u003Cname\u003E \u2014 .state, :is(s), :fire(evt), :on_exit(s, fn), and \u0060self.fsm.\u003Cname\u003E.\u003Cstate\u003E = fn\u0060 appends an enter listener fn(from)"
   },
   "std": [
     {

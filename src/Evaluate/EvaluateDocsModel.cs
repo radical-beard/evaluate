@@ -11,6 +11,9 @@ public sealed class Spec
     public string GodotVersion { get; set; } = "";
     public List<string> SafePrimitives { get; set; } = new();
     public List<string> WithheldGlobals { get; set; } = new();
+    // Godot classes that may NOT be declared in `apis:` (imperative file/resource IO —
+    // assets come from frontmatter `assets:`, persistence from save/sql).
+    public List<string> BlockedApis { get; set; } = new();
     public Hooks Hooks { get; set; } = new();
     public FrontmatterDocModel Frontmatter { get; set; } = new();
     public List<StdType> Std { get; set; } = new();
@@ -30,6 +33,10 @@ public sealed class FrontmatterDocModel
     public string ReturnsGrammar { get; set; } = "";
     public string ParamsGrammar { get; set; } = "";
     public string RequireGrammar { get; set; } = "";
+    public string AssetsGrammar { get; set; } = "";
+    public string PropertiesGrammar { get; set; } = "";
+    public string AttributesGrammar { get; set; } = "";
+    public string MachineGrammar { get; set; } = "";
 }
 
 public sealed class StdType

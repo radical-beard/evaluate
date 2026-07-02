@@ -1,0 +1,27 @@
+---
+config:
+ - player.toml
+apis:
+ - input
+properties:
+  position: [0, 0.5, 0]    # static initial engine state lives in the signature, not the body
+register:
+ - on_attach
+ - on_update
+---
+-- A BEHAVIOR: `self` IS the node this file is attached to (via the scene's
+-- `behaviors = [...]` list). A node holds N behaviors — this one does movement;
+-- sprint.behavior.evt on the SAME node owns the stamina/speed pools it reads
+-- below (`self.attributes` / `self.abilities` are per-node surfaces, shared by
+-- every behavior on the node).
+function on_attach()
+  self:set_meta("base_weapon_damage", config.player.base_weapon_damage)
+end
+
+function on_update(dt)
+  if input.is_down("right") then
+    local p = self.position
+    p.x = p.x + self.attributes.speed * dt   -- modifier-aware read: +haste while sprinting
+    self.position = p                         -- assign back to persist
+  end
+end
