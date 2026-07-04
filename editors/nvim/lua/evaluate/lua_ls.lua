@@ -66,9 +66,18 @@ function M.attach(bufnr, config)
   end
 
   local name = vim.api.nvim_buf_get_name(bufnr)
-  local root = vim.fs.root(bufnr, { "downloads", "Evaluate.slnx", "project.godot", ".git" })
-    or (name ~= "" and vim.fs.dirname(name))
-    or vim.uv.cwd()
+  -- Workspace root. It must NEVER be the home directory: lua-language-server refuses to
+  -- index $HOME (a whole-home scan), and a generic marker can resolve there by accident —
+  -- e.g. a `downloads` marker matches `~/Downloads` on a case-insensitive filesystem (macOS).
+  -- We only need a small, safe root anyway; the Lua types come from the LuaCATS library
+  -- (settings), not from scanning the tree, so falling back to nil (single-file mode) is fine.
+  local home = vim.uv.os_homedir()
+  local root = vim.fs.root(bufnr, { "project.godot", "Evaluate.slnx", ".git" })
+  if root == home then root = nil end
+  if not root and name ~= "" then
+    local dir = vim.fs.dirname(name)
+    if dir ~= home then root = dir end -- a .evt directly in ~ stays single-file (root = nil)
+  end
 
   -- Advertise the completion capabilities a completion engine expects. Prefer an
   -- explicit override, else cmp_nvim_lsp's (so nvim-cmp gets rich body completion),
