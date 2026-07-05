@@ -83,7 +83,9 @@ jobs:
         with: { name: dev-android-apk, path: artifacts/dev-android.apk }
 
   ios-export:
-    runs-on: macos-14
+    # Godot 4.6's iOS template links Swift-6-era runtime modules; Xcode 15.x
+    # (macos-14 default) lacks them — macos-15 defaults to Xcode 16.
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
