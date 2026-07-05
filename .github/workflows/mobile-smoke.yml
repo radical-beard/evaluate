@@ -71,6 +71,9 @@ jobs:
         run: |
           mkdir -p artifacts
           dotnet build dev/Dev.csproj -c Release
+          # twice: first run compiles/enables the C# editor importer plugin,
+          # second imports .scene resources with it active
+          godot --headless --path dev --import || true
           godot --headless --path dev --import || true
           godot --headless --path dev --export-debug "Android" ../artifacts/dev-android.apk
           test -f artifacts/dev-android.apk
@@ -97,6 +100,9 @@ jobs:
         run: |
           mkdir -p artifacts/dev-ios
           dotnet build dev/Dev.csproj -c Release
+          # twice: first run compiles/enables the C# editor importer plugin,
+          # second imports .scene resources with it active
+          /Applications/Godot_mono.app/Contents/MacOS/Godot --headless --path dev --import || true
           /Applications/Godot_mono.app/Contents/MacOS/Godot --headless --path dev --import || true
           /Applications/Godot_mono.app/Contents/MacOS/Godot --headless --path dev --export-debug "iOS" ../artifacts/dev-ios/dev.ipa
           ls -R artifacts/dev-ios | head -40

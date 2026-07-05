@@ -1,0 +1,14 @@
+[remap]
+
+importer="evaluate.scene"
+type="PackedScene"
+uid="uid://bxn471y2ma4u0"
+path="res://.godot/imported/a3.scene-3e33f430eb61ddb28a822471ace1f678.scn"
+
+[deps]
+
+source_file="res://tests/a3.scene"
+dest_files=["res://.godot/imported/a3.scene-3e33f430eb61ddb28a822471ace1f678.scn"]
+
+[params]
+
