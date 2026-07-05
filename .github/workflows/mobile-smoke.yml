@@ -45,6 +45,28 @@ jobs:
           mkdir -p "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable.mono"
           unzip -q templates.tpz -d /tmp/tpl
           mv /tmp/tpl/templates/* "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable.mono/"
+      - name: Install Android gradle build template + editor settings + debug keystore
+        run: |
+          # gradle template (required for .NET Android exports) — the tpz's
+          # contents were moved into the export-templates dir in the prior step
+          mkdir -p dev/android/build
+          unzip -q -o "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable.mono/android_source.zip" -d dev/android/build
+          touch dev/android/build/.gdignore
+          echo "${GODOT_VERSION}.stable.mono" > dev/android/.build_version
+          # headless editors read SDK/JDK paths + keystore from EditorSettings
+          keytool -genkeypair -keystore /tmp/debug.keystore -storepass android \
+            -alias androiddebugkey -keypass android -keyalg RSA -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+          mkdir -p "$HOME/.config/godot"
+          cat > "$HOME/.config/godot/editor_settings-${GODOT_VERSION}.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+          [resource]
+          export/android/android_sdk_path = "$ANDROID_HOME"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          export/android/debug_keystore = "/tmp/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          EOF
       - name: Build .NET assemblies + export APK
         run: |
           mkdir -p artifacts
