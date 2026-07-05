@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +9,12 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Godot;
 using Lua;
+
+// TRIM/AOT: the docs emitter is a DEV-ONLY CLI mode (`--emit-api`), never part
+// of a shipped game. Its whole job is open-ended reflection over live surface,
+// so trim analysis is noise here; the entry point carries Requires* attributes
+// and the single runtime call site suppresses with that justification.
+#pragma warning disable IL2026, IL2070, IL2075, IL3050
 
 namespace Evaluate;
 
@@ -29,6 +36,8 @@ namespace Evaluate;
 //   godot --headless --path . -- --emit-api <outDir>
 public static class EvaluateDocs
 {
+    [RequiresUnreferencedCode("Dev-only CLI mode: reflects over the full live API surface.")]
+    [RequiresDynamicCode("Dev-only CLI mode: serializes open-ended object graphs.")]
     public static void Emit(string outDir, Action<string>? log = null)
     {
         log ??= _ => { };

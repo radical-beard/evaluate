@@ -3,6 +3,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 
+// TRIM/AOT: dev-only projections of the docs Spec (see EvaluateDocs.cs header).
+#pragma warning disable IL2026, IL3050
+
 namespace Evaluate;
 
 // Renders the collected Spec into the three consumer-facing formats. None of these

@@ -7,6 +7,41 @@ the version is `0.x`, minor bumps may include breaking changes.
 
 ## [Unreleased]
 
+## [0.12.0] — 2026-07-04
+
+### Added
+- **Mobile/AOT export support (Android + iOS).** The library is now
+  trim/AOT-analyzer clean (`IsAotCompatible`; CI fails on any new `IL*`
+  warning). An embedded `ILLink.Descriptors.xml` preserves `Evaluate`, `Lua`,
+  `YamlDotNet`, and `Tomlyn` under consumer trimming — empirically load-bearing
+  for YamlDotNet's untyped frontmatter pipeline under NativeAOT. The two
+  deliberate reflection islands (GodotBinder statics fallback, YAML
+  frontmatter) carry written suppression justifications; the dev-only
+  `--emit-api` docs mode is annotated `RequiresUnreferencedCode`/
+  `RequiresDynamicCode`. See `EXPORTING.md`. (`src/Evaluate/Evaluate.csproj`,
+  `ILLink.Descriptors.xml`, `GodotBinder.cs`, `Frontmatter.cs`,
+  `EvaluateDocs.cs`, `EvaluateDocsWriters.cs`, `EvaluateRuntime.cs`)
+- **`dev/AotSmoke` NativeAOT proof harness.** Publishes a real native binary
+  compiling the production `Frontmatter.cs` and exercising YamlDotNet
+  frontmatter parsing, Lua-CSharp closures/metatables, and Tomlyn scene-shaped
+  documents. `dotnet publish dev/AotSmoke -c Release` → run the binary; CI
+  runs it on every push.
+- **`mobile-smoke` workflow**: analyzer-cleanliness + NativeAOT smoke on
+  macOS, Android APK export (Mono) with a `libe_sqlite3.so` presence check,
+  and iOS Xcode-project export compiled unsigned end-to-end. Plus
+  `dev/export_presets.cfg` presets for both platforms.
+- **`EvaluateRuntime.HotReload`** (default `OS.HasFeature("editor")`): hot
+  reload and all `FileSystemWatcher`s are disabled in exported builds —
+  read-only iOS bundles, battery, and determinism all say so. Hosts may
+  override before adding the runtime to the tree.
+
+### Changed
+- **SQLite provider: `Microsoft.Data.Sqlite` → `Microsoft.Data.Sqlite.Core`
+  + `SQLitePCLRaw.bundle_green`** with explicit init (`SqliteBoot`): iOS uses
+  the system sqlite3 (no native library to carry through the export), other
+  platforms keep bundled `e_sqlite3`. No API change for `save`/`sql`
+  consumers.
+
 ## [0.11.1] — 2026-07-02
 
 ### Fixed

@@ -1,0 +1,8 @@
+<!-- Harness-local trimming roots: mirrors what Evaluate's embedded
+     ILLink.Descriptors.xml gives consuming games (the harness doesn't
+     reference Evaluate.csproj, so it needs its own copy). -->
+<linker>
+  <assembly fullname="Lua" />
+  <assembly fullname="YamlDotNet" />
+  <assembly fullname="Tomlyn" />
+</linker>

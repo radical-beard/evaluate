@@ -42,7 +42,10 @@ public partial class EvaluateRuntime : Node
         // any script discovery, so it works in a bare consumer project.
         if (ArgValue(args, "--emit-api") is { } emitDir)
         {
+            // Dev-only CLI path; exported mobile builds never take this branch.
+#pragma warning disable IL2026, IL3050
             EvaluateDocs.Emit(emitDir, GD.Print);
+#pragma warning restore IL2026, IL3050
             GetTree().Quit();
             return;
         }
@@ -241,8 +244,20 @@ public partial class EvaluateRuntime : Node
 
     // ---- hot reload (default) -------------------------------------------------
 
+    // Hot reload is a development superpower and a production liability:
+    // exported bundles are read-only (iOS) and FileSystemWatcher costs battery.
+    // Default: on wherever the editor feature tag exists, off in exported
+    // templates. Hosts may override before adding the runtime to the tree.
+    public bool HotReload { get; set; } = OS.HasFeature("editor");
+
     private void StartHotReload()
     {
+        if (!HotReload)
+        {
+            GD.Print("[evaluate] hot reload disabled (exported build or host opt-out)");
+            return;
+        }
+
         var targets = _loader.WatchTargets().ToList();
         GD.Print($"[evaluate] hot reload watching {targets.Count} file(s): {string.Join(", ", targets)}");
 

@@ -308,6 +308,11 @@ custom dialect's `+=`.
   e.g. red-underline an unknown `apis:` entry or missing config file *as you
   type* (the loader already rejects both at load). The Lua body itself rides
   the standard Lua LSP.
-- **AOT export & mod packaging/distribution**: not yet built.
+- **AOT export**: built (0.12.0) — trim/AOT-analyzer-clean library, embedded
+  trimming roots, NativeAOT proof harness (`dev/AotSmoke`), hot-reload
+  auto-off in exported builds, iOS-safe SQLite (bundle_green), Android/iOS
+  export presets + the `mobile-smoke` CI lane. Consumer guide: `EXPORTING.md`.
+  Mod packaging/**distribution** (runtime-loading third-party scripts from
+  outside the PCK): still desktop-only, not yet built.
 - Out of scope by decision: a Lua type system (signature contract is enough) and
   sandbox resource limits / DoS protection (modding is free).

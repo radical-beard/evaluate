@@ -1,0 +1,12 @@
+<!-- Trimming roots for Evaluate consumers (Godot mobile exports trim; iOS is
+     NativeAOT). Everything here is reached via reflection-by-name and must
+     survive: Evaluate's own api/binder surface, the Lua VM, and YamlDotNet's
+     untyped pipeline (frontmatter graphs are reference-type-only, so shared
+     generic code suffices — metadata is what trimming would strip).
+     GodotSharp itself is rooted by Godot's export pipeline. -->
+<linker>
+  <assembly fullname="Evaluate" />
+  <assembly fullname="Lua" />
+  <assembly fullname="YamlDotNet" />
+  <assembly fullname="Tomlyn" />
+</linker>

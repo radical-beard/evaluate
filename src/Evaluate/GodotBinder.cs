@@ -35,6 +35,14 @@ public sealed class GodotBinder
 
     // A declared Godot class/enum name -> a "type handle": `new` constructor +
     // Lua-convertible statics (classes), or a value table (enums).
+    //
+    // TRIM/AOT: this is the deliberate reflection island (statics fallback +
+    // Activator for `new`). It is lookup-only — no runtime codegen — and it
+    // reflects exclusively over GodotSharp, which Godot's mobile export pipeline
+    // roots wholesale (plus our ILLink.Descriptors.xml). Safe under Android
+    // Mono AOT and iOS NativeAOT; the pre-baked bindings shrink how often this
+    // path runs, never whether it is safe.
+#pragma warning disable IL2026, IL2070, IL2072, IL2075
     public LuaValue? Resolve(string typeName)
     {
         var type = GodotAssembly.GetType($"Godot.{typeName}");
@@ -192,6 +200,7 @@ public sealed class GodotBinder
         if (type is null || !typeof(GodotObject).IsAssignableFrom(type) || type.IsAbstract) return null;
         return (GodotObject)Activator.CreateInstance(type)!;
     }
+#pragma warning restore IL2026, IL2070, IL2072, IL2075
 
     // Set an engine property from a Lua value, with the same target-type-aware
     // marshalling as `node.prop = v` (so scene-file `position = [0,1,2]` becomes
@@ -659,7 +668,11 @@ public sealed class GodotBinder
         if (elem == typeof(Vector2)) { var a = new Vector2[n]; for (int i = 0; i < n; i++) a[i] = Vec2(t[i + 1]); return a; }
         if (elem == typeof(Vector3)) { var a = new Vector3[n]; for (int i = 0; i < n; i++) a[i] = Vec3(t[i + 1]); return a; }
         if (elem == typeof(Color)) { var a = new Color[n]; for (int i = 0; i < n; i++) a[i] = (Color)StructFromLua(t[i + 1], Variant.Type.Color); return a; }
+        // AOT: unreachable-in-practice fallback — every packed element type Godot
+        // accepts is enumerated above with statically compiled array code.
+#pragma warning disable IL3050
         return Array.CreateInstance(elem, 0);
+#pragma warning restore IL3050
     }
 
     private LuaValue FromClr(object? o) => o switch
