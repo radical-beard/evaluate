@@ -11,3 +11,8 @@ project/assembly_name="Dev"
 
 [editor_plugins]
 enabled=PackedStringArray("res://addons/evaluate_scene/plugin.cfg")
+
+[rendering]
+; Mobile exports hard-require ETC2/ASTC texture import — Godot's validator
+; fails SILENTLY without it (export_plugin.cpp: should_import_etc2_astc()).
+textures/vram_compression/import_etc2_astc=true
