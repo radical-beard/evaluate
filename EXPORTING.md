@@ -29,6 +29,22 @@ The `mobile-smoke` workflow exports the dev harness for both on every push.
 
 ## Per-game checklist
 
+0. **Four requirements Godot enforces (two of them silently):**
+   - `project.godot` must set
+     `[rendering] textures/vram_compression/import_etc2_astc=true` — without
+     it BOTH mobile validators fail with **no error message** (only the
+     "experimental" notice prints; see `has_valid_project_configuration` →
+     `should_import_etc2_astc()` → bare `valid = false`).
+   - A **`<AssemblyName>.sln`** must sit next to `project.godot` — the .NET
+     export refuses C# projects without one, even though the editor never
+     needed it (`dotnet new sln -n <AssemblyName> --format sln`).
+   - Set `application/config/icon` — iOS icon slots fall back to the project
+     icon and hard-fail on an empty path
+     (`Export Icons: Invalid icon (icons/settings_58x58): ''`).
+   - Build the exported iOS project with **Xcode 16+** — Godot 4.6's iOS
+     template links Swift-6-era runtime modules that Xcode 15.x lacks
+     (`__swift_FORCE_LOAD_$_swift_Builtin_float` at link time).
+
 1. **Godot export presets:** copy the shape of `dev/export_presets.cfg`.
    Include your script content in the export filter — `*.evt,*.scene,*.toml`
    ship as **data** inside the PCK (bundled interpreted code is App Store
