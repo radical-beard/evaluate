@@ -5,6 +5,9 @@ config_version=5
 config/name="Evaluate Dev"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.6", "C#", "Forward Plus")
+; iOS export generates every icon slot from the project icon; without one the
+; empty-path fallback hard-fails ("Invalid icon (icons/settings_58x58): ''").
+config/icon="res://icon_1024.png"
 
 [dotnet]
 project/assembly_name="Dev"
