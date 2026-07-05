@@ -34,6 +34,7 @@ public sealed class Sql : IDisposable
     // The DB lives next to the kv store in Godot's per-project user:// dir (save.db).
     public Sql(Action<string> log)
     {
+        SqliteBoot.EnsureInit();
         _log = log;
         var dir = ProjectSettings.GlobalizePath("user://");
         Directory.CreateDirectory(dir);

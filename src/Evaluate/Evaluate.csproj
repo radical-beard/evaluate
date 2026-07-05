@@ -11,7 +11,20 @@
     <Description>A data-driven, hot-reloadable game framework for Godot 4.6 / C#. Gameplay is authored in sandboxed Lua (.evt) scripts + TOML — no engine recompiles.</Description>
     <!-- Referenced libraries must ship beside a dynamically-loaded Godot game. -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!-- Mobile AOT posture: trim/AOT analyzers stay on and clean. iOS exports
+         run under NativeAOT (Godot), Android under Mono — both trim. The two
+         deliberate reflection islands (statics fallback, YAML frontmatter) are
+         suppressed with justifications and covered by ILLink.Descriptors.xml
+         plus the tools/AotSmoke NativeAOT harness. -->
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Preserve the reflection-reached surface when a consuming game trims. -->
+    <EmbeddedResource Include="ILLink.Descriptors.xml">
+      <LogicalName>ILLink.Descriptors.xml</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="GodotSharp" Version="4.6.0" />
@@ -19,7 +32,11 @@
          A plain Microsoft.NET.Sdk lib doesn't add this automatically. -->
     <PackageReference Include="Godot.SourceGenerators" Version="4.6.0" PrivateAssets="all" />
     <PackageReference Include="LuaCSharp" Version="0.5.5" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
+    <!-- Core + bundle_green instead of the meta package: green uses the OS
+         sqlite3 on iOS (no native lib to smuggle through Godot's export) and
+         ships e_sqlite3 for desktop/Android. Init is explicit in SqliteBoot. -->
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.0" />
+    <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.10" />
     <PackageReference Include="Tomlyn" Version="0.19.0" />
     <PackageReference Include="YamlDotNet" Version="16.2.1" />
   </ItemGroup>

@@ -1,0 +1,117 @@
+# Mobile/AOT lane: proves on every push that
+#   1. the library stays trim/AOT-analyzer clean,
+#   2. the reflection-adjacent runtime paths survive REAL NativeAOT (AotSmoke),
+#   3. the dev harness exports for Android (Mono) and iOS (NativeAOT).
+# The export jobs are the expensive canaries; keep them on main + PRs to main.
+name: mobile-smoke
+on:
+  push: { branches: [main, "feat/aot-export"] }
+  pull_request: { branches: [main] }
+
+env:
+  GODOT_VERSION: "4.6"
+  GODOT_RELEASE: "4.6-stable"
+
+jobs:
+  aot-analyzers-and-smoke:
+    runs-on: macos-14   # NativeAOT publish for osx-arm64 mirrors the iOS toolchain family
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: "8.0.x" }
+      - name: Analyzer cleanliness (zero IL warnings)
+        run: |
+          dotnet build src/Evaluate/Evaluate.csproj -c Release --no-incremental 2>&1 | tee build.log
+          ! grep -E "warning IL[0-9]+" build.log
+      - name: NativeAOT smoke (frontmatter YAML + Lua VM + TOML as native binary)
+        run: |
+          dotnet publish tools/AotSmoke/AotSmoke.csproj -c Release
+          ./tools/AotSmoke/bin/Release/net8.0/*/publish/AotSmoke
+
+  android-export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: "8.0.x" }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "17" }
+      - uses: android-actions/setup-android@v3
+      - name: Install Godot (mono) + export templates
+        run: |
+          curl -sSL -o godot.zip "https://github.com/godotengine/godot-builds/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_mono_linux_x86_64.zip"
+          unzip -q godot.zip && sudo mv Godot_v${GODOT_RELEASE}_mono_linux_x86_64/* /usr/local/bin/ && sudo mv /usr/local/bin/Godot_v${GODOT_RELEASE}_mono_linux.x86_64 /usr/local/bin/godot
+          curl -sSL -o templates.tpz "https://github.com/godotengine/godot-builds/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_mono_export_templates.tpz"
+          mkdir -p "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable.mono"
+          unzip -q templates.tpz -d /tmp/tpl
+          mv /tmp/tpl/templates/* "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable.mono/"
+      - name: Install Android gradle build template + editor settings + debug keystore
+        run: |
+          # gradle template (required for .NET Android exports) — the tpz's
+          # contents were moved into the export-templates dir in the prior step
+          mkdir -p dev/android/build
+          unzip -q -o "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable.mono/android_source.zip" -d dev/android/build
+          touch dev/android/build/.gdignore
+          echo "${GODOT_VERSION}.stable.mono" > dev/android/.build_version
+          # headless editors read SDK/JDK paths + keystore from EditorSettings
+          keytool -genkeypair -keystore /tmp/debug.keystore -storepass android \
+            -alias androiddebugkey -keypass android -keyalg RSA -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+          mkdir -p "$HOME/.config/godot"
+          cat > "$HOME/.config/godot/editor_settings-${GODOT_VERSION}.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+          [resource]
+          export/android/android_sdk_path = "$ANDROID_HOME"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          export/android/debug_keystore = "/tmp/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          EOF
+      - name: Build .NET assemblies + export APK
+        run: |
+          mkdir -p artifacts
+          dotnet build dev/Dev.csproj -c Release
+          # twice: first run compiles/enables the C# editor importer plugin,
+          # second imports .scene resources with it active
+          godot --headless --path dev --import || true
+          godot --headless --path dev --import || true
+          godot --headless --path dev --export-debug "Android" ../artifacts/dev-android.apk
+          test -f artifacts/dev-android.apk
+      - name: APK must carry the SQLite native lib (bundle_green / e_sqlite3)
+        run: unzip -l artifacts/dev-android.apk | grep -i e_sqlite3
+      - uses: actions/upload-artifact@v4
+        with: { name: dev-android-apk, path: artifacts/dev-android.apk }
+
+  ios-export:
+    # Godot 4.6's iOS template links Swift-6-era runtime modules; Xcode 15.x
+    # (macos-14 default) lacks them — macos-15 defaults to Xcode 16.
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: "8.0.x" }
+      - name: Install Godot (mono) + export templates
+        run: |
+          curl -sSL -o godot.zip "https://github.com/godotengine/godot-builds/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_mono_macos.universal.zip"
+          unzip -q godot.zip && sudo mv Godot_mono.app /Applications/
+          curl -sSL -o templates.tpz "https://github.com/godotengine/godot-builds/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_mono_export_templates.tpz"
+          mkdir -p "$HOME/Library/Application Support/Godot/export_templates/${GODOT_VERSION}.stable.mono"
+          unzip -q templates.tpz -d /tmp/tpl
+          mv /tmp/tpl/templates/* "$HOME/Library/Application Support/Godot/export_templates/${GODOT_VERSION}.stable.mono/"
+      - name: Export Xcode project (project-only; signing stays local)
+        run: |
+          mkdir -p artifacts/dev-ios
+          dotnet build dev/Dev.csproj -c Release
+          # twice: first run compiles/enables the C# editor importer plugin,
+          # second imports .scene resources with it active
+          /Applications/Godot_mono.app/Contents/MacOS/Godot --headless --path dev --import || true
+          /Applications/Godot_mono.app/Contents/MacOS/Godot --headless --path dev --import || true
+          /Applications/Godot_mono.app/Contents/MacOS/Godot --headless --path dev --export-debug "iOS" ../artifacts/dev-ios/dev.ipa
+          ls -R artifacts/dev-ios | head -40
+      - name: Compile the exported project unsigned (NativeAOT path end-to-end)
+        run: |
+          PROJ=$(find artifacts/dev-ios -name "*.xcodeproj" | head -1)
+          test -n "$PROJ"
+          xcodebuild -project "$PROJ" -configuration Debug -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+      - uses: actions/upload-artifact@v4
+        with: { name: dev-ios-xcode, path: artifacts/dev-ios }

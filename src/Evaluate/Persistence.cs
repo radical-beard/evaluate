@@ -20,6 +20,7 @@ public sealed class Persistence : IDisposable
 
     public Persistence()
     {
+        SqliteBoot.EnsureInit();
         var dir = ProjectSettings.GlobalizePath("user://");
         Directory.CreateDirectory(dir);
 

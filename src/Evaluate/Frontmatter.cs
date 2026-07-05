@@ -103,7 +103,18 @@ public sealed class Frontmatter
     public List<string> Scenes = new();
     public string Body = "";
 
-    private static readonly IDeserializer Yaml = new DeserializerBuilder().Build();
+    private static readonly IDeserializer Yaml = BuildYaml();
+
+    // TRIM/AOT: frontmatter deserializes into Dictionary<string, object> graphs
+    // whose nodes are only strings/lists/dicts — reference types, so NativeAOT's
+    // shared generic code covers them; YamlDotNet metadata survives trimming via
+    // ILLink.Descriptors.xml. Empirically validated by tools/AotSmoke, which runs
+    // THIS parser as a published NativeAOT binary.
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050",
+        Justification = "Reference-type-only object graphs; assemblies rooted; covered by tools/AotSmoke.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026",
+        Justification = "YamlDotNet preserved via embedded ILLink.Descriptors.xml.")]
+    private static IDeserializer BuildYaml() => new DeserializerBuilder().Build();
 
     public static Frontmatter Parse(string source)
     {

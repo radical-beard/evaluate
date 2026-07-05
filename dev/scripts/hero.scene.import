@@ -1,0 +1,14 @@
+[remap]
+
+importer="evaluate.scene"
+type="PackedScene"
+uid="uid://b8h1n601uf7xa"
+path="res://.godot/imported/hero.scene-1f77dd123eaac9defb22a5bab3f06cf2.scn"
+
+[deps]
+
+source_file="res://scripts/hero.scene"
+dest_files=["res://.godot/imported/hero.scene-1f77dd123eaac9defb22a5bab3f06cf2.scn"]
+
+[params]
+
