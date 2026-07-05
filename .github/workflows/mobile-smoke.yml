@@ -25,8 +25,8 @@ jobs:
           ! grep -E "warning IL[0-9]+" build.log
       - name: NativeAOT smoke (frontmatter YAML + Lua VM + TOML as native binary)
         run: |
-          dotnet publish dev/AotSmoke/AotSmoke.csproj -c Release
-          ./dev/AotSmoke/bin/Release/net8.0/*/publish/AotSmoke
+          dotnet publish tools/AotSmoke/AotSmoke.csproj -c Release
+          ./tools/AotSmoke/bin/Release/net8.0/*/publish/AotSmoke
 
   android-export:
     runs-on: ubuntu-latest

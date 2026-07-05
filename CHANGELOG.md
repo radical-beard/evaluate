@@ -21,10 +21,10 @@ the version is `0.x`, minor bumps may include breaking changes.
   `RequiresDynamicCode`. See `EXPORTING.md`. (`src/Evaluate/Evaluate.csproj`,
   `ILLink.Descriptors.xml`, `GodotBinder.cs`, `Frontmatter.cs`,
   `EvaluateDocs.cs`, `EvaluateDocsWriters.cs`, `EvaluateRuntime.cs`)
-- **`dev/AotSmoke` NativeAOT proof harness.** Publishes a real native binary
+- **`tools/AotSmoke` NativeAOT proof harness.** Publishes a real native binary
   compiling the production `Frontmatter.cs` and exercising YamlDotNet
   frontmatter parsing, Lua-CSharp closures/metatables, and Tomlyn scene-shaped
-  documents. `dotnet publish dev/AotSmoke -c Release` → run the binary; CI
+  documents. `dotnet publish tools/AotSmoke -c Release` → run the binary; CI
   runs it on every push.
 - **`mobile-smoke` workflow**: analyzer-cleanliness + NativeAOT smoke on
   macOS, Android APK export (Mono) with a `libe_sqlite3.so` presence check,

@@ -15,7 +15,7 @@
          run under NativeAOT (Godot), Android under Mono — both trim. The two
          deliberate reflection islands (statics fallback, YAML frontmatter) are
          suppressed with justifications and covered by ILLink.Descriptors.xml
-         plus the dev/AotSmoke NativeAOT harness. -->
+         plus the tools/AotSmoke NativeAOT harness. -->
     <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 

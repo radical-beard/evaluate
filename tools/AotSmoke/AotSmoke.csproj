@@ -4,7 +4,7 @@
        publishes a REAL native binary (same compilation model as Godot's iOS
        export) and exercises YamlDotNet frontmatter parsing — via the actual
        production Frontmatter.cs — plus the Lua VM and Tomlyn.
-           dotnet publish dev/AotSmoke -c Release && ./dev/AotSmoke/bin/Release/net8.0/*/publish/AotSmoke -->
+           dotnet publish tools/AotSmoke -c Release && ./tools/AotSmoke/bin/Release/net8.0/*/publish/AotSmoke -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>

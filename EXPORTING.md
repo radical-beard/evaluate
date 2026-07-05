@@ -13,9 +13,9 @@ The `mobile-smoke` workflow exports the dev harness for both on every push.
   with written justifications and covered by the points below.
 - **Trimming roots:** an `ILLink.Descriptors.xml` embedded in the assembly
   preserves `Evaluate`, `Lua`, `YamlDotNet`, and `Tomlyn` when a consuming
-  game enables trimming. This is load-bearing: `dev/AotSmoke` demonstrably
+  game enables trimming. This is load-bearing: `tools/AotSmoke` demonstrably
   fails without it and passes with it.
-- **NativeAOT proof:** `dotnet publish dev/AotSmoke -c Release` builds a real
+- **NativeAOT proof:** `dotnet publish tools/AotSmoke -c Release` builds a real
   native binary running the production frontmatter parser, the Lua VM
   (closures + metatables), and Tomlyn. Run it after touching anything
   reflection-adjacent.

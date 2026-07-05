@@ -309,7 +309,7 @@ custom dialect's `+=`.
   type* (the loader already rejects both at load). The Lua body itself rides
   the standard Lua LSP.
 - **AOT export**: built (0.12.0) — trim/AOT-analyzer-clean library, embedded
-  trimming roots, NativeAOT proof harness (`dev/AotSmoke`), hot-reload
+  trimming roots, NativeAOT proof harness (`tools/AotSmoke`), hot-reload
   auto-off in exported builds, iOS-safe SQLite (bundle_green), Android/iOS
   export presets + the `mobile-smoke` CI lane. Consumer guide: `EXPORTING.md`.
   Mod packaging/**distribution** (runtime-loading third-party scripts from
